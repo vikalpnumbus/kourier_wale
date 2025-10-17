@@ -1,0 +1,44 @@
+{
+  "name": "megatron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "NODE_ENV=development npm i && npx nodemon index.mjs",
+    "start": "NODE_ENV=production node index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rahul44895/MEGATRON.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rahul44895/MEGATRON/issues"
+  },
+  "homepage": "https://github.com/rahul44895/MEGATRON#readme",
+  "dependencies": {
+    "amqplib": "^0.10.8",
+    "axios": "^1.11.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "csv-stringify": "^6.6.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "handlebars": "^4.7.8",
+    "ioredis": "^5.7.0",
+    "joi": "^18.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "mysql2": "^3.14.3",
+    "node-cron": "^4.2.1",
+    "p-limit": "^7.1.0",
+    "playwright": "^1.55.1",
+    "sequelize": "^6.37.7",
+    "sharp": "^0.34.3"
+  }
+}

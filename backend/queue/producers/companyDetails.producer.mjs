@@ -1,0 +1,25 @@
+import queueConfig from "../../configurations/queue.config.mjs";
+import rabbitMQ from "../../configurations/rabbitMQ.config.mjs";
+
+class Class {
+  constructor() {
+    if (
+      !queueConfig?.companyDetails?.exchange ||
+      !queueConfig?.companyDetails?.routingKey
+    ) {
+      throw new Error("Missing exchange and Routing Key.");
+    }
+    this.exchange = queueConfig.companyDetails.exchange;
+    this.routingKey = queueConfig.companyDetails.routingKey;
+  }
+  async publish(data) {
+    try {
+      await rabbitMQ.publish(this.exchange, this.routingKey, data);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+}
+
+const CompanyDetailsProducer = new Class();
+export default CompanyDetailsProducer;

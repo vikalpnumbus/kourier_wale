@@ -1,0 +1,99 @@
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+}
+
+.tooltip-box {
+  position: absolute;
+  padding: 4px 8px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;   /* 🔑 add this */
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none; /* tooltip itself won’t block hover */
+}
+
+/* TOP */
+.tooltip-box.tooltip-top {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+}
+.tooltip-box.tooltip-top::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+/* RIGHT */
+.tooltip-box.tooltip-right {
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%) translateX(6px);
+}
+.tooltip-box.tooltip-right::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #333 transparent transparent;
+}
+
+/* BOTTOM */
+.tooltip-box.tooltip-bottom {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+}
+.tooltip-box.tooltip-bottom::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
+}
+
+/* LEFT */
+.tooltip-box.tooltip-left {
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%) translateX(-6px);
+}
+.tooltip-box.tooltip-left::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent transparent #333;
+}
+
+/* Show on hover */
+.tooltip-wrapper:hover .tooltip-box {
+  opacity: 1;
+  visibility: visible;  /* 🔑 make it visible */
+}
+
+/* Ensure tooltips escape table clipping */
+td {
+  overflow: visible !important;
+}

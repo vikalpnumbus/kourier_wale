@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Courier Wale Invoice</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        font-size: 14px;
+      }
+      .d-flex {
+        display: flex;
+      }
+
+      .justify-content-between {
+        justify-content: space-between;
+      }
+
+      .invoice {
+        border: 1px solid #000;
+        padding: 20px;
+        width: 700px;
+        margin: 0 auto;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        padding-top: 10px;
+        margin-bottom: 10px;
+      }
+      .to-section {
+        /* border-top: 1px solid #000; */
+        border-bottom: 1px solid #000;
+        padding: 10px 0;
+      }
+      .order-info {
+        margin-top: 10px;
+        margin-bottom: 15px;
+      }
+      .barcode {
+        text-align: right;
+      }
+      .barcode img {
+        height: 100px;
+        width: 250px;
+      }
+      .details {
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid #000;
+        border-bottom: 1px solid #000;
+        padding: 10px 0;
+        margin-top: 10px;
+      }
+      .details div {
+        width: 45%;
+        text-align: center;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #000;
+      }
+      th,
+      td {
+        padding: 6px;
+        text-align: left;
+      }
+      .footer {
+        text-align: left;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+      .powered {
+        text-align: right;
+        font-size: 11px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div>{{invoice_generated_date}}</div>
+      <div>Megatron</div>
+    </div>
+    <div class="invoice">
+      <div class="to-section">
+        <b>To:</b><br />
+        {{shippingDetails_fname}} {{shippingDetails_lname}}<br />
+        {{shippingDetails_address}}, {{shippingDetails_city}},
+        {{shippingDetails_state}}, {{shippingDetails_country}}<br />
+        {{shippingDetails_pincode}}<br />
+        <b>Primary Phone: </b>{{shippingDetails_phone}}<br />
+        <b>Alternate Phone: </b>{{shippingDetails_alternate_phone}}<br />
+      </div>
+
+      <div class="order-info d-flex justify-content-between">
+        <div>
+          Order Date:<b> {{order_date}}</b><br />
+          Invoice No: <b>{{invoice_no}}</b>
+        </div>
+        <div class="barcode">
+          <img
+            src="https://api-bwipjs.metafloor.com/?bcid=code128&text={{awb_number}}&scale=2&includetext"
+            alt="Barcode"
+          />
+        </div>
+      </div>
+
+      <div class="details">
+        <div>
+          <b>{{paymentType}}</b><br />
+          ₹{{total_price}}<br />
+          WEIGHT: {{packageDetails_weight}}KG
+        </div>
+        <div>
+          {{courier_name}}<br />
+          {{awb_number}}<br />
+          Dimensions (cm): {{packageDetails_length}} X
+          {{packageDetails_breadth}} X {{packageDetails_height}}
+        </div>
+      </div>
+
+      <table>
+        {{#if products}}
+        <tr>
+          <th>Item Name</th>
+          <th>Item SKU</th>
+          <th>Qty.</th>
+          <th>Amount</th>
+        </tr>
+        {{#each products}}
+        <tr>
+          <td>{{this.name}}</td>
+          <td>{{this.sku}}</td>
+          <td>{{this.qty}}</td>
+          <td>{{this.price}}</td>
+        </tr>
+        {{/each}} {{/if}}
+      </table>
+
+      {{#ifEqual pickupWarehouse_full_address rtoWarehouse_full_address}}
+      <div class="order-info">
+        <b>Pickup & RTO Address:</b><br />
+        {{pickupWarehouse_full_address}}<br />
+        Mobile No. {{pickupWarehouse_contactPhone}}<br />
+      </div>
+      {{else}}
+      <div class="order-info">
+        <b>Pickup Address:</b><br />
+        {{pickupWarehouse_full_address}}<br />
+        Mobile No. {{pickupWarehouse_contactPhone}}<br />
+      </div>
+
+      <div class="order-info">
+        <b>RTO Address:</b><br />
+        {{rtoWarehouse_full_address}}<br />
+        Mobile No. {{rtoWarehouse_contactPhone}}<br />
+      </div>
+      {{/ifEqual}}
+
+      <div class="order-info">
+        <b>For any query please contact::</b><br />
+        Phone: <b>{{support_phone}}</b>, Email:<b> {{support_email}}</b>
+      </div>
+
+      <div class="order-info">
+        This is computer generated document, hence does not required
+        signature.<br />
+        <b>Note:</b> All disputes are subject to Delhi jurisdiction. Goods once
+        sold will only be taken back or exchanged as per the store's
+        exchange/return policy
+      </div>
+
+      <div class="powered">Powered By Megatron</div>
+    </div>
+  </body>
+</html>

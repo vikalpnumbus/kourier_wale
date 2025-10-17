@@ -1,0 +1,134 @@
+.form-textarea {
+  height: auto !important;
+}
+
+.css-hlgwow {
+  padding: 6px 8px !important;
+}
+
+.css-13cymwt-control {
+  border: 1px solid #dee2e6 !important;
+}
+
+.rmdp-shadow {
+  /* box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.1) !important; */
+  box-shadow: none !important;
+}
+
+.rmdp-range {
+  background-color: #0074d9 !important;
+  box-shadow: none !important;
+}
+
+.rmdp-day span:hover {
+  background-color: #0074d9c9 !important;
+}
+
+.rmdp-day.rmdp-today span {
+  background-color: #99999952 !important;
+}
+
+.css-hlgwow {
+  padding-left: 24px !important;
+}
+
+.item-icon {
+  background-color: #f9f9fb;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.3rem;
+  color: #3d445c;
+  width: 2.3rem;
+}
+
+.delivery-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
+  padding-left: 20px;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  border: 2px solid;
+  background: #fff;
+}
+
+.timeline-marker.start {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  background: orange;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  top: 2px;
+}
+
+.timeline-marker.start::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3.5px;
+  width: 3px;
+  height: 3px;
+  background: black;
+  border-radius: 50%;
+}
+
+.timeline-marker.end {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  background: teal;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  top: 2px;
+}
+
+
+.timeline-marker.end::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3.5px;
+  width: 3px;
+  height: 3px;
+  background: black;
+  border-radius: 50%;
+}
+
+.timeline-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 15px;
+  width: 0;
+  height: calc(100% + 1.5rem);
+  border-left: 1.5px dashed #999;
+}
+
+.timeline-content {
+  margin-left: 25px;
+}
+
+
+.label_setting {
+    height: 70px;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 15px;
+    cursor: pointer;
+}
