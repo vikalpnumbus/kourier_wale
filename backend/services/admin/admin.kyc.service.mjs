@@ -1,5 +1,5 @@
-import KycProducer from "../queue/producers/kyc.producer.mjs";
-import FactoryRepository from "../repositories/factory.repository.mjs";
+import KycProducer from "../../queue/producers/kyc.producer.mjs";
+import FactoryRepository from "../../repositories/factory.repository.mjs";
 
 class Service {
   constructor() {

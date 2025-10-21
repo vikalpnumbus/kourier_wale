@@ -19,6 +19,9 @@ import ServiceablePincodesRouter from "../controllers/serviceablePincodes.router
 import ShippingRouter from "./shipping.router.mjs";
 import CourierAWBListRouter from "./courierAWBList.router.mjs";
 import LabelSettingsRouter from "./labelSettings.router.mjs";
+import ChannelRouter from "./channel.router.mjs";
+import AdminUserRouter from "./admin/admin.user.router.mjs";
+import AdminKYCRouter from "./admin/admin.kyc.route.mjs";
 
 const globalRouter = express.Router();
 
@@ -37,8 +40,13 @@ globalRouter.use("/pricing-card-courier", CourierPricingCardRouter);
 globalRouter.use("/user-courier", UserCourierRouter);
 globalRouter.use("/serviceable-pincodes", ServiceablePincodesRouter);
 globalRouter.use("/shipping", ShippingRouter);
-globalRouter.use("/courier-awb-list", CourierAWBListRouter);
 globalRouter.use("/label-settings", LabelSettingsRouter);
+globalRouter.use("/channel", ChannelRouter);
+
+// Admin Routes
+globalRouter.use("/admin/courier-awb-list", CourierAWBListRouter);
+globalRouter.use("/admin/users", AdminUserRouter);
+globalRouter.use("/admin/kyc", AdminKYCRouter);
 
 globalRouter.use("/uploads", ImageRouter);
 globalRouter.get(

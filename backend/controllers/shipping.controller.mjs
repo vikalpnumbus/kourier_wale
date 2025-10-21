@@ -47,7 +47,7 @@ export const create = async (req, res, next) => {
       res.success({ data: "Creating Shipments." });
     }
   } catch (error) {
-    console.log('error: ', error);
+    console.error('error: ', error);
     next({ status: error.status, message: error.details || error.message });
   }
 };

@@ -8,7 +8,7 @@ import api from "../../../utils/api";
 
 function ShipModal({ orderData, onClose }) {
   const [shipData, setShipData] = useState({
-    order_db_ids: "",
+    order_id: "",
     warehouse_id: "",
     rto_warehouse_id: "",
     courier_id: "",
@@ -105,7 +105,7 @@ function ShipModal({ orderData, onClose }) {
   const handleCourierSelect = (rate, index) => {
     setSelectedIndex(index);
     setShipData({
-      order_db_ids: [orderData?.id] || [],
+      order_id: orderData?.id || "",
       warehouse_id: orderData?.warehouse_id || "",
       rto_warehouse_id: orderData?.rto_warehouse_id || "",
       courier_id: rate.courier_id || "",
@@ -115,6 +115,21 @@ function ShipModal({ orderData, onClose }) {
       plan_id: planid || "",
     });
   };
+
+  // const handleSubmit = () => {
+  //   const newErrors = validateForm(form);
+  //   if (Object.keys(newErrors).length > 0) {
+  //     setErrors(newErrors);
+  //     return;
+  //   }
+  //   if (!shipData.courier_id) {
+  //     alert("Please select a courier before shipping.");
+  //     return;
+  //   }
+  //   console.log("🚚 Final Shipping Data:", shipData);
+  //   onClose();
+  // };
+
 
   const handleSubmit = async () =>
   {

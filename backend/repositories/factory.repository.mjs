@@ -1,4 +1,5 @@
 import BankDetailsModel from "../model/bankDetails.sql.model.mjs";
+import ChannelModel from "../model/channel.sql.model.mjs";
 import CourierModel from "../model/courier.sql.model.mjs";
 import CourierAWBListModel from "../model/courierAWBList.sql.model.mjs";
 import CourierPricingCardModel from "../model/courierPricingCard.sql.model.mjs";
@@ -15,19 +16,6 @@ import UserModel from "../model/user.sql.model.mjs";
 import UserCourierModel from "../model/user_courier.sql.model.mjs";
 import WarehouseModel from "../model/warehouse.sql.model.mjs";
 import { BaseRepositoryClass } from "./base.sql.repository.mjs";
-// import { BankDetailsRepositoryClass } from "./bankDetails.sql.repository.mjs";
-// import { CourierRepositoryClass } from "./courier.sql.repository.mjs";
-// import { CourierPricingCardRepositoryClass } from "./courierPricingCard.repository.mjs";
-// import { CSVRepositoryClass } from "./csvLogs.repository.mjs";
-// import { KYCRepositoryClass } from "./kyc.sql.repository.mjs";
-// import { OrdersRepositoryClass } from "./orders.sql.repository.mjs";
-// import { OtpRepositoryClass } from "./otp.sql.repository.mjs";
-// import { PricingCardRepositoryClass } from "./pricingCard.repository.mjs";
-// import { PricingPlansRepositoryClass } from "./pricingPlans.repository.mjs";
-// import { ProductsRepositoryClass } from "./products.sql.repository.mjs";
-// import { ServiceablePincodeRepositoryClass } from "./serviceablePincode.repository.mjs";
-// import { UserCourierRepositoryClass } from "./user_courier.sql.repository.mjs";
-// import { WarehouseRepositoryClass } from "./warehouse.sql.repository.mjs";
 
 class Class {
   getRepository(model) {
@@ -50,6 +38,7 @@ class Class {
 
       shipping: new BaseRepositoryClass(ShippingModel),
       courierAWBList: new BaseRepositoryClass(CourierAWBListModel),
+      channel: new BaseRepositoryClass(ChannelModel),
     };
 
     if (!repositories[model]) {

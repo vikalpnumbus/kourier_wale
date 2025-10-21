@@ -12,7 +12,7 @@ const limit = pLimit(10);
 
 const shippingCron = cron.schedule("* * * * *", async () => {
   try {
-    console.log(
+    console.info(
       "⏰ Cron job running every minute:",
       new Date().toLocaleString()
     );

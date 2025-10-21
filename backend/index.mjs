@@ -6,6 +6,8 @@ import rabbitMQ from "./configurations/rabbitMQ.config.mjs";
 import globalRouter from "./routes/index.mjs";
 import { Worker } from "node:worker_threads";
 import redisClient from "./configurations/redis.config.mjs";
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const { PORT } = config;
 const app = express();
@@ -18,6 +20,9 @@ new Worker("./workers/orders.worker.mjs");
 new Worker("./workers/shipping.worker.mjs");
 new Worker("./workers/products.worker.mjs");
 new Worker("./workers/warehouse.worker.mjs");
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(cors());
 app.use(express.json());
@@ -34,6 +39,15 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/v1", globalRouter);
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// All other requests should return React's index.html
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+});
+
 
 app.use((error, req, res, next) => {
   const errorConfig = {

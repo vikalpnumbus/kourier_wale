@@ -26,20 +26,10 @@ class RedisClient {
 
       this.redis.on("end", () => {
         console.warn("🟡 Redis connection closed. Retrying...");
-        if (attempt > MAX_ATTEMPTS) {
-          console.error(
-            `❌ Failed to connect to Redis after ${attempt - 1} attempts.`
-          );
 
-          // Retry after 10 seconds
-          setTimeout(() => {
-            this.connect(1);
-          }, 10 * 1000);
-        } else {
-          setTimeout(() => {
-            this.connect(attempt + 1);
-          }, attempt * 1000);
-        }
+        setTimeout(() => {
+          this.connect(attempt + 1);
+        }, attempt * 1000);
       });
     } catch (error) {
       console.error(

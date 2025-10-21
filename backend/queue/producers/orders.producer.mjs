@@ -10,15 +10,28 @@ class Class {
       throw new Error("Missing exchange and Routing Key.");
     }
 
-    this.import_exchange = queueConfig.orders.exchange;
+    this.exchange = queueConfig.orders.exchange;
     this.import_routingKey = queueConfig.orders.import.routingKey;
+    this.create_routingKey = queueConfig.orders.create.routingKey;
   }
 
   async publishImportFile(data) {
     try {
       await rabbitMQ.publish(
-        this.import_exchange,
+        this.exchange,
         this.import_routingKey,
+        data
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async publishCreateOrder(data) {
+    try {
+      await rabbitMQ.publish(
+        this.exchange,
+        this.create_routingKey,
         data
       );
     } catch (error) {

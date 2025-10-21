@@ -10,15 +10,26 @@ class Service {
 
   async create({ files, data }) {
     try {
-      const { userId, name, sku, category, price } = data;
-
-      const result = await this.repository.save({
+      const {
         userId,
         name,
         sku,
         category,
         price,
-      });
+        channel_name,
+        channel_product_id,
+      } = data;
+
+      const payload = {
+        userId,
+        name,
+        sku,
+        category,
+        price,
+        channel_name:channel_name||null,
+        channel_product_id:channel_product_id||null,
+      };
+      const result = await this.repository.save(payload);
 
       if (files) {
         ProductsProducer.publish({

@@ -44,7 +44,6 @@ export const create = async (req, res, next) => {
       throw CourierAWBListService.error;
     }
     res.success(result);
-    res.send("hii");
   } catch (error) {
     next({ status: error.status, message: error.details || error.message });
   }
@@ -55,8 +54,10 @@ export const read = async (req, res, next) => {
     const query = {
       page: req.query.page,
       limit: req.query.limit,
-      search: req.query.search,
-      id: req.params.id || undefined,
+      id: req.params?.id,
+      awb_number: req.query?.awb_number,
+      mode: req.query?.mode,
+      courier_id: req.query?.courier_id,
     };
 
     const result = await CourierAWBListService.read(query);

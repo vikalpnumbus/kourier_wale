@@ -70,7 +70,7 @@ export const create = async (req, res, next) => {
 
 export const read = async (req, res, next) => {
   try {
-    const result = await KYCService.view({ userId: req.user.id });
+    const result = await KYCService.read({ userId: req.user.id });
     if (!result) {
       throw KYCService.error;
     }

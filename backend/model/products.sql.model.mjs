@@ -55,6 +55,16 @@ const ProductsModel = sqlDB.sequelize.define(
       type: DataTypes.JSON, // array of strings
       defaultValue: [],
     },
+
+    channel_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    channel_product_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     timestamps: true,

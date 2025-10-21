@@ -471,7 +471,8 @@ class Service {
         isPhoneVerified: e.isPhoneVerified,
         isEmailVerified: e.isEmailVerified,
         pricingPlanId: e.pricingPlanId,
-
+        companyName: e.companyName,
+        createdAt: e.createdAt,
         token: TokenHandler.generateToken({
           id: e.id,
           role: e.role,

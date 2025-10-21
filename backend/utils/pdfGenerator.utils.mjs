@@ -65,7 +65,6 @@ export class PdfGenerator {
       pdfOptions.scale = 0.6;
     }
 
-    console.log("pdfOptions: ", pdfOptions);
     const pdfBuffer = await page.pdf(pdfOptions);
     await browser.close();
 

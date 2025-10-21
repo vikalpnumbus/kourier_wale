@@ -8,6 +8,7 @@ import UserService from "./user.service.mjs";
 import CourierService from "./courier.service.mjs";
 import XpressBeesProvider from "../providers/couriers/xpressbees.provider.mjs";
 import CourierAWBListService from "./courierAWBList.service.mjs";
+import ChannelService from "./channel.service.mjs";
 
 class Service {
   constructor() {
@@ -500,7 +501,7 @@ class Service {
 
       if (!allowedStatusesForCancellation.includes(shipping_status)) {
         const error = new Error(
-          `Shipment cannot be cancelled with status as ${shipping_status}.`
+          `Shipment status is ${shipping_status}. It cannot be cancelled.`
         );
         error.status = 400;
         throw error;

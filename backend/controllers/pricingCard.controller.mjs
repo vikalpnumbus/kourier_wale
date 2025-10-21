@@ -326,7 +326,6 @@ export const priceCalculator = async (req, res, next) => {
     data["totalPrice"] = totalPrice;
 
     return {
-      courier_id: data.courierId,
       courier_name: data.courier_name,
       cod_charge: Math.max(data.codPercentagePrice, data.cod_amount),
       freight_charge: data.zoneBasePrice,

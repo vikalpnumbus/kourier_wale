@@ -38,9 +38,9 @@ const queueConfig = {
       routingKey: "orders_import_routingKey",
       queue: "orders_import_queue",
     },
-    export: {
-      routingKey: "orders_export_routingKey",
-      queue: "orders_export_queue",
+    create: {
+      routingKey: "orders_create_routingKey",
+      queue: "orders_create_queue",
     },
   },
   shipping: {

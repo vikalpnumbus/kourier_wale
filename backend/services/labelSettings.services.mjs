@@ -230,8 +230,6 @@ class Service {
       const shipmentsCanBeShipped = shipping.filter(
         (e) => e.awb_number && e.shipping_status != "cancelled"
       );
-      console.log("shipmentsCannotBeShipped: ", shipmentsCannotBeShipped);
-      // console.log("shipmentsCanBeShipped: ", shipmentsCanBeShipped);
 
       const templateHtml = fs.readFileSync(
         "templates/label.template.html",

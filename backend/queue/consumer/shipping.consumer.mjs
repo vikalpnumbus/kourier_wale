@@ -95,7 +95,7 @@ class Class {
         { exchange: this.exchange, routingKey: this.routingKey }
       );
     } catch (error) {
-      // console.log(error);
+      console.error(error);
     }
   }
 
@@ -144,7 +144,7 @@ class Class {
         { exchange: this.exchange, routingKey: this.cancel_routingKey }
       );
     } catch (error) {
-      // console.log(error);
+      console.error(error);
     }
   }
 
@@ -177,7 +177,7 @@ class Class {
         { exchange: this.exchange, routingKey: this.retry_routingKey }
       );
     } catch (error) {
-      // console.log(error);
+      console.error(error);
     }
   }
 }

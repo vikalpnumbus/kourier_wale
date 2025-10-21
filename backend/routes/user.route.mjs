@@ -7,11 +7,9 @@ import {
   save2,
   handleTokenCallback,
   resendOTP,
-  userList,
 } from "../controllers/user.controller.mjs";
 import UserValidations from "../validators/user.validator.mjs";
 import validate from "../middlewares/validator.mjs";
-import TokenHandler from "../middlewares/tokenHandler.mjs";
 const UserRouter = express.Router();
 
 UserRouter.post("/register/step1", validate(UserValidations.save1()), save1);
@@ -30,7 +28,5 @@ UserRouter.post(
   validate(UserValidations.resetPassword()),
   resetPassword
 );
-
-UserRouter.get("/list", TokenHandler.authenticateToken, userList);
 
 export default UserRouter;

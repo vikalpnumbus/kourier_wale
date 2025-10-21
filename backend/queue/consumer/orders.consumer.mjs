@@ -15,18 +15,18 @@ class Class {
     if (
       !queueConfig?.orders?.exchange ||
       !queueConfig?.orders?.import?.queue ||
-      !queueConfig?.orders?.export?.queue
+      !queueConfig?.orders?.create?.queue
     ) {
       throw new Error("Missing exchange and Consumer.");
     }
 
-    this.import_exchange = queueConfig.orders.exchange;
+    this.exchange = queueConfig.orders.exchange;
 
     this.import_queue = queueConfig.orders.import.queue;
     this.import_routingKey = queueConfig.orders.import.routingKey;
 
-    this.export_queue = queueConfig.orders.export.queue;
-    this.export_routingKey = queueConfig.orders.export.routingKey;
+    this.create_queue = queueConfig.orders.create.queue;
+    this.create_routingKey = queueConfig.orders.create.routingKey;
 
     this.repository = FactoryRepository.getRepository("orders");
     this.limit = pLimit(225);
@@ -192,17 +192,32 @@ class Class {
 
           console.timeEnd("bulk-import-orders");
         },
-        { exchange: this.import_exchange, routingKey: this.import_routingKey }
+        { exchange: this.exchange, routingKey: this.import_routingKey }
       );
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  async exportConsume() {
+  async createOrderConsumer() {
     try {
-      await rabbitMQ.consume(this.export_queue, async (msg) => {});
-    } catch (error) {}
+      await rabbitMQ.consume(
+        this.create_queue,
+        async (msg) => {
+          console.time("bulk-create-orders");
+          await msg.map(async (order) => {
+            const savedOrder = await OrdersService.create({ data: order });
+            if(!savedOrder){
+              console.error(OrdersService.error)
+            }
+          });
+          console.timeEnd("bulk-create-orders");
+        },
+        { exchange: this.exchange, routingKey: this.create_routingKey }
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }
 

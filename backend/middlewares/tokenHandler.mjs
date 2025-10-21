@@ -42,6 +42,21 @@ class Class {
         throw error;
       }
 
+      const adminRoutes = [
+        "/api/v1/admin/users/list",
+        "/api/v1/admin/kyc/verify",
+        "/api/v1/admin/courier-awb-list",
+      ];
+
+      console.log("req.originalUrl: ", req.originalUrl);
+      if (adminRoutes.includes(req.originalUrl?.toLowerCase())) {
+        if (existingUser.role != "admin") {
+          const error = new Error("Access denied.");
+          error.status = 403;
+          throw error;
+        }
+      }
+
       req.user = data;
       next();
     } catch (error) {

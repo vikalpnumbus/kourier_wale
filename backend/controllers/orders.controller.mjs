@@ -207,3 +207,19 @@ export const bulkExport = async (req, res, next) => {
     next(error);
   }
 };
+
+export const cancelOrder = async (req, res, next) => {
+  try {
+    const query = { userId: req.user.id };
+    if (req.params.id) {
+      query.id = req.params.id;
+    }
+    const result = await OrdersService.cancelOrder(query);
+    if (!result) {
+      throw OrdersService.error;
+    }
+    res.success(result);
+  } catch (error) {
+    next(error);
+  }
+};

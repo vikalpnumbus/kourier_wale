@@ -99,7 +99,7 @@ const UserModel = sqlDB.sequelize.define(
 
     pricingPlanId: {
       type: DataTypes.INTEGER,
-      defaultValue: 4,
+      defaultValue: 1,
     },
 
     wallet_balance: {
@@ -108,10 +108,16 @@ const UserModel = sqlDB.sequelize.define(
       defaultValue: 0,
     },
 
+    credit_limit: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+
     label_settings: {
       type: DataTypes.JSON,
       defaultValue: {
-        paper_size: "standard",
+        paper_size: "thermal",
       },
     },
   },

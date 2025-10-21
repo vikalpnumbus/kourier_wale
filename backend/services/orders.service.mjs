@@ -3,6 +3,8 @@ import OrdersProducer from "../queue/producers/orders.producer.mjs";
 import FactoryRepository from "../repositories/factory.repository.mjs";
 import ProductsService from "./products.service.mjs";
 import WarehouseService from "./warehouse.service.mjs";
+import ChannelService from "./channel.service.mjs";
+import ShopifyProvider from "../providers/couriers/shopify.provider.mjs";
 
 class Service {
   constructor() {
@@ -39,29 +41,33 @@ class Service {
         throw error;
       }
 
-      const foundWarehouses = await WarehouseService.read({
-        id: warehouse_id,
-      });
-      if (!foundWarehouses) {
-        const error = new Error("Warehouse with given ID does not found.");
-        error.status = 400;
-        throw error;
-      }
+      if (warehouse_id) {
+        const foundWarehouses = await WarehouseService.read({
+          id: warehouse_id,
+        });
+        if (!foundWarehouses) {
+          const error = new Error("Warehouse with given ID does not found.");
+          error.status = 400;
+          throw error;
+        }
 
-      const checkWarehouseExistence = new Set(
-        foundWarehouses?.data?.result?.map((e) => e.id + "")
-      );
-
-      const missingWarehouseIds = !checkWarehouseExistence.has(warehouse_id)
-        ? [warehouse_id]
-        : [];
-
-      if (missingWarehouseIds.length > 0) {
-        const error = new Error(
-          `Warehouse with IDs ${missingWarehouseIds.join(", ")} does not exist.`
+        const checkWarehouseExistence = new Set(
+          foundWarehouses?.data?.result?.map((e) => e.id + "")
         );
-        error.status = 422;
-        throw error;
+
+        const missingWarehouseIds = !checkWarehouseExistence.has(warehouse_id)
+          ? [warehouse_id]
+          : [];
+
+        if (missingWarehouseIds.length > 0) {
+          const error = new Error(
+            `Warehouse with IDs ${missingWarehouseIds.join(
+              ", "
+            )} does not exist.`
+          );
+          error.status = 422;
+          throw error;
+        }
       }
 
       const payload = { ...data, products };
@@ -153,9 +159,10 @@ class Service {
         paymentType,
         start_date,
         end_date,
+        ...filters
       } = params;
 
-      const whereClause = { [Op.and]: [] };
+      const whereClause = { [Op.and]: [], ...filters };
 
       // Direct equality filters
       if (userId) whereClause[Op.and].push({ userId });
@@ -274,76 +281,23 @@ class Service {
       // fill products in each order record
       result = await Promise.all(
         result.map(async (e) => {
-          // ✅ make sure e.products is always an array
-          const productsArray = Array.isArray(e.products) ? e.products : [];
-
-          // ✅ get product IDs
-          let productIDs = productsArray.map((product) => product.id).join(",");
+          let productIDs = e.products.map((product) => product.id).join(",");
           productIDs = productIDs
             .split(",")
-            .map((id) => id?.trim())
+            .map((e) => e?.trim())
             .filter(
-              (id) => id && id !== "null" && id !== "undefined" && id !== "false"
+              (e) => e && e !== "null" && e !== "undefined" && e != "false"
             );
 
-          // ✅ fetch product details
-          let foundProducts = [];
-          if (productIDs.length > 0) {
-            foundProducts = (await ProductsService.read({ id: productIDs })).data
-              .result;
+          let foundProducts = (await ProductsService.read({ id: productIDs }))
+            .data.result;
 
-            foundProducts = foundProducts.map((product) => ({
-              ...product.dataValues,
-              ...productsArray.find((curr) => curr.id == product.id),
-            }));
-          }
+          foundProducts = foundProducts.map((product) => ({
+            ...product.dataValues,
+            ...e.products.filter((curr) => curr.id == product.id)[0],
+          }));
 
-          // ✅ JSON safe parser
-          const safeParse = (data) => {
-            try {
-              if (!data) return {};
-              return typeof data === "string" ? JSON.parse(data) : data;
-            } catch (err) {
-              console.warn("Invalid JSON field:", err, data);
-              return {};
-            }
-          };
-
-          // ✅ parse JSON fields
-
-          const shippingDetails = safeParse(e.dataValues.shippingDetails);
-          const packageDetails = safeParse(e.dataValues.packageDetails);
-          const paymentDetails = safeParse(e.dataValues.paymentDetails);
-
-          // ✅ construct payload
-          const payload = {
-            ...e.dataValues,
-            products: foundProducts,
-            shippingDetails: {
-              phone: shippingDetails.phone || "",
-              fname: shippingDetails.fname || "",
-              lname: shippingDetails.lname || "",
-              address: shippingDetails.address || "",
-              city: shippingDetails.city || "",
-              state: shippingDetails.state || "",
-              country: shippingDetails.country || "",
-              pincode: shippingDetails.pincode || "",
-            },
-            packageDetails: {
-              weight: packageDetails.weight || "",
-              length: packageDetails.length || "",
-              height: packageDetails.height || "",
-              breadth: packageDetails.breadth || "",
-              volumetricWeight: packageDetails.volumetricWeight || 0,
-            },
-            paymentDetails: {
-              shipping: paymentDetails.shipping || 0,
-              tax_amount: paymentDetails.tax_amount || 0,
-              cod: paymentDetails.cod || 0,
-              discount: paymentDetails.discount || 0,
-            },
-          };
-
+          const payload = { ...e.dataValues, products: foundProducts };
           delete payload.productIDs;
           return payload;
         })
@@ -492,6 +446,50 @@ class Service {
             "Product Total Amount": null,
             "Orders Product section": e.products,
           })),
+        },
+      };
+    } catch (error) {
+      this.error = error;
+      return false;
+    }
+  }
+
+  async cancelOrder(params) {
+    try {
+      const { id, userId } = params;
+      const order = (await this.read({ id, userId }))?.data?.result?.[0];
+      if (!order) {
+        const error = new Error("No record found.");
+        error.status = 404;
+        throw error;
+      }
+
+      const { channel_id, channel_order_id } = order;
+      const channelDataRes =
+        (await ChannelService.read({ id: channel_id })) || null;
+      const channelData = channelDataRes?.data?.result?.[0];
+      if (channelData.channel == "shopify") {
+        const shopDomain = channelData.channel_host;
+        const accessToken = channelData.access_token;
+        const response = await ShopifyProvider.cancelOrder(
+          shopDomain,
+          accessToken,
+          channel_order_id
+        );
+        if (!response.order.cancel_reason) {
+          throw new Error("Unable to cancel the order on shopify.");
+        }
+      }
+
+      const cancelOrderRes = this.update({ id, shipping_status: "cancelled" });
+      if (!cancelOrderRes) {
+        throw new Error("Unable to cancel the order on our platform.");
+      }
+      return {
+        status: 200,
+        data: {
+          message: "Order has been cancelled successfully.",
+          id: id,
         },
       };
     } catch (error) {

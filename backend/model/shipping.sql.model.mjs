@@ -106,6 +106,16 @@ const ShippingModel = sqlDB.sequelize.define(
       },
     },
 
+    channel_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    channel_order_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
     // Courier Package Details (nested → JSON)
     courierPackageDetails: {
       type: DataTypes.JSON,

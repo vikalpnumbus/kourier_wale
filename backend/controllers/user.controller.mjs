@@ -112,16 +112,6 @@ export const userList = async (req, res, next) => {
 
     if (id) query.id = id;
 
-    const user = await UserService.read({ id: req.user.id });
-    if (!user) throw UserService.error;
-
-    const isAdmin = user.role == "admin";
-    if (!isAdmin) {
-      const error = new Error("You don't have access to this resource");
-      error.status = 403;
-      throw error;
-    }
-
     const userList = await UserService.readList(query);
     if (!userList) throw UserService.error;
 

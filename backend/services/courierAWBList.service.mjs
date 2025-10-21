@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import sqlDB from "../configurations/sql.config.mjs";
 import FactoryRepository from "../repositories/factory.repository.mjs";
 import CourierService from "./courier.service.mjs";
@@ -55,20 +56,30 @@ class Service {
 
   async read(params) {
     try {
-      const { page = 1, limit = 50, id, search, ...filters } = params;
+      const {
+        page = 1,
+        limit = 50,
+        id,
+        awb_number,
+        mode,
+        courier_id,
+      } = params;
 
       // Build where condition
-      let where = { ...filters };
+      const whereClause = { [Op.and]: [] };
 
-      if (id) {
-        where.id = id;
-      }
+      if (id) whereClause[Op.and].push({ id });
+      if (awb_number) whereClause[Op.and].push({ awb_number });
+      if (mode) whereClause[Op.and].push({ mode });
+      if (courier_id) whereClause[Op.and].push({ courier_id });
+
+      if (!whereClause[Op.and].length) delete whereClause[Op.and];
 
       let result;
       let totalCount;
 
       if (id) {
-        result = await this.repository.find(where);
+        result = await this.repository.find(whereClause);
         if (!result) {
           const error = new Error("No record found.");
           error.status = 404;
@@ -76,8 +87,8 @@ class Service {
         }
         totalCount = result.length;
       } else {
-        result = await this.repository.find(where, { page, limit });
-        totalCount = await this.repository.countDocuments(where);
+        result = await this.repository.find(whereClause, { page, limit });
+        totalCount = await this.repository.countDocuments(whereClause);
 
         if (!result || result.length === 0) {
           const error = new Error("No records found.");
@@ -152,7 +163,7 @@ class Service {
       });
     } catch (error) {
       this.error = error;
-      console.log(error);
+      console.error(error);
       return false;
     }
   }

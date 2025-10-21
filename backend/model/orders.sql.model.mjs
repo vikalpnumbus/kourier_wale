@@ -124,14 +124,23 @@ const OrdersModel = sqlDB.sequelize.define(
 
     rto_warehouse_id: {
       type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "UNKNOWN",
+      allowNull: true,
     },
 
     shipping_status: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue:'new'
+      defaultValue: "new",
+    },
+
+    channel_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    channel_order_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

@@ -9,6 +9,7 @@ import {
   remove,
   bulkImport,
   bulkExport,
+  cancelOrder,
 } from "../controllers/orders.controller.mjs";
 import upload from "../middlewares/multer.mjs";
 import FileValidator from "../validators/file.validator.mjs";
@@ -40,5 +41,7 @@ OrdersRouter.post(
   FileValidator.validate,
   bulkImport
 );
+
+OrdersRouter.post("/cancel/:id", TokenHandler.authenticateToken, cancelOrder);
 
 export default OrdersRouter;
