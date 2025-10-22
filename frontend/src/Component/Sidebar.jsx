@@ -134,7 +134,7 @@ function Sidebar({ setSideNavActive, sideNavActive }) {
         >
           <Link className="nav-link" to="/order_allocation">
             <i className="mdi mdi-wallet menu-icon"></i>
-            <span className="menu-title">Order Allocation Eng.</span>
+            <span className="menu-title">Order Alloc. Eng.</span>
           </Link>
         </li>
         <li
