@@ -4,6 +4,7 @@ import { useAlert } from "../../../middleware/AlertContext";
 import Pagination from "../../../Component/Pagination";
 import api from "../../../utils/api";
 import { encrypt } from "../../../middleware/Encryption";
+import usersConfig from "../../../config/AdminConfig/Users/Users";
 
 function UsersTable() {
   const [dataList, setDataList] = useState([]);
@@ -22,7 +23,7 @@ function UsersTable() {
       params.append("page", page);
       params.append("limit", limit);
 
-      const url = `http://localhost:3001/api/v1/users/list?${params.toString()}`;
+      const url = `${usersConfig.userList}?${params.toString()}`;
 
       const { data } = await api.get(url);
 
