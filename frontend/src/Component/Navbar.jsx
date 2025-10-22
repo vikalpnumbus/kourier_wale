@@ -78,7 +78,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
         </div>
         <div>
           <a className="navbar-brand brand-logo" >
-            <img src={{company_logo}} alt="Kourier Wale" />
+            <img src={company_logo} alt="Kourier Wale" />
           </a>
         </div>
       </div>
