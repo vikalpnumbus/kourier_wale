@@ -171,3 +171,15 @@ a
     font-weight: 600;
     text-transform: uppercase;
 }
+
+#sidebar
+{
+    background: linear-gradient(to bottom, #e6e5f2, #4599cd) !important;
+    font-family: "Rubik", sans-serif !important;
+}
+
+.nav-link
+{
+    margin: 0;
+    color: #3e4b5b !important;
+}
