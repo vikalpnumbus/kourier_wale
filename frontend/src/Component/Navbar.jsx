@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import companyDetailsConfig from "../config/CompanyDetails/CompanyDetailsConfig";
+import company_logo from "../../public/themes/assets/company_image/logo_company.png"
 import api from "../utils/api";
 function Navbar({ setSideNavActive, sideNavActive }) {
   const navigate = useNavigate();
@@ -77,12 +78,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
         </div>
         <div>
           <a className="navbar-brand brand-logo" >
-            {/* <img src="../assets/images/logo.svg" alt="logo" /> */}
-            Brand Name
-          </a>
-          <a className="navbar-brand brand-logo-mini" >
-            {/* <img src="../assets/images/logo-mini.svg" alt="logo" /> */}
-            BN
+            <img src={{company_logo}} alt="Kourier Wale" />
           </a>
         </div>
       </div>
