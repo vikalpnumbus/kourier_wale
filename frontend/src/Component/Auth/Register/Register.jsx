@@ -128,9 +128,20 @@ function Register() {
         otp: phoneOtp,
         type: "phone",
       });
-      setStep(3); // Move to email OTP step
+      setStep(3);
     } catch (err) {
-      showError(err.response?.data?.message || "Invalid phone OTP.");
+      if (Array.isArray(err?.response?.data?.message)) {
+        showError(err?.response?.data?.message[0].message);
+      } else {
+        const errorMsg =
+          typeof err?.response?.data?.message === "string"
+            ? err.response.data.message
+            : typeof err?.response?.data === "string"
+            ? err.response.data
+            : "Something went wrong";
+
+        showError(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -152,7 +163,18 @@ function Register() {
       });
       await getToken(data.data.authCode);
     } catch (err) {
-      showError(err.response?.data?.message || "Invalid email OTP.");
+      if (Array.isArray(err?.response?.data?.message)) {
+        showError(err?.response?.data?.message[0].message);
+      } else {
+        const errorMsg =
+          typeof err?.response?.data?.message === "string"
+            ? err.response.data.message
+            : typeof err?.response?.data === "string"
+            ? err.response.data
+            : "Something went wrong";
+
+        showError(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
