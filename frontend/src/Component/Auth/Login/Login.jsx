@@ -8,6 +8,7 @@ import authConfig from "../../../config/Auth/AuthConfig";
 import api from "../../../utils/api";
 import companyDetailsConfig from "../../../config/CompanyDetails/CompanyDetailsConfig";
 import { encrypt } from "../../../middleware/Encryption";
+import company_logo from "../../../../public/themes/assets/company_image/logo_company.png";
 
 function Login() {
   const [form, setForm] = useState({ phone: "+91", password: "" });
@@ -100,10 +101,8 @@ function Login() {
       const response = await api.get(companyDetailsConfig.companyDetails);
       const data = response?.data?.data?.companyDetails || {};
       localStorage.setItem("role", encrypt(data?.role));
-      if(data?.role === "admin")
-      navigate("/admin");
-      else if(data?.role === "user")
-      navigate("/");
+      if (data?.role === "admin") navigate("/admin");
+      else if (data?.role === "user") navigate("/");
     } catch (error) {
       console.error("Company Details Fetch Error:", error);
     }
@@ -112,97 +111,98 @@ function Login() {
   return (
     <>
       <div className="container-scroller">
-        <div className={`container-fluid page-body-wrapper full-page-wrapper`}>
-          <div className={"main-panel w-100"}>
-            <div
-              className={`content-wrapper p-4 d-flex align-items-center auth px-0 `}
-            >
-              <div className="row w-100 mx-0">
-                <div className="col-xl-3 col-lg-5 col-md-5 d-block mx-auto">
-                  <div className="text-center mb-2">
-                    {/* <a href="/" className="custom-logo">
-                    <img
-                      src="../assets/images/brand-logos/desktop-logo.png"
-                      className="desktop-logo"
-                      alt="logo"
-                    />
-                    <img
-                      src="../assets/images/brand-logos/desktop-dark.png"
-                      className="desktop-dark"
-                      alt="logo"
-                    />
-                  </a> */}
-                    LOGO
-                  </div>
-                  <div className="card custom-card">
-                    <div className="card-body pd-45">
-                      <h5 className="text-center">Sign in to Your Account</h5>
-                      <form onSubmit={handleSubmit}>
-                        <div className="form-group text-start mb-3">
-                          <label>Phone</label>
-                          <input
-                            className="form-control"
-                            placeholder="+91XXXXXXXXXX"
-                            type="tel"
-                            name="phone"
-                            value={form.phone}
-                            onChange={handleChange}
-                            required
-                            inputMode="numeric"
-                            pattern="\+91\d{10}"
-                            maxLength={13}
-                          />
+        <div className="container-fluid page-body-wrapper full-page-wrapper">
+          <div className="content-wrapper d-flex align-items-stretch auth auth-img-bg">
+            <div className="row flex-grow">
+              <div className="col-lg-6 d-flex align-items-center justify-content-center">
+                <div className="auth-form-transparent text-left p-3">
+                  
+                    <img className="mb-3" src={company_logo} alt="Kourier Wale" width={180}/>
+                  
+                  <form onSubmit={handleSubmit}>
+                    <div className="form-group text-start mb-3">
+                      <label>Phone</label>
+                      <div className="input-group">
+                        <div className="input-group-prepend bg-transparent">
+                          <span className="input-group-text bg-transparent border-right-0">
+                            <i className="ti-user text-primary"></i>
+                          </span>
                         </div>
-                        <div className="form-group text-start mb-3">
-                          <label>Password</label>
-                          <div className="input-group">
-                            <input
-                              className="form-control"
-                              placeholder="Enter your password"
-                              type={showPassword ? "text" : "password"}
-                              name="password"
-                              value={form.password}
-                              onChange={handleChange}
-                              required
-                            />
-                            <span
-                              className="input-group-text"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => setShowPassword((prev) => !prev)}
-                            >
-                              {showPassword ? (
-                                <Icon path={mdiEyeOff} size={0.7} />
-                              ) : (
-                                <Icon path={mdiEye} size={0.7} />
-                              )}
-                            </span>
-                          </div>
-                        </div>
-
-                        <button
-                          type="submit"
-                          className="btn ripple btn-primary btn-block w-100"
-                          disabled={loading}
-                        >
-                          {loading ? "Signing In..." : "Sign In"}
-                        </button>
-                      </form>
-                      <div className="mt-3 text-center">
-                        <p className="mb-1">
-                          <Link to="/forgot-password" className="text-primary">
-                            Forgot password?
-                          </Link>
-                        </p>
-                        <p className="mb-0">
-                          Don't have an account?{" "}
-                          <Link to="/register" className="text-primary">
-                            Register
-                          </Link>
-                        </p>
+                        <input
+                          className="form-control  border-left-0"
+                          placeholder="+91XXXXXXXXXX"
+                          type="text"
+                          name="phone"
+                          value={form.phone}
+                          onChange={handleChange}
+                          required
+                          inputMode="numeric"
+                          pattern="\+91\d{10}"
+                          maxLength={13}
+                        />
                       </div>
                     </div>
+                    <div className="form-group text-start mb-3">
+                      <label>Password</label>
+                      <div className="input-group">
+                        <div className="input-group-prepend bg-transparent">
+                          <span className="input-group-text bg-transparent border-right-0">
+                            <i className="ti-lock text-primary"></i>
+                          </span>
+                        </div>
+                        <input
+                          className="form-control"
+                          placeholder="Enter your password"
+                          type={showPassword ? "text" : "password"}
+                          name="password"
+                          value={form.password}
+                          onChange={handleChange}
+                          required
+                        />
+                        <div className="input-group-prepend bg-transparent">
+                          <span
+                            className="input-group-text bg-transparent border-right-0"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => setShowPassword((prev) => !prev)}
+                          >
+                            {showPassword ? (
+                              <Icon path={mdiEyeOff} size={0.7} />
+                            ) : (
+                              <Icon path={mdiEye} size={0.7} />
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="btn ripple btn-primary btn-block w-100"
+                      disabled={loading}
+                    >
+                      {loading ? "Signing In..." : "Sign In"}
+                    </button>
+                  </form>
+                  <div className="mt-3 text-end">
+                    <p className="mb-1">
+                      <Link to="/forgot-password" className="text-primary">
+                        Forgot password?
+                      </Link>
+                    </p>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <p className="mb-0">
+                      Don't have an account?{" "}
+                      <Link to="/register" className="text-primary">
+                        Register
+                      </Link>
+                    </p>
                   </div>
                 </div>
+              </div>
+              <div className="col-lg-6 login-half-bg d-flex flex-row">
+                <p className="text-white fw-medium text-center flex-grow align-self-end">Copyright © 2021 All rights
+              reserved.</p>
               </div>
             </div>
           </div>

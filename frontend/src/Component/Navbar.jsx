@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import companyDetailsConfig from "../config/CompanyDetails/CompanyDetailsConfig";
 import company_logo from "../../public/themes/assets/company_image/logo_company.png";
 import api from "../utils/api";
-import RechageModal from "./RechageModal";
+import RechargeModal from "./RechargeModal";
 function Navbar({ setSideNavActive, sideNavActive }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -216,7 +216,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
           </li>
         </ul>
       </div>
-      {showRechargeModal && <RechageModal onClose={() => setShowRechargeModal(false)} />}
+      {showRechargeModal && <RechargeModal onClose={() => setShowRechargeModal(false)} />}
     </nav>
   );
 }

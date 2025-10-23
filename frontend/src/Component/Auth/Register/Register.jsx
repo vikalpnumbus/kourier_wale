@@ -6,6 +6,7 @@ import { mdiEye, mdiEyeOff, mdiPencil } from "@mdi/js";
 import { useAlert } from "../../../middleware/AlertContext";
 import authConfig from "../../../config/Auth/AuthConfig";
 import { encrypt } from "../../../middleware/Encryption";
+import company_logo from "../../../../public/themes/assets/company_image/logo_company.png";
 
 function Register() {
   const navigate = useNavigate();
@@ -218,354 +219,332 @@ function Register() {
   return (
     <>
       <div className="container-scroller">
-        <div className={`container-fluid page-body-wrapper full-page-wrapper`}>
-          <div className={"main-panel w-100"}>
-            <div
-              className={`content-wrapper p-4 d-flex align-items-center auth px-0 `}
-            >
-              <div className="row w-100 mx-0">
-                {step === 1 && (
-                  <>
-                    <div className="col-xl-7 col-lg-10 col-md-10 d-block mx-auto">
-                      <div className="card custom-card">
-                        <div className="card-body ">
-                          <h5 className="text-center">Create an Account</h5>
-                          <form onSubmit={handleNextStep1}>
+        <div className="container-fluid page-body-wrapper full-page-wrapper">
+          <div className="content-wrapper d-flex align-items-stretch auth auth-img-bg">
+            <div className="row flex-grow">
+              <div className="col-lg-6 d-flex align-items-center justify-content-center">
+                <div
+                  className="auth-form-transparent text-left p-3"
+                  style={{ width: "75%" }}
+                >
+                  <img
+                    className="mb-3"
+                    src={company_logo}
+                    alt="Kourier Wale"
+                    width={180}
+                  />
+                  {step === 1 && (
+                    <>
+                      <form onSubmit={handleNextStep1}>
+                        {" "}
+                        <div className="row">
+                          {" "}
+                          <div className="col-md-6 mb-2">
                             {" "}
-                            <div className="row">
+                            <div className="form-group text-start mb-3">
                               {" "}
-                              <div className="col-md-6 mb-2">
-                                {" "}
-                                <div className="form-group text-start mb-3">
-                                  {" "}
-                                  <label>First Name</label>{" "}
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    name="fname"
-                                    value={form.fname}
-                                    onChange={handleChange}
-                                  />{" "}
-                                </div>{" "}
-                              </div>{" "}
-                              <div className="col-md-6 mb-2">
-                                {" "}
-                                <div className="form-group text-start mb-3">
-                                  {" "}
-                                  <label>Last Name</label>{" "}
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    name="lname"
-                                    value={form.lname}
-                                    onChange={handleChange}
-                                  />{" "}
-                                </div>{" "}
-                              </div>{" "}
+                              <label>First Name</label>{" "}
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="fname"
+                                value={form.fname}
+                                onChange={handleChange}
+                              />{" "}
                             </div>{" "}
-                            <div className="row">
+                          </div>{" "}
+                          <div className="col-md-6 mb-2">
+                            {" "}
+                            <div className="form-group text-start mb-3">
                               {" "}
-                              <div className="col-md-6 mb-2">
-                                {" "}
-                                <div className="form-group text-start mb-3">
-                                  {" "}
-                                  <label>Email</label>{" "}
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    name="email"
-                                    value={form.email}
-                                    onChange={handleChange}
-                                  />{" "}
-                                </div>{" "}
-                              </div>{" "}
-                              <div className="col-md-6 mb-2">
-                                {" "}
-                                <div className="form-group text-start mb-3">
-                                  {" "}
-                                  <label>Phone</label>{" "}
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    name="phone"
-                                    value={form.phone}
-                                    onChange={handleChange}
-                                    maxLength={13}
-                                  />{" "}
-                                </div>{" "}
-                              </div>{" "}
+                              <label>Last Name</label>{" "}
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="lname"
+                                value={form.lname}
+                                onChange={handleChange}
+                              />{" "}
                             </div>{" "}
-                            <div className="row">
+                          </div>{" "}
+                        </div>{" "}
+                        <div className="row">
+                          {" "}
+                          <div className="col-md-6 mb-2">
+                            {" "}
+                            <div className="form-group text-start mb-3">
                               {" "}
-                              <div className="col-md-6 mb-2">
+                              <label>Email</label>{" "}
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="email"
+                                value={form.email}
+                                onChange={handleChange}
+                              />{" "}
+                            </div>{" "}
+                          </div>{" "}
+                          <div className="col-md-6 mb-2">
+                            {" "}
+                            <div className="form-group text-start mb-3">
+                              {" "}
+                              <label>Phone</label>{" "}
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="phone"
+                                value={form.phone}
+                                onChange={handleChange}
+                                maxLength={13}
+                              />{" "}
+                            </div>{" "}
+                          </div>{" "}
+                        </div>{" "}
+                        <div className="row">
+                          {" "}
+                          <div className="col-md-6 mb-2">
+                            {" "}
+                            <div className="form-group text-start mb-3">
+                              {" "}
+                              <label>Company Name</label>{" "}
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="companyName"
+                                value={form.companyName}
+                                onChange={handleChange}
+                              />{" "}
+                            </div>{" "}
+                          </div>{" "}
+                          <div className="col-md-6 mb-2">
+                            {" "}
+                            <div className="form-group text-start mb-3">
+                              {" "}
+                              <label>Shipping Volume</label>{" "}
+                              <select
+                                className="form-control "
+                                name="shippingVolume"
+                                value={form.shippingVolume}
+                                onChange={handleChange}
+                                style={{ lineHeight: "0.6" }}
+                              >
                                 {" "}
-                                <div className="form-group text-start mb-3">
-                                  {" "}
-                                  <label>Company Name</label>{" "}
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    name="companyName"
-                                    value={form.companyName}
-                                    onChange={handleChange}
-                                  />{" "}
-                                </div>{" "}
-                              </div>{" "}
-                              <div className="col-md-6 mb-2">
+                                <option value="">Select</option>{" "}
+                                {shippingOptions.map((opt) => (
+                                  <option key={opt} value={opt}>
+                                    {" "}
+                                    {opt}{" "}
+                                  </option>
+                                ))}{" "}
+                              </select>{" "}
+                            </div>{" "}
+                          </div>
+                        </div>{" "}
+                        <div className="row">
+                          {" "}
+                          <div className="col-md-6 mb-2">
+                            {" "}
+                            <div className="form-group text-start mb-3">
+                              {" "}
+                              <label>Password</label>{" "}
+                              <div className="input-group">
                                 {" "}
-                                <div className="form-group text-start mb-3">
-                                  {" "}
-                                  <label>Shipping Volume</label>{" "}
-                                  <select
-                                    className="form-control lh-sm"
-                                    name="shippingVolume"
-                                    value={form.shippingVolume}
-                                    onChange={handleChange}
+                                <input
+                                  type={showPassword ? "text" : "password"}
+                                  className="form-control"
+                                  name="password"
+                                  value={form.password}
+                                  onChange={handleChange}
+                                />{" "}
+                                <div className="input-group-prepend bg-transparent">
+                                  <span
+                                    className="input-group-text bg-transparent border-right-0"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() =>
+                                      setShowPassword((prev) => !prev)
+                                    }
                                   >
-                                    {" "}
-                                    <option value="">Select</option>{" "}
-                                    {shippingOptions.map((opt) => (
-                                      <option key={opt} value={opt}>
-                                        {" "}
-                                        {opt}{" "}
-                                      </option>
-                                    ))}{" "}
-                                  </select>{" "}
-                                </div>{" "}
-                              </div>
-                            </div>{" "}
-                            <div className="row">
-                              {" "}
-                              <div className="col-md-6 mb-2">
-                                {" "}
-                                <div className="form-group text-start mb-3">
-                                  {" "}
-                                  <label>Password</label>{" "}
-                                  <div className="input-group">
-                                    {" "}
-                                    <input
-                                      type={showPassword ? "text" : "password"}
-                                      className="form-control"
-                                      name="password"
-                                      value={form.password}
-                                      onChange={handleChange}
-                                    />{" "}
-                                    <span
-                                      className="input-group-text"
-                                      style={{ cursor: "pointer" }}
-                                      onClick={() =>
-                                        setShowPassword((prev) => !prev)
-                                      }
-                                    >
-                                      {" "}
-                                      {showPassword ? (
-                                        <Icon path={mdiEyeOff} size={0.7} />
-                                      ) : (
-                                        <Icon path={mdiEye} size={0.7} />
-                                      )}{" "}
-                                    </span>{" "}
-                                  </div>{" "}
-                                </div>{" "}
-                              </div>{" "}
-                              <div className="col-md-6 mb-2">
-                                {" "}
-                                <div className="form-group text-start mb-3">
-                                  {" "}
-                                  <label>Confirm Password</label>{" "}
-                                  <div className="input-group">
-                                    {" "}
-                                    <input
-                                      type={
-                                        showConfirmPassword
-                                          ? "text"
-                                          : "password"
-                                      }
-                                      className="form-control"
-                                      name="confirmPassword"
-                                      value={form.confirmPassword}
-                                      onChange={handleChange}
-                                    />{" "}
-                                    <span
-                                      className="input-group-text"
-                                      style={{ cursor: "pointer" }}
-                                      onClick={() =>
-                                        setShowConfirmPassword((prev) => !prev)
-                                      }
-                                    >
-                                      {" "}
-                                      {showConfirmPassword ? (
-                                        <Icon path={mdiEyeOff} size={0.7} />
-                                      ) : (
-                                        <Icon path={mdiEye} size={0.7} />
-                                      )}{" "}
-                                    </span>{" "}
-                                  </div>{" "}
-                                </div>{" "}
+                                    {showPassword ? (
+                                      <Icon path={mdiEyeOff} size={0.7} />
+                                    ) : (
+                                      <Icon path={mdiEye} size={0.7} />
+                                    )}
+                                  </span>
+                                </div>
                               </div>{" "}
                             </div>{" "}
-                            <button
-                              type="submit"
-                              className="btn ripple btn-primary btn-block w-100"
-                              disabled={loading}
-                            >
+                          </div>{" "}
+                          <div className="col-md-6 mb-2">
+                            {" "}
+                            <div className="form-group text-start mb-3">
                               {" "}
-                              {loading ? "Processing..." : "Next"}{" "}
-                            </button>{" "}
-                          </form>
-                          <div className="mt-3 text-center">
-                            <p className="mb-0">
-                              Already have an account?{" "}
-                              <Link to="/login" className="text-primary">
-                                Sign In
-                              </Link>
+                              <label>Confirm Password</label>{" "}
+                              <div className="input-group">
+                                {" "}
+                                <input
+                                  type={
+                                    showConfirmPassword ? "text" : "password"
+                                  }
+                                  className="form-control"
+                                  name="confirmPassword"
+                                  value={form.confirmPassword}
+                                  onChange={handleChange}
+                                />{" "}
+                                <div className="input-group-prepend bg-transparent">
+                                  <span
+                                    className="input-group-text bg-transparent border-right-0"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() =>
+                                      setShowConfirmPassword((prev) => !prev)
+                                    }
+                                  >
+                                    {showConfirmPassword ? (
+                                      <Icon path={mdiEyeOff} size={0.7} />
+                                    ) : (
+                                      <Icon path={mdiEye} size={0.7} />
+                                    )}
+                                  </span>
+                                </div>
+                              </div>{" "}
+                            </div>{" "}
+                          </div>{" "}
+                        </div>{" "}
+                        <button
+                          type="submit"
+                          className="btn ripple btn-primary btn-block w-100"
+                          disabled={loading}
+                        >
+                          {" "}
+                          {loading ? "Processing..." : "Next"}{" "}
+                        </button>{" "}
+                      </form>
+                      <div className="mt-3 text-center">
+                        <p className="mb-0">
+                          Already have an account?{" "}
+                          <Link to="/login" className="text-primary">
+                            Sign In
+                          </Link>
+                        </p>
+                      </div>
+                    </>
+                  )}
+                  {step === 2 && (
+                    <>
+                      <form onSubmit={handlePhoneOtpVerify}>
+                        <div className="form-group text-start mb-3">
+                          <div className="row align-items-end my-2">
+                            <p>
+                              Enter the 6 digit OTP sent to mobile number <br />
+                              <span className="text-primary">{form.phone}</span>
+                              <span
+                                className="ms-2 text-primary"
+                                onClick={() => setStep(1)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <Icon path={mdiPencil} size={0.6} />
+                              </span>
                             </p>
                           </div>
+                          <input
+                            type="text"
+                            className="form-control otp-input"
+                            style={{
+                              letterSpacing: "8px",
+                              transition: "all 0.2s ease-in-out",
+                            }}
+                            value={phoneOtp}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, "");
+                              if (value.length <= 6) {
+                                setPhoneOtp(value);
+                              }
+                            }}
+                            maxLength={6}
+                            placeholder="••••••"
+                          />
+
+                          <p
+                            className="text-primary my-2"
+                            onClick={() => handleResendOTP("phone")}
+                            style={{ cursor: "pointer" }}
+                          >
+                            Re-send OTP?
+                          </p>
+                          <button
+                            type="submit"
+                            className="btn w-100 ripple btn-primary btn-block mt-2"
+                            disabled={loading}
+                          >
+                            {loading ? "Verifying..." : "Verify"}
+                          </button>
                         </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {step === 2 && (
-                  <>
-                    <div className="col-xl-3 col-lg-10 col-md-10 d-block mx-auto">
-                      <div className="card custom-card">
-                        <div className="card-body">
-                          <h5 className="text-center mb-3">
-                            Verify your mobile number
-                          </h5>
-                          <form onSubmit={handlePhoneOtpVerify}>
-                            <div className="form-group text-start mb-3">
-                              <div className="row align-items-end my-2">
-                                <p>
-                                  Enter the 6 digit OTP sent to mobile number{" "}
-                                  <br />
-                                  <span className="text-primary">
-                                    {form.phone}
-                                  </span>
-                                  <span
-                                    className="ms-2 text-primary"
-                                    onClick={() => setStep(1)}
-                                    style={{ cursor: "pointer" }}
-                                  >
-                                    <Icon path={mdiPencil} size={0.6} />
-                                  </span>
-                                </p>
-                              </div>
-                              <input
-                                type="text"
-                                className="form-control otp-input"
-                                style={{
-                                  letterSpacing: "8px",
-                                  transition: "all 0.2s ease-in-out",
-                                }}
-                                value={phoneOtp}
-                                onChange={(e) => {
-                                  const value = e.target.value.replace(
-                                    /\D/g,
-                                    ""
-                                  );
-                                  if (value.length <= 6) {
-                                    setPhoneOtp(value);
-                                  }
-                                }}
-                                maxLength={6}
-                                placeholder="••••••"
-                              />
-
-                              <p
-                                className="text-primary my-2"
-                                onClick={() => handleResendOTP("phone")}
+                      </form>
+                    </>
+                  )}
+                  {step === 3 && (
+                    <>
+                      <form onSubmit={handleEmailOtpVerify}>
+                        <div className="form-group text-start mb-3">
+                          <div className="row align-items-end my-2">
+                            <p>
+                              Enter the 6 digit OTP sent to E-mail <br />
+                              <span className="text-primary">{form.email}</span>
+                              <span
+                                className="ms-2 text-primary"
+                                onClick={() => setStep(1)}
                                 style={{ cursor: "pointer" }}
                               >
-                                Re-send OTP?
-                              </p>
-                              <button
-                                type="submit"
-                                className="btn w-100 ripple btn-primary btn-block mt-2"
-                                disabled={loading}
-                              >
-                                {loading ? "Verifying..." : "Verify"}
-                              </button>
-                            </div>
-                          </form>
+                                <Icon path={mdiPencil} size={0.6} />
+                              </span>
+                            </p>
+                          </div>
+                          <input
+                            type="text"
+                            className="form-control otp-input"
+                            style={{
+                              letterSpacing: "8px",
+                              transition: "all 0.2s ease-in-out",
+                            }}
+                            value={emailOtp}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, "");
+                              if (value.length <= 6) {
+                                setEmailOtp(value);
+                              }
+                            }}
+                            maxLength={6}
+                            placeholder="••••••"
+                          />
+                          <p
+                            className="text-primary my-2"
+                            onClick={() => handleResendOTP("email")}
+                            style={{ cursor: "pointer" }}
+                          >
+                            Re-send OTP?
+                          </p>
+                          <button
+                            type="submit"
+                            className="btn w-100 ripple btn-primary btn-block "
+                            disabled={loading}
+                          >
+                            {loading ? "Verifying..." : "Submit"}
+                          </button>
                         </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {step === 3 && (
-                  <>
-                    <div className="col-xl-3 col-lg-10 col-md-10 d-block mx-auto">
-                      <div className="card custom-card">
-                        <div className="card-body">
-                          <h5 className="text-center mb-3">
-                            Verify your E-mail
-                          </h5>
-                          <form onSubmit={handleEmailOtpVerify}>
-                            <div className="form-group text-start mb-3">
-                              <div className="row align-items-end my-2">
-                                <p>
-                                  Enter the 6 digit OTP sent to E-mail <br />
-                                  <span className="text-primary">
-                                    {form.email}
-                                  </span>
-                                  <span
-                                    className="ms-2 text-primary"
-                                    onClick={() => setStep(1)}
-                                    style={{ cursor: "pointer" }}
-                                  >
-                                    <Icon path={mdiPencil} size={0.6} />
-                                  </span>
-                                </p>
-                              </div>
-                              <input
-                                type="text"
-                                className="form-control otp-input"
-                                style={{
-                                  letterSpacing: "8px",
-                                  transition: "all 0.2s ease-in-out",
-                                }}
-                                value={emailOtp}
-                                onChange={(e) => {
-                                  const value = e.target.value.replace(
-                                    /\D/g,
-                                    ""
-                                  );
-                                  if (value.length <= 6) {
-                                    setEmailOtp(value);
-                                  }
-                                }}
-                                maxLength={6}
-                                placeholder="••••••"
-                              />
-                              <p
-                                className="text-primary my-2"
-                                onClick={() => handleResendOTP("email")}
-                                style={{ cursor: "pointer" }}
-                              >
-                                Re-send OTP?
-                              </p>
-                              <button
-                                type="submit"
-                                className="btn w-100 ripple btn-primary btn-block "
-                                disabled={loading}
-                              >
-                                {loading ? "Verifying..." : "Submit"}
-                              </button>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
+                      </form>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="col-lg-6 register-half-bg d-flex flex-row">
+                <p className="text-white fw-medium text-center flex-grow align-self-end">
+                  Copyright © 2021 All rights reserved.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
+     
     </>
   );
 }

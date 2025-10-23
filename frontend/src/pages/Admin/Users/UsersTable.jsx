@@ -5,6 +5,7 @@ import Pagination from "../../../Component/Pagination";
 import api from "../../../utils/api";
 import { encrypt } from "../../../middleware/Encryption";
 import usersConfig from "../../../config/AdminConfig/Users/Users";
+import { formatDateTime } from "../../../middleware/CommonFunctions";
 
 function UsersTable() {
   const [dataList, setDataList] = useState([]);
@@ -74,7 +75,7 @@ function UsersTable() {
                     <tr key={data.id}>
                       <td className="py-2">{data?.fname || ""}</td>
                       <td className="py-2">{data?.email || ""}</td>
-                      <td className="py-2">{data?.company_name || ""}</td>
+                      <td className="py-2">{data?.companyName || ""}</td>
                       <td className="py-2">
                         {data?.pricingPlanId === 1
                           ? "Bronze"
@@ -87,7 +88,7 @@ function UsersTable() {
                           : ""}
                       </td>
                       <td className="py-2">
-                        date
+                        {data?.createdAt ? (formatDateTime(data?.createdAt)):("")}
                       </td>
                       <td className="py-2">
                         {data?.isVerified ? (
