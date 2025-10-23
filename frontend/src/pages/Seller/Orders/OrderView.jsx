@@ -146,7 +146,6 @@ function OrderView() {
                             src={`${import.meta.env.VITE_API_URL}${
                               item.productImage[1]
                             }`}
-                            alt={item.name}
                             className="img-fluid rounded border"
                             style={{ maxHeight: "80px", objectFit: "contain" }}
                           />

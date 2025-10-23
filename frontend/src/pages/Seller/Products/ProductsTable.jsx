@@ -96,7 +96,6 @@ function ProductsTable() {
                       src={`${import.meta.env.VITE_API_URL}${
                         data.productImage[1]
                       }`}
-                      alt={data.name}
                       className="img-fluid rounded me-3"
                       height={200}
                       width={200}
