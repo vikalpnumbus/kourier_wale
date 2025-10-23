@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import companyDetailsConfig from "../config/CompanyDetails/CompanyDetailsConfig";
-import company_logo from "../../public/themes/assets/company_image/logo_company.png"
+import company_logo from "../../public/themes/assets/company_image/logo_company.png";
 import api from "../utils/api";
+import RechageModal from "./RechageModal";
 function Navbar({ setSideNavActive, sideNavActive }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,6 +16,16 @@ function Navbar({ setSideNavActive, sideNavActive }) {
     if (hour < 12) return "Good Morning";
     if (hour < 18) return "Good Afternoon";
     return "Good Evening";
+  };
+  const [showRechargeModal, setShowRechargeModal] = useState(false);
+
+  const [searchAWb, setSearchAWB] = useState("");
+
+  const handleSearchAwb = (e) => {
+    e.preventDefault();
+    if (searchAWb.trim()) {
+      navigate(`/shipment?awb_no=${searchAWb}`)
+    }
   };
 
   const [companyData, setCompanyData] = useState({});
@@ -77,13 +88,12 @@ function Navbar({ setSideNavActive, sideNavActive }) {
           </button>
         </div>
         <div>
-          <a className="navbar-brand brand-logo" >
+          <a className="navbar-brand brand-logo">
             <img src={company_logo} alt="Kourier Wale" />
           </a>
         </div>
       </div>
 
-      
       <div className="navbar-menu-wrapper d-flex align-items-top py-0">
         {(location.pathname === "/" || location.pathname === "/dashboard") && (
           <ul className="navbar-nav">
@@ -97,7 +107,80 @@ function Navbar({ setSideNavActive, sideNavActive }) {
         )}
 
         <ul className="navbar-nav ms-auto">
-          <li className="nav-item dropdown d-none d-lg-block user-dropdown">
+
+          <li className="nav-item custom_width">
+            <div
+              className="nav-link dropdown-bordered  dropdown-toggle-split "
+              id="messageDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              style={{ cursor: "pointer" }}
+              onClick={()=>setShowRechargeModal(true)}
+            >
+              {" "}
+              Recharge
+            </div>
+          </li>
+          
+          <li className="nav-item">
+            <div
+              className="nav-link dropdown-bordered  dropdown-toggle-split"
+              id="messageDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {" "}
+              Balance:{" "}{companyData?.wallet_balance}
+            </div>
+          </li>
+          <li className="nav-item dropdown d-lg-block user-dropdown">
+            <div
+              className="nav-link dropdown-bordered  dropdown-toggle-split"
+              id="messageDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              style={{ cursor: "pointer" }}
+            >
+              {" "}
+              Quick Action{" "}
+            </div>
+            <div
+              className="dropdown-menu dropdown-menu-right navbar-dropdown p-0"
+              aria-labelledby="messageDropdown"
+            >
+              <Link to="/orders/add" className="dropdown-item ">
+                <p className="mb-0 fw-medium float-start">Create Order</p>
+              </Link>
+              <Link to="/pickup" className="dropdown-item ">
+                <p className="mb-0 fw-medium float-start">
+                  Create Pickup Request
+                </p>
+              </Link>
+              <a className="dropdown-item ">
+                <p className="mb-0 fw-medium float-start">
+                  Pincode Serviceability
+                </p>
+              </a>
+              <Link to="/rate_calculator" className="dropdown-item ">
+                <p className="mb-0 fw-medium float-start">Rate Calculator</p>
+              </Link>
+            </div>
+          </li>
+          <li className="nav-item">
+            <form className="search-form" onSubmit={handleSearchAwb}>
+              <i className="icon-search"></i>
+              <input
+                type="search"
+                className="form-control"
+                placeholder="Search AWB's"
+                title="Search here"
+                value={searchAWb}
+                onChange={(e) => setSearchAWB(e.target.value)}
+              />
+            </form>
+          </li>
+
+          <li className="nav-item dropdown  d-lg-block user-dropdown">
             <div
               id="UserDropdown"
               data-bs-toggle="dropdown"
@@ -133,6 +216,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
           </li>
         </ul>
       </div>
+      {showRechargeModal && <RechageModal onClose={() => setShowRechargeModal(false)} />}
     </nav>
   );
 }

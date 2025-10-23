@@ -33348,7 +33348,7 @@ div.tagsinput span.tag a {
   margin-top: 0;
   right: 0;
   left: auto;
-  top: 30px;
+  top: 38px;
   padding-top: 0;
 }
 .rtl .navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .navbar-dropdown {
@@ -33460,10 +33460,12 @@ div.tagsinput span.tag a {
   font-size: 12px;
   line-height: 16px;
   font-family: "Manrope", sans-serif;
-  min-width: 170px;
+  /* min-width: 170px; */
   height: 34px;
   background: #ffffff;
 }
+
+
 .navbar .navbar-menu-wrapper .navbar-nav .nav-item .dropdown-bordered.dropdown-toggle:after {
   position: absolute;
   right: 15px;
