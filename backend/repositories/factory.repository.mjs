@@ -14,6 +14,7 @@ import ServiceablePincodeModel from "../model/serviceablePincodes.sql.model.mjs"
 import ShippingModel from "../model/shipping.sql.model.mjs";
 import UserModel from "../model/user.sql.model.mjs";
 import UserCourierModel from "../model/user_courier.sql.model.mjs";
+import WalletHistoryModel from "../model/wallet_history.sql.model.mjs";
 import WarehouseModel from "../model/warehouse.sql.model.mjs";
 import { BaseRepositoryClass } from "./base.sql.repository.mjs";
 
@@ -39,10 +40,11 @@ class Class {
       shipping: new BaseRepositoryClass(ShippingModel),
       courierAWBList: new BaseRepositoryClass(CourierAWBListModel),
       channel: new BaseRepositoryClass(ChannelModel),
+      walletHistory: new BaseRepositoryClass(WalletHistoryModel),
     };
 
     if (!repositories[model]) {
-      throw new Error(`${model} not implemented yet.`);
+      // throw new Error(`${model} not implemented yet.`);
     }
     return repositories[model];
   }
