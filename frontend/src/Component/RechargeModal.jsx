@@ -24,13 +24,12 @@ function RechargeModal({ onClose }) {
     }
 
     try {
-      // 1️⃣ Create Razorpay order
-      const response = await fetch("http://localhost:3001/api/v1/payments/razorpay/order", {
+      const response = await fetch("http://3.111.42.130:3001/api/v1/payments/razorpay/order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization:
-            "Bearer b9cb99335c0348a27753deec471c6e7b4456cad8941502e6ae60f2e53b16ed624d62fdf85397d3e0681afb2712e5e3c48070be32db60f5dcbff39e1e773f0e65a249e967304018446ea122d85f0385542381e2946518c1a9400078abf793ec67c338fb9a9188b000d0d17f7e16349fa4a9bc587ee30f29332ca620b94a874afa42aadba2c209a80f74075a05655324e07ce6281b8c0c3a53f6152d3c093b5ea4",
+            `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({ amount: parseInt(amount, 10) }),
       });
@@ -43,7 +42,6 @@ function RechargeModal({ onClose }) {
         return;
       }
 
-      // 2️⃣ Razorpay Options
       const options = {
         key: "rzp_test_RWRrXY5L9hZwD6",
         amount: order.amount,
@@ -53,13 +51,12 @@ function RechargeModal({ onClose }) {
         image: "https://kourierwale.in/wp-content/uploads/2024/06/cropped-KW-32x32.png",
         order_id: order.id,
         handler: async function (response) {
-          // 3️⃣ Verify payment
-          const verifyRes = await fetch("http://localhost:3001/api/v1/payments/razorpay/verify", {
+          const verifyRes = await fetch("http://3.111.42.130:3001/api/v1/payments/razorpay/verify", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               Authorization:
-                "Bearer b9cb99335c0348a27753deec471c6e7b4456cad8941502e6ae60f2e53b16ed62408936585b1d6d73e932cc425d7c9972ce820906aee711f3d289382dcffcf1c51fdf3df1752a3578d8c9ecf1f158ee9a61a97b72a78e314f7946e83c39d6c32d9830cf711210b671405eb59efb14ce3f4dacf498e5575223fa761a92250ebeee5193f8d12314b306af40344716dfc17c8b37e851cfc0e756d877c8a65e1e9d97",
+                `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify(response),
           });
@@ -80,7 +77,6 @@ function RechargeModal({ onClose }) {
         theme: { color: "#4599cd" },
       };
 
-      // 4️⃣ Open Razorpay Payment Window
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error) {
