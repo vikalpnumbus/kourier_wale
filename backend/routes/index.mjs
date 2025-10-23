@@ -20,6 +20,7 @@ import ShippingRouter from "./shipping.router.mjs";
 import CourierAWBListRouter from "./courierAWBList.router.mjs";
 import LabelSettingsRouter from "./labelSettings.router.mjs";
 import ChannelRouter from "./channel.router.mjs";
+import PaymentRouter from "./payment.router.mjs";
 import AdminUserRouter from "./admin/admin.user.router.mjs";
 import AdminKYCRouter from "./admin/admin.kyc.route.mjs";
 
@@ -42,6 +43,7 @@ globalRouter.use("/serviceable-pincodes", ServiceablePincodesRouter);
 globalRouter.use("/shipping", ShippingRouter);
 globalRouter.use("/label-settings", LabelSettingsRouter);
 globalRouter.use("/channel", ChannelRouter);
+globalRouter.use("/payments", PaymentRouter);
 
 // Admin Routes
 globalRouter.use("/admin/courier-awb-list", CourierAWBListRouter);

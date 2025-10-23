@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Razorpay Integration Example</title>
+    <!-- Razorpay Checkout script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+      async function handlePayment() {
+        try {
+          // 🟢 1️⃣ Create Razorpay Order (via your Node.js backend)
+          const response = await fetch(
+            "http://localhost:3001/api/v1/payments/razorpay/order",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                  "Bearer b9cb99335c0348a27753deec471c6e7b4456cad8941502e6ae60f2e53b16ed62408936585b1d6d73e932cc425d7c9972ce820906aee711f3d289382dcffcf1c51fdf3df1752a3578d8c9ecf1f158ee9a61a97b72a78e314f7946e83c39d6c32d9830cf711210b671405eb59efb14ce3f4dacf498e5575223fa761a92250ebeee5193f8d12314b306af40344716dfc17c8b37e851cfc0e756d877c8a65e1e9d97",
+              },
+              body: JSON.stringify({ amount: 500 }), // ₹500
+            }
+          );
+
+          const order = (await response.json())?.data;
+
+          // 🟢 2️⃣ Configure Razorpay Checkout options
+          const options = {
+            key: "rzp_test_RWRrXY5L9hZwD6", // Replace with your test key ID
+            amount: order.amount,
+            currency: order.currency,
+            name: "Kourier Wale",
+            description: "Test Transaction",
+            order_id: order.id,
+            handler: async function (response) {
+
+              // 🟢 3️⃣ Verify payment signature on backend
+              const verifyRes = await fetch(
+                "http://localhost:3001/api/v1/payments/razorpay/verify",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization:
+                      "Bearer b9cb99335c0348a27753deec471c6e7b4456cad8941502e6ae60f2e53b16ed62408936585b1d6d73e932cc425d7c9972ce820906aee711f3d289382dcffcf1c51fdf3df1752a3578d8c9ecf1f158ee9a61a97b72a78e314f7946e83c39d6c32d9830cf711210b671405eb59efb14ce3f4dacf498e5575223fa761a92250ebeee5193f8d12314b306af40344716dfc17c8b37e851cfc0e756d877c8a65e1e9d97",
+                  },
+                  body: JSON.stringify(response),
+                }
+              );
+
+              const verifyData = await verifyRes.json();
+              if (verifyData.status === 200) {
+                alert(verifyData.data?.message || "✅ Payment Successful");
+              } else {
+                alert("❌ Payment Verification Failed");
+              }
+            },
+            prefill: {
+              name: "Rahul Singh",
+              email: "rahul@example.com",
+              contact: "9999999999",
+            },
+            notes: { plan: "Premium Annual" },
+            image: "https://kourierwale.in/wp-content/uploads/2024/06/cropped-KW-32x32.png",
+            theme: {
+              color: "#4599cd", // Primary button, header
+            },
+          };
+
+          // 🟢 4️⃣ Open Razorpay Checkout
+          const razorpay = new window.Razorpay(options);
+          razorpay.open();
+        } catch (error) {
+          console.error("Payment error:", error);
+          alert("Error during payment initialization");
+        }
+      }
+    </script>
+  </head>
+
+  <body style="font-family: sans-serif; text-align: center; margin-top: 50px">
+    <h2>💳 Razorpay Payment Example</h2>
+    <button
+      onclick="handlePayment()"
+      style="
+        background-color: #3399cc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      "
+    >
+      Pay ₹500
+    </button>
+  </body>
+</html>

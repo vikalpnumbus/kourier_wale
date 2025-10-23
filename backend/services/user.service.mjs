@@ -291,10 +291,12 @@ class Service {
   async forgotPassword(req) {
     const { body: data, baseUrl, host } = req;
     try {
+      console.log('data.phone: ', data.phone);
       const existingUser = await this.repository.findOne({
         phone: data.phone,
       });
-
+      
+      console.log('existingUser: ', existingUser);
       if (!existingUser) {
         const error = new Error("User does not exist.");
         error.status = 404;
