@@ -37,6 +37,7 @@
     "multer": "^2.0.2",
     "mysql2": "^3.14.3",
     "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.10",
     "p-limit": "^7.1.0",
     "playwright": "^1.55.1",
     "razorpay": "^2.9.6",
