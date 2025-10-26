@@ -216,7 +216,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
           </li>
         </ul>
       </div>
-      {showRechargeModal && <RechargeModal onClose={() => setShowRechargeModal(false)} />}
+      {showRechargeModal && <RechargeModal handleFetchData={handleFetchData} onClose={() => setShowRechargeModal(false)} />}
     </nav>
   );
 }
