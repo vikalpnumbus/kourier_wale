@@ -314,7 +314,7 @@ class Service {
       SERVER_URL+"/forgot-password/" + rawToken;
 
       await NotificationService.sendEmail({
-        email: "exams2020mid@gmail.com" || data.email,
+        email: data.email,
         subject: "Forgot Password Link",
         html: `Your resest link <b>is</b> <a href="${resetLink}">${resetLink}</a>`,
       });
