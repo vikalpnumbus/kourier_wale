@@ -58,12 +58,12 @@ class UserValidationsClass {
   login() {
     return [
       this.passwordValidator("password", "password"),
-      this.phoneValidator("phone", "phone"),
+      this.emailValidator("email", "email"),
     ];
   }
 
   forgotPassword() {
-    return [this.phoneValidator("phone", "phone")];
+    return [this.emailValidator("email", "email")];
   }
 
   resetPassword() {
