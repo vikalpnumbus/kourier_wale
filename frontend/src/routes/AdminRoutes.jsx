@@ -9,6 +9,9 @@ import AWBListTable from "../pages/Admin/Courier/AWBList/AWBListTable";
 import AWBListForm from "../pages/Admin/Courier/AWBList/AWBListForm";
 import Users from "../pages/Admin/Users";
 import UsersTable from "../pages/Admin/Users/UsersTable";
+import AdminCouriers from "../pages/Admin/Courier/AdminCouriers";
+import CourierList from "../pages/Admin/Courier/AdminCouriers/CourierList";
+import CourierForm from "../pages/Admin/Courier/AdminCouriers/CourierForm";
 
 
 function AdminRoutes() {
@@ -31,6 +34,11 @@ function AdminRoutes() {
  
           <Route path="/users" element={<Users />}>
             <Route index element={<UsersTable />} />
+          </Route>
+
+          <Route path="/courier" element={<AdminCouriers />}>
+            <Route index element={<CourierList />} />
+            <Route path="add" element={<CourierForm />} />
           </Route>
 
         </Routes>

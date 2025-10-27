@@ -82,6 +82,23 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
             <span className="menu-title">Awb List</span>
           </Link>
         </li>
+
+        <li
+          className={`nav-item 
+            ${
+              location.pathname.includes("/admin/courier")
+                ? "active"
+                : ""
+            }
+            ${hoveredItem === "courier" ? "hover-open" : ""}`}
+          onMouseEnter={() => setHoveredItem("courier")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Link className="nav-link" to="/admin/courier">
+            <i className="mdi mdi-truck-delivery menu-icon"></i>
+            <span className="menu-title">Courier</span>
+          </Link>
+        </li>
         
       </ul>
     </nav>
