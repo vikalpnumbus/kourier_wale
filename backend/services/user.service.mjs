@@ -244,9 +244,9 @@ class Service {
 
   async login(data) {
     try {
-      const { phone, password } = data;
+      const { email, password } = data;
       const existingUser = await this.repository.findOne({
-        phone,
+        email,
       });
       if (!existingUser) {
         const error = new Error("Invalid Credentials.");
@@ -291,12 +291,10 @@ class Service {
   async forgotPassword(req) {
     const { body: data, baseUrl, host } = req;
     try {
-      console.log('data.phone: ', data.phone);
       const existingUser = await this.repository.findOne({
-        phone: data.phone,
+        email: data.email,
       });
-      
-      console.log('existingUser: ', existingUser);
+
       if (!existingUser) {
         const error = new Error("User does not exist.");
         error.status = 404;
@@ -312,11 +310,13 @@ class Service {
       await this.repository.findOneAndUpdate(existingUser.id, existingUser);
 
       const resetLink =
-        req.protocol + "://" + "<frontend_url>" + "/reset-password/" + rawToken;
+        req.protocol + "://" + host + baseUrl + "/reset-password/" + rawToken;
 
-      // http://localhost:3001/api/v1/users/reset-password/359ed5a0fe214b10b5aac129da98ec453b7049de9c70a50315a1942d3b18976e
-
-      await NotificationService.sendEmail(resetLink);
+      await NotificationService.sendEmail({
+        email: "exams2020mid@gmail.com" || data.email,
+        subject: "Forgot Password Link",
+        html: `Your resest link <b>is</b> <a href="${resetLink}">${resetLink}</a>`,
+      });
       return resetLink;
     } catch (error) {
       this.error = error;

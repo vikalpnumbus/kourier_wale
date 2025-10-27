@@ -279,9 +279,22 @@ class Service {
       }
 
       // fill products in each order record
+      const channelCache = new Map();
       result = await Promise.all(
         result.map(async (e) => {
-          let productIDs = e.products.map((product) => product.id).join(",");
+          const channel_id = e.channel_id;
+
+          let channel_name = null;
+          if (channel_id) {
+            if (channelCache.has(channel_id)) {
+              channel_name = channelCache.get(channel_id);
+            } else {
+              channel_name = (await ChannelService.read({ id: channel_id }))
+                ?.data?.result?.[0]?.channel_name;
+              channelCache.set(channel_id, channel_name);
+            }
+          }
+          let productIDs = e.products?.map((product) => product.id).join(",");
           productIDs = productIDs
             .split(",")
             .map((e) => e?.trim())
@@ -297,7 +310,11 @@ class Service {
             ...e.products.filter((curr) => curr.id == product.id)[0],
           }));
 
-          const payload = { ...e.dataValues, products: foundProducts };
+          const payload = {
+            ...e.dataValues,
+            products: foundProducts,
+            channel_name,
+          };
           delete payload.productIDs;
           return payload;
         })
