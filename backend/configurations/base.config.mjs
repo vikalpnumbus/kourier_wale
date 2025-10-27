@@ -8,6 +8,7 @@ dotenv.config({
 
 const {
   PORT,
+  SERVER_URL,
   JWT_SECRET_KEY,
   NODE_ENV,
   RABBITMQ_URI,
@@ -38,6 +39,7 @@ const {
 
 export {
   PORT,
+  SERVER_URL,
   JWT_SECRET_KEY,
   NODE_ENV,
   RABBITMQ_URI,
