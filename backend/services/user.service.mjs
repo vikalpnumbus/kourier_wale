@@ -7,6 +7,7 @@ import redisClient from "../configurations/redis.config.mjs";
 import CourierService from "./courier.service.mjs";
 import UserCourierService from "./userCourier.service.mjs";
 import { Op } from "sequelize";
+import { SERVER_URL } from "../configurations/base.config.mjs";
 
 class Service {
   constructor() {
@@ -310,7 +311,7 @@ class Service {
       await this.repository.findOneAndUpdate(existingUser.id, existingUser);
 
       const resetLink =
-        req.protocol + "://" + host + baseUrl + "/reset-password/" + rawToken;
+      SERVER_URL+"/forgot-password/" + rawToken;
 
       await NotificationService.sendEmail({
         email: "exams2020mid@gmail.com" || data.email,
