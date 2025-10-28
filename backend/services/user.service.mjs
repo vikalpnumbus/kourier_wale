@@ -245,9 +245,10 @@ class Service {
 
   async login(data) {
     try {
-      const { email, password } = data;
+      const { email, phone, password } = data;
       const existingUser = await this.repository.findOne({
-        email,
+        // email,
+        phone,
       });
       if (!existingUser) {
         const error = new Error("Invalid Credentials.");
@@ -310,8 +311,7 @@ class Service {
 
       await this.repository.findOneAndUpdate(existingUser.id, existingUser);
 
-      const resetLink =
-      SERVER_URL+"/forgot-password/" + rawToken;
+      const resetLink = SERVER_URL + "/forgot-password/" + rawToken;
 
       await NotificationService.sendEmail({
         email: data.email,
