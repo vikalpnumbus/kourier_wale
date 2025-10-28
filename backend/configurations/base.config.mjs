@@ -34,7 +34,6 @@ const {
   EMAIL_PORT,
   EMAIL_USER,
   EMAIL_PASS,
-  EMAIL_FROM,
 } = process.env;
 
 export {
@@ -65,5 +64,4 @@ export {
   EMAIL_PORT,
   EMAIL_USER,
   EMAIL_PASS,
-  EMAIL_FROM,
 };

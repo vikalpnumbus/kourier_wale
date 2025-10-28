@@ -1,6 +1,5 @@
 import nodemailer from "nodemailer";
 import {
-  EMAIL_FROM,
   EMAIL_HOST,
   EMAIL_PASS,
   EMAIL_PORT,
