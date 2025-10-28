@@ -245,10 +245,9 @@ class Service {
 
   async login(data) {
     try {
-      const { email, phone, password } = data;
+      const { email, password } = data;
       const existingUser = await this.repository.findOne({
-        // email,
-        phone,
+        email,
       });
       if (!existingUser) {
         const error = new Error("Invalid Credentials.");

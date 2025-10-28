@@ -58,8 +58,7 @@ class UserValidationsClass {
   login() {
     return [
       this.passwordValidator("password", "password"),
-      // this.emailValidator("email", "email"),
-      this.phoneValidator("phone", "phone"),
+      this.emailValidator("email", "email"),
     ];
   }
 
