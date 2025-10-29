@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { useAlert } from "../../../../middleware/AlertContext";
-import api from "../../../../utils/api";
-// import Icon from "@mdi/react";
-// import { mdiDelete, mdiPencil } from "@mdi/js";
-import Pagination from "../../../../Component/Pagination";
+import React, { useEffect, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom';
+import { useAlert } from '../../../middleware/AlertContext';
+import api from '../../../utils/api';
+import Pagination from '../../../Component/Pagination';
+import Icon from "@mdi/react";
+import { mdiDelete, mdiPencil } from "@mdi/js";
 
-function CourierList() {
-  const [dataList, setDataList] = useState([]);
+function PricingPlansList() {
+    const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const { showError, showSuccess } = useAlert();
@@ -23,7 +23,7 @@ function CourierList() {
       params.append("page", page);
       params.append("limit", limit);
 
-      const url = `http://3.111.42.130:3001/api/v1/courier?${params.toString()}`;
+      const url = `http://3.111.42.130:3001/api/v1/pricing-plans?${params.toString()}`;
 
       const { data } = await api.get(url);
 
@@ -40,7 +40,6 @@ function CourierList() {
   useEffect(() => {
     handleFetchData();
   }, [searchParams]);
-
   return (
     <>
       <div className="tab-content tab-content-vertical">
@@ -49,12 +48,9 @@ function CourierList() {
             <table className="table table-hover">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Courier Id</th>
-                  <th>Code</th>
-                  <th>Courier Type</th>
-                  <th>Status</th>
-                  {/* <th>Action</th> */}
+                  <th>Plan Name</th>
+                  <th>Plan Type</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -71,18 +67,9 @@ function CourierList() {
                 ) : dataList.length > 0 ? (
                   dataList.map((data) => (
                     <tr key={data.id}>
-                      <td className="py-3">{data?.name || ""}</td>
-                      <td className="py-3">{data?.id || ""}</td>
-                      <td className="py-3">{data?.code || ""}</td>
+                      <td className="py-3">{data?.name?.toUpperCase() || ""}</td>
+                      <td className="py-3">{data?.type?.toUpperCase() || ""}</td>
                       <td className="py-3">
-                        {data?.courier_type || ""}
-                      </td>
-                      <td className="py-3">
-                        {data?.status === "1" ? "Active" : "Inactive"}
-                      </td>
-                      
-                      
-                      {/* <td className="py-3">
                         <div className="btn-group">
                           <Link
                             to={`edit/${data?.id}`}
@@ -92,7 +79,7 @@ function CourierList() {
                           </Link>
                           
                         </div>
-                      </td> */}
+                      </td>
                     </tr>
                   ))
                 ) : (
@@ -109,7 +96,7 @@ function CourierList() {
         </div>
       </div>
     </>
-  );
+  )
 }
 
-export default CourierList;
+export default PricingPlansList

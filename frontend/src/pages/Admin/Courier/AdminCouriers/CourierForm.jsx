@@ -7,8 +7,8 @@ function CourierForm() {
   const defaultForm = {
     name: "",
     code: "",
-    status: true,
-    show_to_users: true,
+    status: "1", // default Yes
+    show_to_users: "1", // default Yes
     volumetric_divisor: "",
     weight: "",
     additional_weight: "",
@@ -29,9 +29,8 @@ function CourierForm() {
 
   /** Handle input change */
   const handleChange = useCallback((e) => {
-    const { name, type, value, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
-    setForm((prev) => ({ ...prev, [name]: newValue }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
   }, []);
 
@@ -39,15 +38,17 @@ function CourierForm() {
   const validate = useCallback(() => {
     const newErrors = {};
 
-    if (!form.name.trim()) newErrors.name = "Name is required";
-    if (!form.code.trim()) newErrors.code = "Courier code is required";
-    if (!form.volumetric_divisor.trim())
+    if (!String(form.name).trim()) newErrors.name = "Name is required";
+    if (!String(form.code).trim()) newErrors.code = "Courier code is required";
+    if (!String(form.volumetric_divisor).trim())
       newErrors.volumetric_divisor = "Volumetric divisor is required";
-    if (!form.weight.trim()) newErrors.weight = "Weight is required";
-    if (!form.additional_weight.trim())
+    if (!String(form.weight).trim()) newErrors.weight = "Weight is required";
+    if (!String(form.additional_weight).trim())
       newErrors.additional_weight = "Additional weight is required";
-    if (!form.secret_key.trim()) newErrors.secret_key = "Secret key is required";
-    if (!form.password.trim()) newErrors.password = "Password is required";
+    if (!String(form.secret_key).trim())
+      newErrors.secret_key = "Secret key is required";
+    if (!String(form.password).trim())
+      newErrors.password = "Password is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -67,8 +68,8 @@ function CourierForm() {
 
       const payload = {
         ...form,
-        status: form.status ? "1" : "0",
-        show_to_users: form.show_to_users ? "1" : "0",
+        status: form.status === "1" ? "1" : "0",
+        show_to_users: form.show_to_users === "1" ? "1" : "0",
       };
 
       const response = await api[method](url, payload);
@@ -96,15 +97,15 @@ function CourierForm() {
       const data = res?.data?.data?.result?.[0];
       if (data) {
         setForm({
-          name: data.name || "",
-          code: data.code || "",
-          status: data.status === "1",
-          show_to_users: data.show_to_users === "1",
-          volumetric_divisor: data.volumetric_divisor || "",
-          weight: data.weight || "",
-          additional_weight: data.additional_weight || "",
-          secret_key: data.secret_key || "",
-          password: data.password || "",
+          name: String(data.name || ""),
+          code: String(data.code || ""),
+          status: data.status === "1" ? "1" : "0",
+          show_to_users: data.show_to_users === "1" ? "1" : "0",
+          volumetric_divisor: String(data.volumetric_divisor || ""),
+          weight: String(data.weight || ""),
+          additional_weight: String(data.additional_weight || ""),
+          secret_key: String(data.secret_key || ""),
+          password: String(data.password || ""),
         });
       }
     } catch (error) {
@@ -124,7 +125,7 @@ function CourierForm() {
           <div className="card-body pd-45">
             <form onSubmit={handleSubmit}>
               <div className="row">
-                {/** Name */}
+                {/* Name */}
                 <div className="col-md-6 mb-2">
                   <div className="form-group text-start mb-3">
                     <label>Name</label>
@@ -142,7 +143,7 @@ function CourierForm() {
                   </div>
                 </div>
 
-                {/** Code */}
+                {/* Code */}
                 <div className="col-md-6 mb-2">
                   <div className="form-group text-start mb-3">
                     <label>Courier Code</label>
@@ -160,33 +161,7 @@ function CourierForm() {
                   </div>
                 </div>
 
-                {/** Status */}
-                <div className="col-md-6 mb-2">
-                  <div className="form-group text-start mb-3">
-                    <label className="me-2">Active</label>
-                    <input
-                      type="checkbox"
-                      name="status"
-                      checked={form.status}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-                {/** Show to Users */}
-                <div className="col-md-6 mb-2">
-                  <div className="form-group text-start mb-3">
-                    <label className="me-2">Show to Users</label>
-                    <input
-                      type="checkbox"
-                      name="show_to_users"
-                      checked={form.show_to_users}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-                {/** Volumetric Divisor */}
+                {/* Volumetric Divisor */}
                 <div className="col-md-6 mb-2">
                   <div className="form-group text-start mb-3">
                     <label>Volumetric Divisor</label>
@@ -206,7 +181,7 @@ function CourierForm() {
                   </div>
                 </div>
 
-                {/** Weight */}
+                {/* Weight */}
                 <div className="col-md-6 mb-2">
                   <div className="form-group text-start mb-3">
                     <label>Weight</label>
@@ -224,7 +199,7 @@ function CourierForm() {
                   </div>
                 </div>
 
-                {/** Additional Weight */}
+                {/* Additional Weight */}
                 <div className="col-md-6 mb-2">
                   <div className="form-group text-start mb-3">
                     <label>Additional Weight</label>
@@ -244,7 +219,7 @@ function CourierForm() {
                   </div>
                 </div>
 
-                {/** Secret Key */}
+                {/* Secret Key */}
                 <div className="col-md-6 mb-2">
                   <div className="form-group text-start mb-3">
                     <label>Secret Key</label>
@@ -264,7 +239,7 @@ function CourierForm() {
                   </div>
                 </div>
 
-                {/** Password */}
+                {/* Password */}
                 <div className="col-md-6 mb-2">
                   <div className="form-group text-start mb-3">
                     <label>Password</label>
@@ -281,6 +256,38 @@ function CourierForm() {
                     )}
                   </div>
                 </div>
+
+                {/* Status (Dropdown) */}
+                <div className="col-md-3 mb-2">
+                  <div className="form-group text-start mb-3">
+                    <label>Status</label>
+                    <select
+                      name="status"
+                      className="form-control"
+                      value={form.status}
+                      onChange={handleChange}
+                    >
+                      <option value="1">Yes</option>
+                      <option value="0">No</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Show to Users (Dropdown) */}
+                <div className="col-md-3 mb-2">
+                  <div className="form-group text-start mb-3">
+                    <label>Show to Users</label>
+                    <select
+                      name="show_to_users"
+                      className="form-control"
+                      value={form.show_to_users}
+                      onChange={handleChange}
+                    >
+                      <option value="1">Yes</option>
+                      <option value="0">No</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
               <button
@@ -288,7 +295,11 @@ function CourierForm() {
                 className="btn btn-primary w-100 mt-3"
                 disabled={loading}
               >
-                {loading ? "Processing..." : isEdit ? "Update Courier" : "Add Courier"}
+                {loading
+                  ? "Processing..."
+                  : isEdit
+                  ? "Update Courier"
+                  : "Add Courier"}
               </button>
             </form>
           </div>

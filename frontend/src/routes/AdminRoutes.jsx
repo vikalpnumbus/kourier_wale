@@ -12,6 +12,9 @@ import UsersTable from "../pages/Admin/Users/UsersTable";
 import AdminCouriers from "../pages/Admin/Courier/AdminCouriers";
 import CourierList from "../pages/Admin/Courier/AdminCouriers/CourierList";
 import CourierForm from "../pages/Admin/Courier/AdminCouriers/CourierForm";
+import PricingPlans from "../pages/Admin/PricingPlans";
+import PricingPlansList from "../pages/Admin/PricingPlans/PricingPlansList";
+import PricingPlansForm from "../pages/Admin/PricingPlans/PricingPlansForm";
 
 
 function AdminRoutes() {
@@ -39,6 +42,13 @@ function AdminRoutes() {
           <Route path="/courier" element={<AdminCouriers />}>
             <Route index element={<CourierList />} />
             <Route path="add" element={<CourierForm />} />
+            <Route path="edit/:id" element={<CourierForm />} />
+          </Route>
+
+          <Route path="/plans" element={<PricingPlans />}>
+            <Route index element={<PricingPlansList />} />
+            <Route path="add" element={<PricingPlansForm />} />
+            <Route path="edit/:id" element={<PricingPlansForm />} />
           </Route>
 
         </Routes>
