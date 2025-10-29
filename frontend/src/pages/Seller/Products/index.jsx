@@ -32,13 +32,13 @@ function Products() {
   ];
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [search, setSearch] = useState(searchParams.get("name") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [showImportModal, setShowImportModal] = useState(false)
 
   const handleSearch = () => {
     const params = {};
-    if (search.trim()) params.search = search.trim();
+    if (search.trim()) params.name = search.trim();
     if (category.trim()) params.category = category.trim();
 
     setSearchParams(params);
