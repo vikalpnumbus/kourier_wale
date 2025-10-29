@@ -22,7 +22,7 @@ class Class {
 
     transporter.verify((error, success) => {
       if (error) console.error("SMTP connection failed:", error);
-      else console.log("SMTP server ready to send:", success);
+      else console.info("SMTP server ready to send:", success);
     });
 
     const mailOptions = {
