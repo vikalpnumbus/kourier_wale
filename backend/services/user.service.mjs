@@ -56,11 +56,15 @@ class Service {
         },
       });
 
-      await NotificationService.sendEmail({ otpData });
+      // await NotificationService.sendEmail({
+      //   email: data.email,
+      //   subject: "Email Verification OTP",
+      //   html: `Your otp for email verification is <b>${otpData.email_otp}</b>`,
+      // });
       return {
         status: 201,
         data: {
-          message: `OTP sent to ${data.phone} and ${data.email} successfully.`,
+          message: `OTP sent to ${data.email} successfully.`,
         },
       };
     } catch (error) {
@@ -198,8 +202,8 @@ class Service {
       const { type, to } = data;
 
       let query = {};
-      if (type == "phone") query = { "phone.to": to };
-      if (type == "email") query = { "email.to": to };
+      if (type == "phone") query = { phone: to };
+      if (type == "email") query = { email: to };
 
       const otpInstance = await this.otpRepository.findOne(query);
       if (!otpInstance) {
@@ -210,18 +214,20 @@ class Service {
 
       if (type == "phone")
         query = {
-          phone: {
-            to,
-            otp: Math.floor(100000 + Math.random() * 900000).toString(),
-          },
+          phone: to,
+          phone_otp: Math.floor(100000 + Math.random() * 900000).toString(),
         };
-      if (type == "email")
+      if (type == "email") {
         query = {
-          email: {
-            to,
-            otp: Math.floor(100000 + Math.random() * 900000).toString(),
-          },
+          email: to,
+          email_otp: Math.floor(100000 + Math.random() * 900000).toString(),
         };
+        await NotificationService.sendEmail({
+          email: query.email,
+          subject: "Email Verification OTP",
+          html: `Your otp for email verification is <b>${query.email_otp}</b>`,
+        });
+      }
 
       const updatedOtpInstance = await this.otpRepository.findOneAndUpdate(
         {
@@ -230,7 +236,6 @@ class Service {
         query
       );
 
-      await NotificationService.sendEmail({ updatedOtpInstance });
       return {
         status: 201,
         data: {
@@ -238,6 +243,7 @@ class Service {
         },
       };
     } catch (error) {
+      console.log("error: ", error);
       this.error = error;
       return false;
     }
@@ -315,7 +321,7 @@ class Service {
       await NotificationService.sendEmail({
         email: data.email,
         subject: "Forgot Password Link",
-        html: `Your resest link <b>is</b> <a href="${resetLink}">${resetLink}</a>`,
+        html: `Your resest link is <a href="${resetLink}">${resetLink}</a>`,
       });
       return resetLink;
     } catch (error) {
