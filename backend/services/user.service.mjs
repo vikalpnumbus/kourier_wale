@@ -56,11 +56,11 @@ class Service {
         },
       });
 
-      // await NotificationService.sendEmail({
-      //   email: data.email,
-      //   subject: "Email Verification OTP",
-      //   html: `Your otp for email verification is <b>${otpData.email_otp}</b>`,
-      // });
+      await NotificationService.sendEmail({
+        email: data.email,
+        subject: "Email Verification OTP",
+        html: `Your otp for email verification is <b>${otpData.email_otp}</b>`,
+      });
       return {
         status: 201,
         data: {
@@ -78,7 +78,7 @@ class Service {
       const { type, to, otp } = data;
       let query = {};
       if (type == "phone") query = { phone: to };
-      if (type == "email") query = { email: to };
+      if (type == "email") query = { email: to , email_otp:otp};
 
       let otpInstance = await this.otpRepository.findOne(query);
 
@@ -97,14 +97,12 @@ class Service {
 
       if (type == "email") {
         user.isEmailVerified = true;
-      }
-      if (type == "phone") user.isPhoneVerified = true;
+      } 
 
       otpInstance = { ...otpInstance, user };
 
       if (
-        otpInstance?.user?.isEmailVerified &&
-        otpInstance?.user?.isPhoneVerified
+        otpInstance?.user?.isEmailVerified  
       ) {
         const newUser = await this.repository.save({
           ...JSON.parse(JSON.stringify(otpInstance.user)),
