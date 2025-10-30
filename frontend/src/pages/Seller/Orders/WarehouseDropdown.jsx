@@ -94,7 +94,7 @@ function WarehouseDropdown({
   return (
     <>
       <div  ref={wrapperRef}>
-      <h4 className="text-center  mb-3">{warehouseType === "rto" && "RTO "}Warehouse Details</h4>
+      <h4 className="text-center  mb-3">{warehouseType === "rto" && "RTO "}Warehouse Details<span className="text-danger">*</span></h4>
         <div className="form-group mb-1 text-start  position-relative">
           <input
             type="text"
