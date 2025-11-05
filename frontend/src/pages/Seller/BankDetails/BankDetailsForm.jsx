@@ -307,7 +307,7 @@ export default function BankDetailsForm() {
               <div className="row">
                 <div className="col-md-6 mb-2">
                   <div className="form-group text-start mb-3">
-                    <label>Cancelled Cheque Image</label>
+                    <label>Cancelled Cheque Image<span className="text-danger">*</span></label>
                     <input
                       type="file"
                       className="form-control"
@@ -374,7 +374,7 @@ export default function BankDetailsForm() {
 const InputField = ({ label, name, value, onChange, error, ...props }) => (
   <div className={`col-md-${name == "address" ? "12" : "6"} mb-2`}>
     <div className="form-group text-start mb-3">
-      <label>{label}</label>
+      <label>{label}<span className="text-danger">*</span></label>
       {name === "address" ? (
         <textarea
           className="form-control form-textarea "
@@ -402,7 +402,7 @@ const InputField = ({ label, name, value, onChange, error, ...props }) => (
 const SelectField = ({ label, name, value, onChange, error, options }) => (
   <div className="col-md-6 mb-2">
     <div className="form-group text-start mb-3">
-      <label>{label}</label>
+      <label>{label}<span className="text-danger">*</span></label>
       <select
         className="form-control lh-sm text-dark"
         name={name}

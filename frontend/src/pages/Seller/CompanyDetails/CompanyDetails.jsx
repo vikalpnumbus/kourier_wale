@@ -204,6 +204,9 @@ export default function CompanyDetails() {
       <div className="col-lg-10 col-md-10 mx-auto">
         <div className="card custom-card">
           <div className="card-body pd-45">
+            <h5 className="text-center">
+              Add Company Details
+            </h5>
             {/* Form */}
             <form onSubmit={handleSubmit}>
               <div className="row">
@@ -234,7 +237,7 @@ export default function CompanyDetails() {
                 {/* Logo Upload */}
                 <div className="col-md-6 mb-2">
                   <div className="form-group text-start mb-3">
-                    <label>Company Logo</label>
+                    <label>Company Logo<span className="text-danger">*</span></label>
                     <input
                       type="file"
                       className="form-control"
@@ -295,7 +298,7 @@ const InputField = ({
 }) => (
   <div className={`col-md-${name === "companyAddress" ? "12" : "6"} mb-2`}>
     <div className="form-group text-start mb-3">
-      <label>{label}</label>
+      <label>{label}<span className="text-danger">*</span></label>
       {name === "companyAddress" ? (
         <textarea
           className="form-control form-textarea "
@@ -326,7 +329,7 @@ const InputField = ({
 const StaticField = ({ label, value }) => (
   <div className="col-md-6 mb-2">
     <div className="form-group text-start mb-3">
-      <label>{label}</label>
+      <label>{label}<span className="text-danger">*</span></label>
       <input
         type="text"
         className="form-control"

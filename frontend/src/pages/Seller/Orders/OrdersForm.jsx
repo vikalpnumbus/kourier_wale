@@ -438,7 +438,9 @@ function OrdersForm() {
                             </option>
                           ))}
                         </select>
-                        <label key="paymentType">Payment Type</label>
+                        <label key="paymentType">
+                          Payment Type<span className="text-danger">*</span>
+                        </label>
                         {errors.paymentType && (
                           <small className="text-danger">
                             {errors.paymentType}
@@ -501,6 +503,7 @@ function OrdersForm() {
                             />
                             <label htmlFor={`shippingDetails.${field}`}>
                               {label}
+                              <span className="text-danger">*</span>
                             </label>
                             {errors[`shippingDetails.${field}`] && (
                               <small className="text-danger">
@@ -563,6 +566,7 @@ function OrdersForm() {
                                 {dim.charAt(0).toUpperCase() +
                                   dim.slice(1) +
                                   " (cm)"}
+                                <span className="text-danger">*</span>
                               </label>
                               {errors[`packageDetails.${dim}`] && (
                                 <small className="text-danger">
@@ -666,17 +670,18 @@ function OrdersForm() {
                         ref={(node) => setRef("charges.cod", node)}
                       />
                     )}
-
-                    <InputField
-                      key="collectableAmount"
-                      label="Collectable Amount"
-                      name="collectableAmount"
-                      value={form.collectableAmount}
-                      error={errors.collectableAmount}
-                      onChange={handleChange}
-                      disabled={form.paymentType === "prepaid"}
-                      ref={(node) => setRef("collectableAmount", node)}
-                    />
+                    {form.paymentType !== "cod" && (
+                      <InputField
+                        key="collectableAmount"
+                        label="Collectable Amount"
+                        name="collectableAmount"
+                        value={form.collectableAmount}
+                        error={errors.collectableAmount}
+                        onChange={handleChange}
+                        disabled={form.paymentType === "prepaid"}
+                        ref={(node) => setRef("collectableAmount", node)}
+                      />
+                    )}
                   </div>
 
                   <button className="btn btn-primary w-100" type="submit">
@@ -731,7 +736,12 @@ const InputField = React.forwardRef(
           maxLength={maxLength}
           placeholder={name}
         />
-        <label htmlFor={name}>{label}</label>
+        <label htmlFor={name}>
+          {label}
+          {name !== "shippingDetails.alternatePhone" && (
+            <span className="text-danger">*</span>
+          )}
+        </label>
         {name === "shippingDetails.pincode" && loading && (
           <>
             <small className="text-muted">Fetching city & state...</small>

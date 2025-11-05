@@ -215,7 +215,7 @@ export default function ProductsForm() {
                   {" "}
                   <div className="form-group text-start mb-3">
                     {" "}
-                    <label>Category</label>{" "}
+                    <label>Category<span className="text-danger">*</span></label>{" "}
                     <select
                       className="form-control lh-sm"
                       name="category"
@@ -239,7 +239,7 @@ export default function ProductsForm() {
 
                 <div className="col-md-6 mb-2">
                   <div className="form-group text-start mb-3">
-                    <label>Product Image</label>
+                    <label>Product Image<span className="text-danger">*</span></label>
                     <input
                       type="file"
                       className="form-control"
@@ -293,7 +293,7 @@ export default function ProductsForm() {
 const InputField = ({ label, name, value, onChange, error }) => (
   <div className={`col-md-6 mb-2`}>
     <div className="form-group text-start mb-3">
-      <label>{label}</label>
+      <label>{label}<span className="text-danger">*</span></label>
       <input
         type="text"
         className="form-control"
