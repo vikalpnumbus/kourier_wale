@@ -5,6 +5,7 @@ import CourierAWBListModel from "../model/courierAWBList.sql.model.mjs";
 import CourierPricingCardModel from "../model/courierPricingCard.sql.model.mjs";
 import CSVModel from "../model/csvLogs.sql.model.mjs";
 import EscalationModel from "../model/escalation.sql.model.mjs";
+import EscalationConversationsModel from "../model/escalationsConversations.sql.mode.mjs";
 import KycModel from "../model/kyc.sql.model.mjs";
 import OrdersModel from "../model/orders.sql.model.mjs";
 import OTPModel from "../model/otp.sql.model.mjs";
@@ -43,6 +44,7 @@ class Class {
       channel: new BaseRepositoryClass(ChannelModel),
       walletHistory: new BaseRepositoryClass(WalletHistoryModel),
       escalations: new BaseRepositoryClass(EscalationModel),
+      escalations_conversations: new BaseRepositoryClass(EscalationConversationsModel),
     };
 
     if (!repositories[model]) {

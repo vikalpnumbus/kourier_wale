@@ -1,26 +1,26 @@
 import { DataTypes } from "sequelize";
 import sqlDB from "../configurations/sql.config.mjs";
-import EscalationConversationsModel from "./escalationsConversations.sql.mode.mjs";
+import EscalationModel from "./escalation.sql.model.mjs";
 
-const EscalationModel = sqlDB.sequelize.define(
-  "escalations",
+const EscalationConversationsModel = sqlDB.sequelize.define(
+  "escalations_conversations",
   {
-    userId: {
+    escalation_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
 
-    type: {
+    from: {
       type: DataTypes.STRING,
       allowNull: false,
     },
 
-    subject: {
+    to: {
       type: DataTypes.STRING,
       allowNull: false,
     },
 
-    query: {
+    message: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -28,18 +28,14 @@ const EscalationModel = sqlDB.sequelize.define(
     attachments: {
       type: DataTypes.TEXT,
       allowNull: true,
-    },
-
-    awb_numbers: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      defaultValue: null,
     },
   },
   {
     timestamps: true,
-    tableName: "escalations",
+    tableName: "escalations_conversations",
     freezeTableName: true,
   }
 );
 
-export default EscalationModel;
+export default EscalationConversationsModel;
