@@ -102,7 +102,8 @@ function Register() {
       setLoading(true);
 
       await axios.post(authConfig.registerStep1Api, form);
-      setStep(2);
+      // setStep(2);
+      setStep(3);
     } catch (err) {
       showError(
         err?.response?.data?.message[0]?.message ||

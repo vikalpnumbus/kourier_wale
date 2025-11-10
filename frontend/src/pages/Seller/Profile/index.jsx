@@ -7,19 +7,19 @@ function Profile() {
       id: "kyc",
       path: "kyc",
       title: "KYC",
-      icon: "ti-user text-danger ms-2",
+      icon: "ti-user text-danger me-2",
     },
     {
       id: "bank",
       path: "bank",
       title: "Bank Details",
-      icon: "ti-home text-info ms-2",
+      icon: "ti-home text-info me-2",
     },
     {
       id: "company",
       path: "company",
       title: "Company Details",
-      icon: "ti-email text-success ms-2",
+      icon: "ti-email text-success me-2",
     },
   ];
   const activeTab =
@@ -49,8 +49,9 @@ function Profile() {
                             activeTab?.id === tab?.id ? "active" : ""
                           }`}
                         >
-                          {tab?.title}
                           <i className={tab.icon}></i>
+                          {tab?.title}
+                          
                         </button>
                       </li>
                     );

@@ -16,7 +16,7 @@ function ProductsTable() {
   const handleFetchData = async () => {
     setLoading(true);
     try {
-      const search = searchParams.get("search")?.trim();
+      const name = searchParams.get("name")?.trim();
       const category = searchParams.get("category")?.trim();
       const page = parseInt(searchParams.get("page") || "1", 10);
       const limit = parseInt(searchParams.get("limit") || "10", 10);
@@ -25,8 +25,8 @@ function ProductsTable() {
       const params = new URLSearchParams();
       params.append("page", page);
       params.append("limit", limit);
-      if (search) {
-        params.append("search", search);
+      if (name) {
+        params.append("name", name);
       }
       if (category) {
         params.append("category", category);

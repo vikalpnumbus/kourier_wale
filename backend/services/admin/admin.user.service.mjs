@@ -25,6 +25,7 @@ class Service {
     } = params;
 
     const whereClause = { [Op.and]: [] };
+    whereClause[Op.and].push({ role:"user" });
     if (id) whereClause[Op.and].push({ id });
     if (email) {
       whereClause[Op.and].push({

@@ -96,7 +96,7 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
 
   return (
     <>
-      <h4 className="text-center mt-5 mb-3">Products Details</h4>
+      <h4 className="text-center mt-5 mb-3">Products Details<span className="text-danger">*</span></h4>
       <div className="col-md-12 mb-2" ref={wrapperRef}>
         <div className="form-group text-start mb-3 position-relative">
           <input

@@ -24,6 +24,7 @@ import PaymentRouter from "./payment.router.mjs";
 import AdminUserRouter from "./admin/admin.user.router.mjs";
 import AdminKYCRouter from "./admin/admin.kyc.route.mjs";
 import WebhookRouter from "./webhook.router.mjs";
+import EscalationRouter from "./escalation.router.mjs";
 
 const globalRouter = express.Router();
 
@@ -46,6 +47,7 @@ globalRouter.use("/label-settings", LabelSettingsRouter);
 globalRouter.use("/channel", ChannelRouter);
 globalRouter.use("/payments", PaymentRouter);
 globalRouter.use("/webhooks", WebhookRouter);
+globalRouter.use("/escalations", EscalationRouter);
 
 // Admin Routes
 globalRouter.use("/admin/courier-awb-list", CourierAWBListRouter);

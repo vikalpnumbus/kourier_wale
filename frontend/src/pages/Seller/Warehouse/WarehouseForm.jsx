@@ -328,7 +328,7 @@ const InputField = ({
     } mb-2`}
   >
     <div className="form-group text-start mb-3">
-      <label>{label}</label>
+      <label>{label}<span className="text-danger">*</span></label>
 
       {name === "address" ? (
         <textarea

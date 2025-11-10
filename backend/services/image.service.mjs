@@ -20,7 +20,7 @@ class ServiceClass {
       fs.mkdirSync(uploadPath, { recursive: true });
 
       const sizes = [
-        { suffix: "480", width: 480 },
+        // { suffix: "480", width: 480 },
         // { suffix: "768", width: 768 },
         { suffix: "1024", width: 1024 },
         // { suffix: "1440", width: 1440 },
