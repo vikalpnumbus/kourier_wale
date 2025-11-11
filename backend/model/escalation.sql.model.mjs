@@ -34,6 +34,13 @@ const EscalationModel = sqlDB.sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+
+    assigneeId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue:null,
+      comment: "The user id of the assignee",
+    },
   },
   {
     timestamps: true,
