@@ -25,6 +25,8 @@ import AdminUserRouter from "./admin/admin.user.router.mjs";
 import AdminKYCRouter from "./admin/admin.kyc.route.mjs";
 import WebhookRouter from "./webhook.router.mjs";
 import EscalationRouter from "./escalation.router.mjs";
+import AdminEscalationRouter from "./admin/admin.escalation.router.mjs";
+import UserService from "../services/user.service.mjs";
 
 const globalRouter = express.Router();
 
@@ -49,10 +51,42 @@ globalRouter.use("/payments", PaymentRouter);
 globalRouter.use("/webhooks", WebhookRouter);
 globalRouter.use("/escalations", EscalationRouter);
 
+const checkIfUserIsAdmin = async (req, res, next) => {
+  const userId = req.user.id;
+  const user = await UserService.read({ id: userId });
+  if (user && user.role === "admin") {
+    next();
+  } else {
+    const error = new Error("Forbidden");
+    error.status = 403;
+    next(error);
+  }
+};
 // Admin Routes
-globalRouter.use("/admin/courier-awb-list", CourierAWBListRouter);
-globalRouter.use("/admin/users", AdminUserRouter);
-globalRouter.use("/admin/kyc", AdminKYCRouter);
+globalRouter.use(
+  "/admin/courier-awb-list",
+  TokenHandler.authenticateToken,
+  checkIfUserIsAdmin,
+  CourierAWBListRouter
+);
+globalRouter.use(
+  "/admin/users",
+  TokenHandler.authenticateToken,
+  checkIfUserIsAdmin,
+  AdminUserRouter
+);
+globalRouter.use(
+  "/admin/kyc",
+  TokenHandler.authenticateToken,
+  checkIfUserIsAdmin,
+  AdminKYCRouter
+);
+globalRouter.use(
+  "/admin/escalations",
+  TokenHandler.authenticateToken,
+  checkIfUserIsAdmin,
+  AdminEscalationRouter
+);
 
 globalRouter.use("/uploads", ImageRouter);
 globalRouter.get(
