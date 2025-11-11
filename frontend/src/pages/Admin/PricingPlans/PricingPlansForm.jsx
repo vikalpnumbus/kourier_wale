@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAlert } from "../../../middleware/AlertContext";
 import api from "../../../utils/api";
+import PricingPlanConfig from "../../../config/PricingPlan/PricingPlanConfig";
 
 function PricingPlansForm() {
   const defaultForm = {
@@ -58,8 +59,8 @@ function PricingPlansForm() {
 
     try {
       const url = isEdit
-        ? `http://3.111.42.130:3001/api/v1/pricing-plans/${id}`
-        : "http://3.111.42.130:3001/api/v1/pricing-plans";
+        ? `${PricingPlanConfig.pricingPlanApi}/${id}`
+        : `${PricingPlanConfig.pricingPlanApi}`
       const method = isEdit ? "patch" : "post";
 
       const response = await api[method](url, form);
@@ -82,7 +83,7 @@ function PricingPlansForm() {
   const fetchPricingPlan = async (id) => {
     try {
       const res = await api.get(
-        `http://3.111.42.130:3001/api/v1/pricing-plans/${id}`
+        `${PricingPlanConfig.pricingPlanApi}/${id}`
       );
       const data = res?.data?.data?.result?.[0];
       if (data) {

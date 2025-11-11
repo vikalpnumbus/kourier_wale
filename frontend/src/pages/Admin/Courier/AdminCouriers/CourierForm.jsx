@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAlert } from "../../../../middleware/AlertContext";
 import api from "../../../../utils/api";
+import courierConfig from "../../../../config/Courier/CourierConfig";
 
 function CourierForm() {
   const defaultForm = {
@@ -62,8 +63,8 @@ function CourierForm() {
 
     try {
       const url = isEdit
-        ? `http://3.111.42.130:3001/api/v1/courier/${id}`
-        : "http://3.111.42.130:3001/api/v1/courier";
+        ? `${courierConfig.courierApi}/${id}`
+        : `${courierConfig.courierApi}`
       const method = isEdit ? "patch" : "post";
 
       const payload = {
@@ -92,7 +93,7 @@ function CourierForm() {
   const fetchCourier = async (id) => {
     try {
       const res = await api.get(
-        `http://3.111.42.130:3001/api/v1/courier/${id}`
+        `${courierConfig.courierApi}/${id}`
       );
       const data = res?.data?.data?.result?.[0];
       if (data) {
