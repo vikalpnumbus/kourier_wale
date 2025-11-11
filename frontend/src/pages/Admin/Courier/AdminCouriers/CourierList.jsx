@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useAlert } from "../../../../middleware/AlertContext";
 import api from "../../../../utils/api";
 // import Icon from "@mdi/react";
 // import { mdiDelete, mdiPencil } from "@mdi/js";
 import Pagination from "../../../../Component/Pagination";
+import courierConfig from "../../../../config/Courier/CourierConfig";
 
 function CourierList() {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
-  const { showError, showSuccess } = useAlert();
   const [totalCount, setTotalCount] = useState(0);
 
   const handleFetchData = async () => {
@@ -23,7 +22,7 @@ function CourierList() {
       params.append("page", page);
       params.append("limit", limit);
 
-      const url = `http://3.111.42.130:3001/api/v1/courier?${params.toString()}`;
+      const url = `${courierConfig.courierApi}?${params.toString()}`;
 
       const { data } = await api.get(url);
 
