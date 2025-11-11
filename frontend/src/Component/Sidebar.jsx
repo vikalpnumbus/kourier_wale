@@ -53,6 +53,18 @@ function Sidebar({ setSideNavActive, sideNavActive }) {
         </li>
         <li
           className={`nav-item 
+            ${location.pathname.includes("/channel") ? "active" : ""}
+            ${hoveredItem === "channel" ? "hover-open" : ""}`}
+          onMouseEnter={() => setHoveredItem("channel")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Link className="nav-link" to="/channel">
+            <i className="mdi mdi-bell-ring menu-icon"></i>
+            <span className="menu-title">Channel</span>
+          </Link>
+        </li>
+        <li
+          className={`nav-item 
             ${location.pathname.includes("/warehouse") ? "active" : ""}
             ${hoveredItem === "warehouse" ? "hover-open" : ""}`}
           onMouseEnter={() => setHoveredItem("warehouse")}
@@ -223,6 +235,7 @@ function Sidebar({ setSideNavActive, sideNavActive }) {
             <span className="menu-title">Notification</span>
           </Link>
         </li>
+        
       </ul>
     </nav>
   );

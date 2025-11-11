@@ -22,6 +22,9 @@ import Cod_Remittance from "../pages/Seller/Billing/cod_remittance";
 import OrderView from "../pages/Seller/Orders/OrderView";
 import SellerLayout from "../layouts/SellerLayout";
 import LabelSettings from "../pages/Seller/Settings/LabelSettings";
+import Channel from "../pages/Seller/Channel";
+import ChannelTable from "../pages/Seller/Channel/ChannelTable";
+import ChannelForm from "../pages/Seller/Channel/ChannelForm";
 function AppRoutes() {
   return (
     <>
@@ -65,6 +68,12 @@ function AppRoutes() {
           <Route path="/cod_remittance" element={<Cod_Remittance />}></Route>
 
           <Route path="label_setting" element={<LabelSettings />} />
+
+          <Route path="/channel" element={<Channel />}>
+            <Route index element={<ChannelTable />} />
+            <Route path="add" element={<ChannelForm />} />
+            <Route path="edit/:id" element={<ChannelForm />} />
+          </Route>
         </Routes>
       </SellerLayout>
     </>

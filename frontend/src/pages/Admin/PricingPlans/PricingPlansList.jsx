@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom';
-import { useAlert } from '../../../middleware/AlertContext';
 import api from '../../../utils/api';
 import Pagination from '../../../Component/Pagination';
 import Icon from "@mdi/react";
-import { mdiDelete, mdiPencil } from "@mdi/js";
+import { mdiPencil } from "@mdi/js";
+import PricingPlanConfig from '../../../config/PricingPlan/PricingPlanConfig';
 
 function PricingPlansList() {
     const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
-  const { showError, showSuccess } = useAlert();
   const [totalCount, setTotalCount] = useState(0);
 
   const handleFetchData = async () => {
@@ -23,7 +22,7 @@ function PricingPlansList() {
       params.append("page", page);
       params.append("limit", limit);
 
-      const url = `http://3.111.42.130:3001/api/v1/pricing-plans?${params.toString()}`;
+      const url = `${PricingPlanConfig.pricingPlanApi}?${params.toString()}`;
 
       const { data } = await api.get(url);
 
