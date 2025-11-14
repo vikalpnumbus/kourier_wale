@@ -5,6 +5,7 @@ import {
   conversation_read,
   create,
   read,
+  update,
 } from "../../controllers/admin/admin.escalation.controller.mjs";
 import upload from "../../middlewares/multer.mjs";
 import ImageValidator from "../../validators/image.validator.mjs";
@@ -24,5 +25,7 @@ AdminEscalationRouter.get("/conversations/:id", conversation_read);
 
 AdminEscalationRouter.get("/", read);
 AdminEscalationRouter.get("/:id", read);
+
+AdminEscalationRouter.put("/:id", update);
 
 export default AdminEscalationRouter;

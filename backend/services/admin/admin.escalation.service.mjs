@@ -96,6 +96,30 @@ class Service {
     }
   }
 
+  async update({ data }) {
+    try {
+      const existingRecordId = data.id;
+
+      delete data.id;
+
+      const result = await this.repository.findOneAndUpdate(
+        { id: existingRecordId },
+        data
+      );
+
+      return {
+        status: 201,
+        data: {
+          message: "Escalataion has been updated successfully.",
+          id: result.id,
+        },
+      };
+    } catch (error) {
+      this.error = error;
+      return false;
+    }
+  }
+
   async conversation_create({ data }) {
     try {
       const { escalation_id, from, to, message, attachments } = data;
