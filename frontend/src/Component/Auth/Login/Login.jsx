@@ -9,6 +9,7 @@ import api from "../../../utils/api";
 import companyDetailsConfig from "../../../config/CompanyDetails/CompanyDetailsConfig";
 import { encrypt } from "../../../middleware/Encryption";
 import company_logo from "../../../../public/themes/assets/company_image/logo_company.png";
+import ChannelConfig from "../../../config/Channel/ChannelConfig";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -98,10 +99,23 @@ function Login() {
       const response = await api.get(companyDetailsConfig.companyDetails);
       const data = response?.data?.data?.companyDetails || {};
       localStorage.setItem("role", encrypt(data?.role));
+      handleFetchChannel()
       if (data?.role === "admin") navigate("/admin");
       else navigate("/");
     } catch (error) {
       console.error("Company Details Fetch Error:", error);
+    }
+  };
+
+  const handleFetchChannel = async () => {
+    if (!localStorage.getItem("token")) return;
+    try {
+      const response = await api.post(ChannelConfig.channelFetchApi, {
+        channel: "shopify",
+      });
+      
+    } catch (error) {
+      console.error("Channel Fetch Error:", error);
     }
   };
 
