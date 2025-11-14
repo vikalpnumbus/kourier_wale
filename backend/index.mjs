@@ -72,13 +72,13 @@ app.listen(PORT || 8001, () => {
     ...config,
   };
 
-  // console.info("App configurations:");
-  // console.table(
-  //   Object.keys(configuration)
-  //     .sort((a, b) => a.localeCompare(b))
-  //     .reduce((acc, key) => {
-  //       acc[key] = configuration[key];
-  //       return acc;
-  //     }, {})
-  // );
+  console.info("App configurations:");
+  console.table(
+    Object.keys(configuration)
+      .sort((a, b) => a.localeCompare(b))
+      .reduce((acc, key) => {
+        acc[key] = configuration[key];
+        return acc;
+      }, {})
+  );
 });
