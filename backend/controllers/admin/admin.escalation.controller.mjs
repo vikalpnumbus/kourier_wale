@@ -1,5 +1,6 @@
 import EscalationService from "../../services/admin/admin.escalation.service.mjs";
 import ImageService from "../../services/image.service.mjs";
+import UserService from "../../services/user.service.mjs";
 
 export const create = async (req, res, next) => {
   try {
@@ -48,9 +49,14 @@ export const read = async (req, res, next) => {
       id: req.params?.id,
       start_date: req.query?.start_date,
       end_date: req.query?.end_date,
-      userId: req.user.id,
+      userId: req.query?.userId,
       assigneeId: req.user.id,
     };
+
+    const user = await UserService.read({ id: req.user.id });
+    if (["rahul.singh@nimbuspost.com"].includes(user.email)) {
+      delete query.assigneeId;
+    }
 
     const result = await EscalationService.read(query);
     if (!result) {
@@ -60,6 +66,41 @@ export const read = async (req, res, next) => {
     res.success(result);
   } catch (error) {
     console.error("[escalation.controller.mjs/read]: error", error);
+    next(error);
+  }
+};
+
+export const update = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      const error = new Error("Record id is required.");
+      error.status = 400;
+      throw error;
+    }
+
+    const existingRecord = await EscalationService.read({
+      id: id,
+    });
+    if (!existingRecord) {
+      const error = new Error("No record found.");
+      error.status = 404;
+      throw error;
+    }
+
+    const payload = {
+      id: id,
+      ...req.body,
+    };
+
+    const result = await EscalationService.update({
+      data: payload,
+    });
+    if (!result) {
+      throw EscalationService.error;
+    }
+    res.success(result);
+  } catch (error) {
     next(error);
   }
 };
