@@ -21,7 +21,7 @@ class RedisClient {
       });
 
       this.redis.on("error", (err) => {
-        console.error(`🟡 Redis error (attempt ${attempt}):`, err.message);
+        console.error(`🟡 ${new Date()} Redis error (attempt ${attempt}):`, err.message);
       });
 
       this.redis.on("end", () => {
