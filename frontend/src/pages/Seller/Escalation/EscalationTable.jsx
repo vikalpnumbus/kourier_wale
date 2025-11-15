@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { mdiDelete, mdiEye, mdiPencil } from "@mdi/js";
+import { mdiEye } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Link, useSearchParams } from "react-router-dom";
 import api from "../../../utils/api";
 import Pagination from "../../../Component/Pagination";
 import { formatDateTime } from "../../../middleware/CommonFunctions";
+import escalationConfig from "../../../config/Escalation/EscalationConfig";
 
 function EscalationTable() {
   const [dataList, setDataList] = useState([]);
@@ -15,8 +16,6 @@ function EscalationTable() {
   const handleFetchData = async () => {
     setLoading(true);
     try {
-      const name = searchParams.get("name")?.trim();
-      const category = searchParams.get("category")?.trim();
       const page = parseInt(searchParams.get("page") || "1", 10);
       const limit = parseInt(searchParams.get("limit") || "10", 10);
 
@@ -24,14 +23,9 @@ function EscalationTable() {
       const params = new URLSearchParams();
       params.append("page", page);
       params.append("limit", limit);
-      if (name) {
-        params.append("name", name);
-      }
-      if (category) {
-        params.append("category", category);
-      }
+      
 
-      const url = `http://3.111.42.130:3001/api/v1/escalations?${params.toString()}`;
+      const url = `${escalationConfig.escalationApi}?${params.toString()}`;
 
       const { data } = await api.get(url);
 

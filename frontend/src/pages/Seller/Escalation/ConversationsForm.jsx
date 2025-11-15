@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAlert } from "../../../middleware/AlertContext";
 import api from "../../../utils/api";
+import escalationConfig from "../../../config/Escalation/EscalationConfig";
 
 function ConversationsForm({
   escalationId,
@@ -29,7 +30,7 @@ function ConversationsForm({
       formData.append("message", message);
       if (file) formData.append("attachments", file);
 
-      const url = "http://3.111.42.130:3001/api/v1/escalations/conversations";
+      const url = escalationConfig.conversationsApi;
 
       const response = await api.post(url, formData, {
         headers: { "Content-Type": "multipart/form-data" },

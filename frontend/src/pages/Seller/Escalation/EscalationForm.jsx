@@ -7,6 +7,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../../../middleware/AlertContext";
 import api from "../../../utils/api";
+import escalationConfig from "../../../config/Escalation/EscalationConfig";
 
 const defaultForm = {
   type: "",
@@ -81,7 +82,7 @@ function EscalationForm() {
     setLoading(true);
 
     try {
-      const url = "http://3.111.42.130:3001/api/v1/escalations";
+      const url = escalationConfig.escalationApi;
 
       const formData = new FormData();
       formData.append("type", form.type);

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import api from "../../../utils/api";
 import { formatDateTime } from "../../../middleware/CommonFunctions";
 import ConversationsForm from "./ConversationsForm";
+import escalationConfig from "../../../config/Escalation/EscalationConfig";
 
 function EscalationView() {
   const { id } = useParams();
@@ -14,7 +15,7 @@ function EscalationView() {
     try {
       setLoading(true);
       const response = await api.get(
-        `http://3.111.42.130:3001/api/v1/escalations/${id}`
+        `${escalationConfig.escalationApi}/${id}`
       );
       const resData = response?.data?.data?.result?.[0] || {};
       setEscalationData(resData);
@@ -29,7 +30,7 @@ function EscalationView() {
   const handleFetchConversation = async (escalation_id) => {
     try {
       const response = await api.get(
-        `http://3.111.42.130:3001/api/v1/escalations/conversations?escalation_id=${escalation_id}`
+        `${escalationConfig.conversationsApi}?escalation_id=${escalation_id}`
       );
       const resData = response?.data?.data?.result || [];
       setConversationData(resData);
