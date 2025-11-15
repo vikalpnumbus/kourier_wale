@@ -25,6 +25,10 @@ import LabelSettings from "../pages/Seller/Settings/LabelSettings";
 import Channel from "../pages/Seller/Channel";
 import ChannelTable from "../pages/Seller/Channel/ChannelTable";
 import ChannelForm from "../pages/Seller/Channel/ChannelForm";
+import Escalation from "../pages/Seller/Escalation";
+import EscalationTable from "../pages/Seller/Escalation/EscalationTable";
+import EscalationView from "../pages/Seller/Escalation/EscalationView";
+import EscalationForm from "../pages/Seller/Escalation/EscalationForm";
 function AppRoutes() {
   return (
     <>
@@ -73,6 +77,12 @@ function AppRoutes() {
             <Route index element={<ChannelTable />} />
             <Route path="add" element={<ChannelForm />} />
             <Route path="edit/:id" element={<ChannelForm />} />
+          </Route>
+
+          <Route path="/support" element={<Escalation />}>
+            <Route index element={<EscalationTable />} />
+            <Route path="add" element={<EscalationForm />} />
+            <Route path="view/:id" element={<EscalationView />} />
           </Route>
         </Routes>
       </SellerLayout>

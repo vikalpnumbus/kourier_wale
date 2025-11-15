@@ -24443,7 +24443,7 @@ svg {
 }
 .btn-outline-primary:hover {
   background: #1F3BB3;
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 .btn-secondary, .wizard > .actions .disabled a {
