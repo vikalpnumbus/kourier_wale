@@ -508,7 +508,9 @@ function OrdersForm() {
                           </small>
                         )}
 
-                        <h4 className="text-start mb-3 mt-3">Charges</h4>
+                        <div className="col-md-6"></div>
+                        <h4 className="text-start col-md-6 mb-3 mt-3">Charges</h4>
+                        <div className="col-md-6"></div>
                         {[
                           "orderAmount",
                           "charges.shipping",
@@ -523,16 +525,20 @@ function OrdersForm() {
                           };
 
                           return (
-                            <InputField
-                              key={field}
-                              label={labelMap[field] || field}
-                              name={field}
-                              value={form[field]}
-                              onChange={handleChange}
-                              error={errors[field]}
-                              disabled={field === "orderAmount"}
-                              ref={(node) => setRef(field, node)}
-                            />
+                            <>
+                              <InputField
+                                key={field}
+                                label={labelMap[field] || field}
+                                name={field}
+                                value={form[field]}
+                                onChange={handleChange}
+                                error={errors[field]}
+                                disabled={field === "orderAmount"}
+                                ref={(node) => setRef(field, node)}
+                                screenMd="6"
+                              />
+                              <div className="col-md-6"></div>
+                            </>
                           );
                         })}
 
@@ -545,6 +551,7 @@ function OrdersForm() {
                             onChange={handleChange}
                             error={errors["charges.cod"]}
                             ref={(node) => setRef("charges.cod", node)}
+                            screenMd="6"
                           />
                         )}
                         {form.paymentType !== "cod" && (
@@ -557,6 +564,7 @@ function OrdersForm() {
                             onChange={handleChange}
                             disabled={form.paymentType === "prepaid"}
                             ref={(node) => setRef("collectableAmount", node)}
+                            screenMd="6"
                           />
                         )}
                       </div>
@@ -701,8 +709,6 @@ function OrdersForm() {
                         </div>
                       </div>
                     </div>
-
-                   
                   </div>
 
                   <button className="btn btn-primary w-100" type="submit">
