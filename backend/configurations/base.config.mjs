@@ -34,6 +34,8 @@ const {
   EMAIL_PORT,
   EMAIL_USER,
   EMAIL_PASS,
+  SHADOWFAX_SECRET_KEY,
+  SHADOWFAX_API_URL,
 } = process.env;
 
 export {
@@ -64,4 +66,6 @@ export {
   EMAIL_PORT,
   EMAIL_USER,
   EMAIL_PASS,
+  SHADOWFAX_SECRET_KEY,
+  SHADOWFAX_API_URL,
 };

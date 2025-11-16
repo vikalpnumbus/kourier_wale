@@ -9,6 +9,7 @@ import CourierService from "./courier.service.mjs";
 import XpressBeesProvider from "../providers/couriers/xpressbees.provider.mjs";
 import CourierAWBListService from "./courierAWBList.service.mjs";
 import ChannelService from "./channel.service.mjs";
+import ShadowfaxProvider from "../providers/couriers/shadowfax.provider.mjs";
 
 class Service {
   constructor() {
@@ -145,17 +146,18 @@ class Service {
 
       const result = await this.repository.save(payload);
 
-      const orderUpdate = await OrdersService.update({
-        data: {
-          id: order_id,
-          warehouse_id,
-          rto_warehouse_id,
-          shipping_status: "booked",
-        },
-      });
-      if (!orderUpdate)
-        console.error("shipping/create/orderUpdate", OrdersService.error);
+      // const orderUpdate = await OrdersService.update({
+      //   data: {
+      //     id: order_id,
+      //     warehouse_id,
+      //     rto_warehouse_id,
+      //     shipping_status: "booked",
+      //   },
+      // });
+      // if (!orderUpdate)
+      //   console.error("shipping/create/orderUpdate", OrdersService.error);
 
+      console.log("err: ", errors);
       if (errors.length == 0) {
         const createSingleShipment = await this.handleCreateSingleShipment({
           ...payload,
@@ -165,7 +167,7 @@ class Service {
         });
 
         if (!createSingleShipment) throw ShippingService.error;
-      }
+      } else throw new Error(errors.join(", "));
 
       return {
         status: 201,
@@ -412,6 +414,7 @@ class Service {
   }
 
   async handleCreateSingleShipment(data) {
+    console.log("data: ", data);
     try {
       const id = data.id;
       const courier = data.courier;
@@ -453,6 +456,56 @@ class Service {
           if (!updatedAWBData) {
             console.error(CourierAWBListService.error);
           }
+
+          const existingUser = await UserService.read({ id: userId });
+
+          const updatedUser = await UserService.update(
+            { id: userId },
+            {
+              wallet_balance: existingUser.wallet_balance - total_price,
+            }
+          );
+
+          if (!updatedUser) {
+            console.error(
+              "shipping/create/userWalletUpdate",
+              UserService.error
+            );
+          }
+        }
+      } else if (code.includes("shadowfax")) {
+        const shipmentRes = await ShadowfaxProvider.createShipment(data);
+
+        if (!shipmentRes) {
+          await ShippingService.update({
+            data: {
+              id,
+              shipment_error: ShadowfaxProvider.error.message,
+            },
+          });
+        } else {
+          const updatedShipmentData = await ShippingService.update({
+            data: {
+              id,
+              shipping_status: "booked",
+              awb_number: shipmentRes.AWBNo,
+              shipment_error: null,
+            },
+          });
+
+          if (!updatedShipmentData) {
+            console.error(ShippingService.error);
+          }
+
+          // const updatedAWBData = await CourierAWBListService.update({
+          //   data: {
+          //     id: shipmentRes?.courierAWBListData?.id,
+          //     used: 1,
+          //   },
+          // });
+          // if (!updatedAWBData) {
+          //   console.error(CourierAWBListService.error);
+          // }
 
           const existingUser = await UserService.read({ id: userId });
 
