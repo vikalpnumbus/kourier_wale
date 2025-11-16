@@ -29,6 +29,8 @@ import Escalation from "../pages/Seller/Escalation";
 import EscalationTable from "../pages/Seller/Escalation/EscalationTable";
 import EscalationView from "../pages/Seller/Escalation/EscalationView";
 import EscalationForm from "../pages/Seller/Escalation/EscalationForm";
+import AddChannelPage from "../pages/Seller/Channel/AddChannelPage";
+import ShopifyForm from "../pages/Seller/Channel/ShopifyForm";
 function AppRoutes() {
   return (
     <>
@@ -75,8 +77,9 @@ function AppRoutes() {
 
           <Route path="/channel" element={<Channel />}>
             <Route index element={<ChannelTable />} />
-            <Route path="add" element={<ChannelForm />} />
-            <Route path="edit/:id" element={<ChannelForm />} />
+            <Route path="add" element={<AddChannelPage />} />
+            <Route path="add/shopify" element={<ShopifyForm />} />
+            <Route path="edit/shopify/:id" element={<ShopifyForm />} />
           </Route>
 
           <Route path="/support" element={<Escalation />}>

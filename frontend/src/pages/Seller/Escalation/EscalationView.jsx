@@ -14,9 +14,7 @@ function EscalationView() {
   const handleFetchData = async () => {
     try {
       setLoading(true);
-      const response = await api.get(
-        `${escalationConfig.escalationApi}/${id}`
-      );
+      const response = await api.get(`${escalationConfig.escalationApi}/${id}`);
       const resData = response?.data?.data?.result?.[0] || {};
       setEscalationData(resData);
       handleFetchConversation(resData.id);
@@ -61,30 +59,32 @@ function EscalationView() {
       <div className="row">
         <div className="col-md-8">
           <div className="row">
-            <div className="col-md-12">
-              <ul
-                className="list-group mt-3"
-                // style={{ maxHeight: "300px", overflowY: "auto" }}
-              >
-                {conversationData?.length > 0 ? (
-                  conversationData.map((item) => (
-                    <li key={item.id} className="list-group-item">
-                      <div className="row g-2 align-items-center ">
-                        <div>
-                          <b>{item?.to || ""}</b>{" "}
-                          {item?.updatedAt
-                            ? formatDateTime(item?.updatedAt)
-                            : ""}
-                        </div>
-                        <div>{item?.message || ""}</div>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  <></>
-                )}
-              </ul>
-            </div>
+            {conversationData?.length > 0 && (
+              <>
+                <div className="col-md-12">
+                  <ul className="list-group mt-3">
+                    {conversationData?.length > 0 ? (
+                      conversationData.map((item) => (
+                        <li key={item.id} className="list-group-item">
+                          <div className="row g-2 align-items-center ">
+                            <div>
+                              <b>{item?.to || ""}</b>{" "}
+                              {item?.updatedAt
+                                ? formatDateTime(item?.updatedAt)
+                                : ""}
+                            </div>
+                            <div>{item?.message || ""}</div>
+                          </div>
+                        </li>
+                      ))
+                    ) : (
+                      <></>
+                    )}
+                  </ul>
+                </div>
+              </>
+            )}
+
             <div className="col-md-12">
               <ConversationsForm
                 escalationId={escalationData.id}
@@ -94,12 +94,12 @@ function EscalationView() {
           </div>
         </div>
         <div className="col-md-4">
-          <div className="card bg-secondary card-rounded mt-3">
+          <div className="card card-rounded mt-3 bg-light">
             <div className="card-body ">
-              <h4 className="card-title card-title-dash text-white mb-2">
+              <h4 className="card-title card-title-dash  mb-2">
                 Escalation Status
               </h4>
-              <div className="text-white">
+              <div>
                 Raised at:{" "}
                 <b>
                   {escalationData?.createdAt
@@ -107,7 +107,7 @@ function EscalationView() {
                     : ""}
                 </b>
               </div>
-              <div className="text-white">
+              <div>
                 Status : <b>Status</b>
               </div>
             </div>

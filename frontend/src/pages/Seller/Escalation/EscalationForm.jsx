@@ -1,6 +1,5 @@
 import React, {
   useCallback,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -27,14 +26,13 @@ function EscalationForm() {
   const { showError, showSuccess } = useAlert();
   const navigate = useNavigate();
 
-  // Handle text inputs
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
+
     setForm((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
   }, []);
 
-  // Handle multiple file uploads
   const handleFileChange = useCallback((e) => {
     const files = Array.from(e.target.files);
 
@@ -49,20 +47,18 @@ function EscalationForm() {
     }
 
     const urls = files.map((file) => URL.createObjectURL(file));
-
     setPreviews(urls);
+
     setForm((prev) => ({ ...prev, attachments: files }));
     setErrors((prev) => ({ ...prev, attachments: "" }));
   }, []);
 
-  // Remove attachments
   const removePreviews = useCallback(() => {
     setPreviews([]);
     setForm((prev) => ({ ...prev, attachments: [] }));
     if (fileInputRef.current) fileInputRef.current.value = "";
   }, []);
 
-  // Validations
   const validate = useCallback(() => {
     const newErrors = {};
 
@@ -70,11 +66,14 @@ function EscalationForm() {
     if (!form.subject.trim()) newErrors.subject = "Subject is required";
     if (!form.query.trim()) newErrors.query = "Query is required";
 
+    if (form.type === "Shipment Query" && !form.awb_numbers.trim()) {
+      newErrors.awb_numbers = "AWB Number is required for Shipment Query";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [form]);
 
-  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -116,14 +115,7 @@ function EscalationForm() {
     }
   };
 
-  const inputFields = useMemo(
-    () => [
-      { label: "AWB Numbers (comma separated)", name: "awb_numbers" },
-    ],
-    []
-  );
-
-  const typeOptions = ["Tech Query", "Billing Query"];
+  const typeOptions = ["Shipment Query", "Tech Query", "Billing Query", "Pickup Query"];
 
   const subjectOptions = [
     "Proof of Delivery",
@@ -150,7 +142,6 @@ function EscalationForm() {
               <form onSubmit={handleSubmit}>
                 <div className="row">
 
-                  {/* Type Dropdown */}
                   <div className="col-md-4 mb-2">
                     <div className="form-group text-start mb-3">
                       <label>
@@ -175,7 +166,6 @@ function EscalationForm() {
                     </div>
                   </div>
 
-                  {/* Subject Dropdown */}
                   <div className="col-md-4 mb-2">
                     <div className="form-group text-start mb-3">
                       <label>
@@ -200,19 +190,16 @@ function EscalationForm() {
                     </div>
                   </div>
 
-                  {/* Dynamic Input Fields */}
-                  {inputFields.map(({ label, name }) => (
+                  {form.type === "Shipment Query" && (
                     <InputField
-                      key={name}
-                      label={label}
-                      name={name}
-                      value={form[name]}
+                      label="AWB Numbers (comma separated)"
+                      name="awb_numbers"
+                      value={form.awb_numbers}
                       onChange={handleChange}
-                      error={errors[name]}
+                      error={errors.awb_numbers}
                     />
-                  ))}
+                  )}
 
-                  {/* Query */}
                   <div className="col-md-12 mb-2">
                     <div className="form-group text-start mb-3">
                       <label>
@@ -232,7 +219,6 @@ function EscalationForm() {
                     </div>
                   </div>
 
-                  {/* Attachments */}
                   <div className="col-md-6 mb-2">
                     <div className="form-group text-start mb-3">
                       <label>Attachments (multiple)</label>
@@ -249,7 +235,6 @@ function EscalationForm() {
                     </div>
                   </div>
 
-                  {/* Preview */}
                   <div className="col-md-12 mb-2">
                     {previews.length > 0 && (
                       <div className="mt-2 d-flex gap-3 flex-wrap">
@@ -273,9 +258,9 @@ function EscalationForm() {
                       </div>
                     )}
                   </div>
+
                 </div>
 
-                {/* Submit */}
                 <button
                   type="submit"
                   className="btn btn-primary w-100"
@@ -283,6 +268,7 @@ function EscalationForm() {
                 >
                   {loading ? "Processing..." : "Submit Escalation"}
                 </button>
+
               </form>
             </div>
           </div>
