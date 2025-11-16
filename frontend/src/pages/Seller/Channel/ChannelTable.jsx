@@ -9,7 +9,7 @@ import { formatDateTime } from "../../../middleware/CommonFunctions";
 import ChannelConfig from "../../../config/Channel/ChannelConfig";
 
 function ChannelTable() {
-    const [dataList, setDataList] = useState([]);
+  const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const { showError, showSuccess } = useAlert();
@@ -66,14 +66,14 @@ function ChannelTable() {
     handleFetchData();
   }, [searchParams]);
   return (
-    <div>
-      <>
+    <>
       <div className="table-responsive h-100">
         <table className="table table-hover">
           <thead>
             <tr>
               <th>Channel</th>
               <th>Channel Name</th>
+              <th>Channel Host</th>
               <th>Date</th>
               <th>Actions</th>
             </tr>
@@ -92,17 +92,17 @@ function ChannelTable() {
             ) : dataList.length > 0 ? (
               dataList.map((data) => (
                 <tr key={data.id}>
-                  <td className="py-2">
-                    
-                    {data.channel || ""}
-                  </td>
+                  <td className="py-2">{data.channel || ""}</td>
                   <td className="py-2">{data.channel_name || ""}</td>
-                  <td className="py-2">{data?.createdAt ? (formatDateTime(data?.createdAt)):("")}</td>
-                  
+                  <td className="py-2">{data.channel_host || ""}</td>
+                  <td className="py-2">
+                    {data?.createdAt ? formatDateTime(data?.createdAt) : ""}
+                  </td>
+
                   <td className="py-2">
                     <div className="btn-group">
                       <Link
-                        to={`edit/${data.id}`}
+                        to={`edit${data.channel == "shopify" ? "/shopify" : ""}/${data.id}`}
                         className="btn btn-outline-primary btn-md py-2 px-3"
                       >
                         <Icon path={mdiPencil} size={0.6} />
@@ -129,8 +129,7 @@ function ChannelTable() {
       </div>
       <Pagination totalCount={totalCount} />
     </>
-    </div>
-  )
+  );
 }
 
-export default ChannelTable
+export default ChannelTable;
