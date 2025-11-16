@@ -4,6 +4,7 @@ import rabbitMQ from "../../configurations/rabbitMQ.config.mjs";
 import FactoryRepository from "../../repositories/factory.repository.mjs";
 import UserService from "../../services/user.service.mjs";
 import XpressBeesProvider from "../../providers/couriers/xpressbees.provider.mjs";
+import ShadowfaxProvider from "../../providers/couriers/shadowfax.provider.mjs";
 import ShippingService from "../../services/shipping.service.mjs";
 import CourierAWBListService from "../../services/courierAWBList.service.mjs";
 import { createCsvFromArray } from "../../utils/basic.utils.mjs";
