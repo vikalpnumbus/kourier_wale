@@ -51,7 +51,7 @@ class Service {
 
   async read(params) {
     try {
-      const { page = 1, limit = 50, id, search, ...filters } = params;
+      const { page = 1, limit = 50, id, search,courier_id, ...filters } = params;
 
       // Build where condition
       let where = { ...filters };
@@ -63,6 +63,7 @@ class Service {
       if (search) {
         where[Op.or] = [{ name: { [Op.like]: `%${search}%` } }];
       }
+      if(courier_id)where.courier_id = courier_id;
 
       let result;
       let totalCount;
