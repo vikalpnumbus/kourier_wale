@@ -68,14 +68,13 @@ class Service {
       let totalCount;
 
       if (id) {
-        result = await this.repository.findOne(where);
+        result = await this.repository.find(where);
         if (!result) {
           const error = new Error("No record found.");
           error.status = 404;
           throw error;
         }
         totalCount = 1;
-        result = [result];
       } else {
         result = await this.repository.find(where, { page, limit });
         totalCount = await this.repository.countDocuments(where);
