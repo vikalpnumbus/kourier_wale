@@ -65,7 +65,7 @@ export const read = async (req, res, next) => {
     const query = {
       page: req.query.page,
       limit: req.query.limit,
-      search: req.query.search,
+      courier_id: req.query.courier_id,
       id: req.params.id || undefined,
     };
 

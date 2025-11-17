@@ -42,6 +42,7 @@ export const read = async (req, res, next) => {
       limit: req.query.limit,
       search: req.query.search,
       id: req.params.id || undefined,
+      courier_id:req.params?.courier_id
     };
 
     const result = await CourierPricingCardService.read(query);
