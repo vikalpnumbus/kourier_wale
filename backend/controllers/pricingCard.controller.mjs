@@ -100,7 +100,7 @@ export const read = async (req, res, next) => {
       })
     );
 
-    console.log('result: ', resultData);
+    console.log('result: ', { ...result, data: { ...result.data, result: resultData } });
     res.success({ ...result, data: { ...result.data, result: resultData } });
   } catch (error) {
     next(error);
