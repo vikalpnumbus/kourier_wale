@@ -72,12 +72,10 @@ export const read = async (req, res, next) => {
 
     const userId = req.user.id;
     const userData = await UserService.read({ id: userId });
-    console.log("userData: ", userData);
     const userPricingPlanId = userData?.pricing_plan_id;
     if (userData.role == "user") {
       query.plan_id = userPricingPlanId;
     }
-    console.log('query: ', query);
     const result = await PricingCardService.read(query);
 
     if (!result) {
@@ -85,9 +83,11 @@ export const read = async (req, res, next) => {
     }
     const courierCache = {};
 
+    console.log('result: ', result);
     let resultData = await Promise.all(
       result.data.result.map(async (e) => {
         const { dataValues, courier_id } = e;
+        console.log('e: ', e);
 
         if (courier_id && !courierCache.courier_id) {
           const courier = (await CourierService.read({ id: courier_id }))?.data

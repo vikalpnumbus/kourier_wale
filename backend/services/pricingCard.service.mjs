@@ -65,14 +65,12 @@ class Service {
       }
       if(courier_id)where.courier_id = courier_id;
       if(plan_id)where.plan_id = plan_id;
-      console.log('where: ', where);
 
       let result;
       let totalCount;
 
       if (id) {
         result = await this.repository.find(where);
-        console.log('result: ', result);
         if (!result) {
           const error = new Error("No record found.");
           error.status = 404;
@@ -81,7 +79,6 @@ class Service {
         totalCount = 1;
       } else {
         result = await this.repository.find(where, { page, limit });
-        console.log('result: ', result);
         totalCount = await this.repository.countDocuments(where);
 
         if (!result || result.length === 0) {
