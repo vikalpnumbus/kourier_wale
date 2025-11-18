@@ -83,17 +83,16 @@ export const read = async (req, res, next) => {
     }
     const courierCache = {};
 
-    console.log('result: ', result);
     let resultData = await Promise.all(
       result.data.result.map(async (e) => {
         const { dataValues, courier_id } = e;
-        console.log('e: ', e);
-
+        
         if (courier_id && !courierCache.courier_id) {
           const courier = (await CourierService.read({ id: courier_id }))?.data
-            ?.result?.[0]?.name;
+          ?.result?.[0]?.name;
           courierCache.courier_id = courier || null;
         }
+        console.log('e: ', e);
 
         return {
           ...dataValues,
