@@ -67,17 +67,17 @@ export const read = async (req, res, next) => {
       limit: req.query.limit,
       courier_id: req.query.courier_id,
       id: req.params.id || undefined,
-      plan_id: req.query.plan_id,
+      plan_id: req.query?.plan_id,
     };
 
     const userId = req.user.id;
     const userData = await UserService.read({ id: userId });
     console.log("userData: ", userData);
     const userPricingPlanId = userData?.pricing_plan_id;
-    query.plan_id = userPricingPlanId;
-    if (userData.role == "admin") {
-      query.plan_id = plan_id;
+    if (userData.role == "user") {
+      query.plan_id = userPricingPlanId;
     }
+    console.log('query: ', query);
     const result = await PricingCardService.read(query);
 
     if (!result) {
