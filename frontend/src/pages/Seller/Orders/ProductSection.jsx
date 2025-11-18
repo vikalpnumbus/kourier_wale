@@ -151,7 +151,6 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
               >
                 <img
                   src={`${import.meta.env.VITE_API_URL}${item.productImage[1]}`}
-                  alt={item.name}
                   className="img-fluid mb-2 mb-md-0 me-md-3"
                   height={100}
                   width={60}
