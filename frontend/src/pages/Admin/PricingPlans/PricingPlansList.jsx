@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import api from '../../../utils/api';
 import Pagination from '../../../Component/Pagination';
 import Icon from "@mdi/react";
-import { mdiPencil } from "@mdi/js";
+import { mdiEye, mdiPencil } from "@mdi/js";
 import PricingPlanConfig from '../../../config/PricingPlan/PricingPlanConfig';
 
 function PricingPlansList() {
@@ -75,6 +75,12 @@ function PricingPlansList() {
                             className="btn btn-outline-primary btn-md py-2 px-3"
                           >
                             <Icon path={mdiPencil} size={0.6} />
+                          </Link>
+                          <Link
+                            to={`view/${data?.id}`}
+                            className="btn btn-outline-primary btn-md py-2 px-3"
+                          >
+                            <Icon path={mdiEye} size={0.6} />
                           </Link>
                           
                         </div>
