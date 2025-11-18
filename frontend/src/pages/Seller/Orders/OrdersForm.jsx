@@ -407,6 +407,7 @@ function OrdersForm() {
               <div className="card-body pd-45">
                 <form onSubmit={handleSubmit}>
                   <div className="row">
+                    
                     <div className="col-md-8">
                       <div className="row">
                         <h4 className="text-start mb-3">
@@ -711,7 +712,7 @@ function OrdersForm() {
                     </div>
                   </div>
 
-                  <button className="btn btn-primary w-100" type="submit">
+                  <button className="btn btn-primary float-end" type="submit">
                     {loading ? "Submitting..." : "Create order"}
                   </button>
                 </form>

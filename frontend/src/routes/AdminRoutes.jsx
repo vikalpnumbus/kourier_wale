@@ -15,6 +15,8 @@ import CourierForm from "../pages/Admin/Courier/AdminCouriers/CourierForm";
 import PricingPlans from "../pages/Admin/PricingPlans";
 import PricingPlansList from "../pages/Admin/PricingPlans/PricingPlansList";
 import PricingPlansForm from "../pages/Admin/PricingPlans/PricingPlansForm";
+import PricingPlanView from "../pages/Admin/PricingPlans/PricingPlanView";
+import PricingPlanEdit from "../pages/Admin/PricingPlans/PricingPlanEdit";
 
 
 function AdminRoutes() {
@@ -48,7 +50,8 @@ function AdminRoutes() {
           <Route path="/plans" element={<PricingPlans />}>
             <Route index element={<PricingPlansList />} />
             <Route path="add" element={<PricingPlansForm />} />
-            <Route path="edit/:id" element={<PricingPlansForm />} />
+            <Route path="edit/:id" element={<PricingPlanEdit />} />
+            <Route path="view/:id" element={<PricingPlanView />} />
           </Route>
 
         </Routes>
