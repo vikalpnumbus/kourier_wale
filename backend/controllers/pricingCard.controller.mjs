@@ -92,7 +92,6 @@ export const read = async (req, res, next) => {
           ?.result?.[0]?.name;
           courierCache.courier_id = courier || null;
         }
-        console.log('e: ', e);
 
         return {
           ...dataValues,
@@ -101,6 +100,7 @@ export const read = async (req, res, next) => {
       })
     );
 
+    console.log('result: ', resultData);
     res.success({ ...result, data: { ...result.data, result: resultData } });
   } catch (error) {
     next(error);
