@@ -30,7 +30,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   res.success = ({ data, status = 200 }) => {
-    console.log("{ data, status = 200 }: ", { data, status });
+    console.log('hihi', {
+      status,
+      data: data || "",
+    })
     return res.status(status).json({
       status,
       data: data || "",
