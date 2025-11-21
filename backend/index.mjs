@@ -15,11 +15,27 @@ await redisClient.connect();
 await sqlDB.connect();
 await rabbitMQ.connect();
 
-new Worker("./workers/common.worker.mjs");
-new Worker("./workers/orders.worker.mjs");
-new Worker("./workers/shipping.worker.mjs");
-new Worker("./workers/products.worker.mjs");
-new Worker("./workers/warehouse.worker.mjs");
+const workers = [
+  new Worker("./workers/common.worker.mjs"),
+  new Worker("./workers/orders.worker.mjs"),
+  new Worker("./workers/shipping.worker.mjs"),
+  new Worker("./workers/products.worker.mjs"),
+  new Worker("./workers/warehouse.worker.mjs"),
+];
+
+// Wait for workers to signal they are ready
+await Promise.all(
+  workers.map(
+    (w) =>
+      new Promise((resolve) => {
+        w.once("message", (msg) => {
+          if (msg === "ready") resolve();
+        });
+      })
+  )
+);
+
+console.log("All consumers are ready. Starting API...");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,10 +46,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   res.success = ({ data, status = 200 }) => {
-    console.log('hihi', {
+    console.log("hihi", {
       status,
       data: data || "",
-    })
+    });
     return res.status(status).json({
       status,
       data: data || "",
@@ -75,13 +91,15 @@ app.listen(PORT || 8001, () => {
     ...config,
   };
 
-  console.info("App configurations:");
-  console.table(
-    Object.keys(configuration)
-      .sort((a, b) => a.localeCompare(b))
-      .reduce((acc, key) => {
-        acc[key] = configuration[key];
-        return acc;
-      }, {})
-  );
+  if (process.env.NODE_ENV === "production") {
+    console.info("App configurations:");
+    console.table(
+      Object.keys(configuration)
+        .sort((a, b) => a.localeCompare(b))
+        .reduce((acc, key) => {
+          acc[key] = configuration[key];
+          return acc;
+        }, {})
+    );
+  }
 });

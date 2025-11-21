@@ -1,3 +1,4 @@
+import { parentPort, isMainThread } from "node:worker_threads";
 import BankDetailsConsumer from "../queue/consumer/bankDetails.consumer.mjs";
 import CompanyDetailsConsumer from "../queue/consumer/companyDetails.consumer.mjs";
 import KycConsumer from "../queue/consumer/kyc.consumer.mjs";
@@ -6,4 +7,8 @@ import KycConsumer from "../queue/consumer/kyc.consumer.mjs";
   await CompanyDetailsConsumer.consume();
   await BankDetailsConsumer.consume();
   await KycConsumer.consume();
+
+  if (!isMainThread && parentPort) {
+    parentPort.postMessage("ready");
+  }
 })();

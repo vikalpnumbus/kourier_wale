@@ -10,6 +10,9 @@ class RabbitMQClient {
   }
 
   async connect(attempt = 1) {
+
+    if (this.connection) return this.connection;
+    
     if (attempt > 5) {
       throw new Error(
         `Failed to connect to RabbitMQ after ${attempt - 1} attempts`
@@ -52,10 +55,11 @@ class RabbitMQClient {
     return this.channels.get(name);
   }
 
-  async publish(exchange, routingKey, message, options = {}) {
+  async publish(exchange, routingKey, message, options = { mandatory: true }) {
     const channel = await this.getChannel("publisher");
     await channel.assertExchange(exchange, "direct", { durable: true });
     const msgBuffer = Buffer.from(JSON.stringify(message));
+    console.log("msgBuffer: ", msgBuffer);
     channel.publish(exchange, routingKey, msgBuffer, options);
   }
 
@@ -72,7 +76,12 @@ class RabbitMQClient {
 
     await channel.prefetch(prefetch);
 
+    channel.on("return", (msg) => {
+      console.error("Message returned — queue binding not ready!", msg);
+    });
+
     channel.consume(queue, async (msg) => {
+      console.log("msg: ", msg);
       if (msg !== null) {
         try {
           const data = JSON.parse(msg.content.toString());
@@ -84,6 +93,8 @@ class RabbitMQClient {
         }
       }
     });
+
+    
   }
 }
 
