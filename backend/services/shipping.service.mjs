@@ -157,7 +157,7 @@ class Service {
       // if (!orderUpdate)
       //   console.error("shipping/create/orderUpdate", OrdersService.error);
 
-      console.log("err: ", errors);
+      console.error("err: ", errors);
       if (errors.length == 0) {
         const createSingleShipment = await this.handleCreateSingleShipment({
           ...payload,
@@ -414,7 +414,6 @@ class Service {
   }
 
   async handleCreateSingleShipment(data) {
-    console.log("data: ", data);
     try {
       const id = data.id;
       const courier = data.courier;

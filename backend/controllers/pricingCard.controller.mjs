@@ -86,10 +86,10 @@ export const read = async (req, res, next) => {
     let resultData = await Promise.all(
       result.data.result.map(async (e) => {
         const { dataValues, courier_id } = e;
-        
+
         if (courier_id && !courierCache.courier_id) {
           const courier = (await CourierService.read({ id: courier_id }))?.data
-          ?.result?.[0]?.name;
+            ?.result?.[0]?.name;
           courierCache.courier_id = courier || null;
         }
 
@@ -100,7 +100,7 @@ export const read = async (req, res, next) => {
       })
     );
 
-    console.log('result: ', { ...result, data: { ...result.data, result: resultData } });
+   
     res.success({ ...result, data: { ...result.data, result: resultData } });
   } catch (error) {
     next(error);
@@ -166,181 +166,17 @@ export const remove = async (req, res, next) => {
 export const priceCalculator = async (req, res, next) => {
   let { origin, destination, weight, length, breadth, height, paymentType } =
     req.body;
-  const volumetricDivisor = 5000;
-  const deadWeight = CustomMath.roundOff(weight);
 
-  const calculatedZone = PricingCardService.calculateZone(origin, destination);
-
-  const volumetricWeight = CustomMath.roundOff(
-    (CustomMath.roundOff(length) *
-      CustomMath.roundOff(breadth) *
-      CustomMath.roundOff(height) *
-      1000.0) /
-      volumetricDivisor
-  );
-
-  const finalWeight = Math.max(volumetricWeight, deadWeight);
-
-  const plan_id = (
-    await UserService.read({
-      id: req.user.id,
-    })
-  )?.pricingPlanId;
-
-  let pricingCard = (await PricingCardService.read({ plan_id }))?.data?.result;
-
-  if (!pricingCard || pricingCard.length == 0) {
-    const error = new Error(
-      "Error fetching Pricing Card details or it is empty.."
-    );
-    error.status = 400;
-    throw error;
-  }
-
-  const userCouriers = (
-    await UserCourierService.read({ id: req.user.id })
-  )?.data?.result?.flatMap((e) =>
-    e.assigned_courier_ids.split(",").map((curr) => curr.trim())
-  );
-
-  if (!userCouriers || userCouriers.length == 0) {
-    const error = new Error(
-      "Error fetching user courier details or it is empty."
-    );
-    error.status = 400;
-    throw error;
-  }
-
-  // filter-in all the couriers which are  available to the user.
-  pricingCard =
-    pricingCard?.filter((e) => userCouriers?.includes(e.courier_id + "")) ||
-    pricingCard;
-
-  if (!pricingCard || pricingCard.length == 0) {
-    throw new Error("No available plans.");
-  }
-
-  const filteredForwardPlans = pricingCard.filter(
-    (e) => e.type === "forward" || e.type === "weight"
-  );
-
-  const forwardPlanResults = (
-    await Promise.all(
-      filteredForwardPlans.map(async (e) => {
-        const courierDetails = (await CourierService.read({ id: e.courier_id }))
-          ?.data?.result?.[0];
-
-        const { name, weight, additional_weight, show_to_users } =
-          courierDetails;
-
-        const pincodeServiceabilityDetails = (
-          await ServiceablePincodesService.read({ courier_id: e.courier_id })
-        )?.data?.result?.[0];
-
-        if (!pincodeServiceabilityDetails) return null;
-
-        if (
-          paymentType?.toLowerCase() == "cod" &&
-          pincodeServiceabilityDetails.cod?.toLowerCase() != "y"
-        )
-          return null;
-
-        return {
-          courier_id: e.courier_id,
-          plan: {
-            ...e.dataValues,
-            name,
-            weight,
-            additional_weight,
-            show_to_users,
-          },
-        };
-      })
-    )
-  )?.filter((e) => e != null);
-
-  // Group by courier_id
-  const forwardPlans = forwardPlanResults.reduce(
-    (acc, { courier_id, plan }) => {
-      if (!acc[courier_id]) acc[courier_id] = [];
-      acc[courier_id].push(plan);
-      return acc;
-    },
-    {}
-  );
-
-  const rows = Object.keys(forwardPlans).map((courierId) => {
-    const data = { courierId, finalWeight };
-
-    const currentCourier = forwardPlans[courierId];
-
-    data["courier_name"] = currentCourier[0].name;
-    data["cod_amount"] = CustomMath.roundOff(currentCourier[0].cod);
-    data["cod_percentage"] = CustomMath.roundOff(
-      currentCourier[0].cod_percentage
-    );
-
-    const baseWeightDetails = currentCourier.filter(
-      (e) => e.type == "forward"
-    )?.[0];
-    const additionalWeightDetails = currentCourier.filter(
-      (e) => e.type == "weight"
-    )?.[0];
-
-    data["calculatedZone"] = calculatedZone;
-    if (baseWeightDetails) {
-      const zoneBasePrice = baseWeightDetails[calculatedZone];
-
-      data["zoneBasePrice"] = zoneBasePrice;
-      data["baseWeight"] = baseWeightDetails.weight;
-    }
-
-    if (additionalWeightDetails) {
-      const zoneAdditionalPrice = additionalWeightDetails[calculatedZone];
-
-      data["zoneAdditionalPrice"] = CustomMath.roundOff(zoneAdditionalPrice);
-      data["additionalWeight"] = additionalWeightDetails.additional_weight || 0;
-    }
-
-    const calculatedBasePrice = CustomMath.roundOff(data.zoneBasePrice);
-    const leftWeight = data.finalWeight - data.baseWeight;
-    data["calculatedBasePrice"] = calculatedBasePrice;
-    data["leftWeight"] = leftWeight;
-
-    const multiplier = Math.floor(leftWeight / data.additionalWeight);
-    data["tempWeight1"] = data.additionalWeight * multiplier;
-    data["calc1"] = multiplier * data.zoneAdditionalPrice;
-    data["tempWeight2"] = leftWeight - data.additionalWeight * multiplier;
-    data["calc2"] = data.zoneAdditionalPrice;
-    const calculatedAdditionalPrice =
-      multiplier * data.zoneAdditionalPrice +
-      (leftWeight - data.additionalWeight * multiplier > 0
-        ? data.zoneAdditionalPrice
-        : 0);
-    data["calculatedAdditionalPrice"] = calculatedAdditionalPrice;
-
-    let totalPrice = calculatedBasePrice + calculatedAdditionalPrice;
-    if (paymentType == "cod") {
-      const codPercentage = CustomMath.roundOff(
-        (totalPrice * data.cod_percentage) / 100
-      );
-      data["codPercentagePrice"] = codPercentage;
-      totalPrice += Math.max(codPercentage, data.cod_amount);
-    }
-    data["totalPrice"] = totalPrice;
-
-    return {
-      courier_name: data.courier_name,
-      cod_charge: Math.max(data.codPercentagePrice, data.cod_amount),
-      freight_charge: data.zoneBasePrice,
-      total: data.totalPrice,
-      zone: data.calculatedZone,
-    };
+  let { id: userId } = req.user;
+  const result = await PricingCardService.priceCalculator({
+    origin,
+    destination,
+    weight,
+    length,
+    breadth,
+    height,
+    paymentType,
+    userId,
   });
-
-  res.success({
-    data: {
-      rows,
-    },
-  });
+  return res.success({data:result});
 };

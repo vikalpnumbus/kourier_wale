@@ -42,13 +42,13 @@ class Class {
         throw error;
       }
 
-      console.log("req.originalUrl: ", req.originalUrl);
-      console.log("existingUser.role: ", existingUser.role);
+      console.info("req.originalUrl: ", req.originalUrl);
+      console.info("existingUser.role: ", existingUser.role);
 
       req.user = data;
       next();
     } catch (error) {
-      console.log("error: ", error);
+      console.error("error: ", error);
       next(error);
     }
   }

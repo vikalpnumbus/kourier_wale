@@ -1,6 +1,11 @@
 import { Op } from "sequelize";
 import FactoryRepository from "../repositories/factory.repository.mjs";
 import pincodeConfig from "../configurations/pincode.config.mjs";
+import CustomMath from "../utils/basic.utils.mjs";
+import UserService from "./user.service.mjs";
+import UserCourierService from "./userCourier.service.mjs";
+import CourierService from "./courier.service.mjs";
+import ServiceablePincodesService from "./serviceablePincodes.service.mjs";
 
 class Service {
   constructor() {
@@ -51,7 +56,15 @@ class Service {
 
   async read(params) {
     try {
-      const { page = 1, limit = 50, id, search,courier_id,plan_id, ...filters } = params;
+      const {
+        page = 1,
+        limit = 50,
+        id,
+        search,
+        courier_id,
+        plan_id,
+        ...filters
+      } = params;
 
       // Build where condition
       let where = { ...filters };
@@ -63,8 +76,8 @@ class Service {
       if (search) {
         where[Op.or] = [{ name: { [Op.like]: `%${search}%` } }];
       }
-      if(courier_id)where.courier_id = courier_id;
-      if(plan_id)where.plan_id = plan_id;
+      if (courier_id) where.courier_id = courier_id;
+      if (plan_id) where.plan_id = plan_id;
 
       let result;
       let totalCount;
@@ -175,6 +188,198 @@ class Service {
       this.error = error;
       return false;
     }
+  }
+
+  async priceCalculator(data) {
+    let {
+      origin,
+      destination,
+      weight,
+      length,
+      breadth,
+      height,
+      paymentType,
+      userId,
+    } = data;
+    const volumetricDivisor = 5000;
+    const deadWeight = CustomMath.roundOff(weight);
+
+    const calculatedZone = this.calculateZone(origin, destination);
+
+    const volumetricWeight = CustomMath.roundOff(
+      (CustomMath.roundOff(length) *
+        CustomMath.roundOff(breadth) *
+        CustomMath.roundOff(height) *
+        1000.0) /
+        volumetricDivisor
+    );
+
+    const finalWeight = Math.max(volumetricWeight, deadWeight);
+
+    const plan_id = (
+      await UserService.read({
+        id: userId,
+      })
+    )?.pricingPlanId;
+
+    let pricingCard = (await this.read({ plan_id }))?.data?.result;
+
+    if (!pricingCard || pricingCard.length == 0) {
+      const error = new Error(
+        "Error fetching Pricing Card details or it is empty.."
+      );
+      error.status = 400;
+      throw error;
+    }
+
+    const userCouriers = (
+      await UserCourierService.read({ id: userId })
+    )?.data?.result?.flatMap((e) =>
+      e.assigned_courier_ids.split(",").map((curr) => curr.trim())
+    );
+
+    if (!userCouriers || userCouriers.length == 0) {
+      const error = new Error(
+        "Error fetching user courier details or it is empty."
+      );
+      error.status = 400;
+      throw error;
+    }
+
+    // filter-in all the couriers which are  available to the user.
+    pricingCard =
+      pricingCard?.filter((e) => userCouriers?.includes(e.courier_id + "")) ||
+      pricingCard;
+
+    if (!pricingCard || pricingCard.length == 0) {
+      throw new Error("No available plans.");
+    }
+
+    const filteredForwardPlans = pricingCard.filter(
+      (e) => e.type === "forward" || e.type === "weight"
+    );
+
+    const forwardPlanResults = (
+      await Promise.all(
+        filteredForwardPlans.map(async (e) => {
+          const courierDetails = (
+            await CourierService.read({ id: e.courier_id })
+          )?.data?.result?.[0];
+
+          const { name, weight, additional_weight, show_to_users } =
+            courierDetails;
+
+          const pincodeServiceabilityDetails = (
+            await ServiceablePincodesService.read({ courier_id: e.courier_id })
+          )?.data?.result?.[0];
+
+          if (!pincodeServiceabilityDetails) return null;
+
+          if (
+            paymentType?.toLowerCase() == "cod" &&
+            pincodeServiceabilityDetails.cod?.toLowerCase() != "y"
+          )
+            return null;
+
+          return {
+            courier_id: e.courier_id,
+            plan: {
+              ...e.dataValues,
+              name,
+              weight,
+              additional_weight,
+              show_to_users,
+            },
+          };
+        })
+      )
+    )?.filter((e) => e != null);
+
+    // Group by courier_id
+    const forwardPlans = forwardPlanResults.reduce(
+      (acc, { courier_id, plan }) => {
+        if (!acc[courier_id]) acc[courier_id] = [];
+        acc[courier_id].push(plan);
+        return acc;
+      },
+      {}
+    );
+
+    const rows = Object.keys(forwardPlans).map((courierId) => {
+      const data = { courierId, finalWeight };
+
+      const currentCourier = forwardPlans[courierId];
+
+      data["courier_id"] = currentCourier[0].id;
+      data["courier_name"] = currentCourier[0].name;
+      data["cod_amount"] = CustomMath.roundOff(currentCourier[0].cod);
+      data["cod_percentage"] = CustomMath.roundOff(
+        currentCourier[0].cod_percentage
+      );
+
+      const baseWeightDetails = currentCourier.filter(
+        (e) => e.type == "forward"
+      )?.[0];
+      const additionalWeightDetails = currentCourier.filter(
+        (e) => e.type == "weight"
+      )?.[0];
+
+      data["calculatedZone"] = calculatedZone;
+      if (baseWeightDetails) {
+        const zoneBasePrice = baseWeightDetails[calculatedZone];
+
+        data["zoneBasePrice"] = zoneBasePrice;
+        data["baseWeight"] = baseWeightDetails.weight;
+      }
+
+      if (additionalWeightDetails) {
+        const zoneAdditionalPrice = additionalWeightDetails[calculatedZone];
+
+        data["zoneAdditionalPrice"] = CustomMath.roundOff(zoneAdditionalPrice);
+        data["additionalWeight"] =
+          additionalWeightDetails.additional_weight || 0;
+      }
+
+      const calculatedBasePrice = CustomMath.roundOff(data.zoneBasePrice);
+      const leftWeight = data.finalWeight - data.baseWeight;
+      data["calculatedBasePrice"] = calculatedBasePrice;
+      data["leftWeight"] = leftWeight;
+
+      const multiplier = Math.floor(leftWeight / data.additionalWeight);
+      data["tempWeight1"] = data.additionalWeight * multiplier;
+      data["calc1"] = multiplier * data.zoneAdditionalPrice;
+      data["tempWeight2"] = leftWeight - data.additionalWeight * multiplier;
+      data["calc2"] = data.zoneAdditionalPrice;
+      const calculatedAdditionalPrice =
+        multiplier * data.zoneAdditionalPrice +
+        (leftWeight - data.additionalWeight * multiplier > 0
+          ? data.zoneAdditionalPrice
+          : 0);
+      data["calculatedAdditionalPrice"] = calculatedAdditionalPrice;
+
+      let totalPrice = calculatedBasePrice + calculatedAdditionalPrice;
+      if (paymentType == "cod") {
+        const codPercentage = CustomMath.roundOff(
+          (totalPrice * data.cod_percentage) / 100
+        );
+        data["codPercentagePrice"] = codPercentage;
+        totalPrice += Math.max(codPercentage, data.cod_amount);
+      }
+      data["totalPrice"] = totalPrice;
+
+      return {
+        courier_id: data.courier_id,
+        courier_name: data.courier_name,
+        cod_charge: Math.max(data.codPercentagePrice, data.cod_amount),
+        freight_charge: data.zoneBasePrice,
+        total: data.totalPrice,
+        zone: data.calculatedZone,
+      };
+    });
+
+    return {
+      rows,
+    };
   }
 }
 

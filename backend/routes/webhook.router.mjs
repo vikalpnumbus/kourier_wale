@@ -24,10 +24,10 @@ WebhookRouter.post(
       .digest("hex");
 
     if (signature === expectedSignature) {
-      console.log("Webhook verified ✅");
+      console.info("Webhook verified ✅");
       const event = JSON.parse(req.body);
       if (event.event === "payment.captured") {
-        console.log("Payment captured:", event.payload.payment.entity.id);
+        console.info("Payment captured:", event.payload.payment.entity.id);
         // Update DB: mark order as paid
       }
       res.status(200).send("OK");

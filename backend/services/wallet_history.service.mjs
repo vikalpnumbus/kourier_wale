@@ -28,7 +28,7 @@ class Service {
         },
       };
     } catch (error) {
-      console.log("error: ", error);
+      console.error("error: ", error);
       this.error = error;
       return false;
     }
