@@ -76,8 +76,20 @@ class Validations {
 
       // ---- Shipping Specific Validations ----
       this.numericStringValidator("courier_id", "Courier ID"),
-      this.numericStringValidator("freight_charge", "Freight charge"),
-      this.numericStringValidator("cod_price", "COD charge"),
+      // this.numericStringValidator("freight_charge", "Freight charge"),
+      // this.numericStringValidator("cod_price", "COD charge"),
+      check("freight_charge")
+        .if((value, { req }) => req.body.order_db_ids.length == 1)
+        .matches(/^\d+(\.\d{1,2})?$/)
+        .withMessage(
+          `freight_charge must be a numeric string (e.g. "100" or "99.99").`
+        ),
+      check("cod_price")
+        .if((value, { req }) => req.body.order_db_ids.length == 1)
+        .matches(/^\d+(\.\d{1,2})?$/)
+        .withMessage(
+          `cod_price must be a numeric string (e.g. "100" or "99.99").`
+        ),
       this.stringValidator("zone", "Zone"),
       this.numericStringValidator("plan_id", "Plan ID"),
       check("shipping_status")
