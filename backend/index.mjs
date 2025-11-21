@@ -35,7 +35,7 @@ await Promise.all(
   )
 );
 
-console.log("All consumers are ready. Starting API...");
+console.info("All consumers are ready. Starting API...");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,7 +46,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   res.success = ({ data, status = 200 }) => {
-    console.log("hihi", {
+    console.info("hihi", {
       status,
       data: data || "",
     });
