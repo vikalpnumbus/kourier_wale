@@ -59,7 +59,6 @@ class RabbitMQClient {
     const channel = await this.getChannel("publisher");
     await channel.assertExchange(exchange, "direct", { durable: true });
     const msgBuffer = Buffer.from(JSON.stringify(message));
-    console.log("msgBuffer: ", msgBuffer);
     channel.publish(exchange, routingKey, msgBuffer, options);
   }
 
@@ -81,7 +80,6 @@ class RabbitMQClient {
     });
 
     channel.consume(queue, async (msg) => {
-      console.log("msg: ", msg);
       if (msg !== null) {
         try {
           const data = JSON.parse(msg.content.toString());
