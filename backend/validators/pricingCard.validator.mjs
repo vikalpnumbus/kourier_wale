@@ -31,6 +31,24 @@ class PricingPlansValidation {
     ];
   }
 
+  priceCalculator() {
+    const allowedPaymentMethods = ["cod", "prepaid"];
+
+    return [
+      this.stringValidator("origin", "Origin Pincode"),
+      this.stringValidator("destination", "Destination Pincode"),
+      this.numericStringValidator("weight", "Weight"),
+      this.numericStringValidator("length", "Length"),
+      this.numericStringValidator("breadth", "Breadth"),
+      this.numericStringValidator("height", "Height"),
+      this.stringValidator("paymentType", "Payment Type")
+        .isIn(allowedPaymentMethods)
+        .withMessage(
+          `Allowed Payment Methods are ${allowedPaymentMethods.join(", ")}.`
+        ),
+    ];
+  }
+
   // ----- Utility Validators -----
 
   fieldCheck(field, label) {
