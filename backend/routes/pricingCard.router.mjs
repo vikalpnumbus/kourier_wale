@@ -32,6 +32,7 @@ PricingCardRouter.delete("/:id", TokenHandler.authenticateToken, remove);
 PricingCardRouter.post(
   "/calculate",
   TokenHandler.authenticateToken,
+  validate(PricingCardValidations.priceCalculator()),
   priceCalculator
 );
 
