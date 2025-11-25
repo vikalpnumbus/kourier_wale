@@ -50,7 +50,6 @@ class Service {
   }
 
   async read(params) {
-    console.log('params: ', params);
     try {
       const { page = 1, limit = 50, id, search, ...filters } = params;
 
@@ -88,7 +87,6 @@ class Service {
         }
       }
 
-      console.log('result: ', result);
       return { data: { total: totalCount, result } };
     } catch (error) {
       this.error = error;

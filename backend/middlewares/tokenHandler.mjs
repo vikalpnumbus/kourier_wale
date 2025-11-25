@@ -32,6 +32,7 @@ class Class {
         throw err;
       }
 
+      console.log('data: ', data);
       const existingUser = await UserService.repository.findOne({
         id: data.id,
       });

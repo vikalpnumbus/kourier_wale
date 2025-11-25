@@ -216,11 +216,16 @@ class Service {
 
     const finalWeight = Math.max(volumetricWeight, deadWeight);
 
-    const plan_id = (
+    const [UserServiceRes, UserCourierServiceRes] = await Promise.all([
       await UserService.read({
         id: userId,
-      })
-    )?.pricingPlanId;
+      }),
+      await UserCourierService.read({ userId }),
+    ]);
+
+    const plan_id = UserServiceRes?.pricingPlanId;
+
+    if (!plan_id) throw new Error("No pricing plan found for userId." + userId);
 
     let pricingCard = (await this.read({ plan_id }))?.data?.result;
 
@@ -232,12 +237,10 @@ class Service {
       throw error;
     }
 
-    const userCouriers = (
-      await UserCourierService.read({ userId })
-    )?.data?.result?.flatMap((e) =>
+    const userCouriers = UserCourierServiceRes?.data?.result?.flatMap((e) =>
       e.assigned_courier_ids.split(",").map((curr) => curr.trim())
     );
-    
+
     if (!userCouriers || userCouriers.length == 0) {
       const error = new Error(
         "Error fetching user courier details or it is empty."
@@ -246,39 +249,64 @@ class Service {
       throw error;
     }
 
-    console.log('userCouriers: ', userCouriers);
-    
+    // console.log("userCouriers: ", userCouriers);
+
     // filter-in all the couriers which are  available to the user.
-    pricingCard =
-    pricingCard?.filter((e) => userCouriers?.includes(e.courier_id + "")) ||
-    pricingCard;
-    
+    pricingCard = pricingCard?.filter((e) =>
+      userCouriers?.includes(e.courier_id + "")
+    );
+
     if (!pricingCard || pricingCard.length == 0) {
       throw new Error("No available plans.");
     }
 
-    console.log('pricingCard: ', pricingCard.map(e=>e.dataValues));
+    // console.log(
+    //   "pricingCard: ",
+    //   pricingCard.map((e) => e.dataValues)
+    // );
     const filteredForwardPlans = pricingCard.filter(
       (e) => e.type === "forward" || e.type === "weight"
     );
 
-    console.log('filteredForwardPlans: ', filteredForwardPlans.map(e=>e.dataValues));
+    // console.log(
+    //   "filteredForwardPlans: ",
+    //   filteredForwardPlans.map((e) => e.dataValues)
+    // );
+
+    const courierCache = {};
+
     const forwardPlanResults = (
       await Promise.all(
         filteredForwardPlans.map(async (e) => {
-          const courierDetails = (
-            await CourierService.read({ id: e.courier_id })
-          )?.data?.result?.[0];
+          let courierPromise;
 
+          if (courierCache[e.courierId]) {
+            courierPromise = courierCache[e.courierId];
+          } else {
+            // Store the PROMISE immediately → ensures parallel fetching
+            courierPromise = CourierService.read({ id: e.courierId });
+            courierCache[e.courierId] = courierPromise;
+          }
+
+          const [courierDetailsRes, pincodeServiceabilityDetailsRes] =
+            await Promise.all([
+              courierPromise,
+              await ServiceablePincodesService.read({
+                courier_id: e.courier_id,
+              }),
+            ]);
+          const courierDetails = courierDetailsRes?.data?.result?.[0];
           const { name, weight, additional_weight, show_to_users } =
             courierDetails;
 
-          const pincodeServiceabilityDetails = (
-            await ServiceablePincodesService.read({ courier_id: e.courier_id })
-          )?.data?.result?.[0];
-          
-          console.log('courier_id: ', e.courier_id);
-          console.log('pincodeServiceabilityDetails: ', pincodeServiceabilityDetails);
+          const pincodeServiceabilityDetails =
+            pincodeServiceabilityDetailsRes?.data?.result?.[0];
+
+          // console.log("courier_id: ", e.courier_id);
+          // console.log(
+          //   "pincodeServiceabilityDetails: ",
+          //   pincodeServiceabilityDetails
+          // );
           if (!pincodeServiceabilityDetails) return null;
 
           if (
@@ -301,7 +329,7 @@ class Service {
       )
     )?.filter((e) => e != null);
 
-    console.log('forwardPlanResults: ', forwardPlanResults);
+    // console.log("forwardPlanResults: ", forwardPlanResults);
     // Group by courier_id
     const forwardPlans = forwardPlanResults.reduce(
       (acc, { courier_id, plan }) => {
@@ -316,20 +344,19 @@ class Service {
       const data = { courierId, finalWeight };
 
       const currentCourier = forwardPlans[courierId];
+      const firstEntry = currentCourier[0];
 
-      data["courier_id"] = currentCourier[0].id;
-      data["courier_name"] = currentCourier[0].name;
-      data["cod_amount"] = CustomMath.roundOff(currentCourier[0].cod);
-      data["cod_percentage"] = CustomMath.roundOff(
-        currentCourier[0].cod_percentage
-      );
+      data["courier_id"] = firstEntry.id;
+      data["courier_name"] = firstEntry.name;
+      data["cod_amount"] = CustomMath.roundOff(firstEntry.cod);
+      data["cod_percentage"] = CustomMath.roundOff(firstEntry.cod_percentage);
 
-      const baseWeightDetails = currentCourier.filter(
-        (e) => e.type == "forward"
-      )?.[0];
-      const additionalWeightDetails = currentCourier.filter(
-        (e) => e.type == "weight"
-      )?.[0];
+      let baseWeightDetails, additionalWeightDetails;
+
+      for (const row of currentCourier) {
+        if (row.type == "forward") baseWeightDetails = row;
+        else if (row.type === "weight") additionalWeightDetails = row;
+      }
 
       data["calculatedZone"] = calculatedZone;
       if (baseWeightDetails) {
@@ -349,14 +376,10 @@ class Service {
 
       const calculatedBasePrice = CustomMath.roundOff(data.zoneBasePrice);
       const leftWeight = data.finalWeight - data.baseWeight;
-      data["calculatedBasePrice"] = calculatedBasePrice;
-      data["leftWeight"] = leftWeight;
+
 
       const multiplier = Math.floor(leftWeight / data.additionalWeight);
-      data["tempWeight1"] = data.additionalWeight * multiplier;
-      data["calc1"] = multiplier * data.zoneAdditionalPrice;
-      data["tempWeight2"] = leftWeight - data.additionalWeight * multiplier;
-      data["calc2"] = data.zoneAdditionalPrice;
+
       const calculatedAdditionalPrice =
         multiplier * data.zoneAdditionalPrice +
         (leftWeight - data.additionalWeight * multiplier > 0

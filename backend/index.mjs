@@ -46,10 +46,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   res.success = ({ data, status = 200 }) => {
-    console.info("hihi", {
+  if(config.NODE_ENV == 'production')
+    console.info("OUTGOING RESPONSE:",JSON.stringify( {
       status,
       data: data || "",
-    });
+    }), null, 2);
     return res.status(status).json({
       status,
       data: data || "",
@@ -91,7 +92,7 @@ app.listen(PORT || 8001, () => {
     ...config,
   };
 
-  if (process.env.NODE_ENV === "production") {
+  if (config.NODE_ENV === "production") {
     console.info("App configurations:");
     console.table(
       Object.keys(configuration)
