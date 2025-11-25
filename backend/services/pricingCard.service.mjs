@@ -233,11 +233,11 @@ class Service {
     }
 
     const userCouriers = (
-      await UserCourierService.read({ id: userId })
+      await UserCourierService.read({ userId })
     )?.data?.result?.flatMap((e) =>
       e.assigned_courier_ids.split(",").map((curr) => curr.trim())
     );
-
+    
     if (!userCouriers || userCouriers.length == 0) {
       const error = new Error(
         "Error fetching user courier details or it is empty."
@@ -246,19 +246,23 @@ class Service {
       throw error;
     }
 
+    console.log('userCouriers: ', userCouriers);
+    
     // filter-in all the couriers which are  available to the user.
     pricingCard =
-      pricingCard?.filter((e) => userCouriers?.includes(e.courier_id + "")) ||
-      pricingCard;
-
+    pricingCard?.filter((e) => userCouriers?.includes(e.courier_id + "")) ||
+    pricingCard;
+    
     if (!pricingCard || pricingCard.length == 0) {
       throw new Error("No available plans.");
     }
 
+    console.log('pricingCard: ', pricingCard.map(e=>e.dataValues));
     const filteredForwardPlans = pricingCard.filter(
       (e) => e.type === "forward" || e.type === "weight"
     );
 
+    console.log('filteredForwardPlans: ', filteredForwardPlans.map(e=>e.dataValues));
     const forwardPlanResults = (
       await Promise.all(
         filteredForwardPlans.map(async (e) => {
@@ -272,7 +276,9 @@ class Service {
           const pincodeServiceabilityDetails = (
             await ServiceablePincodesService.read({ courier_id: e.courier_id })
           )?.data?.result?.[0];
-
+          
+          console.log('courier_id: ', e.courier_id);
+          console.log('pincodeServiceabilityDetails: ', pincodeServiceabilityDetails);
           if (!pincodeServiceabilityDetails) return null;
 
           if (
@@ -295,6 +301,7 @@ class Service {
       )
     )?.filter((e) => e != null);
 
+    console.log('forwardPlanResults: ', forwardPlanResults);
     // Group by courier_id
     const forwardPlans = forwardPlanResults.reduce(
       (acc, { courier_id, plan }) => {
