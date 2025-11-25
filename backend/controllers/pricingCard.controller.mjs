@@ -100,7 +100,6 @@ export const read = async (req, res, next) => {
       })
     );
 
-   
     res.success({ ...result, data: { ...result.data, result: resultData } });
   } catch (error) {
     next(error);
@@ -164,6 +163,8 @@ export const remove = async (req, res, next) => {
 };
 
 export const priceCalculator = async (req, res, next) => {
+  const start = process.hrtime.bigint();
+
   let { origin, destination, weight, length, breadth, height, paymentType } =
     req.body;
 
@@ -178,5 +179,10 @@ export const priceCalculator = async (req, res, next) => {
     paymentType,
     userId,
   });
-  return res.success({data:result});
+  const end = process.hrtime.bigint();
+  console.log(
+    `API Execution Time: ${(Number(end - start) / 1e6).toFixed(2)} ms`
+  );
+
+  return res.success({ data: result });
 };
