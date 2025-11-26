@@ -43,10 +43,39 @@ function PricingPlanView() {
 
   const loadAllData = async () => {
     setLoading(true);
+
+    // helper to treat "no record found" as empty data instead of hard error
+    const safeGet = async (url, label) => {
+      try {
+        const res = await api.get(url);
+        return res;
+      } catch (error) {
+        const msg = error?.response?.data?.message || "";
+
+        const isNoRecordError =
+          error?.response?.status === 404 ||
+          error?.response?.status === 204 ||
+          msg.toLowerCase().includes("no record found");
+
+        if (isNoRecordError) {
+          // just log and return null -> will be treated as empty array
+          console.warn(`${label}: no record found`);
+          return null;
+        }
+
+        // other errors should still bubble up
+        console.error(`${label} error:`, error);
+        throw error;
+      }
+    };
+
     try {
       const [planRes, cardRes] = await Promise.all([
-        api.get(PricingPlanConfig.pricingPlanCourierApi),
-        api.get(`${PricingPlanConfig.pricingCardApi}?plan_id=${id}`),
+        safeGet(PricingPlanConfig.pricingPlanCourierApi, "Pricing Plan"),
+        safeGet(
+          `${PricingPlanConfig.pricingCardApi}?plan_id=${id}`,
+          "Pricing Card"
+        ),
       ]);
 
       const planData = planRes?.data?.data?.result || [];
@@ -56,6 +85,7 @@ function PricingPlanView() {
       setCourierSuccess(groupSuccessData(successData));
       setReady(true);
     } catch (error) {
+      // only comes here for real errors, not "no record found"
       console.error(error);
       showError("Failed to load pricing data");
     } finally {

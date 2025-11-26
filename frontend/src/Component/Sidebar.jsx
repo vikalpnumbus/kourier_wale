@@ -51,18 +51,7 @@ function Sidebar({ setSideNavActive, sideNavActive }) {
             <span className="menu-title">Products</span>
           </Link>
         </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/channel") ? "active" : ""}
-            ${hoveredItem === "channel" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("channel")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/channel">
-            <i className="mdi mdi-bell-ring menu-icon"></i>
-            <span className="menu-title">Channel</span>
-          </Link>
-        </li>
+        
         <li
           className={`nav-item 
             ${location.pathname.includes("/warehouse") ? "active" : ""}
@@ -163,13 +152,13 @@ function Sidebar({ setSideNavActive, sideNavActive }) {
         </li>
         <li
           className={`nav-item 
-            ${location.pathname.includes("/channel_integration") ? "active" : ""}
+            ${location.pathname.includes("/channel") ? "active" : ""}
             ${hoveredItem === "channel_integration" ? "hover-open" : ""}`}
           onMouseEnter={() => setHoveredItem("channel_integration")}
           onMouseLeave={() => setHoveredItem(null)}
         >
-          <Link className="nav-link" to="/channel_integration">
-            <i className="mdi mdi-wallet menu-icon"></i>
+          <Link className="nav-link" to="/channel">
+            <i className="mdi mdi-webhook menu-icon"></i>
             <span className="menu-title">Channel Integration</span>
           </Link>
         </li>
