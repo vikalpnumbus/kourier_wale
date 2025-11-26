@@ -11,6 +11,7 @@ function PricingPlanEdit() {
   const [plan, setPlan] = useState({});
   const [form, setForm] = useState({});
   const [loading, setLoading] = useState(true);
+  const [dirtyRows, setDirtyRows] = useState({}); // { [courierId]: { [type]: true } }
 
   const TYPE_ORDER = ["forward", "rto", "weight"];
 
@@ -30,17 +31,42 @@ function PricingPlanEdit() {
       return acc;
     }, {});
 
-  const load = async () => {
+  // 🔹 helper to treat "no record found" as empty result
+  const safeGet = async (url, label) => {
     try {
-      setLoading(true);
+      const res = await api.get(url);
+      return res;
+    } catch (error) {
+      const msg = error?.response?.data?.message || "";
 
+      const isNoRecordError =
+        error?.response?.status === 404 ||
+        error?.response?.status === 204 ||
+        msg.toLowerCase().includes("no record found");
+
+      if (isNoRecordError) {
+        console.warn(`${label}: no record found`);
+        return null; // will be treated as empty array
+      }
+
+      console.error(`${label} error:`, error);
+      throw error; // real error -> let load() handle it
+    }
+  };
+
+  const load = async () => {
+    setLoading(true);
+    try {
       const [planRes, successRes] = await Promise.all([
-        api.get(PricingPlanConfig.pricingPlanCourierApi),
-        api.get(`${PricingPlanConfig.pricingCardApi}?plan_id=${id}`),
+        safeGet(PricingPlanConfig.pricingPlanCourierApi, "Pricing Plan"),
+        safeGet(
+          `${PricingPlanConfig.pricingCardApi}?plan_id=${id}`,
+          "Pricing Card"
+        ),
       ]);
 
-      const planGroup = groupPlan(planRes.data.data.result || []);
-      const successGroup = groupSuccess(successRes.data.data.result || []);
+      const planGroup = groupPlan(planRes?.data?.data?.result || []);
+      const successGroup = groupSuccess(successRes?.data?.data?.result || []);
 
       const finalForm = {};
       Object.keys(planGroup).forEach((cid) => {
@@ -67,11 +93,13 @@ function PricingPlanEdit() {
 
       setPlan(planGroup);
       setForm(finalForm);
+      setDirtyRows({}); // reset dirty on load
     } catch (err) {
       console.error(err);
       showError("Failed to load data");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -89,51 +117,97 @@ function PricingPlanEdit() {
         },
       },
     }));
+
+    // mark this row as dirty
+    setDirtyRows((prev) => ({
+      ...prev,
+      [courierId]: {
+        ...(prev[courierId] || {}),
+        [type]: true,
+      },
+    }));
   };
 
-  const handleSave = async (courierId, type) => {
-    const row = form[courierId][type];
-
-    const payload = {
-      plan_id: Number(id),
-      courier_id: Number(courierId),
-      type,
-      zone1: row.zone1,
-      zone2: row.zone2,
-      zone3: row.zone3,
-      zone4: row.zone4,
-      zone5: row.zone5,
-      cod: row.cod,
-      cod_percentage: row.cod_percentage,
-    };
+  const handleSaveAll = async () => {
+    // nothing changed
+    if (!Object.keys(dirtyRows).length) {
+      showError("No changes to save");
+      return;
+    }
 
     try {
-      if (row.id) {
-        await api.patch(
-          `${PricingPlanConfig.pricingCardApi}/${row.id}`,
-          payload
-        );
-        showSuccess(`${type.toUpperCase()} updated successfully`);
-      } else {
-        const createRes = await api.post(
-          PricingPlanConfig.pricingCardApi,
-          payload
-        );
+      const updateRequests = [];
+      const createRequests = [];
 
-        const newId = createRes.data?.data?.id;
-        setForm((prev) => ({
-          ...prev,
-          [courierId]: {
-            ...prev[courierId],
-            [type]: { ...prev[courierId][type], id: newId },
-          },
-        }));
+      // Only iterate over dirty rows
+      Object.entries(dirtyRows).forEach(([courierId, typesObj]) => {
+        Object.keys(typesObj).forEach((type) => {
+          const row = form[courierId][type];
 
-        showSuccess(`${type.toUpperCase()} created successfully`);
+          const payload = {
+            plan_id: Number(id),
+            courier_id: Number(courierId),
+            type,
+            zone1: row.zone1,
+            zone2: row.zone2,
+            zone3: row.zone3,
+            zone4: row.zone4,
+            zone5: row.zone5,
+            cod: type === "rto" || type === "weight" ? "0" : row.cod,
+            cod_percentage:
+              type === "rto" || type === "weight" ? "0" : row.cod_percentage,
+          };
+
+          if (row.id) {
+            // Existing row: update
+            updateRequests.push(
+              api.patch(
+                `${PricingPlanConfig.pricingCardApi}/${row.id}`,
+                payload
+              )
+            );
+          } else {
+            // New row: create and capture new ID
+            createRequests.push(
+              api
+                .post(PricingPlanConfig.pricingCardApi, payload)
+                .then((res) => ({
+                  courierId,
+                  type,
+                  id: res?.data?.data?.id,
+                }))
+            );
+          }
+        });
+      });
+
+      await Promise.all(updateRequests);
+      const createdResults = await Promise.all(createRequests);
+
+      // Update IDs for newly created rows
+      if (createdResults.length) {
+        setForm((prev) => {
+          const updated = { ...prev };
+          createdResults.forEach(({ courierId, type, id }) => {
+            if (!id) return;
+            updated[courierId] = {
+              ...updated[courierId],
+              [type]: {
+                ...updated[courierId][type],
+                id,
+              },
+            };
+          });
+          return updated;
+        });
       }
+
+      // clear dirty flags after successful save
+      setDirtyRows({});
+      showSuccess("All changed rows saved successfully");
     } catch (err) {
       console.error(err);
-      showError("Failed to save");
+      showError("Failed to save changes");
     }
   };
 
@@ -162,7 +236,6 @@ function PricingPlanEdit() {
                 <th className="text-center">Z5</th>
                 <th className="text-center">Min COD</th>
                 <th className="text-center">COD %</th>
-                <th className="text-center">Action</th>
               </tr>
             </thead>
 
@@ -203,6 +276,25 @@ function PricingPlanEdit() {
                       <td className="py-3" key={field}>
                         <div className="d-flex flex-column gap-3">
                           {TYPE_ORDER.map((type) => {
+                            if (
+                              (field === "cod" || field === "cod_percentage") &&
+                              (type === "rto" || type === "weight")
+                            ) {
+                              return (
+                                <div className="input-group" style={{opacity: "0"}} key={type}>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    disabled
+                                    
+                                  />
+                                  <div className="input-group-text">
+                                    
+                                  </div>
+                                </div>
+                              );
+                            }
+
                             const planValue = row.data[type]?.[field] || "0";
                             const successVal =
                               form[courierId]?.[type]?.[field] || "";
@@ -231,25 +323,18 @@ function PricingPlanEdit() {
                         </div>
                       </td>
                     ))}
-
-                    <td className="py-3">
-                      <div className="d-flex flex-column gap-4">
-                        {TYPE_ORDER.map((type) => (
-                          <button
-                            key={type}
-                            className="btn btn-primary btn-sm"
-                            onClick={() => handleSave(courierId, type)}
-                          >
-                            Save {type.toUpperCase()}
-                          </button>
-                        ))}
-                      </div>
-                    </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
+        </div>
+
+        {/* Save All button at bottom */}
+        <div className="d-flex justify-content-end mt-3">
+          <button className="btn btn-primary" onClick={handleSaveAll}>
+            Save All
+          </button>
         </div>
       </div>
     </div>

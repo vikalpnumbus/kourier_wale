@@ -97,7 +97,7 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
   return (
     <>
       <h4 className="text-start mt-2 mb-3">Products Details<span className="text-danger">*</span></h4>
-      <div className="col-md-12 mb-2" ref={wrapperRef}>
+      <div className="col-md-12 mb-2" ref={wrapperRef} >
         <div className="form-group text-start mb-3 position-relative">
           <input
             type="text"
@@ -138,15 +138,15 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
         {/* Selected products */}
         <ul
           className="list-group mt-3"
-          style={{ maxHeight: "200px", overflowY: "auto" }}
+          style={{height: "260px", maxHeight: "260px", overflowY: "auto" }}
         >
           {selectedProducts.length > 0 ? (
             selectedProducts.map((item) => (
               <li
                 key={item.id}
-                style={{
-                  minHeight: "60px",
-                }}
+                // style={{
+                //   minHeight: "60px",
+                // }}
                 className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center"
               >
                 <img
@@ -187,7 +187,7 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
               </li>
             ))
           ) : (
-            <li className="list-group-item text-muted">No products selected</li>
+            <li className="list-group-item text-muted" style={{height: "200px"}}>No products selected</li>
           )}
         </ul>
       </div>
