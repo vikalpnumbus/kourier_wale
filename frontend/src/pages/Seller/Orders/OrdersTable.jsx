@@ -332,7 +332,9 @@ function OrdersTable() {
               </tbody>
             </table>
           </div>
-          <Pagination totalCount={totalCount} />
+          {dataList.length > 0 && !loading && (
+            <Pagination totalCount={totalCount} />
+          )}
           {showShipModal && shipOrderDetails && (
             <ShipModal
               onClose={() => setShowShipModal(false)}
