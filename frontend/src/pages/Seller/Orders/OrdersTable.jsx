@@ -4,6 +4,7 @@ import { mdiCubeSend, mdiPencil } from "@mdi/js";
 import { Link, useSearchParams } from "react-router-dom";
 import Pagination from "../../../Component/Pagination";
 import ordersConfig from "../../../config/Orders/OrdersConfig";
+import ShipModal from "../Orders/ShipModal";
 import api from "../../../utils/api";
 import {
   formatDateTime,
@@ -328,12 +329,12 @@ function OrdersTable() {
             </table>
           </div>
           <Pagination totalCount={totalCount} />
-          {/* {showShipModal && shipOrderDetails && (
+          {showShipModal && shipOrderDetails && (
             <ShipModal
               onClose={() => setShowShipModal(false)}
               orderData={shipOrderDetails}
             />
-          )} */}
+          )}
         </div>
       </div>
     </>
