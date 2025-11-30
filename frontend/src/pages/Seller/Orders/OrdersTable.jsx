@@ -11,7 +11,7 @@ import {
   getLastNDaysRange,
 } from "../../../middleware/CommonFunctions";
 import warehouseConfig from "../../../config/Warehouse/WarehouseConfig";
-// import ShipModal from "./ShipModal";
+import ShipModal from "./ShipModal";
 function OrdersTable() {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -336,6 +336,7 @@ function OrdersTable() {
           {dataList.length > 0 && !loading && (
             <Pagination totalCount={totalCount} />
           )}
+
           {showShipModal && shipOrderDetails && (
             <ShipModal
               onClose={() => setShowShipModal(false)}
