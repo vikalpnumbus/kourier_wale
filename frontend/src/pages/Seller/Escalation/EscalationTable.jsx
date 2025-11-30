@@ -23,7 +23,6 @@ function EscalationTable() {
       const params = new URLSearchParams();
       params.append("page", page);
       params.append("limit", limit);
-      
 
       const url = `${escalationConfig.escalationApi}?${params.toString()}`;
 
@@ -38,8 +37,6 @@ function EscalationTable() {
       setLoading(false);
     }
   };
-
- 
 
   useEffect(() => {
     handleFetchData();
@@ -93,7 +90,6 @@ function EscalationTable() {
                         >
                           <Icon path={mdiEye} size={0.6} /> View Escalation
                         </Link>
-                        
                       </div>
                     </td>
                   </tr>
@@ -108,7 +104,9 @@ function EscalationTable() {
             </tbody>
           </table>
         </div>
-        <Pagination totalCount={totalCount} />
+        {dataList.length > 0 && !loading && (
+          <Pagination totalCount={totalCount} />
+        )}
       </>
     </div>
   );

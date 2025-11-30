@@ -7,7 +7,12 @@ import bankDetailsConfig from "../../../config/BankDetails/BankDetailsConfig";
 import { useAlert } from "../../../middleware/AlertContext";
 import api from "../../../utils/api";
 import Pagination from "../../../Component/Pagination";
-const BankTable = ({ dataList = [], loading = false, handleFetchData, totalCount = 0 }) => {
+const BankTable = ({
+  dataList = [],
+  loading = false,
+  handleFetchData,
+  totalCount = 0,
+}) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [show, setShow] = useState(false);
   const [image, setImage] = useState(null);
@@ -66,7 +71,7 @@ const BankTable = ({ dataList = [], loading = false, handleFetchData, totalCount
 
       if (response?.data?.status === 201) {
         showSuccess("Bank details updated to primary");
-        handleFetchData(); 
+        handleFetchData();
       }
     } catch (error) {
       showError(
@@ -78,7 +83,7 @@ const BankTable = ({ dataList = [], loading = false, handleFetchData, totalCount
   };
 
   useEffect(() => {
-    if ( totalCount === 1) {
+    if (totalCount === 1) {
       const [item] = dataList;
       if (item && !item.isPrimary) {
         handleMakePrimary(item.id);
@@ -214,7 +219,9 @@ const BankTable = ({ dataList = [], loading = false, handleFetchData, totalCount
         </table>
         {show && <ImageModal imageUrl={image} onClose={() => setShow(false)} />}
       </div>
-      <Pagination totalCount={totalCount}/>
+      {sortedData.length > 0 && !loading && (
+        <Pagination totalCount={totalCount} />
+      )}
     </>
   );
 };

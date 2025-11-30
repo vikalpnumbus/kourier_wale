@@ -234,16 +234,20 @@ function OrdersTable() {
 
                       <td className="py-2">
                         <div className="d-flex flex-column gap-3 org_des_box box-class">
-                          <div className="mile-container"><div className="mile-path"></div></div>
-                            <div className="fromclass">
-                              <span className="fw-bolder">From: </span>
-                              <span>{findWarehouse(data.warehouse_id) || ""}</span>
-                            </div>
-                            <div className="toclass">
-                              <span className="fw-bolder">To: </span>
-                              <span>
-                                {`${data.shippingDetails.city} ( ${data.shippingDetails.state} - ${data.shippingDetails.pincode} )`}
-                              </span>                            
+                          <div className="mile-container">
+                            <div className="mile-path"></div>
+                          </div>
+                          <div className="fromclass">
+                            <span className="fw-bolder">From: </span>
+                            <span>
+                              {findWarehouse(data.warehouse_id) || ""}
+                            </span>
+                          </div>
+                          <div className="toclass">
+                            <span className="fw-bolder">To: </span>
+                            <span>
+                              {`${data.shippingDetails.city} ( ${data.shippingDetails.state} - ${data.shippingDetails.pincode} )`}
+                            </span>
                           </div>
                         </div>
                       </td>
@@ -270,9 +274,7 @@ function OrdersTable() {
                       <td className="py-2">
                         <div className="d-flex flex-column gap-3 box-class">
                           <span>
-                            {data.orderAmount
-                              ? `₹ ${data.orderAmount}`
-                              : ""}
+                            {data.orderAmount ? `₹ ${data.orderAmount}` : ""}
                           </span>
                           <span>
                             {data.paymentType
@@ -286,7 +288,9 @@ function OrdersTable() {
                           <button
                             className="btn btn-primary btn-md py-2 px-3"
                             onClick={() => {
-                              const warehouse = warehouseList.find((w) => w.id == data.warehouse_id);
+                              const warehouse = warehouseList.find(
+                                (w) => w.id == data.warehouse_id
+                              );
                               setShipOrderDetails({
                                 id: data.id,
                                 warehouse_id: data.warehouse_id,
@@ -305,7 +309,8 @@ function OrdersTable() {
                               ? "Ship"
                               : "Not Shipped"}
                           </button>
-                        </div> &nbsp;
+                        </div>{" "}
+                        &nbsp;
                         <div className="btn-group">
                           <Link
                             to={`edit/${data.id}`}
@@ -327,7 +332,9 @@ function OrdersTable() {
               </tbody>
             </table>
           </div>
-          <Pagination totalCount={totalCount} />
+          {dataList.length > 0 && !loading && (
+            <Pagination totalCount={totalCount} />
+          )}
           {/* {showShipModal && shipOrderDetails && (
             <ShipModal
               onClose={() => setShowShipModal(false)}
