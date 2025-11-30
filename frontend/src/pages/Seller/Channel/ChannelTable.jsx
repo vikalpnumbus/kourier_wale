@@ -102,7 +102,9 @@ function ChannelTable() {
                   <td className="py-2">
                     <div className="btn-group">
                       <Link
-                        to={`edit${data.channel == "shopify" ? "/shopify" : ""}/${data.id}`}
+                        to={`edit${
+                          data.channel == "shopify" ? "/shopify" : ""
+                        }/${data.id}`}
                         className="btn btn-outline-primary btn-md py-2 px-3"
                       >
                         <Icon path={mdiPencil} size={0.6} />
@@ -127,7 +129,9 @@ function ChannelTable() {
           </tbody>
         </table>
       </div>
-      <Pagination totalCount={totalCount} />
+      {dataList.length > 0 && !loading && (
+        <Pagination totalCount={totalCount} />
+      )}
     </>
   );
 }

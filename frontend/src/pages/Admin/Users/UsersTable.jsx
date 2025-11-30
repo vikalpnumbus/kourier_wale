@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { useAlert } from "../../../middleware/AlertContext";
+import { Link, useSearchParams } from "react-router-dom";
 import Pagination from "../../../Component/Pagination";
 import api from "../../../utils/api";
 import { encrypt } from "../../../middleware/Encryption";
 import usersConfig from "../../../config/AdminConfig/Users/Users";
 import { formatDateTime } from "../../../middleware/CommonFunctions";
+import ApproveRejectModal from "./ApproveRejectModal";
 
 function UsersTable() {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const [totalCount, setTotalCount] = useState(0);
-  const navigate = useNavigate();
+  const [modalData, setModalData] = useState(null);
 
   const handleFetchData = async () => {
     setLoading(true);
@@ -30,9 +30,9 @@ function UsersTable() {
 
       setDataList(data?.data?.result || []);
       setTotalCount(data?.data?.total || 0);
-    } catch (error) {
-      console.error("Fetch error:", error);
+    } catch (err) {
       setDataList([]);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -44,8 +44,20 @@ function UsersTable() {
 
   return (
     <>
+      {/* Modal */}
+      {modalData && (
+        <ApproveRejectModal
+          userId={modalData.id}
+          action={modalData.action}
+          onClose={(refresh) => {
+            setModalData(null);
+            if (refresh) handleFetchData();
+          }}
+        />
+      )}
+
       <div className="tab-content tab-content-vertical">
-        <div className="tab-pane fade show active" role="tabpanel">
+        <div className="tab-pane fade show active">
           <div className="table-responsive h-100">
             <table className="table table-hover">
               <thead>
@@ -59,6 +71,7 @@ function UsersTable() {
                   <th>Action</th>
                 </tr>
               </thead>
+
               <tbody>
                 {loading ? (
                   <tr>
@@ -73,10 +86,10 @@ function UsersTable() {
                 ) : dataList.length > 0 ? (
                   dataList.map((data) => (
                     <tr key={data.id}>
-                      <td className="py-2">{data?.fname || ""}</td>
-                      <td className="py-2">{data?.email || ""}</td>
-                      <td className="py-2">{data?.companyName || ""}</td>
-                      <td className="py-2">
+                      <td>{data?.fname}</td>
+                      <td>{data?.email}</td>
+                      <td>{data?.companyName}</td>
+                      <td>
                         {data?.pricingPlanId === 1
                           ? "Bronze"
                           : data?.pricingPlanId === 2
@@ -87,28 +100,42 @@ function UsersTable() {
                           ? "Platinum"
                           : ""}
                       </td>
-                      <td className="py-2">
-                        {data?.createdAt ? (formatDateTime(data?.createdAt)):("")}
+
+                      <td>
+                        {data?.createdAt ? formatDateTime(data.createdAt) : ""}
                       </td>
-                      <td className="py-2">
+
+                      <td>
                         {data?.isVerified ? (
                           <span className="text-success">Verified</span>
                         ) : (
                           <div className="btn-group">
-                            <button className="btn btn-outline-primary btn-md py-2 px-3">
+                            <button
+                              className="btn btn-outline-primary btn-md px-3"
+                              onClick={() =>
+                                setModalData({ id: data.id, action: "approve" })
+                              }
+                            >
                               Approve
                             </button>
-                            <button className="btn btn-outline-primary btn-md py-2 px-3">
+
+                            <button
+                              className="btn btn-outline-danger btn-md px-3"
+                              onClick={() =>
+                                setModalData({ id: data.id, action: "reject" })
+                              }
+                            >
                               Reject
                             </button>
                           </div>
                         )}
                       </td>
-                      <td className="py-2">
+
+                      <td>
                         <Link
                           to="/dashboard"
                           target="_blank"
-                          className="btn btn-outline-primary py-2 px-3"
+                          className="btn btn-outline-primary px-3"
                           onClick={() => {
                             localStorage.clear();
                             localStorage.setItem("token", data.token);
@@ -130,7 +157,10 @@ function UsersTable() {
               </tbody>
             </table>
           </div>
-          <Pagination totalCount={totalCount} />
+
+          {dataList.length > 0 && !loading && (
+            <Pagination totalCount={totalCount} />
+          )}
         </div>
       </div>
     </>

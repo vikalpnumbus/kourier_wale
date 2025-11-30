@@ -102,182 +102,157 @@ function PricingPlanView() {
   };
 
   return (
-    <>
-      <div className="tab-content tab-content-vertical">
-        <div className="tab-pane fade show active" role="tabpanel">
-          <div className="table-responsive h-100">
-            <table className="table table-hover">
-              <thead>
-                <tr>
-                  <th>Courier</th>
-                  <th>Mode</th>
-                  <th>Z1</th>
-                  <th>Z2</th>
-                  <th>Z3</th>
-                  <th>Z4</th>
-                  <th>Z5</th>
-                  <th>Min COD</th>
-                  <th>COD %</th>
-                </tr>
-              </thead>
+    <div className="tab-content tab-content-vertical">
+      <div className="tab-pane fade show active" role="tabpanel">
+        <div className="table-responsive h-100">
+          <table className="table table-hover">
+            <thead>
+              <tr>
+                <th>Courier</th>
+                <th>Mode</th>
+                <th>Z1</th>
+                <th>Z2</th>
+                <th>Z3</th>
+                <th>Z4</th>
+                <th>Z5</th>
+                <th>Min COD</th>
+                <th>COD %</th>
+              </tr>
+            </thead>
 
-              <tbody>
-                {!ready || loading ? (
-                  <tr>
-                    <td colSpan="9">
-                      <div className="dot-opacity-loader">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+            <tbody>
+              {!ready || loading ? (
+                <tr>
+                  <td colSpan="9">
+                    <div className="dot-opacity-loader">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </td>
+                </tr>
+              ) : Object.values(courierPricingPlan).length > 0 ? (
+                Object.values(courierPricingPlan).map((row, index) => (
+                  <tr key={index}>
+                    {console.log("row: ", row)}
+                    <td className="py-3">{row.courier_name}</td>
+
+                    <td className="py-3">
+                      <div className="d-flex flex-column gap-3">
+                        {TYPE_ORDER.map((mode) => (
+                          <span key={mode}>{mode.toUpperCase()}</span>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="py-3">
+                      <div className="d-flex flex-column gap-3">
+                        {TYPE_ORDER.map((mode) => (
+                          <span key={mode}>
+                            {row.data[mode]?.zone1 || "0"} |{" "}
+                            <span className="text-success">
+                              {getSuccess(row.data[mode]?.id, mode, "zone1")}
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="py-3">
+                      <div className="d-flex flex-column gap-3">
+                        {TYPE_ORDER.map((mode) => (
+                          <span key={mode}>
+                            {row.data[mode]?.zone2 || "0"} |{" "}
+                            <span className="text-success">
+                              {getSuccess(row.data[mode]?.id, mode, "zone2")}
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="py-3">
+                      <div className="d-flex flex-column gap-3">
+                        {TYPE_ORDER.map((mode) => (
+                          <span key={mode}>
+                            {row.data[mode]?.zone3 || "0"} |{" "}
+                            <span className="text-success">
+                              {getSuccess(row.data[mode]?.id, mode, "zone3")}
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="py-3">
+                      <div className="d-flex flex-column gap-3">
+                        {TYPE_ORDER.map((mode) => (
+                          <span key={mode}>
+                            {row.data[mode]?.zone4 || "0"} |{" "}
+                            <span className="text-success">
+                              {getSuccess(row.data[mode]?.id, mode, "zone4")}
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="py-3">
+                      <div className="d-flex flex-column gap-3">
+                        {TYPE_ORDER.map((mode) => (
+                          <span key={mode}>
+                            {row.data[mode]?.zone5 || "0"} |{" "}
+                            <span className="text-success">
+                              {getSuccess(row.data[mode]?.id, mode, "zone5")}
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="py-3">
+                      <div className="d-flex flex-column gap-3">
+                        {TYPE_ORDER.map((mode) => (
+                          <span key={mode}>
+                            {row.data[mode]?.cod || "0"} |{" "}
+                            <span className="text-success">
+                              {getSuccess(row.data[mode]?.id, mode, "cod")}
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+
+                    <td className="py-3">
+                      <div className="d-flex flex-column gap-3">
+                        {TYPE_ORDER.map((mode) => (
+                          <span key={mode}>
+                            {row.data[mode]?.cod_percentage || "0"} |{" "}
+                            <span className="text-success">
+                              {getSuccess(
+                                row.data[mode]?.id,
+                                mode,
+                                "cod_percentage"
+                              )}
+                            </span>
+                          </span>
+                        ))}
                       </div>
                     </td>
                   </tr>
-                ) : Object.values(courierPricingPlan).length > 0 ? (
-                  Object.values(courierPricingPlan).map((row, index) => (
-                    <tr key={index}>
-                      <td className="py-3">{row.courier_name}</td>
-
-                      <td className="py-3">
-                        <div className="d-flex flex-column gap-3">
-                          {TYPE_ORDER.map((mode) => (
-                            <span key={mode}>{mode.toUpperCase()}</span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="py-3">
-                        <div className="d-flex flex-column gap-3">
-                          {TYPE_ORDER.map((mode) => (
-                            <span key={mode}>
-                              {row.data[mode]?.zone1 || "0"} |{" "}
-                              <span className="text-success">
-                                {getSuccess(
-                                  row.data[mode]?.courier_id,
-                                  mode,
-                                  "zone1"
-                                )}
-                              </span>
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="py-3">
-                        <div className="d-flex flex-column gap-3">
-                          {TYPE_ORDER.map((mode) => (
-                            <span key={mode}>
-                              {row.data[mode]?.zone2 || "0"} |{" "}
-                              <span className="text-success">
-                                {getSuccess(
-                                  row.data[mode]?.courier_id,
-                                  mode,
-                                  "zone2"
-                                )}
-                              </span>
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="py-3">
-                        <div className="d-flex flex-column gap-3">
-                          {TYPE_ORDER.map((mode) => (
-                            <span key={mode}>
-                              {row.data[mode]?.zone3 || "0"} |{" "}
-                              <span className="text-success">
-                                {getSuccess(
-                                  row.data[mode]?.courier_id,
-                                  mode,
-                                  "zone3"
-                                )}
-                              </span>
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="py-3">
-                        <div className="d-flex flex-column gap-3">
-                          {TYPE_ORDER.map((mode) => (
-                            <span key={mode}>
-                              {row.data[mode]?.zone4 || "0"} |{" "}
-                              <span className="text-success">
-                                {getSuccess(
-                                  row.data[mode]?.courier_id,
-                                  mode,
-                                  "zone4"
-                                )}
-                              </span>
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="py-3">
-                        <div className="d-flex flex-column gap-3">
-                          {TYPE_ORDER.map((mode) => (
-                            <span key={mode}>
-                              {row.data[mode]?.zone5 || "0"} |{" "}
-                              <span className="text-success">
-                                {getSuccess(
-                                  row.data[mode]?.courier_id,
-                                  mode,
-                                  "zone5"
-                                )}
-                              </span>
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="py-3">
-                        <div className="d-flex flex-column gap-3">
-                          {TYPE_ORDER.map((mode) => (
-                            <span key={mode}>
-                              {row.data[mode]?.cod || "0"} |{" "}
-                              <span className="text-success">
-                                {getSuccess(
-                                  row.data[mode]?.courier_id,
-                                  mode,
-                                  "cod"
-                                )}
-                              </span>
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="py-3">
-                        <div className="d-flex flex-column gap-3">
-                          {TYPE_ORDER.map((mode) => (
-                            <span key={mode}>
-                              {row.data[mode]?.cod_percentage || "0"} |{" "}
-                              <span className="text-success">
-                                {getSuccess(
-                                  row.data[mode]?.courier_id,
-                                  mode,
-                                  "cod_percentage"
-                                )}
-                              </span>
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="9" className="text-center">
-                      No records found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center">
+                    No records found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
