@@ -205,6 +205,7 @@ class Service {
     const deadWeight = CustomMath.roundOff(weight);
 
     const calculatedZone = this.calculateZone(origin, destination);
+    console.log('calculatedZone: ', calculatedZone);
 
     const volumetricWeight = CustomMath.roundOff(
       (CustomMath.roundOff(length) *
@@ -224,10 +225,12 @@ class Service {
     ]);
 
     const plan_id = UserServiceRes?.pricingPlanId;
+    console.log('plan_id: ', plan_id);
 
     if (!plan_id) throw new Error("No pricing plan found for userId." + userId);
 
     let pricingCard = (await this.read({ plan_id }))?.data?.result;
+    console.log('pricingCard: ', pricingCard);
 
     if (!pricingCard || pricingCard.length == 0) {
       const error = new Error(
@@ -249,7 +252,7 @@ class Service {
       throw error;
     }
 
-    // console.log("userCouriers: ", userCouriers);
+    console.log("userCouriers: ", userCouriers);
 
     // filter-in all the couriers which are  available to the user.
     pricingCard = pricingCard?.filter((e) =>
@@ -260,18 +263,18 @@ class Service {
       throw new Error("No available plans.");
     }
 
-    // console.log(
-    //   "pricingCard: ",
-    //   pricingCard.map((e) => e.dataValues)
-    // );
+    console.log(
+      "pricingCard: ",
+      pricingCard.map((e) => e.dataValues)
+    );
     const filteredForwardPlans = pricingCard.filter(
       (e) => e.type === "forward" || e.type === "weight"
     );
 
-    // console.log(
-    //   "filteredForwardPlans: ",
-    //   filteredForwardPlans.map((e) => e.dataValues)
-    // );
+    console.log(
+      "filteredForwardPlans: ",
+      filteredForwardPlans.map((e) => e.dataValues)
+    );
 
     const courierCache = {};
 
@@ -329,7 +332,7 @@ class Service {
       )
     )?.filter((e) => e != null);
 
-    // console.log("forwardPlanResults: ", forwardPlanResults);
+    console.log("forwardPlanResults: ", forwardPlanResults);
     // Group by courier_id
     const forwardPlans = forwardPlanResults.reduce(
       (acc, { courier_id, plan }) => {
