@@ -347,6 +347,7 @@ class Service {
       const data = { courierId, finalWeight };
 
       const currentCourier = forwardPlans[courierId];
+      console.log('currentCourier: ', currentCourier);
       const firstEntry = currentCourier[0];
 
       data["courier_id"] = firstEntry.id;
