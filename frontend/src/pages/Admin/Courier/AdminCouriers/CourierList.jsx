@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import api from "../../../../utils/api";
-// import Icon from "@mdi/react";
-// import { mdiDelete, mdiPencil } from "@mdi/js";
 import Pagination from "../../../../Component/Pagination";
 import courierConfig from "../../../../config/Courier/CourierConfig";
+import { useAlert } from "../../../../middleware/AlertContext";
 
 function CourierList() {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const [totalCount, setTotalCount] = useState(0);
+  const { showError, showSuccess } = useAlert();
 
   const handleFetchData = async () => {
     setLoading(true);
@@ -36,78 +36,94 @@ function CourierList() {
     }
   };
 
+  // PATCH Update Status
+  const handleStatusToggle = async (id, currentStatus) => {
+    const newStatus = currentStatus === "1" ? "0" : "1";
+
+    try {
+      await api.patch(`${courierConfig.courierApi}/${id}`, {
+        status: newStatus,
+      });
+
+      setDataList((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status: newStatus } : item
+        )
+      );
+      showSuccess("Courier status updated successfully");
+    } catch (error) {
+      console.error("Status update failed:", error);
+      showError("Failed to update courier status");
+    }
+  };
+
   useEffect(() => {
     handleFetchData();
   }, [searchParams]);
 
   return (
-    <>
-      <div className="tab-content tab-content-vertical">
-        <div className="tab-pane fade show active" role="tabpanel">
-          <div className="table-responsive h-100">
-            <table className="table table-hover">
-              <thead>
+    <div className="tab-content tab-content-vertical">
+      <div className="tab-pane fade show active" role="tabpanel">
+        <div className="table-responsive h-100">
+          <table className="table table-hover">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Courier Id</th>
+                <th>Code</th>
+                <th>Courier Type</th>
+                <th>Active</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
                 <tr>
-                  <th>Name</th>
-                  <th>Courier Id</th>
-                  <th>Code</th>
-                  <th>Courier Type</th>
-                  <th>Status</th>
-                  {/* <th>Action</th> */}
+                  <td colSpan="5">
+                    <div className="dot-opacity-loader">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="5">
-                      <div className="dot-opacity-loader">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+              ) : dataList.length > 0 ? (
+                dataList.map((data) => (
+                  <tr key={data.id}>
+                    <td className="py-3">{data?.name || ""}</td>
+                    <td className="py-3">{data?.id || ""}</td>
+                    <td className="py-3">{data?.code || ""}</td>
+                    <td className="py-3">{data?.courier_type || ""}</td>
+
+                    {/* Toggle Button */}
+                    <td className="py-3">
+                      <div className=" form-switch">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          checked={data?.status === "1"}
+                          onChange={() =>
+                            handleStatusToggle(data.id, data.status)
+                          }
+                        />
                       </div>
                     </td>
                   </tr>
-                ) : dataList.length > 0 ? (
-                  dataList.map((data) => (
-                    <tr key={data.id}>
-                      <td className="py-3">{data?.name || ""}</td>
-                      <td className="py-3">{data?.id || ""}</td>
-                      <td className="py-3">{data?.code || ""}</td>
-                      <td className="py-3">
-                        {data?.courier_type || ""}
-                      </td>
-                      <td className="py-3">
-                        {data?.status === "1" ? "Active" : "Inactive"}
-                      </td>
-                      
-                      
-                      {/* <td className="py-3">
-                        <div className="btn-group">
-                          <Link
-                            to={`edit/${data?.id}`}
-                            className="btn btn-outline-primary btn-md py-2 px-3"
-                          >
-                            <Icon path={mdiPencil} size={0.6} />
-                          </Link>
-                          
-                        </div>
-                      </td> */}
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="text-center">
-                      No records found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          <Pagination totalCount={totalCount} />
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center">
+                    No records found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
+        {dataList.length > 0 && !loading && (
+          <Pagination totalCount={totalCount} />
+        )}
       </div>
-    </>
+    </div>
   );
 }
 

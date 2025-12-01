@@ -120,7 +120,9 @@ function AWBListTable() {
               </tbody>
             </table>
           </div>
-          <Pagination totalCount={totalCount} />
+          {dataList.length > 0 && !loading && (
+            <Pagination totalCount={totalCount} />
+          )}
         </div>
       </div>
     </>

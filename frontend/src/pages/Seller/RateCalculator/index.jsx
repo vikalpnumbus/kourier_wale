@@ -14,7 +14,7 @@ function index() {
     length: "",
     breadth: "",
     height: "",
-    paymentMethod: "",
+    paymentType: "",
     amount: ""
   });
   const planNames = {
@@ -180,9 +180,9 @@ function index() {
                             <div className="form-group col-md-6">
                             <label>Payment Method</label>
                             <select
-                                name="paymentMethod"
+                                name="paymentType"
                                 className="form-select"
-                                value={formData.paymentMethod}
+                                value={formData.paymentType}
                                 onChange={handleChange}
                             >
                                 <option value="">Payment Method</option>
@@ -217,7 +217,7 @@ function index() {
                                 length: "",
                                 breadth: "",
                                 height: "",
-                                paymentMethod: "",
+                                paymentType: "",
                                 amount: ""
                             });
                             setErrors({});
