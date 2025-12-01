@@ -146,16 +146,16 @@ class Service {
 
       const result = await this.repository.save(payload);
 
-      // const orderUpdate = await OrdersService.update({
-      //   data: {
-      //     id: order_id,
-      //     warehouse_id,
-      //     rto_warehouse_id,
-      //     shipping_status: "booked",
-      //   },
-      // });
-      // if (!orderUpdate)
-      //   console.error("shipping/create/orderUpdate", OrdersService.error);
+      const orderUpdate = await OrdersService.update({
+        data: {
+          id: order_id,
+          warehouse_id,
+          rto_warehouse_id,
+          shipping_status: "booked",
+        },
+      });
+      if (!orderUpdate)
+        console.error("shipping/create/orderUpdate", OrdersService.error);
 
       console.error("err: ", errors);
       if (errors.length == 0) {
