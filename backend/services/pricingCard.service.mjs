@@ -283,12 +283,12 @@ class Service {
         filteredForwardPlans.map(async (e) => {
           let courierPromise;
 
-          if (courierCache[e.courierId]) {
-            courierPromise = courierCache[e.courierId];
+          if (courierCache[e.courier_id]) {
+            courierPromise = courierCache[e.courier_id];
           } else {
             // Store the PROMISE immediately → ensures parallel fetching
-            courierPromise = CourierService.read({ id: e.courierId });
-            courierCache[e.courierId] = courierPromise;
+            courierPromise = CourierService.read({ id: e.courier_id });
+            courierCache[e.courier_id] = courierPromise;
           }
 
           const [courierDetailsRes, pincodeServiceabilityDetailsRes] =
@@ -411,7 +411,7 @@ class Service {
         zone: data.calculatedZone,
       };
     });
-
+console.log('courierCache', JSON.stringify(courierCache, null, 2))
     return {
       rows,
     };
