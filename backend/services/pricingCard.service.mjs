@@ -348,7 +348,8 @@ class Service {
 
       const currentCourier = forwardPlans[courierId];
       console.log('currentCourier: ', currentCourier);
-      const firstEntry = currentCourier[0];
+      const firstEntry = currentCourier.filter(curr=>curr.type == "forward");
+      console.log('firstEntry: ', firstEntry);
 
       data["courier_id"] = firstEntry.id;
       data["courier_name"] = firstEntry.name;
