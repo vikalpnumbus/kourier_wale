@@ -305,11 +305,11 @@ class Service {
           const pincodeServiceabilityDetails =
             pincodeServiceabilityDetailsRes?.data?.result?.[0];
 
-          // console.log("courier_id: ", e.courier_id);
-          // console.log(
-          //   "pincodeServiceabilityDetails: ",
-          //   pincodeServiceabilityDetails
-          // );
+          console.log("courier_id: ", e.courier_id);
+          console.log(
+            "pincodeServiceabilityDetails: ",
+            pincodeServiceabilityDetails
+          );
           if (!pincodeServiceabilityDetails) return null;
 
           if (
