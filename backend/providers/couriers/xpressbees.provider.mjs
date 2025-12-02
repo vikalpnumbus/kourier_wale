@@ -66,19 +66,19 @@ class Provider {
   }
 
   async createShipment(data) {
+    const {
+      courier_id,
+      order_db_id,
+      paymentType,
+      total_price,
+      shippingDetails,
+      warehouse_id,
+      warehouses,
+      rto_warehouse_id,
+      packageDetails,
+      shipmentId,
+    } = data;
     try {
-      const {
-        courier_id,
-        order_db_id,
-        paymentType,
-        total_price,
-        shippingDetails,
-        warehouse_id,
-        warehouses,
-        rto_warehouse_id,
-        packageDetails,
-        shipmentId,
-      } = data;
       const errors = [];
       console.log('errors: ', errors);
 
