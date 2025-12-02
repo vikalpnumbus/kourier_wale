@@ -287,7 +287,54 @@ class Provider {
       await NotificationService.sendEmail({
         email: 'hisinghrahul44895@gmail.com',
         subject: "URGENT: No AWB number available",
-        html: `There is no AWB Number available in the database due to which shipment id ${shipmentId} for seller id ${userId} cannot be pushed to Xpressbees. Please take action immediately.`,
+        html: `<table width="100%" cellpadding="0" cellspacing="0" style="font-family: Arial, sans-serif; background-color:#f7f8fa; padding: 20px;">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:8px; padding: 30px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        
+        <!-- Company Logo -->
+        <tr>
+          <td align="center" style="padding-bottom: 20px;">
+            <img src="http://kourierwale.live/assets/logo_company-B_87LJ-d.png" alt="Company Logo" width="120" style="display:block;">
+          </td>
+        </tr>
+
+        <!-- Title -->
+        <tr>
+          <td style="font-size: 20px; font-weight:600; color:#333; padding-bottom: 10px;">
+            URGENT: AWB Number Unavailable
+          </td>
+        </tr>
+
+        <!-- Body Content -->
+        <tr>
+          <td style="font-size: 15px; line-height: 22px; color:#555;">
+            Dear Team,<br><br>
+
+            This is to inform you that there are currently <strong>no available AWB numbers</strong> in the system.  
+            As a result, the shipment with the following details could not be pushed to Xpressbees:<br><br>
+
+            <strong>Shipment ID:</strong> ${shipmentId}<br>
+            <strong>Seller/User ID:</strong> ${userId}<br><br>
+
+            Kindly take immediate action to replenish the AWB inventory to avoid any operational delays.
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="padding-top: 30px; font-size: 14px; color:#777; border-top:1px solid #eee;">
+            Regards,<br>
+            <strong>Your Operations System</strong><br>
+            (This is an automated email)
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+`,
       });
       this.error = error;
       return false;
