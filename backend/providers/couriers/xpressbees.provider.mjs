@@ -77,6 +77,7 @@ class Provider {
       rto_warehouse_id,
       packageDetails,
       shipmentId,
+      userId
     } = data;
     try {
       const errors = [];
@@ -286,7 +287,7 @@ class Provider {
       await NotificationService.sendEmail({
         email: 'hisinghrahul44895@gmail.com',
         subject: "URGENT: No AWB number available",
-        html: `There is no AWB Number available in the database due to which shipment id ${shipmentId} cannot be pushed to Xpressbees. Please take action immediately.`,
+        html: `There is no AWB Number available in the database due to which shipment id ${shipmentId} for seller id ${userId} cannot be pushed to Xpressbees. Please take action immediately.`,
       });
       this.error = error;
       return false;
