@@ -157,7 +157,7 @@ class Service {
       if (!orderUpdate)
         console.error("shipping/create/orderUpdate", OrdersService.error);
 
-      console.error("err: ", errors);
+      // console.error("err: ", errors);
       if (errors.length == 0) {
         const createSingleShipment = await this.handleCreateSingleShipment({
           ...payload,
@@ -421,6 +421,8 @@ class Service {
       const { total_price } = data;
 
       const { code } = courier?.data?.result?.[0];
+      console.log('courier: ', courier.data);
+      console.log('code: ', code);
 
       if (code.includes("xpressbees")) {
         const shipmentRes = await XpressBeesProvider.createShipment(data);

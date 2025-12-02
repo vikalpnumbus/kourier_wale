@@ -140,6 +140,7 @@ class Service {
   }
 
   async readAndUpdateNextAvailable(params) {
+    console.log('params: ', params);
     try {
       return await sqlDB.sequelize.transaction(async (t) => {
         // Step 1: Lock one available AWB row
@@ -150,6 +151,7 @@ class Service {
           transaction: t,
         });
         
+        console.log('awb: ', awb);
         if (!awb) {
           throw new Error("No available AWB numbers.");
         }
@@ -160,6 +162,7 @@ class Service {
         return awb;
       });
     } catch (error) {
+      console.log('error: ', error);
       this.error = error;
       console.error(error);
       return false;

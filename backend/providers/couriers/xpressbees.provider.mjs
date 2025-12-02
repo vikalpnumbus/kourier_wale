@@ -78,6 +78,7 @@ class Provider {
         packageDetails,
       } = data;
       const errors = [];
+      console.log('errors: ', errors);
 
       let [courierAWBListRes] = await Promise.all([
         CourierAWBListService.readAndUpdateNextAvailable({
@@ -96,6 +97,7 @@ class Provider {
       }
 
       const availableAWB =  courierAWBListRes?.dataValues?.awb_number;
+      console.log('availableAWB: ', availableAWB);
       if (!availableAWB) {
         errors.push("No awb number is available.");
       }
