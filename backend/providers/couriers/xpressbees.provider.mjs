@@ -13,6 +13,7 @@ import CourierAWBListService from "../../services/courierAWBList.service.mjs";
 import ShippingService from "../../services/shipping.service.mjs";
 import WarehouseService from "../../services/warehouse.service.mjs";
 import CustomMath from "../../utils/basic.utils.mjs";
+import NotificationService from "../../services/email.service.mjs";
 
 class Provider {
   constructor() {
@@ -76,6 +77,7 @@ class Provider {
         warehouses,
         rto_warehouse_id,
         packageDetails,
+        shipmentId,
       } = data;
       const errors = [];
       console.log('errors: ', errors);
@@ -281,6 +283,11 @@ class Provider {
       };
     } catch (error) {
       console.error("[Xpressbees.provider.mjs/createShipment]: error", error);
+      await NotificationService.sendEmail({
+        email: data.email,
+        subject: "URGENT: No AWB number available",
+        html: `There is no AWB Number available in the database due to which shipment id ${shipmentId} cannot be pushed to Xpressbees. Please take action immediately.`,
+      });
       this.error = error;
       return false;
     }

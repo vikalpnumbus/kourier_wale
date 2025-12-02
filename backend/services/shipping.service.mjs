@@ -425,7 +425,7 @@ class Service {
       console.log('code: ', code);
 
       if (code.includes("xpressbees")) {
-        const shipmentRes = await XpressBeesProvider.createShipment(data);
+        const shipmentRes = await XpressBeesProvider.createShipment({...data, shipmentId:id});
 
         if (!shipmentRes) {
           await ShippingService.update({
