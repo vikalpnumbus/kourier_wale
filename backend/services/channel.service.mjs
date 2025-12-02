@@ -1,7 +1,6 @@
 import ShopifyProvider from "../providers/couriers/shopify.provider.mjs";
 import OrdersProducer from "../queue/producers/orders.producer.mjs";
 import FactoryRepository from "../repositories/factory.repository.mjs";
-import CourierService from "./courier.service.mjs";
 import OrdersService from "./orders.service.mjs";
 import ProductsService from "./products.service.mjs";
 
