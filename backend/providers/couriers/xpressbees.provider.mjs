@@ -280,7 +280,7 @@ class Provider {
         courierAWBListData: courierAWBListRes.dataValues,
       };
     } catch (error) {
-      // console.error("error: ", error);
+      console.error("[Xpressbees.provider.mjs/createShipment]: error", error);
       this.error = error;
       return false;
     }
