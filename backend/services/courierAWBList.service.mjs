@@ -141,21 +141,19 @@ class Service {
 
   async readAndUpdateNextAvailable(params) {
     try {
-      return sqlDB.sequelize.transaction(async (t) => {
+      return await sqlDB.sequelize.transaction(async (t) => {
         // Step 1: Lock one available AWB row
         const awb = await this.repository.findOne({
-          where: {
-            ...params,
-          },
+          where: params,
           order: [["id", "DESC"]],
           lock: t.LOCK.UPDATE, // Prevent others from reading this row concurrently
           transaction: t,
         });
-
+        
         if (!awb) {
           throw new Error("No available AWB numbers.");
         }
-
+        
         // Step 2: Mark it as used
         awb.used = true;
         await awb.save({ transaction: t });

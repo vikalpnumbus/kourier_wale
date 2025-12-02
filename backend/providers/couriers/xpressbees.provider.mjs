@@ -79,30 +79,32 @@ class Provider {
       } = data;
       const errors = [];
 
-      let [courierAWBListRes] = await Promise.all([
-        CourierAWBListService.readAndUpdateNextAvailable({
-          courier_id,
-          used: false,
-          mode: "forward",
-        }),
-      ]);
+      // let [courierAWBListRes] = await Promise.all([
+      //   CourierAWBListService.readAndUpdateNextAvailable({
+      //     courier_id,
+      //     used: false,
+      //     mode: "forward",
+      //   }),
+      // ]);
 
-      if (!courierAWBListRes) {
-        errors.push("No awb number is available.");
-      }
+      // if (!courierAWBListRes) {
+      //   errors.push("No awb number is available.");
+      // }
 
-      if (errors.length > 0) {
-        throw new Error(errors.join("|"));
-      }
+      // if (errors.length > 0) {
+      //   throw new Error(errors.join("|"));
+      // }
 
-      const availableAWB = courierAWBListRes?.dataValues?.awb_number;
-      if (!availableAWB) {
-        errors.push("No awb number is available.");
-      }
+      const availableAWB = '153758514550'
+      //  courierAWBListRes?.dataValues?.awb_number;
+      // if (!availableAWB) {
+      //   errors.push("No awb number is available.");
+      // }
+      console.log('availableAWB: ', availableAWB);
 
-      if (errors.length > 0) {
-        throw new Error(errors.join("|"));
-      }
+      // if (errors.length > 0) {
+      //   throw new Error(errors.join("|"));
+      // }
 
       let pickup_warehouse = null;
       let rto_warehouse = null;
@@ -116,16 +118,16 @@ class Provider {
       const payload = {
         AirWayBillNO: availableAWB,
         BusinessAccountName: "Quickdaak Small",
-        OrderNo: order_db_id,
-        SubOrderNo: order_db_id,
+        OrderNo: order_db_id?.toString(),
+        SubOrderNo: order_db_id?.toString(),
         OrderType:
           paymentType == "prepaid"
             ? "PrePaid"
             : paymentType == "cod"
             ? "COD"
             : null,
-        CollectibleAmount: total_price,
-        DeclaredValue: total_price,
+        CollectibleAmount: total_price?.toString(),
+        DeclaredValue: total_price?.toString(),
         PickupType: "Vendor",
         Quantity: "1",
         ServiceType: "SD",
@@ -229,30 +231,35 @@ class Provider {
             Width: packageDetails.breadth,
           },
           Weight: {
-            BillableWeight: CustomMath.roundOff(packageDetails.weight / 1000), //g->kg
-            PhyWeight: CustomMath.roundOff(packageDetails.weight / 1000),
-            VolWeight: CustomMath.roundOff(packageDetails.weight / 1000),
+            BillableWeight: (CustomMath.roundOff(packageDetails.weight / 1000))?.toString(), //g->kg
+            PhyWeight: (CustomMath.roundOff(packageDetails.weight / 1000))?.toString(),
+            VolWeight: (CustomMath.roundOff(packageDetails.weight / 1000))?.toString(),
           },
         },
         GSTMultiSellerInfo: [],
       };
 
       const token = (await this.generateTokenSmall())?.token || null;
+      console.log('token: ', token);
       if (!token) {
         throw this.error;
       }
 
-      // const agent = new https.Agent({
-      //   rejectUnauthorized: NODE_ENV == "development" ? false : false,
-      // });
+      const agent = new https.Agent({
+        rejectUnauthorized: NODE_ENV == "development" ? false : false,
+      });
 
       const url = this.XPRESSBEES_URL_CREATE_SHIPMENT_FORWARD;
+      console.log('url: ', url);
+      console.log('payload: ', JSON.stringify(payload, null, 2));
       const response = await axios.post(url, payload, {
-        // httpsAgent: agent,
+        httpsAgent: agent,
         headers: { token },
       });
 
+      console.log('response: ', response);
       const resData = response.data;
+      console.log('resData: ', resData);
       if (resData.ReturnCode != 100) {
         throw new Error(resData.ReturnMessage);
       }

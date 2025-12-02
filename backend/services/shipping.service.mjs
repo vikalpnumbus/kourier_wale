@@ -44,11 +44,11 @@ class Service {
         throw OrdersService.error;
       }
 
-      if (order.shipping_status == "booked") {
-        const error = new Error("Order is already booked.");
-        error.status = 400;
-        throw error;
-      }
+      // if (order.shipping_status == "booked") {
+      //   const error = new Error("Order is already booked.");
+      //   error.status = 400;
+      //   throw error;
+      // }
 
       if (order.shipping_status == "cancelled") {
         const error = new Error("Cancelled order cannot be shipped.");
