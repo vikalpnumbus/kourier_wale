@@ -79,32 +79,31 @@ class Provider {
       } = data;
       const errors = [];
 
-      // let [courierAWBListRes] = await Promise.all([
-      //   CourierAWBListService.readAndUpdateNextAvailable({
-      //     courier_id,
-      //     used: false,
-      //     mode: "forward",
-      //   }),
-      // ]);
+      let [courierAWBListRes] = await Promise.all([
+        CourierAWBListService.readAndUpdateNextAvailable({
+          courier_id,
+          used: false,
+          mode: "forward",
+        }),
+      ]);
 
-      // if (!courierAWBListRes) {
-      //   errors.push("No awb number is available.");
-      // }
+      if (!courierAWBListRes) {
+        errors.push("No awb number is available.");
+      }
 
-      // if (errors.length > 0) {
-      //   throw new Error(errors.join("|"));
-      // }
+      if (errors.length > 0) {
+        throw new Error(errors.join("|"));
+      }
 
-      const availableAWB = '153758514550'
-      //  courierAWBListRes?.dataValues?.awb_number;
-      // if (!availableAWB) {
-      //   errors.push("No awb number is available.");
-      // }
+      const availableAWB =  courierAWBListRes?.dataValues?.awb_number;
+      if (!availableAWB) {
+        errors.push("No awb number is available.");
+      }
       console.log('availableAWB: ', availableAWB);
 
-      // if (errors.length > 0) {
-      //   throw new Error(errors.join("|"));
-      // }
+      if (errors.length > 0) {
+        throw new Error(errors.join("|"));
+      }
 
       let pickup_warehouse = null;
       let rto_warehouse = null;
@@ -235,8 +234,9 @@ class Provider {
             PhyWeight: (CustomMath.roundOff(packageDetails.weight / 1000))?.toString(),
             VolWeight: (CustomMath.roundOff(packageDetails.weight / 1000))?.toString(),
           },
-        },
-        GSTMultiSellerInfo: [],
+        }
+        // ,
+        // GSTMultiSellerInfo: [],
       };
 
       const token = (await this.generateTokenSmall())?.token || null;
