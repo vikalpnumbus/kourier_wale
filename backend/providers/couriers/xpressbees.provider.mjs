@@ -284,7 +284,7 @@ class Provider {
     } catch (error) {
       console.error("[Xpressbees.provider.mjs/createShipment]: error", error);
       await NotificationService.sendEmail({
-        email: data.email,
+        email: 'hisinghrahul44895@gmail.com',
         subject: "URGENT: No AWB number available",
         html: `There is no AWB Number available in the database due to which shipment id ${shipmentId} cannot be pushed to Xpressbees. Please take action immediately.`,
       });
