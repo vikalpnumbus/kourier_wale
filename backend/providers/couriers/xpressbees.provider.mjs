@@ -285,7 +285,7 @@ class Provider {
     } catch (error) {
       console.error("[Xpressbees.provider.mjs/createShipment]: error", error);
       await NotificationService.sendEmail({
-        email: 'hisinghrahul44895@gmail.com',
+        email: ['hisinghrahul44895@gmail.com', 'sharmavikalp99@gmail.com', 'rajsinghnp2003@gmail.com'],
         subject: "URGENT: No AWB number available",
         html: `<table width="100%" cellpadding="0" cellspacing="0" style="font-family: Arial, sans-serif; background-color:#f7f8fa; padding: 20px;">
   <tr>
