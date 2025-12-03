@@ -115,3 +115,20 @@ export const razorPayVerify = async (req, res, next) => {
     next({ status: error.status, message: error.details || error.message });
   }
 };
+
+export const history = async (req, res, next) => {
+  const {  page = 1, limit = 50, id, start_date, end_date } = req.query;
+  const userId = req.user.id
+  try {
+
+    const result = await WalletHistoryService.read({page, limit, id, start_date, end_date, userId});
+    res.success(result);
+  } catch (error) {
+    console.error("[Payment.controller.mjs/history]: error", {
+      userId: req.user.id,
+      time: new Date().toLocaleString(),
+      error,
+    });
+    next({ status: error.status, message: error.details || error.message });
+  }
+};

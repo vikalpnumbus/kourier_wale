@@ -5,6 +5,7 @@ import TokenHandler from "../middlewares/tokenHandler.mjs";
 import {
   razorPayOrder,
   razorPayVerify,
+  history
 } from "../controllers/payment.controller.mjs";
 const PaymentRouter = express.Router();
 
@@ -20,6 +21,12 @@ PaymentRouter.post(
   TokenHandler.authenticateToken,
     validate(RazorPayPaymentValidations.verify()),
   razorPayVerify
+);
+
+PaymentRouter.get(
+  "/history",
+  TokenHandler.authenticateToken,
+  history
 );
 
 export default PaymentRouter;

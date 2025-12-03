@@ -36,10 +36,10 @@ class Service {
 
   async read(params) {
     try {
-      const { page = 1, limit = 50, id, start_date, end_date } = params;
-
-      const whereClause = { [Op.and]: [], ...filters };
-
+      const { page = 1, limit = 50, id, start_date, end_date, userId } = params;
+      
+      const whereClause = { [Op.and]: [] };
+      
       // Direct equality filters
       if (userId) whereClause[Op.and].push({ userId });
       if (id) whereClause[Op.and].push({ id });
