@@ -415,10 +415,7 @@ class Service {
 
   async handleCreateSingleShipment(data) {
     try {
-      const id = data.id;
-      const courier = data.courier;
-      const userId = data.userId;
-      const { total_price } = data;
+      const { id, userId, courier, total_price, freight_charge, cod_price } = data;
 
       const { code } = courier?.data?.result?.[0];
       console.log('courier: ', courier.data);
@@ -463,7 +460,7 @@ class Service {
           const updatedUser = await UserService.update(
             { id: userId },
             {
-              wallet_balance: existingUser.wallet_balance - total_price,
+              wallet_balance: existingUser.wallet_balance - ((freight_charge||0)+(cod_price||0)),
             }
           );
 
