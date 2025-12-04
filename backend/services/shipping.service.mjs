@@ -474,7 +474,7 @@ class Service {
             );
           }
         }
-      } else if (code.includes("shadowfax")) {
+      } else if (code.includes("Shadow_Fax")) {
         const shipmentRes = await ShadowfaxProvider.createShipment(data);
 
         if (!shipmentRes) {
@@ -498,15 +498,15 @@ class Service {
             console.error(ShippingService.error);
           }
 
-          // const updatedAWBData = await CourierAWBListService.update({
-          //   data: {
-          //     id: shipmentRes?.courierAWBListData?.id,
-          //     used: 1,
-          //   },
-          // });
-          // if (!updatedAWBData) {
-          //   console.error(CourierAWBListService.error);
-          // }
+          const updatedAWBData = await CourierAWBListService.update({
+            data: {
+              id: shipmentRes?.courierAWBListData?.id,
+              used: 1,
+            },
+          });
+          if (!updatedAWBData) {
+            console.error(CourierAWBListService.error);
+          }
 
           const existingUser = await UserService.read({ id: userId });
 

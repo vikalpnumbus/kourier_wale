@@ -10,7 +10,7 @@ const limit = pLimit(10);
  * Run this cron every 5 minutes to check wallet balance and re-try shipping.
  */
 
-const shippingCron = cron.schedule("0 * * * *", async () => {
+const shippingCron = cron.schedule("* * * * *", async () => {
   
   try {
     console.info(
