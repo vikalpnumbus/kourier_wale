@@ -133,7 +133,7 @@ class Service {
         courier_id,
         freight_charge,
         cod_price,
-        // total_price,
+        total_price,
         zone,
         plan_id,
         courierPackageDetails: {
@@ -431,7 +431,7 @@ class Service {
           await ShippingService.update({
             data: {
               id,
-              shipment_error: XpressBeesProvider.error.message,
+              shipment_error: "aa"+XpressBeesProvider.error.message,
             },
           });
         } else {
