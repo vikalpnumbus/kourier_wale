@@ -104,7 +104,7 @@ class Service {
       }
 
       if (user_wallet_balance < total_price) {
-        errors.push("Wallet Balance is low.fjdkldlbds");
+        errors.push("Wallet Balance is low");
       }
 
       if (total_price > 2_00_000 && order.paymentType == "cod") {
@@ -133,7 +133,7 @@ class Service {
         courier_id,
         freight_charge,
         cod_price,
-        total_price,
+        // total_price,
         zone,
         plan_id,
         courierPackageDetails: {
