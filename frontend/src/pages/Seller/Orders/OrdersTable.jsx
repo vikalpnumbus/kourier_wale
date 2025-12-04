@@ -26,7 +26,7 @@ function OrdersTable() {
       order.shipping_status === "new" &&
       order.warehouse_id &&
       order.rto_warehouse_id &&
-      order.collectableAmount &&
+      (order.paymentType == "cod" ? order.collectableAmount:true) &&
       order.paymentType &&
       order.packageDetails.weight &&
       order.packageDetails["length"] &&
@@ -298,9 +298,7 @@ function OrdersTable() {
                           }}
                           disabled={!orderCanShip(data)}
                         >
-                          {data.shipping_status === "new"
-                            ? "Ship"
-                            : "Not Shipped"}
+                          {data.shipping_status == "new" ? "ship" : data.shipping_status}
                         </button>
                       </div>{" "}
                       &nbsp;
