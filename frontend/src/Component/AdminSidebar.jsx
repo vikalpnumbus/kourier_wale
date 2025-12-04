@@ -116,6 +116,23 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
             <span className="menu-title">Pricing Plans</span>
           </Link>
         </li>
+
+        <li
+          className={`nav-item 
+            ${
+              location.pathname.includes("/admin/pricingCourier")
+                ? "active"
+                : ""
+            }
+            ${hoveredItem === "pricingCourier" ? "hover-open" : ""}`}
+          onMouseEnter={() => setHoveredItem("pricingCourier")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Link className="nav-link" to="/admin/pricingCourier">
+            <i className="mdi mdi-currency-usd menu-icon"></i>
+            <span className="menu-title">Courier Pricing</span>
+          </Link>
+        </li>
         
       </ul>
     </nav>

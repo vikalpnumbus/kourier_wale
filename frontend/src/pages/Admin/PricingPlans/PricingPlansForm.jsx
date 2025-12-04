@@ -13,7 +13,6 @@ function PricingPlansForm() {
   const [form, setForm] = useState(defaultForm);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -172,8 +171,8 @@ function PricingPlansForm() {
                 {loading
                   ? "Processing..."
                   : isEdit
-                  ? "Update Pricing Plan"
-                  : "Add Pricing Plan"}
+                    ? "Update Pricing Plan"
+                    : "Add Pricing Plan"}
               </button>
             </form>
           </div>

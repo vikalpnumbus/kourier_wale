@@ -134,7 +134,6 @@ function PricingPlanView() {
               ) : Object.values(courierPricingPlan).length > 0 ? (
                 Object.values(courierPricingPlan).map((row, index) => (
                   <tr key={index}>
-                    {console.log("row: ", row)}
                     <td className="py-3">{row.courier_name}</td>
 
                     <td className="py-3">
@@ -151,7 +150,7 @@ function PricingPlanView() {
                           <span key={mode}>
                             {row.data[mode]?.zone1 || "0"} |{" "}
                             <span className="text-success">
-                              {getSuccess(row.data[mode]?.id, mode, "zone1")}
+                              {getSuccess(row.data[mode]?.courier_id, mode, "zone1")}
                             </span>
                           </span>
                         ))}
@@ -164,7 +163,7 @@ function PricingPlanView() {
                           <span key={mode}>
                             {row.data[mode]?.zone2 || "0"} |{" "}
                             <span className="text-success">
-                              {getSuccess(row.data[mode]?.id, mode, "zone2")}
+                              {getSuccess(row.data[mode]?.courier_id, mode, "zone2")}
                             </span>
                           </span>
                         ))}
@@ -177,7 +176,7 @@ function PricingPlanView() {
                           <span key={mode}>
                             {row.data[mode]?.zone3 || "0"} |{" "}
                             <span className="text-success">
-                              {getSuccess(row.data[mode]?.id, mode, "zone3")}
+                              {getSuccess(row.data[mode]?.courier_id, mode, "zone3")}
                             </span>
                           </span>
                         ))}
@@ -190,7 +189,7 @@ function PricingPlanView() {
                           <span key={mode}>
                             {row.data[mode]?.zone4 || "0"} |{" "}
                             <span className="text-success">
-                              {getSuccess(row.data[mode]?.id, mode, "zone4")}
+                              {getSuccess(row.data[mode]?.courier_id, mode, "zone4")}
                             </span>
                           </span>
                         ))}
@@ -203,7 +202,7 @@ function PricingPlanView() {
                           <span key={mode}>
                             {row.data[mode]?.zone5 || "0"} |{" "}
                             <span className="text-success">
-                              {getSuccess(row.data[mode]?.id, mode, "zone5")}
+                              {getSuccess(row.data[mode]?.courier_id, mode, "zone5")}
                             </span>
                           </span>
                         ))}
@@ -216,7 +215,7 @@ function PricingPlanView() {
                           <span key={mode}>
                             {row.data[mode]?.cod || "0"} |{" "}
                             <span className="text-success">
-                              {getSuccess(row.data[mode]?.id, mode, "cod")}
+                              {getSuccess(row.data[mode]?.courier_id, mode, "cod")}
                             </span>
                           </span>
                         ))}
@@ -230,7 +229,7 @@ function PricingPlanView() {
                             {row.data[mode]?.cod_percentage || "0"} |{" "}
                             <span className="text-success">
                               {getSuccess(
-                                row.data[mode]?.id,
+                                row.data[mode]?.courier_id,
                                 mode,
                                 "cod_percentage"
                               )}
