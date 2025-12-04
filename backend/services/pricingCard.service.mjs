@@ -293,19 +293,29 @@ class Service {
 
           const [courierDetailsRes, pincodeServiceabilityDetailsRes] =
             await Promise.all([
-              courierPromise,
+              await CourierService.read({ id: e.courier_id }),
               await ServiceablePincodesService.read({
                 courier_id: e.courier_id,
               }),
             ]);
           const courierDetails = courierDetailsRes?.data?.result?.[0];
+          console.log('courierDetails: ', courierDetails);
           const { name, weight, additional_weight, show_to_users } =
             courierDetails;
 
           const pincodeServiceabilityDetails =
             pincodeServiceabilityDetailsRes?.data?.result?.[0];
 
-          console.log("courier_id: ", e.courier_id);
+          console.log("courier_id: ", e.courier_id, name, {
+            courier_id: e.courier_id,
+            plan: {
+              ...e.dataValues,
+              name,
+              weight,
+              additional_weight,
+              show_to_users,
+            },
+          });
           console.log(
             "pincodeServiceabilityDetails: ",
             pincodeServiceabilityDetails
@@ -351,7 +361,7 @@ class Service {
       const firstEntry = currentCourier.filter(curr=>curr.type == "forward")?.[0];
       console.log('firstEntry: ', firstEntry);
 
-      data["courier_id"] = firstEntry.id;
+      data["courier_id"] = firstEntry.courier_id;
       data["courier_name"] = firstEntry.name;
       data["cod_amount"] = CustomMath.roundOff(firstEntry.cod);
       data["cod_percentage"] = CustomMath.roundOff(firstEntry.cod_percentage);
