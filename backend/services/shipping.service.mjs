@@ -104,7 +104,7 @@ class Service {
       }
 
       if (user_wallet_balance < total_price) {
-        errors.push("Wallet Balance is low.");
+        errors.push("Wallet Balance is low.fjdkldlbds");
       }
 
       if (total_price > 2_00_000 && order.paymentType == "cod") {

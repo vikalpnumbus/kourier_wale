@@ -20,7 +20,7 @@ const shippingCron = cron.schedule("* * * * *", async () => {
 
     const shipments = (
       await ShippingService.read({
-        shipping_error: "Wallet balance is low.",
+        shipping_error: "Wallet balance is low kndkndkdnkdn",
         shipping_status: "new",
       })
     )?.data?.result;
