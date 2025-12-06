@@ -116,22 +116,6 @@ function ShipModal({ orderData, onClose }) {
   });
 };
 
-
-  // const handleSubmit = () => {
-  //   const newErrors = validateForm(form);
-  //   if (Object.keys(newErrors).length > 0) {
-  //     setErrors(newErrors);
-  //     return;
-  //   }
-  //   if (!shipData.courier_id) {
-  //     alert("Please select a courier before shipping.");
-  //     return;
-  //   }
-  //   console.log("🚚 Final Shipping Data:", shipData);
-  //   onClose();
-  // };
-
-
   const handleSubmit = async () =>
   {
     const newErrors = validateForm(form);

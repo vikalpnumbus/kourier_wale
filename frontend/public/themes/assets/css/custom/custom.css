@@ -204,3 +204,17 @@ a
 {
     color: #fff !important;
 }
+
+.kw_button_cancel
+{
+    color: #fff !important;
+    background-color: rgb(230, 11, 11) !important;
+    border-color: rgb(230, 11, 11) !important;
+}
+.kw_button_booked
+{
+    
+    color: #fff !important;
+    background-color: #155724 !important;
+    border-color: #1e7e34 !important;
+}
