@@ -38,3 +38,15 @@ export const verify = async (req, res, next) => {
     next(error);
   }
 };
+
+export const read = async (req, res, next) => {
+  try {
+    const result = await KYCService.read({ userId: req.params.userId });
+    if (!result) {
+      throw KYCService.error;
+    }
+    res.success(result);
+  } catch (error) {
+    next(error);
+  }
+};

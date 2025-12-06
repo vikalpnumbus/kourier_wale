@@ -72,6 +72,7 @@ class Service {
       if (awb_number) whereClause[Op.and].push({ awb_number });
       if (mode) whereClause[Op.and].push({ mode });
       if (courier_id) whereClause[Op.and].push({ courier_id });
+      if(!id)whereClause[Op.and].push({used:false})
 
       if (!whereClause[Op.and].length) delete whereClause[Op.and];
 
