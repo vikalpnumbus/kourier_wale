@@ -104,8 +104,10 @@ class Service {
   }
 
   async read(params) {
+    console.log('params: ', params);
     try {
       const result = await this.repository.findOne(params);
+      console.log('result: ', result);
 
       if (!result) {
         const error = new Error("No record found.");

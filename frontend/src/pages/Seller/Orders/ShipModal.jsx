@@ -8,7 +8,7 @@ import api from "../../../utils/api";
 
 function ShipModal({ orderData, onClose }) {
   const [shipData, setShipData] = useState({
-    order_id: "",
+    order_db_ids: "",
     warehouse_id: "",
     rto_warehouse_id: "",
     courier_id: "",
@@ -103,65 +103,50 @@ function ShipModal({ orderData, onClose }) {
 }, [orderData, form.warehouse_id, form.rto_warehouse_id]);
 
   const handleCourierSelect = (rate, index) => {
-    setSelectedIndex(index);
-    setShipData({
-      order_id: orderData?.id || "",
-      warehouse_id: orderData?.warehouse_id || "",
-      rto_warehouse_id: orderData?.rto_warehouse_id || "",
-      courier_id: rate.courier_id || "",
-      freight_charge: rate.freight_charge || "",
-      cod_price: rate.cod_charge || "30",
-      zone: rate.zone || "",
-      plan_id: planid || "",
-    });
-  };
-
-  // const handleSubmit = () => {
-  //   const newErrors = validateForm(form);
-  //   if (Object.keys(newErrors).length > 0) {
-  //     setErrors(newErrors);
-  //     return;
-  //   }
-  //   if (!shipData.courier_id) {
-  //     alert("Please select a courier before shipping.");
-  //     return;
-  //   }
-  //   console.log("🚚 Final Shipping Data:", shipData);
-  //   onClose();
-  // };
-
+  setSelectedIndex(index);
+  setShipData({
+    order_db_ids: orderData?.id ? [orderData.id] : [],
+    warehouse_id: form.warehouse_id || orderData?.warehouse_id || "",
+    rto_warehouse_id: form.rto_warehouse_id || orderData?.rto_warehouse_id || "",
+    courier_id: rate.courier_id || "",
+    freight_charge: Number(rate.freight_charge) || 0,
+    cod_price: Number(rate.cod_charge) || 0,
+    zone: rate.zone || "",
+    plan_id: planid || "",
+  });
+};
 
   const handleSubmit = async () =>
   {
-      const newErrors = validateForm(form);
-      if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors);
-        return;
-      }
-      if (!shipData.courier_id) {
-        alert("Please select a courier before shipping.");
-        return;
-      }
-      try
-      {
-        setLoading(true);
-        const url = `${create_shipment.createshipments}`;
-        const res = await api.post(url, shipData);
-        console.log("✅ Shipment Created Successfully:", res.data);
-        alert("Shipment created successfully!");
-        onClose();
-      }
-      catch (error)
-      {
-        console.error("❌ Error creating shipment:", error);
-        alert("Something went wrong while creating shipment");
-      }
-      finally
-      {
-        setLoading(false);
-      }
+    const newErrors = validateForm(form);
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    if (!shipData.courier_id) {
+      alert("Please select a courier before shipping.");
+      return;
+    }
+    const finalPayload = {
+      ...shipData,
+      warehouse_id: form.warehouse_id,
+      rto_warehouse_id: form.rto_warehouse_id,
+      plan_id: planid,
+    };
+    try {
+      setLoading(true);
+      const url = `${create_shipment.createshipments}`;
+      const res = await api.post(url, finalPayload);
+      onClose();
+      handleFetchData();
+    } catch (error) {
+      console.error("❌ Error creating shipment:", error);
+      alert("Something went wrong while creating shipment");
+      handleFetchData();
+    } finally {
+      setLoading(false);
+    }
   };
-
 
   return (
     <div
@@ -226,6 +211,7 @@ function ShipModal({ orderData, onClose }) {
                 {ratePrice.length > 0 ? (
                   <div className="row">
                     {ratePrice.map((rate, index) => (
+                      
                       <div
                         key={index}
                         className="col-md-6 mb-3"
@@ -253,14 +239,13 @@ function ShipModal({ orderData, onClose }) {
                             <div className="courier-box text-center">
                               <div className="courier-box-rs">
                                 <sup>₹</sup>
-                                <span className="price">{rate.total || 0}</span>
+                                <span className="price">{(Number(rate.freight_charge) || 0) + (Number(rate.cod_charge) || 0)}</span>
                               </div>
                               <small className="text-muted d-block mt-1">
                                 {rate.zone || "N/A"}
                               </small>
                             </div>
                           </div>
-
                           <div className="form-text mt-2">
                             <i className="ti ti-info-circle menu-icon"></i>
                             Freight Charges: ₹ {rate.freight_charge || 0} + COD

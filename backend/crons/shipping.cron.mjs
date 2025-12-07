@@ -10,8 +10,7 @@ const limit = pLimit(10);
  * Run this cron every 5 minutes to check wallet balance and re-try shipping.
  */
 
-const shippingCron = cron.schedule("0 * * * *", async () => {
-  
+const shippingCron = cron.schedule("* * * * *", async () => {
   try {
     console.info(
       "⏰ Cron job running every hour:",
@@ -20,7 +19,7 @@ const shippingCron = cron.schedule("0 * * * *", async () => {
 
     const shipments = (
       await ShippingService.read({
-        shipping_error: "Wallet balance is low.",
+        shipping_error: "Wallet balance is low",
         shipping_status: "new",
       })
     )?.data?.result;

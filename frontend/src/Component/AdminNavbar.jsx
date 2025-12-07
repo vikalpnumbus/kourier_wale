@@ -89,7 +89,7 @@ function AdminNavbar({ setSideNavActive, sideNavActive }) {
       </div>
 
       {/* Navbar Menu */}
-      <div className="navbar-menu-wrapper d-flex align-items-top py-0">
+      <div className="navbar-menu-wrapper d-flex align-items-top">
         {(location.pathname === "/admin" || location.pathname === "/admin/dashboard") && (
           <ul className="navbar-nav">
             <li className="nav-item fw-semibold d-none d-lg-block ms-0">

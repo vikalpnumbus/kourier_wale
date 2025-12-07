@@ -1,5 +1,7 @@
 const apiUrl = import.meta.env.VITE_API_URL;
 const shipmentsConfig = {
-  createshipments: apiUrl + "/shipping"
+  createshipments: apiUrl + "/shipping",
+  fetchshipmentlist: apiUrl + "/shipping",
+  shipping_charges: apiUrl + "/shipping/shipping-charges"
 };
 export default shipmentsConfig;

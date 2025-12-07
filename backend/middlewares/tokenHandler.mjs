@@ -33,10 +33,11 @@ class Class {
       }
 
       console.log('data: ', data);
-      const existingUser = await UserService.repository.findOne({
+      const existingUser = await UserService.read({
         id: data.id,
       });
 
+      console.log('existingUser: ', existingUser);
       if (!existingUser) {
         const error = new Error("User does not exist.");
         error.status = 400;

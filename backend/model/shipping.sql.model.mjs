@@ -200,10 +200,10 @@ const ShippingModel = sqlDB.sequelize.define(
       allowNull: false,
     },
 
-    total_price: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-    },
+    // total_price: {
+    //   type: DataTypes.DECIMAL(10, 2),
+    //   allowNull: false,
+    // },
 
     zone: {
       type: DataTypes.STRING,

@@ -198,9 +198,31 @@ a
 }
 .navbar-menu-wrapper
 {
-    background: #000 !important;
+    background: #fff !important;
+    height: 70px !important;
 }
 .welcome-text
 {
     color: #fff !important;
+}
+.navbar .navbar-menu-wrapper .navbar-nav .nav-item .dropdown-bordered
+{
+    border: 1px solid #3598dc;
+    background: #3598dc;
+    color: #fff !important;
+    font-weight: bold !important;
+}
+
+.kw_button_cancel
+{
+    color: #fff !important;
+    background-color: rgb(230, 11, 11) !important;
+    border-color: rgb(230, 11, 11) !important;
+}
+.kw_button_booked
+{
+    
+    color: #fff !important;
+    background-color: #155724 !important;
+    border-color: #1e7e34 !important;
 }
