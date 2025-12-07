@@ -86,19 +86,19 @@ function UsersTable() {
                 ) : dataList.length > 0 ? (
                   dataList.map((data) => (
                     <tr key={data.id}>
-                      <td>{data?.fname}</td>
+                      <td><Link to={`view/${data.id}`}>{data?.fname}</Link></td>
                       <td>{data?.email}</td>
                       <td>{data?.companyName}</td>
                       <td>
                         {data?.pricingPlanId === 1
                           ? "Bronze"
                           : data?.pricingPlanId === 2
-                          ? "Silver"
-                          : data?.pricingPlanId === 3
-                          ? "Gold"
-                          : data?.pricingPlanId === 4
-                          ? "Platinum"
-                          : ""}
+                            ? "Silver"
+                            : data?.pricingPlanId === 3
+                              ? "Gold"
+                              : data?.pricingPlanId === 4
+                                ? "Platinum"
+                                : ""}
                       </td>
 
                       <td>
