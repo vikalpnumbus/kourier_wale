@@ -149,6 +149,7 @@ export const shippingChargesRead = async (req, res, next) => {
       paymentType: req.query?.paymentType || undefined,
       start_date: req.query?.start_date,
       end_date: req.query?.end_date,
+      courier_id:req.query?.courier_id,
       exclude_shipping_status:'new'
     };
 
@@ -160,8 +161,10 @@ export const shippingChargesRead = async (req, res, next) => {
       id: e.id,
       createdAt: e.createdAt,
       courier_id: e.courier_id,
+      courier_name:e.courier_name,
       awb_number: e.awb_number,
       shipping_status: e.shipping_status,
+      zone: e.zone,
       freight_charge: e.freight_charge,
       cod_price: e.cod_price,
       entered_weight: Math.max(
