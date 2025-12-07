@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { fn, Op, where, col } from "sequelize";
 import ShippingProducer from "../queue/producers/shipping.producer.mjs";
 import FactoryRepository from "../repositories/factory.repository.mjs";
 import ProductsService from "./products.service.mjs";
