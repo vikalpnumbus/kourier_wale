@@ -17,7 +17,7 @@ class Class {
         host: MYSQL_HOST,
         port: MYSQL_PORT,
         dialect: "mysql",
-        logging: true,
+        logging: false,
         pool: {
           max: 100,
           min: 2,

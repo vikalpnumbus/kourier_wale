@@ -41,6 +41,13 @@ const EscalationModel = sqlDB.sequelize.define(
       defaultValue:null,
       comment: "The user id of the assignee",
     },
+
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "open",
+      comment: "The status of the escalation",
+    },
   },
   {
     timestamps: true,

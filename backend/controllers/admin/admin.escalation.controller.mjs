@@ -54,10 +54,11 @@ export const read = async (req, res, next) => {
     };
 
     const user = await UserService.read({ id: req.user.id });
-    if (["rahul.singh@nimbuspost.com"].includes(user.email)) {
+    if (["rahul.singh@nimbuspost.com", 'adminkourier@gamil.com'].includes(user.email)) {
       delete query.assigneeId;
     }
 
+    console.log('query: ', query);
     const result = await EscalationService.read(query);
     if (!result) {
       throw EscalationService.error;
