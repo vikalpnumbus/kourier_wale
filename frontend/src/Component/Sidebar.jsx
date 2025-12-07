@@ -41,6 +41,18 @@ function Sidebar({ setSideNavActive, sideNavActive }) {
         </li>
         <li
           className={`nav-item 
+            ${location.pathname.includes("/shipments") ? "active" : ""}
+            ${hoveredItem === "shipments" ? "hover-open" : ""}`}
+          onMouseEnter={() => setHoveredItem("shipments")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Link className="nav-link" to="/shipments">
+            <i className="mdi mdi-truck-outline menu-icon"></i>
+            <span className="menu-title">Shipments</span>
+          </Link>
+        </li>
+        <li
+          className={`nav-item 
             ${location.pathname.includes("/products") ? "active" : ""}
             ${hoveredItem === "products" ? "hover-open" : ""}`}
           onMouseEnter={() => setHoveredItem("products")}
