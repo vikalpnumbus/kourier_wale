@@ -64,7 +64,7 @@ function shippingcharges() {
                           <td className="py-2">TID: {data.id}</td>
                           <td className="py-2">{data.awb_number}</td>
                           <td className="py-2">{data.createdAt}</td>
-                          <td className="py-2">{data.entered_weight} (GM)</td>
+                          <td className="py-2">{data.entered_weight}</td>
                           <td className="py-2">{data.zone}</td>
                           <td className="py-2">{data.courier_name}</td>
                           <td className="py-2">{data.shipping_status}</td>
