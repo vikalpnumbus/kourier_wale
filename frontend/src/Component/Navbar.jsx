@@ -94,7 +94,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
         </div>
       </div>
 
-      <div className="navbar-menu-wrapper d-flex align-items-top py-0">
+      <div className="navbar-menu-wrapper d-flex align-items-top">
         {(location.pathname === "/" || location.pathname === "/dashboard") && (
           <ul className="navbar-nav">
             <li className="nav-item fw-semibold d-none d-lg-block ms-0">
