@@ -138,9 +138,11 @@ function ShipModal({ orderData, onClose }) {
       const url = `${create_shipment.createshipments}`;
       const res = await api.post(url, finalPayload);
       onClose();
+      handleFetchData();
     } catch (error) {
       console.error("❌ Error creating shipment:", error);
       alert("Something went wrong while creating shipment");
+      handleFetchData();
     } finally {
       setLoading(false);
     }

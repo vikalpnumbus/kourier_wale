@@ -1,64 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { mdiDelete, mdiPencil } from "@mdi/js";
 import Icon from "@mdi/react";
-import { mdiCubeSend, mdiPencil } from "@mdi/js";
 import { Link, useSearchParams } from "react-router-dom";
-import Pagination from "../../../Component/Pagination";
-import ordersConfig from "../../../config/Orders/OrdersConfig";
-import ShipModal from "../Orders/ShipModal";
 import api from "../../../utils/api";
-import {
-  formatDateTime,
-  getLastNDaysRange,
-} from "../../../middleware/CommonFunctions";
-import warehouseConfig from "../../../config/Warehouse/WarehouseConfig";
-function OrdersTable() {
+import {formatDateTime,getLastNDaysRange} from "../../../middleware/CommonFunctions";
+import Pagination from "../../../Component/Pagination";
+import ShipmentsConfig from "../../../config/Shipments/ShipmentsConfig";
+function ShipmentsTable() {
   const [dataList, setDataList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchParams] = useSearchParams();
-  // const { showError, showSuccess } = useAlert();
-  const [totalCount, setTotalCount] = useState(0);
-  const [defaultStart, defaultEnd] = useMemo(() => getLastNDaysRange(7), []);
-  const [showShipModal, setShowShipModal] = useState(false);
-  const [shipOrderDetails, setShipOrderDetails] = useState("");
-  const [selectedOrders, setSelectedOrders] = useState([]);
-  const orderCanShip = (order) => {
-    return (
-      order.shipping_status === "new" &&
-      order.warehouse_id &&
-      order.rto_warehouse_id &&
-      (order.paymentType == "cod" ? order.collectableAmount:true) &&
-      order.paymentType &&
-      order.packageDetails.weight &&
-      order.packageDetails["length"] &&
-      order.packageDetails.breadth &&
-      order.packageDetails.height
-    );
-  };
-
-  const toggleOrder = (id) => {
-    setSelectedOrders((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  const shipEligibleIds = useMemo(
-    () => dataList.filter(orderCanShip).map((o) => o.id),
-    [dataList]
-  );
-
-  const toggleSelectAll = () => {
-    if (selectedOrders.length === shipEligibleIds.length) {
-      setSelectedOrders([]);
-    } else {
-      setSelectedOrders(shipEligibleIds);
-    }
-  };
-
-  const allSelected =
-    shipEligibleIds.length > 0 &&
-    selectedOrders.length === shipEligibleIds.length;
-
-  const handleFetchData = async () => {
+    const [loading, setLoading] = useState(false);
+    const [searchParams] = useSearchParams();
+    const [selectedOrders, setSelectedOrders] = useState([]);
+    const [totalCount, setTotalCount] = useState(0);
+    const [defaultStart, defaultEnd] = useMemo(() => getLastNDaysRange(7), []);
+    const handleFetchData = async () => {
     setLoading(true);
     try {
       const params = {
@@ -84,7 +39,7 @@ function OrdersTable() {
         .map(([k, v]) => `${k}=${v}`)
         .join("&");
 
-      const url = `${ordersConfig.ordersApi}?${query}`;
+      const url = `${ShipmentsConfig.fetchshipmentlist}?${query}`;
 
       const { data } = await api.get(url);
 
@@ -97,46 +52,11 @@ function OrdersTable() {
       setLoading(false);
     }
   };
-
-  const formatWeight = (weight) => {
-    if (!weight) return "";
-    return weight >= 1000
-      ? `Wt: ${(weight / 1000).toFixed(2)} kg`
-      : `Wt: ${weight} gm`;
-  };
-
-  const [warehouseList, setWarehouseList] = useState([]);
-  const handleWarehouseData = async () => {
-    try {
-      const url = warehouseConfig.warehouseApi;
-
-      const { data } = await api.get(url);
-      const results = data?.data?.result || [];
-      setWarehouseList(results);
-    } catch (error) {
-      console.error("Fetch warehouses error:", error);
-      setWarehouseList([]);
-    }
-  };
-
-  useEffect(() => {
-    handleWarehouseData();
-  }, []);
-
-  const findWarehouse = (warehouseId) => {
-    const warehouse = warehouseList.find((w) => w.id == warehouseId);
-
-    if (!warehouse) return "";
-
-    return `${warehouse.city} (${warehouse.state} - ${warehouse.pincode})`;
-  };
-
   useEffect(() => {
     handleFetchData();
   }, [searchParams]);
-
   return (
-    <div className="tab-content tab-content-vertical">
+      <div className="tab-content tab-content-vertical">
       <div className="tab-pane fade show active" role="tabpanel">
         <div>
           {selectedOrders.length > 0 && (
@@ -165,8 +85,6 @@ function OrdersTable() {
                 <th>
                   <input
                     type="checkbox"
-                    checked={allSelected}
-                    onChange={toggleSelectAll}
                     style={{ cursor: "pointer" }}
                   />
                 </th>
@@ -278,37 +196,15 @@ function OrdersTable() {
                     </td>
                     <td className="py-2">
                       <div className="btn-group">
-                        {/* <button
-                          className="btn btn-primary btn-md py-2 px-3"
-                          onClick={() => {
-                            const warehouse = warehouseList.find(
-                              (w) => w.id == data.warehouse_id
-                            );
-                            setShipOrderDetails({
-                              id: data.id,
-                              warehouse_id: data.warehouse_id,
-                              rto_warehouse_id: data.rto_warehouse_id,
-                              collectableAmount: data.collectableAmount,
-                              paymentType: data.paymentType,
-                              packageDetails: data.packageDetails,
-                              shippingDetails: data.shippingDetails,
-                              originpincode: warehouse?.pincode,
-                            });
-                            setShowShipModal(true);
-                          }}
-                          disabled={!orderCanShip(data)}
-                        >
-                          {data.shipping_status == "new" ? "ship" : data.shipping_status}
-                        </button> */}
                         <button
                           className={`btn btn-md py-2 px-3 ${
                             data.shipping_status === "new"
                               ? "btn-primary"
                               : data.shipping_status === "cancel"
-                              ? "btn-danger"
+                              ? "btn-danger kw_button_cancel"
                               : data.shipping_status === "booked"
-                              ? "btn-success"
-                              : "btn-secondary"
+                              ? "btn-success kw_button_booked"
+                              : "btn-secondary kw_button_booked"
                           }`}
                           onClick={() => {
                             const warehouse = warehouseList.find(
@@ -332,14 +228,16 @@ function OrdersTable() {
                         </button>
                       </div>{" "}
                       &nbsp;
-                      <div className="btn-group">
-                        <Link
-                          to={`edit/${data.id}`}
-                          className="btn btn-outline-primary btn-md py-2 px-3"
-                        >
-                          <Icon path={mdiPencil} size={0.6} />
-                        </Link>
-                      </div>
+                      {data.shipping_status === "new" && (
+                        <div className="btn-group">
+                          <Link
+                            to={`edit/${data.id}`}
+                            className="btn btn-outline-primary btn-md py-2 px-3"
+                          >
+                            <Icon path={mdiPencil} size={0.6} />
+                          </Link>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -356,15 +254,9 @@ function OrdersTable() {
         {dataList.length > 0 && !loading && (
           <Pagination totalCount={totalCount} />
         )}
-        {showShipModal && shipOrderDetails && (
-          <ShipModal
-            onClose={() => setShowShipModal(false)}
-            orderData={shipOrderDetails}
-          />
-        )}
       </div>
     </div>
-  );
+  )
 }
 
-export default OrdersTable;
+export default ShipmentsTable
