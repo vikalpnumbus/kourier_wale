@@ -20,17 +20,7 @@ class Service {
   async create({ data }) {
     try {
       let payload = {};
-      let {
-        order_id,
-        warehouse_id,
-        rto_warehouse_id,
-        courier_id,
-        freight_charge,
-        cod_price,
-        zone,
-        plan_id,
-        userId,
-      } = data;
+      let { order_id, warehouse_id, rto_warehouse_id, courier_id, freight_charge, cod_price, zone, plan_id, userId } = data;
 
       let [orderRes, warehouseRes, user] = await Promise.all([
         OrdersService.read({ id: order_id, userId }),
@@ -41,6 +31,11 @@ class Service {
       let order = orderRes?.data?.result?.[0];
 
       if (!order) {
+        if (["No record found."].includes(OrdersService?.error?.message)) {
+          const error = new Error("Order not found.");
+          error.status = 404;
+          throw error;
+        }
         throw OrdersService.error;
       }
 
@@ -61,12 +56,8 @@ class Service {
 
       let productIDs = order.products.map((product) => product.id + "");
       const foundProducts = await ProductsService.read({ id: productIDs });
-      const checkProductExistence = new Set(
-        foundProducts?.data?.result?.map((e) => e.id + "")
-      );
-      const missingIds = productIDs.filter(
-        (id) => !checkProductExistence.has(id)
-      );
+      const checkProductExistence = new Set(foundProducts?.data?.result?.map((e) => e.id + ""));
+      const missingIds = productIDs.filter((id) => !checkProductExistence.has(id));
 
       const total_price =
         Number(freight_charge) +
@@ -75,27 +66,18 @@ class Service {
         Number(order.charges?.shipping) +
         Number(order.charges?.tax_amount) -
         Number(order.charges?.discount) +
-        order.products.reduce(
-          (acc, e) => acc + Number(e.qty) * Number(e.price),
-          0
-        );
+        order.products.reduce((acc, e) => acc + Number(e.qty) * Number(e.price), 0);
 
       const errors = [];
 
       if (missingIds.length > 0) {
-        errors.push(
-          `Product with IDs ${missingIds.join(", ")} does not exist.`
-        );
+        errors.push(`Product with IDs ${missingIds.join(", ")} does not exist.`);
       }
 
       if (warehouse_id == rto_warehouse_id && warehouses.length !== 1) {
-        errors.push(
-          "Pickup Warehouse or RTO warehouse with given IDs not found."
-        );
+        errors.push("Pickup Warehouse or RTO warehouse with given IDs not found.");
       } else if (warehouse_id != rto_warehouse_id && warehouses.length !== 2) {
-        errors.push(
-          "Pickup Warehouse or RTO warehouse with given IDs not found."
-        );
+        errors.push("Pickup Warehouse or RTO warehouse with given IDs not found.");
       }
 
       const isCourierExist = await CourierService.read({ id: courier_id });
@@ -108,9 +90,7 @@ class Service {
       }
 
       if (total_price > 2_00_000 && order.paymentType == "cod") {
-        const error = new Error(
-          "COD is not available for more than 200000 collectable amount"
-        );
+        const error = new Error("COD is not available for more than 200000 collectable amount");
         error.status = 400;
         throw error;
       }
@@ -154,8 +134,7 @@ class Service {
           shipping_status: "booked",
         },
       });
-      if (!orderUpdate)
-        console.error("shipping/create/orderUpdate", OrdersService.error);
+      if (!orderUpdate) console.error("shipping/create/orderUpdate", OrdersService.error);
 
       // console.error("err: ", errors);
       if (errors.length == 0) {
@@ -201,10 +180,7 @@ class Service {
           },
         };
       }
-      const result = await this.repository.findOneAndUpdate(
-        { id: existingRecordId },
-        payload
-      );
+      const result = await this.repository.findOneAndUpdate({ id: existingRecordId }, payload);
 
       return {
         status: 201,
@@ -249,18 +225,14 @@ class Service {
       if (paymentType) whereClause[Op.and].push({ paymentType });
 
       if (orderId) {
-        const orderIdsArray = Array.isArray(orderId)
-          ? orderId
-          : orderId?.split(",").map((e) => e.trim());
+        const orderIdsArray = Array.isArray(orderId) ? orderId : orderId?.split(",").map((e) => e.trim());
         whereClause[Op.and].push({
           orderId: { [Op.in]: orderIdsArray },
         });
       }
 
       if (awb_number) {
-        const idsArray = Array.isArray(awb_number)
-          ? awb_number
-          : awb_number?.split(",").map((e) => e.trim());
+        const idsArray = Array.isArray(awb_number) ? awb_number : awb_number?.split(",").map((e) => e.trim());
         whereClause[Op.and].push({
           awb_number: { [Op.in]: idsArray },
         });
@@ -272,31 +244,9 @@ class Service {
           where(
             fn(
               "CONCAT",
-              fn(
-                "COALESCE",
-                fn(
-                  "JSON_UNQUOTE",
-                  fn(
-                    "JSON_EXTRACT",
-                    col("shippingDetails"),
-                    literal("'$.fname'")
-                  )
-                ),
-                ""
-              ),
+              fn("COALESCE", fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.fname'"))), ""),
               " ",
-              fn(
-                "COALESCE",
-                fn(
-                  "JSON_UNQUOTE",
-                  fn(
-                    "JSON_EXTRACT",
-                    col("shippingDetails"),
-                    literal("'$.lname'")
-                  )
-                ),
-                ""
-              )
+              fn("COALESCE", fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.lname'"))), "")
             ),
             { [Op.like]: `%${shipping_name}%` }
           )
@@ -307,38 +257,20 @@ class Service {
       if (shipping_phone) {
         whereClause[Op.and].push({
           [Op.or]: [
-            where(
-              fn(
-                "JSON_UNQUOTE",
-                fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.phone'"))
-              ),
-              { [Op.like]: `%${shipping_phone}%` }
-            ),
-            where(
-              fn(
-                "JSON_UNQUOTE",
-                fn(
-                  "JSON_EXTRACT",
-                  col("shippingDetails"),
-                  literal("'$.alternate_phone'")
-                )
-              ),
-              { [Op.like]: `%${shipping_phone}%` }
-            ),
+            where(fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.phone'"))), { [Op.like]: `%${shipping_phone}%` }),
+            where(fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.alternate_phone'"))), {
+              [Op.like]: `%${shipping_phone}%`,
+            }),
           ],
         });
       }
 
       // Date filters (ignore time)
       if (start_date) {
-        whereClause[Op.and].push(
-          where(fn("DATE", col("createdAt")), { [Op.gte]: start_date })
-        );
+        whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.gte]: start_date }));
       }
       if (end_date) {
-        whereClause[Op.and].push(
-          where(fn("DATE", col("createdAt")), { [Op.lte]: end_date })
-        );
+        whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.lte]: end_date }));
       }
 
       // If no conditions were added, remove Op.and
@@ -371,12 +303,9 @@ class Service {
           productIDs = productIDs
             .split(",")
             .map((e) => e?.trim())
-            .filter(
-              (e) => e && e !== "null" && e !== "undefined" && e != "false"
-            );
+            .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
 
-          let foundProducts = (await ProductsService.read({ id: productIDs }))
-            .data.result;
+          let foundProducts = (await ProductsService.read({ id: productIDs })).data.result;
 
           foundProducts = foundProducts.map((product) => ({
             ...product.dataValues,
@@ -418,17 +347,17 @@ class Service {
       const { id, userId, courier, total_price, freight_charge, cod_price } = data;
 
       const { code } = courier?.data?.result?.[0];
-      console.log('courier: ', courier.data);
-      console.log('code: ', code);
+      console.log("courier: ", courier.data);
+      console.log("code: ", code);
 
       if (code.includes("xpressbees")) {
-        const shipmentRes = await XpressBeesProvider.createShipment({...data, shipmentId:id});
+        const shipmentRes = await XpressBeesProvider.createShipment({ ...data, shipmentId: id });
 
         if (!shipmentRes) {
           await ShippingService.update({
             data: {
               id,
-              shipment_error: "aa"+XpressBeesProvider.error.message,
+              shipment_error: "aa" + XpressBeesProvider.error.message,
             },
           });
         } else {
@@ -460,15 +389,12 @@ class Service {
           const updatedUser = await UserService.update(
             { id: userId },
             {
-              wallet_balance: existingUser.wallet_balance - ((freight_charge||0)+(cod_price||0)),
+              wallet_balance: existingUser.wallet_balance - ((freight_charge || 0) + (cod_price || 0)),
             }
           );
 
           if (!updatedUser) {
-            console.error(
-              "shipping/create/userWalletUpdate",
-              UserService.error
-            );
+            console.error("shipping/create/userWalletUpdate", UserService.error);
           }
         }
       } else if (code.includes("Shadow_Fax")) {
@@ -515,10 +441,7 @@ class Service {
           );
 
           if (!updatedUser) {
-            console.error(
-              "shipping/create/userWalletUpdate",
-              UserService.error
-            );
+            console.error("shipping/create/userWalletUpdate", UserService.error);
           }
         }
       }
@@ -532,8 +455,7 @@ class Service {
     try {
       const { id, userId } = data;
       const isShipmentExistsRes = await this.read({ id, userId });
-      const existingShipmentData =
-        isShipmentExistsRes?.data?.result?.[0] || null;
+      const existingShipmentData = isShipmentExistsRes?.data?.result?.[0] || null;
 
       const existingShipmentCount = isShipmentExistsRes?.data?.total || null;
       if (!existingShipmentCount || existingShipmentCount == 0) {
@@ -544,16 +466,10 @@ class Service {
 
       const shipping_status = existingShipmentData.shipping_status;
 
-      const allowedStatusesForCancellation = [
-        "new",
-        "booked",
-        "pending-pickup",
-      ];
+      const allowedStatusesForCancellation = ["new", "booked", "pending-pickup"];
 
       if (!allowedStatusesForCancellation.includes(shipping_status)) {
-        const error = new Error(
-          `Shipment status is ${shipping_status}. It cannot be cancelled.`
-        );
+        const error = new Error(`Shipment status is ${shipping_status}. It cannot be cancelled.`);
         error.status = 400;
         throw error;
       }
