@@ -304,6 +304,11 @@ class Service {
       }
 
       // fill products in each order record
+      const courierCache = {};
+      const getCourier = async (id) => {
+        if (courierCache[id]) return courierCache[id];
+        return await CourierService.read({ id });
+      };
       result = await Promise.all(
         result.map(async (e) => {
           let productIDs = e.products.map((product) => product.id).join(",");
@@ -312,14 +317,20 @@ class Service {
             .map((e) => e?.trim())
             .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
 
-          let foundProducts = (await ProductsService.read({ id: productIDs })).data.result;
+          let courierID = e.courier_id;
+          console.log("courierID: ", courierID, Date.now());
+
+          let [foundProductsRes, courierRes] = await Promise.all([await ProductsService.read({ id: productIDs }), await getCourier(courierID)]);
+
+          if (!courierCache[courierID]) courierCache[courierID] = courierRes;
+          let foundProducts = foundProductsRes?.data.result;
 
           foundProducts = foundProducts.map((product) => ({
             ...product.dataValues,
             ...e.products.filter((curr) => curr.id == product.id)[0],
           }));
 
-          const payload = { ...e.dataValues, products: foundProducts };
+          const payload = { ...e.dataValues, products: foundProducts, courier_name: courierRes?.data?.result?.[0]?.name };
           delete payload.productIDs;
           return payload;
         })
