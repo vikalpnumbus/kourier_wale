@@ -19,6 +19,7 @@ import PricingPlanView from "../pages/Admin/PricingPlans/PricingPlanView";
 import PricingPlanEdit from "../pages/Admin/PricingPlans/PricingPlanEdit";
 import PricingCourier from "../pages/Admin/Courier/PricingCouriers";
 import PricingCourierPage from "../pages/Admin/Courier/PricingCouriers/PricingCourierPage";
+import UserView from "../pages/Admin/Users/UserVeiw";
 
 
 function AdminRoutes() {
@@ -38,9 +39,10 @@ function AdminRoutes() {
             <Route path="add" element={<AWBListForm />} />
             <Route path="edit/:id" element={<AWBListForm />} />
           </Route>
- 
+
           <Route path="/users" element={<Users />}>
             <Route index element={<UsersTable />} />
+            <Route path="view/:id" element={<UserView />} />
           </Route>
 
           <Route path="/courier" element={<AdminCouriers />}>

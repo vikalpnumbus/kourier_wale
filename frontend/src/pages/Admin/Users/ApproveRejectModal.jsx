@@ -22,11 +22,11 @@ function ApproveRejectModal({ onClose, userId, action }) {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (response.data?.status === 200) {
-        showSuccess(response.data?.data?.message || "Status updated!");
+      if (response.data?.status === 201) {
+        showSuccess(response.data?.data || "Status updated!");
         onClose(true); // reload table
       } else {
-        showError(response.data?.data?.message || "Failed to update status!");
+        showError(response.data?.data || "Failed to update status!");
       }
     } catch (err) {
       showError(err?.response?.data?.message || "Something went wrong!");
