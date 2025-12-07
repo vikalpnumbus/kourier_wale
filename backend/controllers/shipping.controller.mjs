@@ -149,6 +149,7 @@ export const shippingChargesRead = async (req, res, next) => {
       paymentType: req.query?.paymentType || undefined,
       start_date: req.query?.start_date,
       end_date: req.query?.end_date,
+      exclude_shipping_status:'new'
     };
 
     const result = await ShippingService.read(query);

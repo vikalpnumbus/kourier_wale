@@ -212,6 +212,7 @@ class Service {
         start_date,
         end_date,
         awb_number,
+        exclude_shipping_status,
       } = params;
 
       const whereClause = { [Op.and]: [] };
@@ -228,6 +229,12 @@ class Service {
         const orderIdsArray = Array.isArray(orderId) ? orderId : orderId?.split(",").map((e) => e.trim());
         whereClause[Op.and].push({
           orderId: { [Op.in]: orderIdsArray },
+        });
+      }
+
+      if (exclude_shipping_status) {
+        whereClause[Op.and].push({
+          shipping_status: { [Op.ne]: exclude_shipping_status },
         });
       }
 
