@@ -323,7 +323,7 @@ class Service {
           let [foundProductsRes, courierRes] = await Promise.all([await ProductsService.read({ id: productIDs }), await getCourier(courierID)]);
 
           if (!courierCache[courierID]) courierCache[courierID] = courierRes;
-          let foundProducts = foundProductsRes?.data.result;
+          let foundProducts = foundProductsRes?.data?.result||[];
 
           foundProducts = foundProducts.map((product) => ({
             ...product.dataValues,

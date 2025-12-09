@@ -54,5 +54,9 @@ class Class {
   }
 }
 
+
+UserModel.hasOne(KycModel, { foreignKey: "userId" });
+KycModel.belongsTo(UserModel, { foreignKey: "userId" });
+
 const FactoryRepository = new Class();
 export default FactoryRepository;

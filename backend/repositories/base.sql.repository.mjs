@@ -7,7 +7,7 @@ export class BaseRepositoryClass {
     return await this.model.count({ where: condition });
   }
 
-  async find(condition = {}, constraints = {}) {
+  async find(condition = {}, constraints = {},include=[]) {
     let { page = 1, limit = 50, order = [["id", "DESC"]] } = constraints;
     page = Math.max(1, page);
     limit = Math.min(500, limit);
@@ -15,16 +15,17 @@ export class BaseRepositoryClass {
 
     return await this.model.findAll({
       where: condition,
+      include,
       limit,
       offset,
       order,
     });
   }
 
-  async findOne(condition) {
+  async findOne(condition,include = []) {
     if (condition.hasOwnProperty("where"))
       return await this.model.findOne(condition);
-    else return (await this.model.findOne({ where: condition }))?.dataValues;
+    else return (await this.model.findOne({ where: condition ,include}))?.dataValues;
   }
 
   async findOneAndDelete(condition) {

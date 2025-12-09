@@ -13,6 +13,7 @@ const KycModel = sqlDB.sequelize.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: { model: "users", key: "id" },
     },
 
     kycType: {
@@ -116,10 +117,7 @@ const KycModel = sqlDB.sequelize.define(
       beforeUpdate: async (kyc, options) => {
         sanitizeKyc(kyc);
 
-        if (
-          kyc._previousDataValues.status === "approved" &&
-          !kyc._adminOverride
-        ) {
+        if (kyc._previousDataValues.status === "approved" && !kyc._adminOverride) {
           throw new Error("Approved KYC cannot be modified without override");
         }
 
@@ -141,9 +139,7 @@ function sanitizeKyc(doc) {
   }
 
   if (doc.documentType) {
-    doc.documentType =
-      doc.documentType.charAt(0).toUpperCase() +
-      doc.documentType.slice(1).toLowerCase();
+    doc.documentType = doc.documentType.charAt(0).toUpperCase() + doc.documentType.slice(1).toLowerCase();
   }
 
   if (doc.nameOnDocument) {

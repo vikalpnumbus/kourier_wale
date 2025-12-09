@@ -7,22 +7,11 @@ class Service {
   constructor() {
     this.error = null;
     this.repository = FactoryRepository.getRepository("user");
-    this.otpRepository = FactoryRepository.getRepository("otp");
+    this.kycRepository = FactoryRepository.getRepository("kyc");
   }
 
   async read(params) {
-    const {
-      page = 1,
-      limit = 50,
-      id,
-      name,
-      email,
-      phone,
-      isVerified,
-      start_date,
-      end_date,
-      include,
-    } = params;
+    const { page = 1, limit = 50, id, name, email, phone, isVerified, start_date, end_date, include } = params;
 
     const whereClause = { [Op.and]: [] };
     if (id) whereClause[Op.and].push({ id });
@@ -43,42 +32,35 @@ class Service {
     }
 
     if (start_date) {
-      whereClause[Op.and].push(
-        where(fn("DATE", col("createdAt")), { [Op.gte]: start_date })
-      );
+      whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.gte]: start_date }));
     }
     if (end_date) {
-      whereClause[Op.and].push(
-        where(fn("DATE", col("createdAt")), { [Op.lte]: end_date })
-      );
+      whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.lte]: end_date }));
     }
 
     if (!whereClause[Op.and].length) delete whereClause[Op.and];
+
+    const includeKyc = {
+      model: this.kycRepository.model,
+      required: false, // LEFT JOIN
+      attributes: ["id", "status", "createdAt", "remarks"],
+    };
 
     let result;
     let totalCount;
 
     if (id) {
-      result = await this.repository.find(whereClause);
+      result = await this.repository.find(whereClause,{},[includeKyc]);
       if (!result) {
         const error = new Error("No record found.");
         error.status = 404;
         throw error;
       }
 
-      const kycPromise =
-        include === "kycDetails"
-          ? KYCService.read({ userId: id })
-          : Promise.resolve(null);
-      const bankPromise =
-        include === "bankDetails"
-          ? BankDetailsService.read({ userId: id })
-          : Promise.resolve(null);
+      const kycPromise = include === "kycDetails" ? KYCService.read({ userId: id }) : Promise.resolve(null);
+      const bankPromise = include === "bankDetails" ? BankDetailsService.read({ userId: id }) : Promise.resolve(null);
 
-      const [kycDetailsRes, bankDetailsRes] = await Promise.all([
-        kycPromise,
-        bankPromise,
-      ]);
+      const [kycDetailsRes, bankDetailsRes] = await Promise.all([kycPromise, bankPromise]);
 
       const kycDetails = kycDetailsRes?.data || null;
       const bankDetails = bankDetailsRes?.data?.result || null;
@@ -88,7 +70,7 @@ class Service {
 
       totalCount = result.length;
     } else {
-      result = await this.repository.find(whereClause, { page, limit });
+      result = await this.repository.find(whereClause, { page, limit }, [includeKyc]);
       totalCount = await this.repository.countDocuments(whereClause);
 
       if (!result || result.length === 0) {
