@@ -25,6 +25,7 @@ import AdminUserRouter from "./admin/admin.user.router.mjs";
 import AdminKYCRouter from "./admin/admin.kyc.route.mjs";
 import WebhookRouter from "./webhook.router.mjs";
 import EscalationRouter from "./escalation.router.mjs";
+import WeightRecoRouter from "./weightReco.router.mjs";
 import AdminEscalationRouter from "./admin/admin.escalation.router.mjs";
 import UserService from "../services/user.service.mjs";
 import AdminOrdersRouter from "./admin/admin.orders.route.mjs";
@@ -52,6 +53,7 @@ globalRouter.use("/channel", ChannelRouter);
 globalRouter.use("/payments", PaymentRouter);
 globalRouter.use("/webhooks", WebhookRouter);
 globalRouter.use("/escalations", EscalationRouter);
+globalRouter.use("/weight-reco", WeightRecoRouter);
 
 const checkIfUserIsAdmin = async (req, res, next) => {
   const userId = req.user.id;

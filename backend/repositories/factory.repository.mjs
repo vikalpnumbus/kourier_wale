@@ -18,6 +18,7 @@ import UserModel from "../model/user.sql.model.mjs";
 import UserCourierModel from "../model/user_courier.sql.model.mjs";
 import WalletHistoryModel from "../model/wallet_history.sql.model.mjs";
 import WarehouseModel from "../model/warehouse.sql.model.mjs";
+import WeightRecoModel from "../model/weightReco.sql.model.mjs";
 import { BaseRepositoryClass } from "./base.sql.repository.mjs";
 
 class Class {
@@ -45,6 +46,7 @@ class Class {
       walletHistory: new BaseRepositoryClass(WalletHistoryModel),
       escalations: new BaseRepositoryClass(EscalationModel),
       escalations_conversations: new BaseRepositoryClass(EscalationConversationsModel),
+      weightReco: new BaseRepositoryClass(WeightRecoModel),
     };
 
     if (!repositories[model]) {
