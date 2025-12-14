@@ -50,7 +50,7 @@ class Class {
     };
 
     if (!repositories[model]) {
-      // throw new Error(`${model} not implemented yet.`);
+      throw new Error(`${model} not implemented yet.`);
     }
     return repositories[model];
   }

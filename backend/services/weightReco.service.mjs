@@ -1,11 +1,45 @@
 import { Op, where } from "sequelize";
 import FactoryRepository from "../repositories/factory.repository.mjs";
+import WeightRecoProducer from "../queue/producers/weightReco.producer.mjs";
 
 class Service {
   constructor() {
     this.error = null;
     this.repository = FactoryRepository.getRepository("weightReco");
   }
+
+
+   async create({ files, data }) {
+      try {
+        const { userId } = data;
+        if (!files) {
+          const error = new Error("No file found.");
+          error.status = 400;
+          throw error;
+        }
+  
+        WeightRecoProducer.publishImportFile({
+          files: files.map((e) => ({
+            fileName: userId,
+            file: e,
+            dir: "weight",
+          })),
+          metadata: {
+            id: userId,
+          },
+        });
+  
+        return {
+          status: 200,
+          data: {
+            message: "Processing the weight file.",
+          },
+        };
+      } catch (error) {
+        this.error = error;
+        return false;
+      }
+    }
 
   async read(params) {
     try {

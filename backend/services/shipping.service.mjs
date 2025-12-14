@@ -318,7 +318,6 @@ class Service {
             .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
 
           let courierID = e.courier_id;
-          console.log("courierID: ", courierID, Date.now());
 
           let [foundProductsRes, courierRes] = await Promise.all([await ProductsService.read({ id: productIDs }), await getCourier(courierID)]);
 

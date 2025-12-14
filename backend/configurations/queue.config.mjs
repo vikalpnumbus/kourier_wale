@@ -58,6 +58,11 @@ const queueConfig = {
       queue: "shipping_retry_queue",
     },
   },
+  weightReco: {
+    exchange: "weightReco_exchange",
+    routingKey: "weightReco_routingKey",
+    queue: "weightReco_queue",
+  },
 };
 
 export default queueConfig;
