@@ -120,6 +120,12 @@ const UserModel = sqlDB.sequelize.define(
         paper_size: "thermal",
       },
     },
+
+    seller_remit_cycle: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "7",
+    },
   },
   {
     timestamps: true,
