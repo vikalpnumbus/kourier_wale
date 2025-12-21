@@ -20,6 +20,9 @@ import PricingPlanEdit from "../pages/Admin/PricingPlans/PricingPlanEdit";
 import PricingCourier from "../pages/Admin/Courier/PricingCouriers";
 import PricingCourierPage from "../pages/Admin/Courier/PricingCouriers/PricingCourierPage";
 import UserView from "../pages/Admin/Users/UserVeiw";
+import Weight from "../pages/Admin/Weight";
+import UploadWeight from "../pages/Admin/Weight/UploadWeight";
+import ManageWeight from "../pages/Admin/Weight/ManageWeight";
 
 
 function AdminRoutes() {
@@ -60,6 +63,11 @@ function AdminRoutes() {
 
           <Route path="/pricingCourier" element={<PricingCourier />}>
             <Route index element={<PricingCourierPage />} />
+          </Route>
+          <Route path="/Weight" element={<Weight />}>
+            <Route index element={<UploadWeight />} />
+            <Route path="upload" element={<UploadWeight />} />
+            <Route path="manage" element={<ManageWeight />} />
           </Route>
 
         </Routes>

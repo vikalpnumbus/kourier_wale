@@ -57,9 +57,7 @@ function UserView() {
         handleUserKycData();
     }, [id, searchParams]);
 
-    // -----------------------
-    // Skeleton Loader
-    // -----------------------
+
     const Skeleton = () => (
         <div className="placeholder-glow">
             <div className="placeholder col-12 mb-2" style={{ height: 20 }} />
@@ -71,7 +69,7 @@ function UserView() {
     );
 
     // Image Helper
-    const imgBase = "http://3.111.42.130:3001/api/v1";
+    const imgBase = import.meta.env.VITE_API_URL;
 
     return (
         <>
@@ -138,7 +136,7 @@ function UserView() {
                             </div>
 
                             {
-                                !kycDataLoading && userKycData?.remarks && (
+                                !kycDataLoading && userKycData?.remarks && userKycData?.status === "rejected" && (
                                     <div className="alert alert-warning mb-2"><strong>KYC Remarks: </strong>{userKycData?.remarks}</div>
                                 )
                             }

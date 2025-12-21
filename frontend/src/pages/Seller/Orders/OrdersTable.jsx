@@ -26,7 +26,7 @@ function OrdersTable() {
       order.shipping_status === "new" &&
       order.warehouse_id &&
       order.rto_warehouse_id &&
-      (order.paymentType == "cod" ? order.collectableAmount:true) &&
+      (order.paymentType == "cod" ? order.collectableAmount : true) &&
       order.paymentType &&
       order.packageDetails.weight &&
       order.packageDetails["length"] &&
@@ -133,6 +133,7 @@ function OrdersTable() {
 
   useEffect(() => {
     handleFetchData();
+    setSelectedOrders([]);
   }, [searchParams]);
 
   return (
@@ -219,7 +220,7 @@ function OrdersTable() {
                       <div className="d-flex flex-column gap-3 box-class">
                         <span>
                           {data.shippingDetails.fname &&
-                          data.shippingDetails.lname
+                            data.shippingDetails.lname
                             ? `${data.shippingDetails.fname} ${data.shippingDetails.lname}`
                             : ""}
                         </span>
@@ -279,15 +280,14 @@ function OrdersTable() {
                     <td className="py-2">
                       <div className="btn-group">
                         <button
-                          className={`btn btn-md py-2 px-3 ${
-                            data.shipping_status === "new"
+                          className={`btn btn-md py-2 px-3 ${data.shipping_status === "new"
                               ? "btn-primary"
                               : data.shipping_status === "cancel"
-                              ? "btn-danger kw_button_cancel"
-                              : data.shipping_status === "booked"
-                              ? "btn-success kw_button_booked"
-                              : "btn-secondary kw_button_booked"
-                          }`}
+                                ? "btn-danger kw_button_cancel"
+                                : data.shipping_status === "booked"
+                                  ? "btn-success kw_button_booked"
+                                  : "btn-secondary kw_button_booked"
+                            }`}
                           onClick={() => {
                             const warehouse = warehouseList.find(
                               (w) => w.id == data.warehouse_id
