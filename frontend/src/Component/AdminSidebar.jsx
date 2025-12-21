@@ -16,11 +16,10 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
       <ul className="nav">
         <li
           className={`nav-item 
-            ${
-              location.pathname.includes("/admin/dashboard") ||
+            ${location.pathname.includes("/admin/dashboard") ||
               location.pathname === "/admin"
-                ? "active"
-                : ""
+              ? "active"
+              : ""
             }
             ${hoveredItem === "dashboard" ? "hover-open" : ""}`}
           onMouseEnter={() => setHoveredItem("dashboard")}
@@ -34,10 +33,9 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
 
         <li
           className={`nav-item 
-            ${
-              location.pathname.includes("/admin/shipment")
-                ? "active"
-                : ""
+            ${location.pathname.includes("/admin/shipment")
+              ? "active"
+              : ""
             }
             ${hoveredItem === "shipment" ? "hover-open" : ""}`}
           onMouseEnter={() => setHoveredItem("shipment")}
@@ -51,10 +49,9 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
 
         <li
           className={`nav-item 
-            ${
-              location.pathname.includes("/admin/users")
-                ? "active"
-                : ""
+            ${location.pathname.includes("/admin/users")
+              ? "active"
+              : ""
             }
             ${hoveredItem === "users" ? "hover-open" : ""}`}
           onMouseEnter={() => setHoveredItem("users")}
@@ -68,10 +65,9 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
 
         <li
           className={`nav-item 
-            ${
-              location.pathname.includes("/admin/awb_list")
-                ? "active"
-                : ""
+            ${location.pathname.includes("/admin/awb_list")
+              ? "active"
+              : ""
             }
             ${hoveredItem === "awb_list" ? "hover-open" : ""}`}
           onMouseEnter={() => setHoveredItem("awb_list")}
@@ -85,10 +81,9 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
 
         <li
           className={`nav-item 
-            ${
-              location.pathname.includes("/admin/courier")
-                ? "active"
-                : ""
+            ${location.pathname.includes("/admin/courier")
+              ? "active"
+              : ""
             }
             ${hoveredItem === "courier" ? "hover-open" : ""}`}
           onMouseEnter={() => setHoveredItem("courier")}
@@ -102,10 +97,9 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
 
         <li
           className={`nav-item 
-            ${
-              location.pathname.includes("/admin/plans")
-                ? "active"
-                : ""
+            ${location.pathname.includes("/admin/plans")
+              ? "active"
+              : ""
             }
             ${hoveredItem === "plans" ? "hover-open" : ""}`}
           onMouseEnter={() => setHoveredItem("plans")}
@@ -119,10 +113,9 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
 
         <li
           className={`nav-item 
-            ${
-              location.pathname.includes("/admin/pricingCourier")
-                ? "active"
-                : ""
+            ${location.pathname.includes("/admin/pricingCourier")
+              ? "active"
+              : ""
             }
             ${hoveredItem === "pricingCourier" ? "hover-open" : ""}`}
           onMouseEnter={() => setHoveredItem("pricingCourier")}
@@ -133,7 +126,23 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
             <span className="menu-title">Courier Pricing</span>
           </Link>
         </li>
-        
+
+        <li
+          className={`nav-item 
+            ${location.pathname.includes("/admin/weight")
+              ? "active"
+              : ""
+            }
+            ${hoveredItem === "weight" ? "hover-open" : ""}`}
+          onMouseEnter={() => setHoveredItem("weight")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Link className="nav-link" to="/admin/weight">
+            <i className="mdi mdi-weight-kilogram menu-icon"></i>
+            <span className="menu-title">Weight</span>
+          </Link>
+        </li>
+
       </ul>
     </nav>
   );

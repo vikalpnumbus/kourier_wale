@@ -18,7 +18,6 @@ import OrdersTable from "../pages/Seller/Orders/OrdersTable";
 import ShipmentsTable from "../pages/Seller/Shipment/ShipmentTable";
 import OrdersForm from "../pages/Seller/Orders/OrdersForm";
 import RateCalculator from "../pages/Seller/RateCalculator/index";
-import ShippingCharges from "../pages/Seller/Billing/shippingcharges";
 import Cod_Remittance from "../pages/Seller/Billing/cod_remittance";
 import OrderView from "../pages/Seller/Orders/OrderView";
 import SellerLayout from "../layouts/SellerLayout";
@@ -33,6 +32,10 @@ import EscalationForm from "../pages/Seller/Escalation/EscalationForm";
 import AddChannelPage from "../pages/Seller/Channel/AddChannelPage";
 import ShopifyForm from "../pages/Seller/Channel/ShopifyForm";
 import Shipments from "../pages/Seller/Shipment";
+import ShippingCharge from "../pages/Seller/Billing/ShippingCharge";
+import ShippingChargesTable from "../pages/Seller/Billing/ShippingCharge/ShippingChargesTable";
+import WalletTransaction from "../pages/Seller/WalletTransaction";
+import WalletTransactionTable from "../pages/Seller/WalletTransaction/WalletTransactionTable";
 function AppRoutes() {
   return (
     <>
@@ -76,8 +79,11 @@ function AppRoutes() {
           </Route>
 
           <Route path="/rate_calculator" element={<RateCalculator />}></Route>
-          <Route path="/shippingcharges" element={<ShippingCharges />}></Route>
           <Route path="/cod_remittance" element={<Cod_Remittance />}></Route>
+
+          <Route path="/shippingcharges" element={<ShippingCharge />}>
+            <Route index element={<ShippingChargesTable />} />
+          </Route>
 
           <Route path="label_setting" element={<LabelSettings />} />
 
@@ -92,6 +98,9 @@ function AppRoutes() {
             <Route index element={<EscalationTable />} />
             <Route path="add" element={<EscalationForm />} />
             <Route path="view/:id" element={<EscalationView />} />
+          </Route>
+          <Route path="/wallet_history" element={<WalletTransaction />}>
+            <Route index element={<WalletTransactionTable />} />
           </Route>
         </Routes>
       </SellerLayout>

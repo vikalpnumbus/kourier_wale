@@ -12,11 +12,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../../../utils/api";
 import ordersConfig from "../../../config/Orders/OrdersConfig";
 import warehouseConfig from "../../../config/Warehouse/WarehouseConfig";
+import shipmentsConfig from "../../../config/Shipments/ShipmentsConfig";
 
 function OrderView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [orderData, setOrderData] = useState({});
+  const [shippingData, setShippingData] = useState({});
   const [loading, setLoading] = useState(false);
 
   const handleFetchData = async () => {
@@ -30,6 +32,20 @@ function OrderView() {
       return {};
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFetchShippingData = async () => {
+    setLoading(true);
+    try {
+
+
+      const url = `${shipmentsConfig.fetchshipmentlist}/${id}`;
+
+      const { data } = await api.get(url);
+      setShippingData(data?.result?.[0] || {});
+    } catch (error) {
+      console.error("Fetch orders error:", error);
     }
   };
 
@@ -49,6 +65,7 @@ function OrderView() {
 
   useEffect(() => {
     handleWarehouseData();
+    handleFetchShippingData();
   }, []);
 
   const findWarehouse = (warehouseId) => {
@@ -143,9 +160,8 @@ function OrderView() {
                         {/* Product Image */}
                         <div className="col-12 col-md-2">
                           <img
-                            src={`${import.meta.env.VITE_API_URL}${
-                              item.productImage[1]
-                            }`}
+                            src={`${import.meta.env.VITE_API_URL}${item.productImage[1]
+                              }`}
                             className="img-fluid rounded border"
                             style={{ maxHeight: "80px", objectFit: "contain" }}
                           />
@@ -375,8 +391,8 @@ function OrderView() {
                       orderData?.packageDetails?.weight
                         ? orderData?.packageDetails?.weight >= 1000
                           ? (orderData?.packageDetails?.weight / 1000).toFixed(
-                              2
-                            )
+                            2
+                          )
                           : orderData?.packageDetails?.weight
                         : ""
                     }

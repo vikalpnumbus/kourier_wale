@@ -149,7 +149,7 @@ function ShipmentsTable() {
                     </td>
                     <td className="py-2">
                       <div className="d-flex flex-column gap-3 box-class">
-                        <Link to={`view/${data?.id}`}>{data?.orderId || ""}</Link>
+                        <Link to={`/orders/view/${data?.id}`}>{data?.orderId || ""}</Link>
                         <span>
                           {data?.createdAt ? formatDateTime(data?.createdAt) : ""}
                         </span>
