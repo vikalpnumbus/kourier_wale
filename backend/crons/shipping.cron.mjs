@@ -4,18 +4,16 @@ import UserService from "../services/user.service.mjs";
 import ShippingProducer from "../queue/producers/shipping.producer.mjs";
 
 import pLimit from "p-limit";
+import RemittanceService from "../services/admin/admin.remmitance.service.mjs";
 const limit = pLimit(10);
 
 /**
- * Run this cron every 5 minutes to check wallet balance and re-try shipping.
+ * Run this cron every minute to check wallet balance and re-try shipping.
  */
 
-const shippingCron = cron.schedule("* * * * *", async () => {
+export const shippingCron = cron.schedule("* * * * *", async () => {
   try {
-    console.info(
-      "⏰ Cron job running every hour:",
-      new Date().toLocaleString()
-    );
+    console.info("⏰ Cron job running every minute:", new Date().toLocaleString());
 
     const shipments = (
       await ShippingService.read({
@@ -26,9 +24,7 @@ const shippingCron = cron.schedule("* * * * *", async () => {
 
     const userData = {};
 
-    const uniqueUserIds = [
-      ...new Set(shipments.map((shipment) => shipment.userId)),
-    ];
+    const uniqueUserIds = [...new Set(shipments.map((shipment) => shipment.userId))];
 
     const uniqueUsers = await UserService.read({ id: uniqueUserIds });
 
@@ -53,4 +49,13 @@ const shippingCron = cron.schedule("* * * * *", async () => {
   }
 });
 
-export default shippingCron;
+export const remittanceCron = cron.schedule("* * * * *", async () => {
+  try {
+    console.info("⏰ Remittance Cron job running every minute:", new Date().toLocaleString());
+
+    await RemittanceService.calculateRemittance();
+  } catch (error) {
+    console.error(error);
+  }
+});
+

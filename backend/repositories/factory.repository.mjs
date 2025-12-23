@@ -12,6 +12,8 @@ import OTPModel from "../model/otp.sql.model.mjs";
 import PricingCardModel from "../model/pricingCard.sql.model.mjs";
 import PricingPlansModel from "../model/pricingPlans.sql.model.mjs";
 import ProductsModel from "../model/products.sql.model.mjs";
+import RemittanceModel from "../model/remittance.sql.model.mjs";
+import RemittanceBatchModel from "../model/remittanceBatch.sql.model.mjs";
 import ServiceablePincodeModel from "../model/serviceablePincodes.sql.model.mjs";
 import ShippingModel from "../model/shipping.sql.model.mjs";
 import UserModel from "../model/user.sql.model.mjs";
@@ -47,6 +49,8 @@ class Class {
       escalations: new BaseRepositoryClass(EscalationModel),
       escalations_conversations: new BaseRepositoryClass(EscalationConversationsModel),
       weightReco: new BaseRepositoryClass(WeightRecoModel),
+      remittance: new BaseRepositoryClass(RemittanceModel),
+      remittanceBatch: new BaseRepositoryClass(RemittanceBatchModel),
     };
 
     if (!repositories[model]) {
@@ -56,9 +60,29 @@ class Class {
   }
 }
 
-
 UserModel.hasOne(KycModel, { foreignKey: "userId" });
 KycModel.belongsTo(UserModel, { foreignKey: "userId" });
+
+RemittanceBatchModel.hasMany(RemittanceModel, {
+  foreignKey: "batch_id",
+  as: "remittances",
+  onDelete: "CASCADE",
+});
+
+RemittanceModel.belongsTo(RemittanceBatchModel, {
+  foreignKey: "batch_id",
+  as: "batch",
+});
+
+ShippingModel.hasOne(RemittanceModel, {
+  foreignKey: "awb_number",
+  sourceKey: "awb_number",
+});
+
+RemittanceModel.belongsTo(ShippingModel, {
+  foreignKey: "awb_number",
+  targetKey: "awb_number",
+});
 
 const FactoryRepository = new Class();
 export default FactoryRepository;

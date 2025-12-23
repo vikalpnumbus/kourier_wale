@@ -30,6 +30,7 @@ import AdminEscalationRouter from "./admin/admin.escalation.router.mjs";
 import UserService from "../services/user.service.mjs";
 import AdminOrdersRouter from "./admin/admin.orders.route.mjs";
 import AdminShippingRouter from "./admin/admin.shipping.route.mjs";
+import AdminRemittanceRouter from "./admin/admin.remittance.route.mjs";
 
 const globalRouter = express.Router();
 
@@ -102,6 +103,12 @@ globalRouter.use(
   TokenHandler.authenticateToken,
   checkIfUserIsAdmin,
   AdminShippingRouter
+);
+globalRouter.use(
+  "/admin/remittance",
+  TokenHandler.authenticateToken,
+  checkIfUserIsAdmin,
+  AdminRemittanceRouter
 );
 
 globalRouter.use("/uploads", ImageRouter);
