@@ -21,6 +21,11 @@ const RemittanceModel = sqlDB.sequelize.define(
       allowNull: false,
     },
 
+    collectable_amount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+
     batch_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

@@ -84,5 +84,14 @@ RemittanceModel.belongsTo(ShippingModel, {
   targetKey: "awb_number",
 });
 
+RemittanceModel.belongsTo(UserModel, {
+  foreignKey: "userId",
+  as: "user"
+});
+
+UserModel.hasMany(RemittanceModel, {
+  foreignKey: "userId"
+});
+
 const FactoryRepository = new Class();
 export default FactoryRepository;

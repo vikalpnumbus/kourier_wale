@@ -1,7 +1,8 @@
 import express from "express";
-import { read } from "../../controllers/admin/admin.remittance.controller.mjs";
+import { update, read } from "../../controllers/admin/admin.remittance.controller.mjs";
 const AdminRemittanceRouter = express.Router();
 
 AdminRemittanceRouter.get("/", read);
+AdminRemittanceRouter.patch('/:id', update)
 
 export default AdminRemittanceRouter;

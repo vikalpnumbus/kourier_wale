@@ -19,7 +19,6 @@ export const read = async (req, res, next) => {
       courier_id: req.query?.courier_id,
     };
 
-    console.log('query: ', query);
     const result = await ShippingService.read(query);
     if (!result) {
       throw ShippingService.error;

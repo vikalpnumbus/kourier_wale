@@ -15,6 +15,11 @@ const RemittanceBatchModel = sqlDB.sequelize.define(
       allowNull: false,
     },
 
+    recieved_from_courier: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+
     remittance_status: {
       type: DataTypes.ENUM("pending", "paid", "hold"),
       allowNull: false,

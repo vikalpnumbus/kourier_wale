@@ -26,6 +26,14 @@ class Service {
             model: RemittanceModel,
             as: "remittances",
             required: false,
+            include: [
+              {
+                model: UserModel,
+                as: "user",
+                required: false,
+                attributes: ["id", "seller_remit_cycle", "wallet_balance", "companyName"],
+              },
+            ],
           },
         ],
       });
@@ -50,7 +58,7 @@ class Service {
     let page = 1;
     do {
       users = await UserModel.findAll({
-        attributes: ["id", "seller_remit_cycle"],
+        // attributes: ["id", "seller_remit_cycle"],
         limit: 50,
         offset: 50 * (page - 1),
       });
@@ -62,7 +70,7 @@ class Service {
         const remittancesDue = await ShippingModel.findOne({
           attributes: [
             "userId",
-            [fn("SUM", col("shipping.orderAmount")), "totalOrderAmount"],
+            [fn("SUM", col("shipping.collectableAmount")), "totalCollectableAmount"],
             [fn("COUNT", col("shipping.id")), "totalOrders"],
             [literal("GROUP_CONCAT(shipping.awb_number)"), "awbNumbers"],
           ],
@@ -78,6 +86,7 @@ class Service {
 
           where: {
             shipping_status: "delivered",
+            paymentType: "cod",
             "$remittance.awb_number$": null,
             userId: user.id,
             createdAt: {
@@ -90,17 +99,23 @@ class Service {
         });
 
         if (remittancesDue) {
-          const { totalOrderAmount } = remittancesDue || {};
+          const { totalCollectableAmount } = remittancesDue || {};
           const remittanceBatchId = await RemittanceBatchModel.create({
-            remittance_amount: totalOrderAmount,
+            remittance_amount: totalCollectableAmount,
             remittance_status: "pending",
           });
           const { id: batch_id } = remittanceBatchId;
           const { awbNumbers } = remittancesDue || {};
           awbNumbers.split(",").map(async (awb) => {
+            const { collectableAmount } =
+              (await ShippingModel.findOne({
+                attributes: ["collectableAmount"],
+                where: { awb_number: awb },
+              })) || {};
             await RemittanceModel.create({
               userId: user.id,
               awb_number: awb,
+              collectable_amount: collectableAmount,
               batch_id,
             });
           });
@@ -109,7 +124,32 @@ class Service {
       page++;
     } while (users && users.length > 0);
   }
+
+  async update({ id, remarks, remittance_status }) {
+    try {
+      const isExists = await RemittanceBatchModel.findByPk(id);
+      if (!isExists) {
+        const error = new Error("No record found.");
+        error.status = 400;
+        throw error;
+      }
+
+      const updatedRecord = await RemittanceBatchModel.update({ remarks, remittance_status }, { where: { id } });
+      if (!updatedRecord) {
+        const error = new Error("Unable to update the record.");
+        error.status = 500;
+        throw error;
+      }
+      return { status: 201, data: "Record updated successfully." };
+    } catch (error) {
+      this.error = error;
+      return false;
+    }
+  }
 }
 
 const RemittanceService = new Service();
 export default RemittanceService;
+(async () => {
+  await RemittanceService.calculateRemittance();
+})();
