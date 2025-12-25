@@ -1,5 +1,5 @@
 import Icon from "@mdi/react";
-import { mdiClose, mdiCloudDownload, mdiPlus } from "@mdi/js";
+import { mdiPlus } from "@mdi/js";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 function Escalation() {
@@ -27,7 +27,7 @@ function Escalation() {
                       <Icon path={mdiPlus} size={0.7} /> Create Escalation
                     </button>
                   )}
-                
+
               </div>
             </div>
 
