@@ -143,6 +143,19 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
           </Link>
         </li>
 
+        <li
+          className={`nav-item 
+            ${location.pathname.includes("/admin/support") ? "active" : ""}
+            ${hoveredItem === "support" ? "hover-open" : ""}`}
+          onMouseEnter={() => setHoveredItem("support")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Link className="nav-link" to="/admin/support">
+            <i className="mdi mdi-ticket-account menu-icon"></i>
+            <span className="menu-title">Support</span>
+          </Link>
+        </li>
+
       </ul>
     </nav>
   );

@@ -23,6 +23,9 @@ import UserView from "../pages/Admin/Users/UserVeiw";
 import Weight from "../pages/Admin/Weight";
 import UploadWeight from "../pages/Admin/Weight/UploadWeight";
 import ManageWeight from "../pages/Admin/Weight/ManageWeight";
+import Support from "../pages/Admin/Support";
+import SupportTable from "../pages/Admin/Support/SupportTable";
+import SupportView from "../pages/Admin/Support/SupportView";
 
 
 function AdminRoutes() {
@@ -68,6 +71,10 @@ function AdminRoutes() {
             <Route index element={<UploadWeight />} />
             <Route path="upload" element={<UploadWeight />} />
             <Route path="manage" element={<ManageWeight />} />
+          </Route>
+          <Route path="/support" element={<Support />}>
+            <Route index element={<SupportTable />} />
+            <Route path="view/:id" element={<SupportView />} />
           </Route>
 
         </Routes>
