@@ -156,6 +156,19 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
           </Link>
         </li>
 
+        <li
+          className={`nav-item 
+            ${location.pathname.includes("/admin/remittance") ? "active" : ""}
+            ${hoveredItem === "remittance" ? "hover-open" : ""}`}
+          onMouseEnter={() => setHoveredItem("remittance")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Link className="nav-link" to="/admin/remittance">
+            <i className="mdi mdi-currency-usd menu-icon"></i>
+            <span className="menu-title">Remittance</span>
+          </Link>
+        </li>
+
       </ul>
     </nav>
   );
