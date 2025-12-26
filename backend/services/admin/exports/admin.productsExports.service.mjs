@@ -20,37 +20,33 @@ class Service {
   }
 
   buildWhereClause(params) {
-    const { page = 1, limit = 50, id, name, sku, category, ...filters } = params;
+    const { id, name, sku, category, start_date, end_date } = params;
 
-    // Build where condition
-    let where = { ...filters };
+    let whereClause = { [Op.and]: [] };
 
-    if (id) {
-      where.id = id;
-    }
-    let searchQueries = [];
+    if (id) whereClause[Op.and].push({ id });
 
-    if (name) {
-      searchQueries.push(...[{ name: { [Op.like]: `%${name}%` } }]);
-    }
-    if (sku) {
-      searchQueries.push(...[{ sku: { [Op.like]: `%${sku}%` } }]);
-    }
-    if (category) {
-      searchQueries.push(...[{ category: { [Op.like]: `%${category}%` } }]);
-    }
+    if (name) whereClause[Op.and].push({ name: { [Op.like]: `%${name}%` } });
+    if (sku) whereClause[Op.and].push({ sku: { [Op.like]: `%${sku}%` } });
+    if (category) whereClause[Op.and].push({ category: { [Op.like]: `%${category}%` } });
 
-    where[Op.and] = searchQueries;
+    if (start_date) {
+      whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.gte]: start_date }));
+    }
+    if (end_date) {
+      whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.lte]: end_date }));
+    }
 
     // If no conditions were added, remove Op.and
-    if (!where[Op.and].length) delete where[Op.and];
-    return where;
+    if (!whereClause[Op.and].length) delete whereClause[Op.and];
+    return whereClause;
   }
   async getData({ filters, exportJobId }) {
     try {
       let whereClause = this.buildWhereClause(filters);
       const whereSQL = queryGenerator.getWhereConditions(whereClause, "products");
       const sql = `SELECT * FROM products ${whereSQL ? `WHERE ${whereSQL}` : ""} ORDER BY id DESC`;
+      console.log("sql: ", sql);
       const countQuery = `SELECT count(*) FROM products ${whereSQL ? `WHERE ${whereSQL}` : ""}`;
       const [rows] = await mysqlConnection.promise().query(countQuery);
 
