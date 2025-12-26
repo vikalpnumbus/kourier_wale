@@ -26,6 +26,8 @@ import ManageWeight from "../pages/Admin/Weight/ManageWeight";
 import Support from "../pages/Admin/Support";
 import SupportTable from "../pages/Admin/Support/SupportTable";
 import SupportView from "../pages/Admin/Support/SupportView";
+import Remittance from "../pages/Admin/Remittance";
+import RemittanceTable from "../pages/Admin/Remittance/RemittanceTable";
 
 
 function AdminRoutes() {
@@ -75,6 +77,9 @@ function AdminRoutes() {
           <Route path="/support" element={<Support />}>
             <Route index element={<SupportTable />} />
             <Route path="view/:id" element={<SupportView />} />
+          </Route>
+          <Route path="/remittance" element={<Remittance />}>
+            <Route index element={<RemittanceTable />} />
           </Route>
 
         </Routes>
