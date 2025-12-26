@@ -16,11 +16,11 @@ class Service {
     try {
       const { page = 1, limit = 50 } = params;
 
-      const offset = (page - 1) * limit;
+      const offset = (Number(page) - 1) * Number(limit);
 
       const result = await RemittanceBatchModel.findAll({
         offset,
-        limit,
+        limit:Number(limit),
         include: [
           {
             model: RemittanceModel,
