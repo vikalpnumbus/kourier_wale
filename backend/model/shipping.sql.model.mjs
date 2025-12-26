@@ -66,15 +66,7 @@ const ShippingModel = sqlDB.sequelize.define(
       allowNull: false,
       validate: {
         hasRequiredFields(value) {
-          const required = [
-            "fname",
-            "lname",
-            "address",
-            "city",
-            "state",
-            "phone",
-            "pincode",
-          ];
+          const required = ["fname", "lname", "address", "city", "state", "phone", "pincode"];
           for (let field of required) {
             if (!value[field]) {
               throw new Error(`Missing field ${field} in shippingDetails`);
@@ -90,13 +82,7 @@ const ShippingModel = sqlDB.sequelize.define(
       allowNull: false,
       validate: {
         hasRequiredFields(value) {
-          const required = [
-            "weight",
-            "length",
-            "height",
-            "breadth",
-            "volumetricWeight",
-          ];
+          const required = ["weight", "length", "height", "breadth", "volumetricWeight"];
           for (let field of required) {
             if (!value[field]) {
               throw new Error(`Missing field ${field} in packageDetails`);
@@ -123,17 +109,10 @@ const ShippingModel = sqlDB.sequelize.define(
       validate: {
         hasRequiredFields(value) {
           if (!value) return true;
-          const required = [
-            "courier_billed_weight",
-            "courier_billed_length",
-            "courier_billed_height",
-            "courier_billed_breadth",
-          ];
+          const required = ["courier_billed_weight", "courier_billed_length", "courier_billed_height", "courier_billed_breadth"];
           for (let field of required) {
             if (!value[field].toString()) {
-              throw new Error(
-                `Missing field ${field} in courierPackageDetails`
-              );
+              throw new Error(`Missing field ${field} in courierPackageDetails`);
             }
           }
         },
@@ -217,6 +196,21 @@ const ShippingModel = sqlDB.sequelize.define(
 
     edd: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    delivered_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+
+    remittance_status: {
+      type: DataTypes.ENUM("pending", "paid", "hold"),
+      allowNull: true,
+    },
+
+    remittance_paid_date: {
+      type: DataTypes.DATE,
       allowNull: true,
     },
   },

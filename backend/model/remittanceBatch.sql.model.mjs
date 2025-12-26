@@ -10,7 +10,18 @@ const RemittanceBatchModel = sqlDB.sequelize.define(
       autoIncrement: true,
     },
 
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: "users", key: "id" },
+    },
+
     remittance_amount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+
+    hold_amount: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
@@ -28,6 +39,11 @@ const RemittanceBatchModel = sqlDB.sequelize.define(
 
     remarks: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    awb_numbers: {
+      type: DataTypes.TEXT,
       allowNull: true,
     },
   },
