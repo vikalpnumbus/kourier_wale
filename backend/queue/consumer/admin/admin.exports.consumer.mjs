@@ -24,12 +24,15 @@ class Class {
         this.queue,
         async (msg) => {
           const { type, filters, exportJobId } = msg;
-
+          
           if (type == "orders") {
             this.handler = ExportsHandlerFactory.getExportsHandler("orders");
           }
-           else if (type == "shipping") {
+          else if (type == "shipping") {
             this.handler = ExportsHandlerFactory.getExportsHandler("shipping");
+          } 
+          else if (type == "products") {
+            this.handler = ExportsHandlerFactory.getExportsHandler("products");
           } 
            else if (type == "remittance") {
             this.handler = ExportsHandlerFactory.getExportsHandler("remittance");

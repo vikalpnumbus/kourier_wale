@@ -1,4 +1,5 @@
 import AdminOrderExportsHandler from "./admin.ordersExports.service.mjs";
+import AdminProductsExportsHandler from "./admin.productsExports.service.mjs";
 import AdminRemittanceExportsHandler from "./admin.remittanceExports.service.mjs";
 import AdminShippingExportsHandler from "./admin.shippingExports.service.mjs";
 
@@ -7,6 +8,7 @@ class Service {
     const exportHandlers = {
       orders: AdminOrderExportsHandler,
       shipping: AdminShippingExportsHandler,
+      products: AdminProductsExportsHandler,
       remittance: AdminRemittanceExportsHandler,
     };
 
