@@ -1,10 +1,12 @@
 import AdminOrderExportsHandler from "./admin.ordersExports.service.mjs";
 import AdminRemittanceExportsHandler from "./admin.remittanceExports.service.mjs";
+import AdminShippingExportsHandler from "./admin.shippingExports.service.mjs";
 
 class Service {
   getExportsHandler(type) {
     const exportHandlers = {
       orders: AdminOrderExportsHandler,
+      shipping: AdminShippingExportsHandler,
       remittance: AdminRemittanceExportsHandler,
     };
 

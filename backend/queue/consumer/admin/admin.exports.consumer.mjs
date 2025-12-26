@@ -27,9 +27,14 @@ class Class {
 
           if (type == "orders") {
             this.handler = ExportsHandlerFactory.getExportsHandler("orders");
-          } else if (type == "remittance") {
+          }
+           else if (type == "shipping") {
+            this.handler = ExportsHandlerFactory.getExportsHandler("shipping");
+          } 
+           else if (type == "remittance") {
             this.handler = ExportsHandlerFactory.getExportsHandler("remittance");
-          } else {
+          } 
+          else {
             throw new Error("This type has not been implemented yet.");
           }
           console.time("admin-exports-queue");
