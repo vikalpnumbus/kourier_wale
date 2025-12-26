@@ -13,8 +13,11 @@ const queryGenerator = sqlDB.sequelize.getQueryInterface().queryGenerator;
 
 class Service {
   constructor() {
-    this.error = null;
+    this.MAX_PRODUCTS = 5;
+    this.BATCH_SIZE = 50;
     this.repository = FactoryRepository.getRepository("orders");
+    this.exportJobRepository = FactoryRepository.getRepository("exportJobs");
+    this.error = null;
   }
 
   buildWhereClause(params) {
@@ -73,16 +76,18 @@ class Service {
     if (!whereClause[Op.and].length) delete whereClause[Op.and];
     return whereClause;
   }
-  async getData(params) {
-    let whereClause = this.buildWhereClause(params);
-    const whereSQL = queryGenerator.getWhereConditions(whereClause, "orders");
-    const sql = `SELECT * FROM orders ${whereSQL ? `WHERE ${whereSQL}` : ""} ORDER BY id DESC`;
-    console.log("sql: ", sql);
+  async getData({ filters, exportJobId }) {
+    try {
+      let whereClause = this.buildWhereClause(filters);
+      const whereSQL = queryGenerator.getWhereConditions(whereClause, "orders");
+      const sql = `SELECT * FROM orders ${whereSQL ? `WHERE ${whereSQL}` : ""} ORDER BY id DESC`;
+      const countQuery = `SELECT count(*) FROM orders ${whereSQL ? `WHERE ${whereSQL}` : ""}`;
+      const [rows] = await mysqlConnection.promise().query(countQuery);
 
-    const channelCache = new Map();
-    const csvStream = stringify({
-      header: true,
-      columns: [
+      await this.exportJobRepository.findOneAndUpdate({ id: exportJobId }, { status: "processing", total_count: rows?.[0]?.["count(*)"] });
+      const channelCache = new Map();
+
+      let columns = [
         "User ID",
         "id",
         "Order ID",
@@ -110,81 +115,114 @@ class Service {
         "Shipping Discount (By Seller)",
         "Collectable Amount",
         "Product Total Amount",
-        "Orders Product section",
-      ],
-    });
-    let dbStream = mysqlConnection.query(sql).stream({ highWaterMark: 1000 });
+      ];
 
-    const transformStream = new Transform({
-      objectMode: true,
-      async transform(e, _, callback) {
-        const channel_id = e.channel_id;
+      for (let i = 1; i <= AdminOrderExportsHandler.MAX_PRODUCTS; i++) {
+        columns.push(`Product ${i} Name`);
+        columns.push(`Product ${i} SKU`);
+        columns.push(`Product ${i} Price`);
+        columns.push(`Product ${i} Qty`);
+      }
 
-        let channel_name = null;
-        if (channel_id) {
-          if (channelCache.has(channel_id)) {
-            channel_name = channelCache.get(channel_id);
-          } else {
-            channel_name = (await ChannelService.read({ id: channel_id }))?.data?.result?.[0]?.channel_name;
-            channelCache.set(channel_id, channel_name);
+      const csvStream = stringify({
+        header: true,
+        columns,
+      });
+
+      const dbStream = mysqlConnection.query(sql).stream({ highWaterMark: 1000 });
+
+      let processed_count = 0;
+      const transformStream = new Transform({
+        objectMode: true,
+        async transform(e, _, callback) {
+          ++processed_count;
+          if (processed_count % AdminOrderExportsHandler.BATCH_SIZE === 0) {
+            await AdminOrderExportsHandler.exportJobRepository.findOneAndUpdate({ id: exportJobId }, { processed_count });
           }
-        }
-        let productIDs = e.products?.map((product) => product.id).join(",");
-        productIDs = productIDs
-          .split(",")
-          .map((e) => e?.trim())
-          .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
 
-        let foundProducts = (await ProductsService.read({ id: productIDs })).data.result;
+          const channel_id = e.channel_id;
 
-        foundProducts = foundProducts.map((product) => ({
-          ...product.dataValues,
-          ...e.products.filter((curr) => curr.id == product.id)[0],
-        }));
+          let channel_name = null;
+          if (channel_id) {
+            if (channelCache.has(channel_id)) {
+              channel_name = channelCache.get(channel_id);
+            } else {
+              channel_name = (await ChannelService.read({ id: channel_id }))?.data?.result?.[0]?.channel_name;
+              channelCache.set(channel_id, channel_name);
+            }
+          }
+          let productIDs = e.products?.map((product) => product.id).join(",");
+          productIDs = productIDs
+            .split(",")
+            .map((e) => e?.trim())
+            .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
 
-        callback(null, {
-          "User ID": e.userId,
-          id: e.id,
-          "Order ID": e.orderId,
-          "Order Date": new Date(e.createdAt),
-          "Payment Type": e.paymentType,
-          "Channel Name": channel_name,
-          "Warehouse ID": e.warehouse_id,
-          "Warehouse Name": null,
-          "Warehouse No": null,
-          "Warehouse Address": null,
-          "Warehouse Pincode": null,
-          "Warehouse City": null,
-          "Warehouse State": null,
-          "Customer Name": e["shippingDetails"].fname + " " + e["shippingDetails"].lname,
-          "Customer Email": e["shippingDetails"].email || null,
-          "Customer Address": e["shippingDetails"].address || null,
-          "Customer Pincode": e["shippingDetails"].pincode || null,
-          "Customer City": e["shippingDetails"].city || null,
-          "Customer State": e["shippingDetails"].state || null,
-          "Product Weight": e.packageDetails.weight || null,
-          "Product LBH": e.packageDetails.length + " X " + e.packageDetails.breadth + " X " + e.packageDetails.height,
-          "Shipping Charges (By Seller)": e.charges.shipping || null,
-          "Shipping TAX (By Seller)": e.charges.tax_amount || null,
-          "COD Charge (By Seller)": e.charges.cod || null,
-          "Shipping Discount (By Seller)": e.charges.discount || null,
-          "Collectable Amount": e.collectableAmount || null,
-          "Product Total Amount": null,
-          "Orders Product section": foundProducts.map((e) => e.name).join(", "),
-        });
-      },
-    });
+          let foundProducts = (await ProductsService.read({ id: productIDs })).data.result;
 
-    const dir = path.join("uploads", "exports", "orders");
-    fs.mkdirSync(dir, { recursive: true });
+          foundProducts = foundProducts.map((product) => ({
+            ...product.dataValues,
+            ...e.products.filter((curr) => curr.id == product.id)[0],
+          }));
 
-    const uploadPath = path.join(dir, `${Date.now()}.orders.csv`);
+          let row = {
+            "User ID": e.userId,
+            id: e.id,
+            "Order ID": e.orderId,
+            "Order Date": new Date(e.createdAt),
+            "Payment Type": e.paymentType,
+            "Channel Name": channel_name,
+            "Warehouse ID": e.warehouse_id,
+            "Warehouse Name": null,
+            "Warehouse No": null,
+            "Warehouse Address": null,
+            "Warehouse Pincode": null,
+            "Warehouse City": null,
+            "Warehouse State": null,
+            "Customer Name": e["shippingDetails"].fname + " " + e["shippingDetails"].lname,
+            "Customer Email": e["shippingDetails"].email || null,
+            "Customer Address": e["shippingDetails"].address || null,
+            "Customer Pincode": e["shippingDetails"].pincode || null,
+            "Customer City": e["shippingDetails"].city || null,
+            "Customer State": e["shippingDetails"].state || null,
+            "Product Weight": e.packageDetails.weight || null,
+            "Product LBH": e.packageDetails.length + " X " + e.packageDetails.breadth + " X " + e.packageDetails.height,
+            "Shipping Charges (By Seller)": e.charges.shipping || null,
+            "Shipping TAX (By Seller)": e.charges.tax_amount || null,
+            "COD Charge (By Seller)": e.charges.cod || null,
+            "Shipping Discount (By Seller)": e.charges.discount || null,
+            "Collectable Amount": e.collectableAmount || null,
+            "Product Total Amount": null,
+          };
 
-    const fileStream = fs.createWriteStream(uploadPath);
+          for (let i = 1; i <= AdminOrderExportsHandler.MAX_PRODUCTS; i++) {
+            const p = foundProducts[i];
 
-    await pipeline(dbStream, transformStream, csvStream, fileStream);
+            row[`Product ${i} Name`] = p?.name ?? "";
+            row[`Product ${i} SKU`] = p?.sku ?? "";
+            row[`Product ${i} Price`] = p?.price ?? "";
+            row[`Product ${i} Qty`] = p?.qty ?? "";
+          }
 
-    return dbStream;
+          callback(null, row);
+        },
+      });
+
+      const dir = path.join("uploads", "exports", "orders");
+      fs.mkdirSync(dir, { recursive: true });
+
+      const uploadPath = path.join(dir, `${Date.now()}.orders.csv`);
+
+      const fileStream = fs.createWriteStream(uploadPath);
+
+      await pipeline(dbStream, transformStream, csvStream, fileStream);
+
+      await this.exportJobRepository.findOneAndUpdate({ id: exportJobId }, { processed_count, status: "completed", file_url: uploadPath });
+
+      return dbStream;
+    } catch (error) {
+      await this.exportJobRepository.findOneAndUpdate({ id: exportJobId }, { status: "failed", error: error?.message || "Some error occured" });
+      throw err;
+    }
   }
 }
 

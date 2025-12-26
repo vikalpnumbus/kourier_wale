@@ -25,12 +25,12 @@ class Class {
         async (msg) => {
           console.time("admin-exports-queue");
 
-          const { type, filters, format } = msg;
+          const { type, filters, format, exportJobId } = msg;
 
           if (type == "orders") {
             this.handler = ExportsHandlerFactory.getExportsHandler("orders");
           }
-          const data = await this.handler.getData(filters);
+          const data = await this.handler.getData({ filters, exportJobId });
 
           console.timeEnd("admin-exports-queue");
         },
