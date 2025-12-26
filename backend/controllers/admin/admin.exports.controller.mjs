@@ -2,10 +2,10 @@ import ExportsService from "../../services/admin/admin.exports.service.mjs";
 
 export const create = async (req, res, next) => {
   try {
-    const { type, format, filters } = req.body;
+    const { type, filters } = req.body;
     const { id: userId } = req.user;
 
-    const result = await ExportsService.create({ userId, type, format, filters });
+    const result = await ExportsService.create({ userId, type, filters });
 
     if (!result) {
       throw ExportsService.error;

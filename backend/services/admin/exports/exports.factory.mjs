@@ -1,9 +1,11 @@
 import AdminOrderExportsHandler from "./admin.ordersExports.service.mjs";
+import AdminRemittanceExportsHandler from "./admin.remittanceExports.service.mjs";
 
 class Service {
   getExportsHandler(type) {
     const exportHandlers = {
       orders: AdminOrderExportsHandler,
+      remittance: AdminRemittanceExportsHandler,
     };
 
     if (!exportHandlers[type]) {

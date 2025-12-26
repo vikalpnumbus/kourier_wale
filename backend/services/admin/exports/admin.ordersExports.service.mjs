@@ -15,7 +15,6 @@ class Service {
   constructor() {
     this.MAX_PRODUCTS = 5;
     this.BATCH_SIZE = 50;
-    this.repository = FactoryRepository.getRepository("orders");
     this.exportJobRepository = FactoryRepository.getRepository("exportJobs");
     this.error = null;
   }
@@ -221,7 +220,7 @@ class Service {
       return dbStream;
     } catch (error) {
       await this.exportJobRepository.findOneAndUpdate({ id: exportJobId }, { status: "failed", error: error?.message || "Some error occured" });
-      throw err;
+      throw error;
     }
   }
 }

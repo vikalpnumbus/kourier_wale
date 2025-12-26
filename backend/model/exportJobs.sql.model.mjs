@@ -49,12 +49,6 @@ const ExportJobs = sqlDB.sequelize.define(
       allowNull: true,
     },
 
-    completed_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-    },
-
     processed_count: {
       type: DataTypes.INTEGER,
       allowNull: false,

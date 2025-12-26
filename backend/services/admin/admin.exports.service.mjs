@@ -10,8 +10,8 @@ class Service {
 
   async create({ userId, type, format, filters }) {
     try {
-      const exportJob = await this.repository.save({ userId, type, format, filters });
-      await AdminExportsProducer.publishData({ type, format, filters, exportJobId: exportJob?.id });
+      const exportJob = await this.repository.save({ userId, type, filters });
+      await AdminExportsProducer.publishData({ type, filters, exportJobId: exportJob?.id });
       return {
         data: `Your export request is being processed with id ${exportJob?.id}`,
       };

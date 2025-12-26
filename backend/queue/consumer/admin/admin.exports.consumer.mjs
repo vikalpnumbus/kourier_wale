@@ -23,14 +23,18 @@ class Class {
       await rabbitMQ.consume(
         this.queue,
         async (msg) => {
-          console.time("admin-exports-queue");
-
-          const { type, filters, format, exportJobId } = msg;
+          const { type, filters, exportJobId } = msg;
 
           if (type == "orders") {
             this.handler = ExportsHandlerFactory.getExportsHandler("orders");
+          } else if (type == "remittance") {
+            this.handler = ExportsHandlerFactory.getExportsHandler("remittance");
+          } else {
+            throw new Error("This type has not been implemented yet.");
           }
-          const data = await this.handler.getData({ filters, exportJobId });
+          console.time("admin-exports-queue");
+
+          await this.handler.getData({ filters, exportJobId });
 
           console.timeEnd("admin-exports-queue");
         },
