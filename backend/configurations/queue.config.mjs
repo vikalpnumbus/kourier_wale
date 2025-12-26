@@ -63,6 +63,11 @@ const queueConfig = {
     routingKey: "weightReco_routingKey",
     queue: "weightReco_queue",
   },
+  adminExports: {
+    exchange: "admin_exports_exchange",
+    routingKey: "admin_exports_routingKey",
+    queue: "admin_exports_queue",
+  },
 };
 
 export default queueConfig;

@@ -32,20 +32,20 @@ class Class {
         throw err;
       }
 
-      console.log('data: ', data);
+      // console.log('data: ', data);
       const existingUser = await UserService.read({
         id: data.id,
       });
 
-      console.log('existingUser: ', existingUser);
+      // console.log('existingUser: ', existingUser);
       if (!existingUser) {
         const error = new Error("User does not exist.");
         error.status = 400;
         throw error;
       }
 
-      console.info("req.originalUrl: ", req.originalUrl);
-      console.info("existingUser.role: ", existingUser.role);
+      // console.info("req.originalUrl: ", req.originalUrl);
+      // console.info("existingUser.role: ", existingUser.role);
 
       req.user = data;
       next();

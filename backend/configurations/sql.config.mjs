@@ -1,37 +1,32 @@
-import {
-  MYSQL_DATABASE_NAME,
-  MYSQL_HOST,
-  MYSQL_PASSWORD,
-  MYSQL_PORT,
-  MYSQL_USERNAME,
-} from "./base.config.mjs";
+import { MYSQL_DATABASE_NAME, MYSQL_HOST, MYSQL_PASSWORD, MYSQL_PORT, MYSQL_USERNAME } from "./base.config.mjs";
 import { Sequelize } from "sequelize";
+import mysql from "mysql2";
+
+export const mysqlConnection = mysql.createConnection({
+  host: MYSQL_HOST,
+  user: MYSQL_USERNAME,
+  password: MYSQL_PASSWORD,
+  database: MYSQL_DATABASE_NAME,
+});
 
 class Class {
   constructor() {
-    this.sequelize = new Sequelize(
-      MYSQL_DATABASE_NAME,
-      MYSQL_USERNAME,
-      MYSQL_PASSWORD,
-      {
-        host: MYSQL_HOST,
-        port: MYSQL_PORT,
-        dialect: "mysql",
-        logging: false,
-        pool: {
-          max: 10,
-          min: 0,
-          acquire: 30000,
-          idle: 10000,
-        },
-      }
-    );
+    this.sequelize = new Sequelize(MYSQL_DATABASE_NAME, MYSQL_USERNAME, MYSQL_PASSWORD, {
+      host: MYSQL_HOST,
+      port: MYSQL_PORT,
+      dialect: "mysql",
+      logging: false,
+      pool: {
+        max: 10,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+      },
+    });
   }
   async connect(attempt = 1) {
     if (attempt > 5) {
-      throw new Error(
-        "Failed to connect to sqlDB after " + (attempt - 1) + " attempts"
-      );
+      throw new Error("Failed to connect to sqlDB after " + (attempt - 1) + " attempts");
     }
 
     try {

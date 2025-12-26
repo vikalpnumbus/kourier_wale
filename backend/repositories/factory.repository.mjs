@@ -6,6 +6,7 @@ import CourierPricingCardModel from "../model/courierPricingCard.sql.model.mjs";
 import CSVModel from "../model/csvLogs.sql.model.mjs";
 import EscalationModel from "../model/escalation.sql.model.mjs";
 import EscalationConversationsModel from "../model/escalationsConversations.sql.mode.mjs";
+import ExportJobs from "../model/exportJobs.sql.model.mjs";
 import KycModel from "../model/kyc.sql.model.mjs";
 import OrdersModel from "../model/orders.sql.model.mjs";
 import OTPModel from "../model/otp.sql.model.mjs";
@@ -51,6 +52,8 @@ class Class {
       weightReco: new BaseRepositoryClass(WeightRecoModel),
       remittance: new BaseRepositoryClass(RemittanceModel),
       remittanceBatch: new BaseRepositoryClass(RemittanceBatchModel),
+     
+      exportJobs: new BaseRepositoryClass(ExportJobs),
     };
 
     if (!repositories[model]) {

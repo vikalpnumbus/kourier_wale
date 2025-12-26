@@ -8,7 +8,6 @@ import { Worker } from "node:worker_threads";
 import redisClient from "./configurations/redis.config.mjs";
 import path from "path";
 import { fileURLToPath } from "url";
-import RemittanceService from "./services/admin/admin.remmitance.service.mjs";
 
 const { PORT } = config;
 const app = express();
@@ -106,5 +105,3 @@ app.listen(PORT || 8001, () => {
   }
 });
 
-
-RemittanceService;
