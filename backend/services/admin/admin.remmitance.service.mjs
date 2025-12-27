@@ -16,7 +16,7 @@ class Service {
     try {
       const { page = 1, limit = 50 } = params;
       const result = await this.remittanceBatchRepository.find({}, { page, limit }, [
-        { model: UserModel, as: "user", attributes: ["companyName", "wallet_balance"], required: true },
+        { model: UserModel, as: "user", attributes: ["companyName", "wallet_balance", "seller_remit_cycle"], required: true },
       ]);
       const total = await this.remittanceBatchRepository.countDocuments();
       return { data: { total, result } };
@@ -30,7 +30,7 @@ class Service {
     try {
       const { page = 1, limit = 50 } = params;
       const result = await this.remittanceSellerRepository.find({}, { page, limit }, [
-        { model: UserModel, as: "user", attributes: ["companyName", "wallet_balance"], required: true },
+        { model: UserModel, as: "user", attributes: ["companyName", "wallet_balance", "seller_remit_cycle"], required: true },
       ]);
       const total = await this.remittanceSellerRepository.countDocuments();
       return { data: { total, result } };
