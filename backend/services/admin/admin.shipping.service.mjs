@@ -1,6 +1,7 @@
 import { col, fn, literal, Op, where } from "sequelize";
 import FactoryRepository from "../../repositories/factory.repository.mjs";
 import ProductsService from "../products.service.mjs";
+import CourierService from "../courier.service.mjs";
 
 class Service {
   constructor() {
@@ -8,7 +9,7 @@ class Service {
     this.repository = FactoryRepository.getRepository("shipping");
   }
 
-    async read(params) {
+  async read(params) {
     try {
       const {
         userId,
@@ -38,18 +39,14 @@ class Service {
       if (paymentType) whereClause[Op.and].push({ paymentType });
 
       if (orderId) {
-        const orderIdsArray = Array.isArray(orderId)
-          ? orderId
-          : orderId?.split(",").map((e) => e.trim());
+        const orderIdsArray = Array.isArray(orderId) ? orderId : orderId?.split(",").map((e) => e.trim());
         whereClause[Op.and].push({
           orderId: { [Op.in]: orderIdsArray },
         });
       }
 
       if (awb_number) {
-        const idsArray = Array.isArray(awb_number)
-          ? awb_number
-          : awb_number?.split(",").map((e) => e.trim());
+        const idsArray = Array.isArray(awb_number) ? awb_number : awb_number?.split(",").map((e) => e.trim());
         whereClause[Op.and].push({
           awb_number: { [Op.in]: idsArray },
         });
@@ -61,31 +58,9 @@ class Service {
           where(
             fn(
               "CONCAT",
-              fn(
-                "COALESCE",
-                fn(
-                  "JSON_UNQUOTE",
-                  fn(
-                    "JSON_EXTRACT",
-                    col("shippingDetails"),
-                    literal("'$.fname'")
-                  )
-                ),
-                ""
-              ),
+              fn("COALESCE", fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.fname'"))), ""),
               " ",
-              fn(
-                "COALESCE",
-                fn(
-                  "JSON_UNQUOTE",
-                  fn(
-                    "JSON_EXTRACT",
-                    col("shippingDetails"),
-                    literal("'$.lname'")
-                  )
-                ),
-                ""
-              )
+              fn("COALESCE", fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.lname'"))), "")
             ),
             { [Op.like]: `%${shipping_name}%` }
           )
@@ -96,38 +71,20 @@ class Service {
       if (shipping_phone) {
         whereClause[Op.and].push({
           [Op.or]: [
-            where(
-              fn(
-                "JSON_UNQUOTE",
-                fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.phone'"))
-              ),
-              { [Op.like]: `%${shipping_phone}%` }
-            ),
-            where(
-              fn(
-                "JSON_UNQUOTE",
-                fn(
-                  "JSON_EXTRACT",
-                  col("shippingDetails"),
-                  literal("'$.alternate_phone'")
-                )
-              ),
-              { [Op.like]: `%${shipping_phone}%` }
-            ),
+            where(fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.phone'"))), { [Op.like]: `%${shipping_phone}%` }),
+            where(fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.alternate_phone'"))), {
+              [Op.like]: `%${shipping_phone}%`,
+            }),
           ],
         });
       }
 
       // Date filters (ignore time)
       if (start_date) {
-        whereClause[Op.and].push(
-          where(fn("DATE", col("createdAt")), { [Op.gte]: start_date })
-        );
+        whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.gte]: start_date }));
       }
       if (end_date) {
-        whereClause[Op.and].push(
-          where(fn("DATE", col("createdAt")), { [Op.lte]: end_date })
-        );
+        whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.lte]: end_date }));
       }
 
       // If no conditions were added, remove Op.and
@@ -153,6 +110,11 @@ class Service {
         }
       }
 
+       const courierCache = {};
+      const getCourier = async (id) => {
+        if (courierCache[id]) return courierCache[id];
+        return await CourierService.read({ id });
+      };
       // fill products in each order record
       result = await Promise.all(
         result.map(async (e) => {
@@ -160,19 +122,20 @@ class Service {
           productIDs = productIDs
             .split(",")
             .map((e) => e?.trim())
-            .filter(
-              (e) => e && e !== "null" && e !== "undefined" && e != "false"
-            );
+            .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
 
-          let foundProducts = (await ProductsService.read({ id: productIDs }))
-            .data.result;
+          let courierID = e.courier_id;
+
+          let foundProducts = (await ProductsService.read({ id: productIDs })).data.result;
+          let courierRes = await getCourier(courierID);
+          if (!courierCache[courierID]) courierCache[courierID] = courierRes;
 
           foundProducts = foundProducts.map((product) => ({
             ...product.dataValues,
             ...e.products.filter((curr) => curr.id == product.id)[0],
           }));
 
-          const payload = { ...e.dataValues, products: foundProducts };
+          const payload = { ...e.dataValues, products: foundProducts, courier_name: courierRes?.data?.result?.[0]?.name };
           delete payload.productIDs;
           return payload;
         })
