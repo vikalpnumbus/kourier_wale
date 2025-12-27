@@ -14,6 +14,7 @@ import PricingCardModel from "../model/pricingCard.sql.model.mjs";
 import PricingPlansModel from "../model/pricingPlans.sql.model.mjs";
 import ProductsModel from "../model/products.sql.model.mjs";
 import RemittanceBatchModel from "../model/remittanceBatch.sql.model.mjs";
+import RemittanceSellerModel from "../model/sellerRemittance.sql.model.mjs";
 import ServiceablePincodeModel from "../model/serviceablePincodes.sql.model.mjs";
 import ShippingModel from "../model/shipping.sql.model.mjs";
 import UserModel from "../model/user.sql.model.mjs";
@@ -49,7 +50,9 @@ class Class {
       escalations: new BaseRepositoryClass(EscalationModel),
       escalations_conversations: new BaseRepositoryClass(EscalationConversationsModel),
       weightReco: new BaseRepositoryClass(WeightRecoModel),
+
       remittanceBatch: new BaseRepositoryClass(RemittanceBatchModel),
+      remittanceSeller: new BaseRepositoryClass(RemittanceSellerModel),
 
       exportJobs: new BaseRepositoryClass(ExportJobs),
     };

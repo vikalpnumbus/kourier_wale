@@ -1,12 +1,12 @@
 import RemittanceService from "../../services/admin/admin.remmitance.service.mjs";
 
-export const read = async (req, res, next) => {
+export const readAdminRemittance = async (req, res, next) => {
   try {
     const query = {
       page: req.query.page,
       limit: req.query.limit,
     };
-    const result = await RemittanceService.read(query);
+    const result = await RemittanceService.readAdminRemittance(query);
     if (!result) {
       throw RemittanceService.error;
     }
@@ -16,11 +16,10 @@ export const read = async (req, res, next) => {
   }
 };
 
-export const update = async (req, res, next) => {
+export const createRemittance = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { remarks, remittance_status } = req.body;
-    const result = await RemittanceService.update({ id, remarks, remittance_status });
+    const { awb_numbers } = req.body;
+    const result = await RemittanceService.createRemittance({ awb_numbers });
     if (!result) {
       throw RemittanceService.error;
     }
