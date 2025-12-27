@@ -87,5 +87,15 @@ RemittanceBatchModel.belongsTo(UserModel, {
   as: "user",
 });
 
+UserModel.hasMany(RemittanceSellerModel, {
+  foreignKey: "userId",
+  as: "remittance_batch",
+});
+
+RemittanceSellerModel.belongsTo(UserModel, {
+  foreignKey: "userId",
+  as: "user",
+});
+
 const FactoryRepository = new Class();
 export default FactoryRepository;
