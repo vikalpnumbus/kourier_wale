@@ -16,6 +16,22 @@ export const readAdminRemittance = async (req, res, next) => {
   }
 };
 
+export const readSellerRemittance = async (req, res, next) => {
+  try {
+    const query = {
+      page: req.query.page,
+      limit: req.query.limit,
+    };
+    const result = await RemittanceService.readSellerRemittance(query);
+    if (!result) {
+      throw RemittanceService.error;
+    }
+    res.success(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createRemittance = async (req, res, next) => {
   try {
     const { awb_numbers } = req.body;

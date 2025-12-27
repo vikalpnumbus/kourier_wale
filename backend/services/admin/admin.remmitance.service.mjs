@@ -26,6 +26,20 @@ class Service {
     }
   }
 
+  async readSellerRemittance(params) {
+    try {
+      const { page = 1, limit = 50 } = params;
+      const result = await this.remittanceSellerRepository.find({}, { page, limit }, [
+        { model: UserModel, as: "user", attributes: ["companyName", "wallet_balance"], required: true },
+      ]);
+      const total = await this.remittanceSellerRepository.countDocuments();
+      return { data: { total, result } };
+    } catch (error) {
+      this.error = error;
+      return false;
+    }
+  }
+
   async calculateRemittance() {
     try {
       const shipments = await ShippingModel.findAll({
