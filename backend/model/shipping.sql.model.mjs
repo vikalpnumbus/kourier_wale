@@ -14,7 +14,9 @@ const ShippingModel = sqlDB.sequelize.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: { model: "users", key: "id" },
     },
+
     order_db_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -212,6 +214,12 @@ const ShippingModel = sqlDB.sequelize.define(
     remittance_paid_date: {
       type: DataTypes.DATE,
       allowNull: true,
+    },
+
+    remittance_batch_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: { model: "remittance_batch", key: "id" },
     },
   },
   {

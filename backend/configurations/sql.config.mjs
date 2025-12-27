@@ -2,12 +2,21 @@ import { MYSQL_DATABASE_NAME, MYSQL_HOST, MYSQL_PASSWORD, MYSQL_PORT, MYSQL_USER
 import { Sequelize } from "sequelize";
 import mysql from "mysql2";
 
-export const mysqlConnection = mysql.createConnection({
-  host: MYSQL_HOST,
-  user: MYSQL_USERNAME,
-  password: MYSQL_PASSWORD,
-  database: MYSQL_DATABASE_NAME,
-});
+export const mysqlConnection = mysql
+  .createPool({
+    host: MYSQL_HOST,
+    user: MYSQL_USERNAME,
+    password: MYSQL_PASSWORD,
+    database: MYSQL_DATABASE_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000,
+  })
+  .on("error", (err) => {
+    console.error("MySQL Streaming Pool Error =>", err);
+  });
 
 class Class {
   constructor() {
