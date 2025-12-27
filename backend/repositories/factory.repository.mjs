@@ -89,7 +89,7 @@ RemittanceBatchModel.belongsTo(UserModel, {
 
 UserModel.hasMany(RemittanceSellerModel, {
   foreignKey: "userId",
-  as: "remittance_batch",
+  as: "remittance_seller",
 });
 
 RemittanceSellerModel.belongsTo(UserModel, {
