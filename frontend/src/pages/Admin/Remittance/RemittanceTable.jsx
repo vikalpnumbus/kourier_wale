@@ -4,12 +4,15 @@ import { useSearchParams } from 'react-router-dom';
 import api from "../../../utils/api";
 import RemittanceConfig from '../../../config/AdminConfig/Remittance/RemittanceConfig';
 import { formatDateTime } from '../../../middleware/CommonFunctions';
+import RemittanceAwbListModal from './RemittanceAwbListModal';
 
 function RemittanceTable() {
     const [dataList, setDataList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchParams] = useSearchParams();
     const [totalCount, setTotalCount] = useState(0);
+    const [showAwbListModal, setShowAwbListModal] = useState(false);
+    const [awbListForModal, setAwbListForModal] = useState("");
 
     const handleFetchData = async () => {
         setLoading(true);
@@ -22,8 +25,7 @@ function RemittanceTable() {
             params.append("page", page);
             params.append("limit", limit);
 
-            // const url = `${RemittanceConfig.remittanceListApi}?${params.toString()}`;
-            const url = `${RemittanceConfig.remittanceListApi}`;
+            const url = `${RemittanceConfig.remittanceListApi}?${params.toString()}`;
 
             const { data } = await api.get(url);
 
@@ -69,17 +71,28 @@ function RemittanceTable() {
                         ) : dataList.length > 0 ? (
                             dataList.map((data) => (
                                 <tr key={data.id}>
-                                    <td className="py-2">{data?.remittances[0]?.userId || ""}</td>
-                                    <td className="py-2">{data?.remittances[0]?.user?.companyName || ""}</td>
-                                    <td className="py-2">{data?.remittances[0]?.user?.wallet_balance || ""}</td>
+                                    <td className="py-2">{data?.userId || ""}</td>
+                                    <td className="py-2">{data?.user?.companyName || ""}</td>
+                                    <td className="py-2">{data?.user?.wallet_balance || ""}</td>
                                     <td className="py-2">
                                         {data?.createdAt ? formatDateTime(data?.createdAt) : ""}
                                     </td>
                                     <td className="py-2">
-                                        -
+                                        {data?.hold_amount || "-"}
                                     </td>
-                                    <td className="py-2">{data?.remittances[0]?.user?.seller_remit_cycle ? `T+${data?.remittances[0]?.user?.seller_remit_cycle}` : ""}</td>
-                                    <td className="py-2">{data?.remittance_amount}</td>
+                                    <td className="py-2">{data?.user?.seller_remit_cycle ? `T+${data?.user?.seller_remit_cycle}` : ""}</td>
+                                    <td className="py-2">
+                                        <div className='d-flex justify-content-between align-items-center'>{data?.remittance_amount}
+                                            <button className="btn btn-sm btn-primary"
+                                                onClick={() => {
+                                                    if (!data?.awb_numbers || data?.awb_numbers.length === 0) return;
+                                                    setAwbListForModal(data?.awb_numbers)
+                                                    setShowAwbListModal(true)
+                                                }}
+                                            >view
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             ))
                         ) : (
@@ -94,6 +107,12 @@ function RemittanceTable() {
             </div>
             {dataList.length > 0 && !loading && (
                 <Pagination totalCount={totalCount} />
+            )}
+            {showAwbListModal && awbListForModal.length > 0 && (
+                <RemittanceAwbListModal
+                    onClose={() => setShowAwbListModal(false)}
+                    awbList={awbListForModal}
+                />
             )}
         </>
     )
