@@ -322,7 +322,7 @@ class Service {
           let [foundProductsRes, courierRes] = await Promise.all([await ProductsService.read({ id: productIDs }), await getCourier(courierID)]);
 
           if (!courierCache[courierID]) courierCache[courierID] = courierRes;
-          let foundProducts = foundProductsRes?.data?.result||[];
+          let foundProducts = foundProductsRes?.data?.result || [];
 
           foundProducts = foundProducts.map((product) => ({
             ...product.dataValues,
@@ -374,7 +374,7 @@ class Service {
           await ShippingService.update({
             data: {
               id,
-              shipment_error: "aa" + XpressBeesProvider.error.message,
+              shipment_error: XpressBeesProvider.error.message,
             },
           });
         } else {
