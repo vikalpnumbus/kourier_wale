@@ -3,6 +3,8 @@ import { formatDateTime } from '../../../middleware/CommonFunctions';
 import ShipmentConfig from '../../../config/AdminConfig/Shipment/ShipmentConfig';
 import api from '../../../utils/api';
 import RemittanceConfig from '../../../config/AdminConfig/Remittance/RemittanceConfig';
+import { useNavigate } from 'react-router-dom';
+import { useAlert } from '../../../middleware/AlertContext';
 
 
 function RemittanceAwbListModal({ onClose, awbList }) {
@@ -10,6 +12,8 @@ function RemittanceAwbListModal({ onClose, awbList }) {
     const [loading, setLoading] = useState(false);
     const [selectedAwb, setSelectedAwb] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+    const navigate = useNavigate();
+    const { showError, showSuccess } = useAlert();
 
     const handleFetchAwbData = async () => {
         setLoading(true);
@@ -62,13 +66,13 @@ function RemittanceAwbListModal({ onClose, awbList }) {
             await api.post(RemittanceConfig.remittanceCreateApi, {
                 awb_numbers: selectedAwb.join(',')
             });
-
-            alert('Remittance created successfully');
+            showSuccess('Remittance created successfully');
+            navigate('/admin/remittance/seller');
             setSelectedAwb([]);
             onClose();
         } catch (error) {
             console.error('Create remittance error:', error);
-            alert('Failed to create remittance');
+            showError('Failed to create remittance');
         } finally {
             setSubmitting(false);
         }
@@ -99,7 +103,7 @@ function RemittanceAwbListModal({ onClose, awbList }) {
                     </div>
 
                     {/* Body */}
-                    <div className="table-responsive">
+                    <div className="table-responsive" style={{ maxHeight: "50vh" }}>
                         <table className="table table-hover mb-0">
                             <thead>
                                 <tr>
@@ -165,15 +169,15 @@ function RemittanceAwbListModal({ onClose, awbList }) {
 
                     {/* Footer */}
                     <div className="modal-footer py-2">
-                        <button
+                        {/* <button
                             className="btn btn-secondary"
                             onClick={onClose}
                             disabled={submitting}
                         >
                             Close
-                        </button>
+                        </button> */}
                         <button
-                            className="btn btn-primary"
+                            className="btn btn-dark"
                             onClick={handleCreateRemittance}
                             disabled={submitting || selectedAwb.length === 0}
                         >
