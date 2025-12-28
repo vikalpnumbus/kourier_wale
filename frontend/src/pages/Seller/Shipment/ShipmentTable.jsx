@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { mdiCubeSend, mdiDelete, mdiPencil } from "@mdi/js";
+import { mdiDelete, mdiPencil, mdiPrinter} from "@mdi/js";
 import Icon from "@mdi/react";
 import { Link, useSearchParams } from "react-router-dom";
 import api from "../../../utils/api";
@@ -11,14 +11,13 @@ function ShipmentsTable() {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
-  const [selectedOrders, setSelectedOrders] = useState([]);
+  const [selectedShipments, setselectedShipments] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [defaultStart, defaultEnd] = useMemo(() => getLastNDaysRange(7), []);
   const [warehouseList, setWarehouseList] = useState([]);
   const handleWarehouseData = async () => {
     try {
       const url = warehouseConfig.warehouseApi;
-
       const { data } = await api.get(url);
       const results = data?.data?.result || [];
       setWarehouseList(results);
@@ -27,6 +26,7 @@ function ShipmentsTable() {
       setWarehouseList([]);
     }
   };
+
   const formatWeight = (weight) => {
     if (!weight) return "";
     return weight >= 1000
@@ -54,15 +54,11 @@ function ShipmentsTable() {
         const value = searchParams.get(key)?.trim();
         if (value) params[key] = value;
       });
-
       const query = Object.entries(params)
         .map(([k, v]) => `${k}=${v}`)
         .join("&");
-
       const url = `${ShipmentsConfig.fetchshipmentlist}?${query}`;
-
       const { data } = await api.get(url);
-
       setDataList(data?.data?.result || []);
       setTotalCount(data?.data?.total || 0);
     } catch (error) {
@@ -85,24 +81,80 @@ function ShipmentsTable() {
   useEffect(() => {
     handleFetchData();
   }, [searchParams]);
+
+  const handleSelect = (id) => {
+  setselectedShipments((prev) =>
+    prev.includes(id)
+      ? prev.filter((item) => item !== id)
+      : [...prev, id]
+  );
+};
+
+
+  const handleSelectAll = () => {
+    const bookedIds = dataList
+      .filter((d) => d.shipping_status === "booked")
+      .map((d) => d.id);
+    if (selectedShipments.length === bookedIds.length) {
+      setselectedShipments([]);
+    } else {
+      setselectedShipments(bookedIds);
+    }
+  };
+
+
+  const handleBulkCancel = async () =>
+  {
+    alert(selectedShipments);
+      if (!selectedShipments.length) {
+        alert("No shipments selected");
+        return;
+      }
+
+      try {
+        await cancelShipments(selectedShipments);
+        alert("Shipments cancelled successfully");
+        setselectedShipments([]);
+        handleFetchData();
+      } catch (err) {
+        alert("Failed to cancel shipments");
+      }
+  };
+
+  const cancelShipments = async (shipmentIds) => {
+      try {
+        const url = ShipmentsConfig.cancelshipment;
+        const res = await api.post(url, {
+          shipment_ids: shipmentIds,
+        });
+        return res.data;
+        } catch (error) {
+        console.error(
+          "Cancel failed:",
+          error.response?.data || error.message
+        );
+        throw error;
+      }
+  };
+
   return (
     <div className="tab-content tab-content-vertical">
       <div className="tab-pane fade show active" role="tabpanel">
         <div>
-          {selectedOrders.length > 0 && (
+          {selectedShipments.length > 0 && (
             <>
               <div className="d-flex justify-content-start align-items-center mb-2 gap-2 border-bottom pb-2">
                 <div
                   className="btn btn-light btn-md py-2 px-3 text-dark"
                   style={{ width: "fit-content" }}
                 >
-                  Selected: {selectedOrders?.length}
+                  Selected: {selectedShipments?.length}
                 </div>
-                <div
-                  className="btn btn-dark btn-md py-2 px-3"
-                  style={{ width: "fit-content" }}
-                >
-                  <Icon path={mdiCubeSend} size={0.7} /> Bulk Ship
+                <div className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }}>
+                  <Icon path={mdiPrinter} size={0.7} /> Bulk Label
+                </div>
+                <div className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }} onClick={handleBulkCancel}>
+                  <Icon path={mdiDelete} size={0.7} /> Bulk Cancel
                 </div>
               </div>
             </>
@@ -112,18 +164,17 @@ function ShipmentsTable() {
           <table className="table table-hover">
             <thead>
               <tr>
+                
                 <th>
-                  <input
-                    type="checkbox"
-                    style={{ cursor: "pointer" }}
-                  />
+                  <input type="checkbox" style={{ cursor: "pointer" }} onChange={handleSelectAll} checked={dataList.filter((d) => d.shipping_status === "booked").length > 0 && selectedShipments.length === dataList.filter((d) => d.shipping_status === "booked").map((d) => d.id).length}/>
                 </th>
                 <th>Order ID</th>
                 <th>Customer</th>
                 <th>Pickup & delivery Address</th>
                 <th>Package Details</th>
                 <th>Payment Details</th>
-                <th>Status / Action</th>
+                <th>Courier Details</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -141,15 +192,12 @@ function ShipmentsTable() {
                 dataList.map((data) => (
                   <tr key={data?.id}>
                     <td className="py-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedOrders.includes(data?.id)}
-                        style={{ cursor: "pointer" }}
-                      />
+                      {data.shipping_status === "booked" && (
+                      <input type="checkbox" checked={selectedShipments.includes(data.id)} style={{ cursor: "pointer" }} onChange={() => handleSelect(data.id)}/>)}
                     </td>
                     <td className="py-2">
                       <div className="d-flex flex-column gap-3 box-class">
-                        <Link to={`/orders/view/${data?.id}`}>{data?.orderId || ""}</Link>
+                        <Link to={`view/${data?.id}`}>{data?.orderId || ""}</Link>
                         <span>
                           {data?.createdAt ? formatDateTime(data?.createdAt) : ""}
                         </span>
@@ -218,33 +266,26 @@ function ShipmentsTable() {
                       </div>
                     </td>
                     <td className="py-2">
+                      <div className="d-flex flex-column gap-3 box-class">
+                        <span>
+                          {data?.courier_name}
+                        </span>
+                        <span className="awb_design">
+                          {data?.awb_number}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-2">
                       <div className="btn-group">
                         <button
                           className={`btn btn-md py-2 px-3 ${data?.shipping_status === "new"
                             ? "btn-warning kw_button_ship"
-                            : data?.shipping_status === "cancel"
+                            : data?.shipping_status === "cancelled"
                               ? "btn-danger kw_button_cancel"
                               : data?.shipping_status === "booked"
                                 ? "btn-success kw_button_booked"
                                 : "btn-secondary kw_button_booked"
                             }`}
-                        // onClick={() => {
-                        //   const warehouse = warehouseList.find(
-                        //     (w) => w.id == data?.warehouse_id
-                        //   );
-                        //   setShipOrderDetails({
-                        //     id: data?.id,
-                        //     warehouse_id: data?.warehouse_id,
-                        //     rto_warehouse_id: data?.rto_warehouse_id,
-                        //     collectableAmount: data?.collectableAmount,
-                        //     paymentType: data?.paymentType,
-                        //     packageDetails: data?.packageDetails,
-                        //     shippingDetails: data?.shippingDetails,
-                        //     originpincode: warehouse?.pincode,
-                        //   });
-                        //   setShowShipModal(true);
-                        // }}
-                        // disabled={!orderCanShip(data)}
                         >
                           {data?.shipping_status === "new" ? "Processing" : data?.shipping_status}
                         </button>
@@ -252,7 +293,7 @@ function ShipmentsTable() {
                       </div>{" "}
                       {
                         data?.shipment_error && (
-                          <div className="text-danger mt-2">
+                          <div className="text-danger mt-2 response_error">
                             {data?.shipment_error}
                           </div>
                         )

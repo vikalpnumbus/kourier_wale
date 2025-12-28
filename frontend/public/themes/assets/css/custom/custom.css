@@ -218,11 +218,28 @@ a
     color: #fff !important;
     background-color: rgb(230, 11, 11) !important;
     border-color: rgb(230, 11, 11) !important;
+    text-transform: uppercase;
 }
 .kw_button_booked
 {
     
-    color: #fff !important;
-    background-color: #155724 !important;
-    border-color: #1e7e34 !important;
+    color: #155724 !important;
+    background-color: #fff !important;
+    border-color: #155724 !important;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+.awb_design
+{
+    color: blue !important;
+}
+.response_error
+{
+    color: rgb(230, 11, 11) !important;
+  text-transform: capitalize !important;
+  font-weight: bold;
+
+  max-width: 250px;        /* adjust as per table */
+  white-space: normal;    /* allow wrap */
+  word-break: break-word; /* break long words */
 }
