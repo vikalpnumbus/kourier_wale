@@ -28,6 +28,7 @@ import SupportTable from "../pages/Admin/Support/SupportTable";
 import SupportView from "../pages/Admin/Support/SupportView";
 import Remittance from "../pages/Admin/Remittance";
 import RemittanceTable from "../pages/Admin/Remittance/RemittanceTable";
+import RemittanceSellerTable from "../pages/Admin/Remittance/RemittanceSellerTable";
 
 
 function AdminRoutes() {
@@ -80,6 +81,8 @@ function AdminRoutes() {
           </Route>
           <Route path="/remittance" element={<Remittance />}>
             <Route index element={<RemittanceTable />} />
+            <Route path="payable" element={<RemittanceTable />} />
+            <Route path="seller" element={<RemittanceSellerTable />} />
           </Route>
 
         </Routes>
