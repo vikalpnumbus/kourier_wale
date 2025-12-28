@@ -68,6 +68,12 @@ const queueConfig = {
     routingKey: "admin_exports_routingKey",
     queue: "admin_exports_queue",
   },
+  adminImports: {
+    exchange: "admin_imports_exchange",
+    routingKey: "admin_imports_routingKey",
+    queue: "admin_imports_queue",
+  },
+  
 };
 
 export default queueConfig;

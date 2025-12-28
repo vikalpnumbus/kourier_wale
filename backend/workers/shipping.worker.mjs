@@ -25,12 +25,14 @@ import { shippingCron, remittanceCron } from "../crons/shipping.cron.mjs";
 import ShopifyProvider from "../providers/couriers/shopify.provider.mjs";
 import ShippingConsumer from "../queue/consumer/shipping.consumer.mjs";
 import AdminExportsConsumer from "../queue/consumer/admin/admin.exports.consumer.mjs";
+import AdminImportsConsumer from "../queue/consumer/admin/admin.imports.consumer.mjs";
 
 (async () => {
   await ShippingConsumer.handleShipmentCreateConsumer();
   await ShippingConsumer.handleShipmentCancelConsumer();
   await ShippingConsumer.handleShipmentRetryConsumer();
-  await AdminExportsConsumer.handleExprotProcessConsumer();
+  await AdminExportsConsumer.handleExportProcessConsumer();
+  await AdminImportsConsumer.handleImportProcessConsumer();
   await shippingCron.start();
   await remittanceCron.start();
 

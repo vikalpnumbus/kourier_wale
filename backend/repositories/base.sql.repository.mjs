@@ -40,6 +40,7 @@ export class BaseRepositoryClass {
 
   // Update one by condition
   async findOneAndUpdate(condition, data, options = {}) {
+    console.log('condition, data: ', condition, data);
     const record = await this.model.findOne({ where: condition, ...options });
     if (!record) return null;
     return (await record.update(data))?.dataValues;

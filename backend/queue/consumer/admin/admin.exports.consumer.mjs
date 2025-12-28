@@ -18,7 +18,7 @@ class Class {
     this.handler = null;
   }
 
-  async handleExprotProcessConsumer() {
+  async handleExportProcessConsumer() {
     try {
       await rabbitMQ.consume(
         this.queue,

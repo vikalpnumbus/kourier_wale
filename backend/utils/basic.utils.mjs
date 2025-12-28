@@ -75,6 +75,20 @@ export const formatDate_YYYY_MM_DD = (date_input) => {
   return formatted;
 };
 
+export const formatDate_YYYY_MM_DD_HH_MM_SS = (d = new Date()) => {
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const year = d.getFullYear();
+  const month = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  const hours = pad(d.getHours());
+  const mins = pad(d.getMinutes());
+  const secs = pad(d.getSeconds());
+
+  return `${year}-${month}-${day} ${hours}:${mins}:${secs}`;
+};
+
+
 export const capitialiseFirstLetter = (input) => {
   if (!input) throw new Error("No text provided.");
   const text = input.toString();

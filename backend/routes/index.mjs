@@ -32,6 +32,7 @@ import AdminOrdersRouter from "./admin/admin.orders.route.mjs";
 import AdminShippingRouter from "./admin/admin.shipping.route.mjs";
 import AdminRemittanceRouter from "./admin/admin.remittance.route.mjs";
 import AdminExportRouter from "./admin/admin.exports.route.mjs";
+import AdminImportRouter from "./admin/admin.imports.route.mjs";
 
 const globalRouter = express.Router();
 
@@ -116,6 +117,12 @@ globalRouter.use(
   TokenHandler.authenticateToken,
   checkIfUserIsAdmin,
   AdminExportRouter
+);
+globalRouter.use(
+  "/admin/imports",
+  TokenHandler.authenticateToken,
+  checkIfUserIsAdmin,
+  AdminImportRouter
 );
 
 globalRouter.use("/uploads", ImageRouter);

@@ -1,4 +1,4 @@
-import { col, fn, literal, Op, where } from "sequelize";
+import { col, fn, literal, Op } from "sequelize";
 import FactoryRepository from "../../repositories/factory.repository.mjs";
 import ShippingModel from "../../model/shipping.sql.model.mjs";
 import UserModel from "../../model/user.sql.model.mjs";
@@ -144,35 +144,37 @@ class Service {
 
       // Insert into remittance_seller
       await this.remittanceSellerRepository.bulkSave(
-       ( await Promise.all(
-          remittances?.map(async (remittance) => {
-            const amountOfRemainingAWBs = (
-              await this.shippingRepository.find(
-                {
-                  awb_number: {
-                    [Op.in]: remittance.awb_numbers?.split(",")?.filter((e) => awbList.includes(e)),
+        (
+          await Promise.all(
+            remittances?.map(async (remittance) => {
+              const amountOfRemainingAWBs = (
+                await this.shippingRepository.find(
+                  {
+                    awb_number: {
+                      [Op.in]: remittance.awb_numbers?.split(",")?.filter((e) => awbList.includes(e)),
+                    },
                   },
-                },
-                {},
-                [],
-                false,
-                {
-                  attributes: [[fn("SUM", col("collectableAmount")), "totalCollectableAmount"]],
-                  transaction: t,
-                }
-              )
-            )?.map((e) => e.dataValues?.totalCollectableAmount)?.[0];
-            if(!amountOfRemainingAWBs)return null;
-            return {
-              userId: remittance.userId,
-              remittance_amount: amountOfRemainingAWBs || 0,
-              awb_numbers: remittance.awb_numbers
-                ?.split(",")
-                ?.filter((e) => awbList.includes(e))
-                .join(","),
-            };
-          })
-        ))?.filter(Boolean),
+                  {},
+                  [],
+                  false,
+                  {
+                    attributes: [[fn("SUM", col("collectableAmount")), "totalCollectableAmount"]],
+                    transaction: t,
+                  }
+                )
+              )?.map((e) => e.dataValues?.totalCollectableAmount)?.[0];
+              if (!amountOfRemainingAWBs) return null;
+              return {
+                userId: remittance.userId,
+                remittance_amount: amountOfRemainingAWBs || 0,
+                awb_numbers: remittance.awb_numbers
+                  ?.split(",")
+                  ?.filter((e) => awbList.includes(e))
+                  .join(","),
+              };
+            })
+          )
+        )?.filter(Boolean),
         { transaction: t }
       );
 
@@ -244,8 +246,8 @@ class Service {
 const RemittanceService = new Service();
 export default RemittanceService;
 (async () => {
-  const isRemittanceCalculated = await RemittanceService.calculateRemittance();
+  // const isRemittanceCalculated = await RemittanceService.calculateRemittance();
   // console.log("isRemittanceCalculated: ", isRemittanceCalculated);
-  if (isRemittanceCalculated)
-    await RemittanceService.createRemittance({ awb_numbers: `${[153758598607, 153758598597, 153758598595, 153758597633].slice(0,2).join(',')}` });
+  // if (isRemittanceCalculated)
+    // await RemittanceService.createRemittance({ awb_numbers: `${[153758598607, 153758598597, 153758598595, 153758597633].slice(0, 2).join(",")}` });
 })();
