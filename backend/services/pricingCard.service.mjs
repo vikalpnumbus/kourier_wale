@@ -241,9 +241,9 @@ class Service {
     }
 
     const userCouriers = UserCourierServiceRes?.data?.result?.flatMap((e) =>
-      e.assigned_courier_ids.split(",").map((curr) => curr.trim())
-    );
-
+      e.assigned_courier_ids.map((curr) => curr.id.trim())
+  );
+  
     if (!userCouriers || userCouriers.length == 0) {
       const error = new Error(
         "Error fetching user courier details or it is empty."
