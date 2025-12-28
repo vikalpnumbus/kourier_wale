@@ -59,7 +59,7 @@ function RemittanceAwbListModal({ onClose, awbList }) {
 
         setSubmitting(true);
         try {
-            await api.post(RemittanceConfig.createRemittanceApi, {
+            await api.post(RemittanceConfig.remittanceCreateApi, {
                 awb_numbers: selectedAwb.join(',')
             });
 
@@ -144,7 +144,7 @@ function RemittanceAwbListModal({ onClose, awbList }) {
                                             <td>{data?.createdAt ? formatDateTime(data.createdAt) : ""}</td>
                                             <td>{data?.courier_name || ""}</td>
                                             <td>{data?.awb_number || ""}</td>
-                                            <td>need discussion</td>
+                                            <td>{data?.collectableAmount || ""}</td>
                                             <td>
                                                 {data?.delivered_date
                                                     ? formatDateTime(data.delivered_date)
