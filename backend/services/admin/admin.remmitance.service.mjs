@@ -71,10 +71,8 @@ class Service {
         raw: true,
       });
 
-      console.log("shipments: ", shipments);
       await Promise.all(
         shipments.map(async (shipment) => {
-          console.log("Updating AWBs:", shipment.awb_numbers);
           const { totalCollectableAmount, awb_numbers, userId } = shipment;
           const remittanceData = await this.remittanceBatchRepository.save({
             remittance_amount: totalCollectableAmount,
@@ -82,7 +80,6 @@ class Service {
             awb_numbers,
             userId,
           });
-          console.log("remittanceData: ", remittanceData.id);
           if (remittanceData) {
             await this.shippingRepository.updateMany(
               { awb_number: { [Op.in]: [...awb_numbers.split(",")] } },
@@ -106,7 +103,6 @@ class Service {
         { awb_number: { [Op.in]: awbList }, remittance_status: "pending" },
         { transaction: t }
       );
-      console.log("countDocuments", pendingCount);
       if (pendingCount === 0) {
         await t.rollback();
         return { data: "No awb found with remittance_status as pending." };
@@ -125,7 +121,6 @@ class Service {
         await t.rollback();
         return { data: "No awb found with remittance_status as pending." };
       }
-      console.log("updatedShipments: ", updatedShipments);
 
       // Get their remittance_batch_id
       let remittanceBatchIds = await this.shippingRepository.find(
@@ -137,10 +132,8 @@ class Service {
         false,
         { attributes: ["remittance_batch_id"], transaction: t }
       );
-      console.log("remittanceBatchIds: ", remittanceBatchIds);
       remittanceBatchIds = remittanceBatchIds?.map((e) => e.remittance_batch_id);
 
-      console.log("remittanceBatchIds: ", remittanceBatchIds);
       if (!remittanceBatchIds?.length) {
         await t.commit();
         return; // nothing to process
@@ -151,14 +144,35 @@ class Service {
 
       // Insert into remittance_seller
       await this.remittanceSellerRepository.bulkSave(
-        remittances?.map((remittance) => ({
-          userId: remittance.userId,
-          remittance_amount: remittance.remittance_amount,
-          awb_numbers: remittance.awb_numbers
-            ?.split(",")
-            ?.filter((e) => awbList.includes(e))
-            .join(","),
-        })),
+       ( await Promise.all(
+          remittances?.map(async (remittance) => {
+            const amountOfRemainingAWBs = (
+              await this.shippingRepository.find(
+                {
+                  awb_number: {
+                    [Op.in]: remittance.awb_numbers?.split(",")?.filter((e) => awbList.includes(e)),
+                  },
+                },
+                {},
+                [],
+                false,
+                {
+                  attributes: [[fn("SUM", col("collectableAmount")), "totalCollectableAmount"]],
+                  transaction: t,
+                }
+              )
+            )?.map((e) => e.dataValues?.totalCollectableAmount)?.[0];
+            if(!amountOfRemainingAWBs)return null;
+            return {
+              userId: remittance.userId,
+              remittance_amount: amountOfRemainingAWBs || 0,
+              awb_numbers: remittance.awb_numbers
+                ?.split(",")
+                ?.filter((e) => awbList.includes(e))
+                .join(","),
+            };
+          })
+        ))?.filter(Boolean),
         { transaction: t }
       );
 
@@ -171,9 +185,29 @@ class Service {
             if (!remainingAwbs.length) {
               return remittance.id;
             } else {
+              const amountOfRemainingAWBs = (
+                await this.shippingRepository.find(
+                  {
+                    awb_number: {
+                      [Op.in]: remittance.awb_numbers?.split(",")?.filter((e) => awbList.includes(e)),
+                    },
+                  },
+                  {},
+                  [],
+                  false,
+                  {
+                    attributes: [[fn("SUM", col("collectableAmount")), "totalCollectableAmount"]],
+                    transaction: t,
+                  }
+                )
+              )?.map((e) => e.dataValues?.totalCollectableAmount)?.[0];
               await this.remittanceBatchRepository.findOneAndUpdate(
                 { id: remittance.id },
-                { awb_numbers: remainingAwbs.join(",") },
+                {
+                  awb_numbers: remainingAwbs.join(","),
+                  remittance_amount: remittance.remittance_amount,
+                  hold_amount: Number(remittance.hold_amount) - Number(amountOfRemainingAWBs || 0),
+                },
                 { transaction: t }
               );
             }
@@ -195,6 +229,7 @@ class Service {
       }
 
       await t.commit();
+
       console.log("Remittance created successfully");
       return { data: "Remittance created successfully" };
     } catch (error) {
@@ -209,7 +244,8 @@ class Service {
 const RemittanceService = new Service();
 export default RemittanceService;
 (async () => {
-  // const isRemittanceCalculated = await RemittanceService.calculateRemittance();
+  const isRemittanceCalculated = await RemittanceService.calculateRemittance();
   // console.log("isRemittanceCalculated: ", isRemittanceCalculated);
-  // if (isRemittanceCalculated) await RemittanceService.createRemittance({ awb_numbers: "153758597633,153758598595" });
+  if (isRemittanceCalculated)
+    await RemittanceService.createRemittance({ awb_numbers: `${[153758598607, 153758598597, 153758598595, 153758597633].slice(0,2).join(',')}` });
 })();

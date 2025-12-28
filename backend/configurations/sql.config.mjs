@@ -24,6 +24,11 @@ class Class {
       host: MYSQL_HOST,
       port: MYSQL_PORT,
       dialect: "mysql",
+      timezone: "+05:30",
+      dialectOptions: {
+        dateStrings: true,
+        typeCast: true,
+      },
       logging: false,
       pool: {
         max: 10,

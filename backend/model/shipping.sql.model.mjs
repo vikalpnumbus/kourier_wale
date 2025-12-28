@@ -211,11 +211,6 @@ const ShippingModel = sqlDB.sequelize.define(
       allowNull: true,
     },
 
-    remittance_paid_date: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-
     remittance_batch_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
