@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import FactoryRepository from "../repositories/factory.repository.mjs";
+import CourierService from "./courier.service.mjs";
 
 class Service {
   constructor() {
@@ -31,10 +32,7 @@ class Service {
 
       let payload = { ...data };
 
-      const result = await this.repository.findOneAndUpdate(
-        { id: existingRecordId },
-        payload
-      );
+      const result = await this.repository.findOneAndUpdate({ id: existingRecordId }, payload);
 
       return {
         status: 201,
@@ -86,7 +84,34 @@ class Service {
           throw error;
         }
       }
+      const courierCache = {};
+      const getCourier = async (id) => {
+        if (courierCache[id]) return courierCache[id];
+        return await CourierService.read({ id });
+      };
 
+      console.log('result: ', result);
+      result = await Promise.all(
+        result.map(async (curr) => {
+          const { assigned_courier_ids } = curr;
+          let transformedAssignedCouriers = await Promise.all(
+            assigned_courier_ids?.split(",")?.map(async (courierID) => {
+              const courierRes = await getCourier(courierID);
+              if (!courierCache[courierID]) courierCache[courierID] = courierRes;
+              if (!courierRes?.data?.result?.[0]?.name)
+                return {
+                  id: courierID,
+                  error: "This courier does not exist in our system.",
+                };
+              return {
+                id: courierID,
+                courier_name: courierRes?.data?.result?.[0]?.name,
+              };
+            })
+          );
+          return { ...curr?.dataValues, assigned_courier_ids: transformedAssignedCouriers };
+        })
+      );
       return { data: { total: totalCount, result } };
     } catch (error) {
       this.error = error;

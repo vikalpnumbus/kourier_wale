@@ -20,18 +20,12 @@ export const create = async (req, res, next) => {
       ),
     ];
 
-    const couriers = await Promise.all(
-      ids.map((id) => CourierService.read({ id }))
-    );
+    const couriers = await Promise.all(ids.map((id) => CourierService.read({ id })));
 
-    const checkCourierNotExists = ids.filter(
-      (_, idx) => couriers[idx] === false
-    );
+    const checkCourierNotExists = ids.filter((_, idx) => couriers[idx] === false);
 
     if (checkCourierNotExists.length != 0) {
-      const error = new Error(
-        `Given courier ids do not exist: ${checkCourierNotExists.join(", ")}`
-      );
+      const error = new Error(`Given courier ids do not exist: ${checkCourierNotExists.join(", ")}`);
       error.status = 422;
       throw error;
     }
@@ -57,7 +51,8 @@ export const read = async (req, res, next) => {
       page: req.query.page,
       limit: req.query.limit,
       search: req.query.search,
-      id: req.params.id || undefined,
+      id: req.params.id,
+      userId: req.query.userId,
     };
 
     const result = await UserCourierService.read(query);
@@ -101,18 +96,12 @@ export const update = async (req, res, next) => {
       ),
     ];
 
-    const couriers = await Promise.all(
-      ids.map((id) => CourierService.read({ id }))
-    );
+    const couriers = await Promise.all(ids.map((id) => CourierService.read({ id })));
 
-    const checkCourierNotExists = ids.filter(
-      (_, idx) => couriers[idx] === false
-    );
+    const checkCourierNotExists = ids.filter((_, idx) => couriers[idx] === false);
 
     if (checkCourierNotExists.length != 0) {
-      const error = new Error(
-        `Given courier ids do not exist: ${checkCourierNotExists.join(", ")}`
-      );
+      const error = new Error(`Given courier ids do not exist: ${checkCourierNotExists.join(", ")}`);
       error.status = 422;
       throw error;
     }
