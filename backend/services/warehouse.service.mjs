@@ -87,12 +87,6 @@ class Service {
       } else {
         result = await this.repository.find(where, { page, limit });
         totalCount = await this.repository.countDocuments(where);
-
-        if (!result || result.length === 0) {
-          const error = new Error("No records found.");
-          error.status = 404;
-          throw error;
-        }
       }
 
       return { data: { total: totalCount, result } };
