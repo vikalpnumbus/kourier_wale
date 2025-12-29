@@ -221,7 +221,7 @@ class Service {
       if (remittancesToBeDeleted?.length) {
         await this.shippingRepository.updateMany(
           {
-            awb_number: { [Op.in]: awbList },
+            remittance_batch_id: { [Op.in]: remittancesToBeDeleted },
           },
           { remittance_batch_id: null },
           { transaction: t }
@@ -246,7 +246,7 @@ class Service {
 const RemittanceService = new Service();
 export default RemittanceService;
 (async () => {
-  // const isRemittanceCalculated = await RemittanceService.calculateRemittance();
+  const isRemittanceCalculated = await RemittanceService.calculateRemittance();
   // console.log("isRemittanceCalculated: ", isRemittanceCalculated);
   // if (isRemittanceCalculated)
     // await RemittanceService.createRemittance({ awb_numbers: `${[153758598607, 153758598597, 153758598595, 153758597633].slice(0, 2).join(",")}` });

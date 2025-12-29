@@ -33,6 +33,7 @@ import AdminShippingRouter from "./admin/admin.shipping.route.mjs";
 import AdminRemittanceRouter from "./admin/admin.remittance.route.mjs";
 import AdminExportRouter from "./admin/admin.exports.route.mjs";
 import AdminImportRouter from "./admin/admin.imports.route.mjs";
+import RemittanceRouter from "./remittance.route.mjs";
 
 const globalRouter = express.Router();
 
@@ -57,6 +58,7 @@ globalRouter.use("/payments", PaymentRouter);
 globalRouter.use("/webhooks", WebhookRouter);
 globalRouter.use("/escalations", EscalationRouter);
 globalRouter.use("/weight-reco", WeightRecoRouter);
+globalRouter.use("/remittance", RemittanceRouter);
 
 const checkIfUserIsAdmin = async (req, res, next) => {
   const userId = req.user.id;
