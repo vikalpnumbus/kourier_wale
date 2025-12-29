@@ -66,9 +66,10 @@ class Provider {
   }
 
   async createShipment(data) {
+    console.log('data: ', data);
     const {
       courier_id,
-      order_db_id,
+      orderId,
       paymentType,
       total_price,
       shippingDetails,
@@ -122,8 +123,8 @@ class Provider {
       const payload = {
         AirWayBillNO: availableAWB,
         BusinessAccountName: "Quickdaak Small",
-        OrderNo: order_db_id?.toString(),
-        SubOrderNo: order_db_id?.toString(),
+        OrderNo: orderId?.toString(),
+        SubOrderNo: orderId?.toString(),
         OrderType:
           paymentType == "prepaid"
             ? "PrePaid"
@@ -223,7 +224,7 @@ class Provider {
         IsDGShipmentType: null,
         IsOpenDelivery: null,
         IsSameDayDelivery: null,
-        ManifestID: order_db_id,
+        ManifestID: orderId,
         MultiShipmentGroupID: null,
         SenderName: null,
         IsEssential: "false",
