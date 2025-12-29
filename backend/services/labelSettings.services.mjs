@@ -146,8 +146,9 @@ class Service {
                 state,
                 pincode,
                 phone,
-                alternate_phone,
+                alternatePhone,
               } = e.shippingDetails || {};
+              console.log('alternate_phone: ', alternatePhone);
               return {
                 shippingDetails_fname: fname || "",
                 shippingDetails_lname: lname || "",
@@ -162,7 +163,7 @@ class Service {
                 shippingDetails_alternate_phone:
                   hide_end_customer_contact_number
                     ? null
-                    : alternate_phone || "",
+                    : alternatePhone || "",
               };
             })(),
 
@@ -171,7 +172,7 @@ class Service {
             awb_number: e.awb_number || "",
 
             paymentType: capitialiseFirstLetter(e.paymentType) || "",
-            total_price: e.total_price || "",
+            total_price: e.orderAmount || "",
 
             ...(() => {
               const { weight, volumetricWeight, height, length, breadth } =
