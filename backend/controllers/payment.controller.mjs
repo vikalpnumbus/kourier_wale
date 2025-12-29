@@ -76,21 +76,21 @@ export const razorPayVerify = async (req, res, next) => {
       }
     );
 
-    await WalletHistoryService.create({
-      userId: req.user.id,
-      event_type: "payment_done",
-      amount,
-      payment_type: "credit",
-      logs: JSON.stringify(
-        {
-          "userWalletBalance: previous ": Number(userWalletBalance),
-          "userWalletBalance: after ":
-            Number(userWalletBalance) + Number(amount),
-        },
-        null,
-        2
-      ),
-    });
+    // await WalletHistoryService.create({
+    //   userId: req.user.id,
+    //   event_type: "payment_done",
+    //   amount,
+    //   payment_type: "credit",
+    //   logs: JSON.stringify(
+    //     {
+    //       "userWalletBalance: previous ": Number(userWalletBalance),
+    //       "userWalletBalance: after ":
+    //         Number(userWalletBalance) + Number(amount),
+    //     },
+    //     null,
+    //     2
+    //   ),
+    // });
 
     console.info("userWalletBalance: previous=> ", Number(userWalletBalance));
     console.info(

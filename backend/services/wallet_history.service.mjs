@@ -38,7 +38,7 @@ class Service {
     try {
       const { page = 1, limit = 50, id, start_date, end_date, userId } = params;
       
-      const whereClause = { [Op.and]: [] };
+      const whereClause = { [Op.and]: [{event_type:'payment_done'}] };
       
       // Direct equality filters
       if (userId) whereClause[Op.and].push({ userId });
