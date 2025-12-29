@@ -63,6 +63,14 @@ export const update = async (req, res, next) => {
       error.status = 404;
       throw error;
     }
+    
+    const shipping_status =  existingRecord.data?.result[0]?.shipping_status
+    
+    if(shipping_status && shipping_status!='new'){
+       const error = new Error("Order has already been booked and cannot be edited.");
+      error.status = 400;
+      throw error;
+    }
 
     const payload = {
       userId: req.user.id,
