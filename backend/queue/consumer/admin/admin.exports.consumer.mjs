@@ -37,6 +37,9 @@ class Class {
            else if (type == "remittance") {
             this.handler = ExportsHandlerFactory.getExportsHandler("remittance");
           } 
+           else if (type == "shippingCharges") {
+            this.handler = ExportsHandlerFactory.getExportsHandler("shippingCharges");
+          } 
           else {
             throw new Error("This type has not been implemented yet.");
           }
