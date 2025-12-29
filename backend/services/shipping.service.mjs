@@ -438,16 +438,6 @@ class Service {
             console.error(ShippingService.error);
           }
 
-          const updatedAWBData = await CourierAWBListService.update({
-            data: {
-              id: shipmentRes?.courierAWBListData?.id,
-              used: 1,
-            },
-          });
-          if (!updatedAWBData) {
-            console.error(CourierAWBListService.error);
-          }
-
           const existingUser = await UserService.read({ id: userId });
 
           const updatedUser = await UserService.update(

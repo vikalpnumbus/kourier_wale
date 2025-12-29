@@ -1,8 +1,5 @@
 import axios from "axios";
-import {
-  SHADOWFAX_API_URL,
-  SHADOWFAX_SECRET_KEY,
-} from "../../configurations/base.config.mjs";
+import { SHADOWFAX_API_URL, SHADOWFAX_SECRET_KEY } from "../../configurations/base.config.mjs";
 
 class ShadowfaxService {
   constructor() {
@@ -18,27 +15,20 @@ class ShadowfaxService {
 
   async createShipment(data) {
     if (!data) throw new Error("Invalid data");
-    const {
-      shippingDetails = {},
-      warehouses,
-      warehouse_id,
-      rto_warehouse_id,
-      products = [],
-      packageDetails = {},
-    } = data;
+    const { shippingDetails = {}, warehouses, warehouse_id, rto_warehouse_id, products = [], packageDetails = {} } = data;
 
     let pickup_warehouse = warehouses.filter((e) => e.id == warehouse_id)[0];
     let rto_warehouse = warehouses.filter((e) => e.id == rto_warehouse_id)[0];
 
     const jsonData = {
       order_details: {
-        client_order_id: data.id ?? Math.floor(Math.random() * 90000 + 10000),
+        client_order_id: data.orderId,
         awb_number: "AWB" + Math.floor(Math.random() * 9000 + 1000),
         actual_weight: packageDetails.weight,
         volumetric_weight: packageDetails.volumetricWeight,
         product_value: data.total_price,
         payment_mode: data.paymentType,
-        cod_amount: data.collectableAmount,
+        cod_amount:data?.paymentType=='cod'? data.collectableAmount:0,
         total_amount: data.total_price,
       },
       customer_details: {
@@ -103,8 +93,7 @@ class ShadowfaxService {
     if (!res.message) throw new Error("Internal Error");
 
     if (res.message.toLowerCase() === "failure") {
-      const err =
-        typeof res.errors === "object" ? "Error in payload" : res.errors;
+      const err = typeof res.errors === "object" ? "Error in payload" : res.errors;
 
       // AWB used → mark used
       if (err?.toLowerCase().includes("awb already used")) {
@@ -202,60 +191,3 @@ class ShadowfaxService {
 
 const ShadowfaxProvider = new ShadowfaxService();
 export default ShadowfaxProvider;
-// (async () => {
-//   await ShadowfaxProvider.createOrder({
-//     id: 17,
-//     userId: 1,
-//     orderId: "Shopify-6660454809876",
-//     orderAmount: "17199.87",
-//     collectableAmount: "17199.87",
-//     order_source: "shopify",
-//     paymentType: "cod",
-//     products: [
-//       {
-//         id: 15,
-//         userId: 1,
-//         category: "other",
-//         name: "The 3p Fulfilled Snowboard",
-//         sku: "sku-hosted-1",
-//         price: "2629.95",
-//         productImage: [],
-//         channel_name: "shopify",
-//         channel_product_id: "16528090398996",
-//         createdAt: "2025-10-23T06:20:02.000Z",
-//         updatedAt: "2025-10-23T06:20:02.000Z",
-//         qty: 6,
-//       },
-//     ],
-//     shippingDetails: {
-//       city: "0",
-//       fname: "0",
-//       lname: "0",
-//       phone: "0",
-//       state: "0",
-//       address: "0",
-//       pincode: "000000",
-//     },
-//     packageDetails: {
-//       height: "0",
-//       length: "0",
-//       weight: "0",
-//       breadth: "0",
-//       volumetricWeight: "0",
-//     },
-//     charges: {
-//       cod: "0",
-//       discount: "0",
-//       shipping: "0",
-//       tax_amount: "0",
-//     },
-//     warehouse_id: null,
-//     rto_warehouse_id: null,
-//     shipping_status: "cancelled",
-//     channel_id: "1",
-//     channel_order_id: "6660454809876",
-//     createdAt: "2025-10-23T06:20:03.000Z",
-//     updatedAt: "2025-10-23T06:20:03.000Z",
-//     channel_name: "rahul-shopify-1",
-//   });
-// })();
