@@ -76,6 +76,7 @@ function AppRoutes() {
 
           <Route path="/shipments" element={<Shipments />}>
             <Route index element={<ShipmentsTable />} />
+            <Route path="view/:id" element={<OrderView />} />
           </Route>
 
           <Route path="/rate_calculator" element={<RateCalculator />}></Route>

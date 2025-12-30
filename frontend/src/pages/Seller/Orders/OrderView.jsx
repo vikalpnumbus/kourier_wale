@@ -13,13 +13,30 @@ import api from "../../../utils/api";
 import ordersConfig from "../../../config/Orders/OrdersConfig";
 import warehouseConfig from "../../../config/Warehouse/WarehouseConfig";
 import shipmentsConfig from "../../../config/Shipments/ShipmentsConfig";
+import ShipModal from "./ShipModal";
 
 function OrderView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [orderData, setOrderData] = useState({});
-  const [shippingData, setShippingData] = useState({});
   const [loading, setLoading] = useState(false);
+  const isShipmentView = window.location.pathname.includes("shipments/view");
+  const [shipOrderDetails, setShipOrderDetails] = useState("");
+  const [showShipModal, setShowShipModal] = useState(false);
+
+  const orderCanShip = (order) => {
+    return (
+      order.shipping_status === "new" &&
+      order.warehouse_id &&
+      order.rto_warehouse_id &&
+      (order.paymentType == "cod" ? order.collectableAmount : true) &&
+      order.paymentType &&
+      order.packageDetails.weight &&
+      order.packageDetails["length"] &&
+      order.packageDetails.breadth &&
+      order.packageDetails.height
+    );
+  };
 
   const handleFetchData = async () => {
     try {
@@ -43,9 +60,11 @@ function OrderView() {
       const url = `${shipmentsConfig.fetchshipmentlist}/${id}`;
 
       const { data } = await api.get(url);
-      setShippingData(data?.result?.[0] || {});
+      setOrderData(data?.data?.result?.[0] || {});
     } catch (error) {
       console.error("Fetch orders error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,7 +84,7 @@ function OrderView() {
 
   useEffect(() => {
     handleWarehouseData();
-    handleFetchShippingData();
+
   }, []);
 
   const findWarehouse = (warehouseId) => {
@@ -77,7 +96,11 @@ function OrderView() {
   };
 
   useEffect(() => {
-    handleFetchData();
+    if (isShipmentView) {
+      handleFetchShippingData();
+    } else {
+      handleFetchData();
+    }
   }, [id]);
 
   if (loading) {
@@ -117,24 +140,51 @@ function OrderView() {
       <div className="px-4">
         <div className="row">
           <div className="col-12 col-md-3">
-            <h5 className="card-title mb-1">Id: {orderData.orderId}</h5>
+            <h5 className="card-title mb-1">Id: {orderData?.orderId || ""}</h5>
             <div className="d-flex gap-2  align-items-center">
               <span className="mb-0">
-                Status: <ShippingStatus status={orderData.shipping_status} />
+                Status: <ShippingStatus status={orderData?.shipping_status || ""} />
               </span>
             </div>
           </div>
 
           <div className="col-12 col-md-9 d-flex justify-content-end gap-2 ">
+            {!isShipmentView && (
+              <>
+                <button
+                  className="btn btn-dark btn-md py-2 px-3"
+                  onClick={() => navigate(`/orders/edit/${id}`)}
+                >
+                  <Icon path={mdiPencil} size={0.7} /> Edit
+                </button>
+                <button
+                  className="btn btn-dark btn-md py-2 px-3"
+                  onClick={() => {
+                    const warehouse = warehouseList.find(
+                      (w) => w.id == orderData.warehouse_id
+                    );
+                    setShipOrderDetails({
+                      id: orderData.id,
+                      warehouse_id: orderData.warehouse_id,
+                      rto_warehouse_id: orderData.rto_warehouse_id,
+                      collectableAmount: orderData.collectableAmount,
+                      paymentType: orderData.paymentType,
+                      packageDetails: orderData.packageDetails,
+                      shippingDetails: orderData.shippingDetails,
+                      originpincode: warehouse?.pincode,
+                    });
+                    setShowShipModal(true);
+                  }}
+                  disabled={!orderCanShip(orderData)}
+                >
+                  <Icon path={mdiCubeScan} size={0.7} />Ship
+                </button>
+              </>
+            )}
+
             <button
               className="btn btn-dark btn-md py-2 px-3"
-              onClick={() => navigate(`/orders/edit/${id}`)}
-            >
-              <Icon path={mdiPencil} size={0.7} /> Edit
-            </button>
-            <button
-              className="btn btn-dark btn-md py-2 px-3"
-              onClick={() => navigate(`/orders/clone/${id}`)}
+              onClick={() => navigate(`/orders/clone/${isShipmentView ? orderData.order_db_id : id}`)}
             >
               <Icon path={mdiContentCopy} size={0.7} /> Clone
             </button>
@@ -307,18 +357,19 @@ function OrderView() {
 
               <div className="delivery-timeline">
                 <div className="timeline-item">
+                  <div className="timeline-marker end"></div>
+                  <div className="timeline-content">
+                    {findWarehouse(orderData.warehouse_id) || ""}
+                  </div>
+                </div>
+                <div className="timeline-item">
                   <div className="timeline-marker start"></div>
                   <div className="timeline-content">
                     {`${orderData?.shippingDetails?.city} (${orderData?.shippingDetails?.state} - ${orderData?.shippingDetails?.pincode})`}
                   </div>
                 </div>
 
-                <div className="timeline-item">
-                  <div className="timeline-marker end"></div>
-                  <div className="timeline-content">
-                    {findWarehouse(orderData.warehouse_id) || ""}
-                  </div>
-                </div>
+
               </div>
             </div>
 
@@ -420,6 +471,12 @@ function OrderView() {
           </div>
         </div>
       </div>
+      {showShipModal && shipOrderDetails && (
+        <ShipModal
+          onClose={() => setShowShipModal(false)}
+          orderData={shipOrderDetails}
+        />
+      )}
     </>
   );
 }
