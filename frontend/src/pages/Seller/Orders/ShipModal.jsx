@@ -84,7 +84,7 @@ function ShipModal({ orderData, onClose }) {
   };
 
   const fetchRate = async () => {
-    try {
+    try{
       setLoading(true);
       const url = `${RateConfig.RateCalculator}`;
       const res = await api.post(url, formData);
@@ -116,36 +116,43 @@ function ShipModal({ orderData, onClose }) {
   });
 };
 
-  const handleSubmit = async () =>
-  {
-    const newErrors = validateForm(form);
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    if (!shipData.courier_id) {
-      alert("Please select a courier before shipping.");
-      return;
-    }
-    const finalPayload = {
-      ...shipData,
-      warehouse_id: form.warehouse_id,
-      rto_warehouse_id: form.rto_warehouse_id,
-      plan_id: planid,
-    };
-    try {
-      setLoading(true);
-      const url = `${create_shipment.createshipments}`;
-      const res = await api.post(url, finalPayload);
-      onClose();
-      handleFetchData();
-    } catch (error) {
-      console.error("❌ Error creating shipment:", error);
-      alert("Something went wrong while creating shipment");
-      handleFetchData();
-    } finally {
-      setLoading(false);
-    }
+  const handleSubmit = async () => {
+      const newErrors = validateForm(form);
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+      if (!shipData.courier_id) {
+        alert("Please select a courier before shipping.");
+        return;
+      }
+      const finalPayload = {
+        ...shipData,
+        warehouse_id: form.warehouse_id,
+        rto_warehouse_id: form.rto_warehouse_id,
+        plan_id: planid,
+      };
+      try {
+        setLoading(true);
+        const url = create_shipment.createshipments;
+        const res = await api.post(url, finalPayload);
+        if (res?.status === 201) {
+          alert(res.data?.message || "Shipment created successfully");
+
+          // optional: newly created shipment id
+          console.log("Shipment ID:", res.data?.id);
+
+          onClose();
+          handleFetchData();
+        } else {
+          alert("Something went wrong while creating shipment");
+        }
+
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
   };
 
   return (
