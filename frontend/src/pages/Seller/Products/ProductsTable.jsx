@@ -54,7 +54,7 @@ function ProductsTable() {
     } catch (error) {
       showError(
         error?.response?.data?.message ||
-          "Something went wrong, Please try again later."
+        "Something went wrong, Please try again later."
       );
       console.error("Delete product error:", error);
     }
@@ -93,9 +93,8 @@ function ProductsTable() {
                 <tr key={data.id}>
                   <td className="py-2">
                     <img
-                      src={`${import.meta.env.VITE_API_URL}${
-                        data.productImage[1]
-                      }`}
+                      src={`${import.meta.env.VITE_API_URL}${data.productImage[0]
+                        }`}
                       className="img-fluid rounded me-3"
                       height={200}
                       width={200}
