@@ -97,22 +97,6 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
 
         <li
           className={`nav-item 
-            ${location.pathname.includes("/admin/plans")
-              ? "active"
-              : ""
-            }
-            ${hoveredItem === "plans" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("plans")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/admin/plans">
-            <i className="mdi mdi-currency-usd menu-icon"></i>
-            <span className="menu-title">Pricing Plans</span>
-          </Link>
-        </li>
-
-        <li
-          className={`nav-item 
             ${location.pathname.includes("/admin/pricingCourier")
               ? "active"
               : ""
@@ -124,6 +108,22 @@ function AdminSidebar({ setSideNavActive, sideNavActive }) {
           <Link className="nav-link" to="/admin/pricingCourier">
             <i className="mdi mdi-currency-usd menu-icon"></i>
             <span className="menu-title">Courier Pricing</span>
+          </Link>
+        </li>
+
+        <li
+          className={`nav-item 
+            ${location.pathname.includes("/admin/plans")
+              ? "active"
+              : ""
+            }
+            ${hoveredItem === "plans" ? "hover-open" : ""}`}
+          onMouseEnter={() => setHoveredItem("plans")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Link className="nav-link" to="/admin/plans">
+            <i className="mdi mdi-currency-usd menu-icon"></i>
+            <span className="menu-title">Seller Pricing Plans</span>
           </Link>
         </li>
 

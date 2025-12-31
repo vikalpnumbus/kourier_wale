@@ -52,9 +52,9 @@ export default function DateRange() {
   const [values, setValues] = useState(() =>
     initialStart && initialEnd
       ? [
-          new DateObject(initialStart), 
-          new DateObject(initialEnd),
-        ]
+        new DateObject(initialStart),
+        new DateObject(initialEnd),
+      ]
       : defaultLast7
   );
 
@@ -112,9 +112,10 @@ export default function DateRange() {
   const quickFilters = [
     { label: "Today", getRange: getTodayRange },
     { label: "Last 7 Days", getRange: () => getLastNDaysRange(7) },
-    { label: "Last 30 Days", getRange: () => getLastNDaysRange(30) },
     { label: "This Week", getRange: getThisWeekRange },
+    { label: "Last 30 Days", getRange: () => getLastNDaysRange(30) },
     { label: "This Month", getRange: getThisMonthRange },
+    { label: "Last 90 Days", getRange: () => getLastNDaysRange(90) },
   ];
 
   const formatDate = (dateObj) => (dateObj ? dateObj.format("DD-MM-YYYY") : "");

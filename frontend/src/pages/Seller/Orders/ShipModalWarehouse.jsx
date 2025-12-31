@@ -56,7 +56,9 @@ function ShipModalWarehouse({
 
   const handleSelect = (item) => {
     setSelected(item);
-    setSearch(item.name);
+    setSearch(
+      `${item.name} - ${item.city}, ${item.state} (${item.pincode})`
+    );
     setShowList(false);
   };
 
@@ -83,9 +85,12 @@ function ShipModalWarehouse({
       const warehouse = dataList.find(
         (item) => item.id == initialWarehouseData
       );
+
       if (warehouse) {
         setSelected(warehouse);
-        setSearch(warehouse.name);
+        setSearch(
+          `${warehouse.name} - ${warehouse.city}, ${warehouse.state} (${warehouse.pincode})`
+        );
         setIsInitialSet(true);
       }
     }
@@ -129,7 +134,8 @@ function ShipModalWarehouse({
                   className="list-group-item list-group-item-action"
                   onClick={() => handleSelect(item)}
                 >
-                  {item.name}
+                  {item.name}<br />
+                  {item.city}, {item.state}, {item.pincode}
                 </button>
               ))
             ) : (
