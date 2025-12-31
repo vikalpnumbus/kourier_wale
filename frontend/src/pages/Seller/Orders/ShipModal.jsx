@@ -150,7 +150,6 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
       }
     } catch (error) {
       showError(error?.response?.data?.message || "Something went wrong while creating shipment")
-      handleFetchData();
     } finally {
       setLoading(false);
     }
