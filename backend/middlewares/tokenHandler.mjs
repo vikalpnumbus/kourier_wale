@@ -43,6 +43,12 @@ class Class {
         error.status = 400;
         throw error;
       }
+      console.log("existingUser: ", existingUser);
+      if (existingUser?.isActive !== true) {
+        const error = new Error("User is forbidden from accessing this resource.");
+        error.status = 401;
+        throw error;
+      }
 
       // console.info("req.originalUrl: ", req.originalUrl);
       // console.info("existingUser.role: ", existingUser.role);

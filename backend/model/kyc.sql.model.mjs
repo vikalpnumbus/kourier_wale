@@ -15,7 +15,7 @@ const KycModel = sqlDB.sequelize.define(
       allowNull: false,
       references: { model: "users", key: "id" },
     },
-
+    
     kycType: {
       type: DataTypes.ENUM(
         "sole proprietorship",
@@ -26,7 +26,7 @@ const KycModel = sqlDB.sequelize.define(
       ),
       allowNull: false,
     },
-
+    
     panCardNumber: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -34,32 +34,32 @@ const KycModel = sqlDB.sequelize.define(
         is: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, // PAN regex
       },
     },
-
+    
     nameOnPanCard: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-
+    
     panCardImage: {
       type: DataTypes.JSON, // store array of strings
       defaultValue: [],
     },
-
+    
     documentType: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-
+    
     documentId: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-
+    
     nameOnDocument: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-
+    
     documentFrontImage: {
       type: DataTypes.JSON, // store array of strings
       defaultValue: [],
@@ -69,41 +69,47 @@ const KycModel = sqlDB.sequelize.define(
       type: DataTypes.JSON,
       defaultValue: [],
     },
-
+    
     partnershipDeedImage: {
       type: DataTypes.JSON,
       allowNull: true,
       defaultValue: [],
     },
-
+    
     coiNumber: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-
+    
     gstNumber: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-
+    
     gstName: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-
+    
     gstImage: {
       type: DataTypes.JSON,
       defaultValue: [],
     },
-
+    
     status: {
       type: DataTypes.ENUM("pending", "approved", "rejected"),
       defaultValue: "pending",
     },
-
+    
     remarks: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+
+    approvedBy: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: { model: "users", key: "id" },
     },
   },
   {
@@ -116,11 +122,11 @@ const KycModel = sqlDB.sequelize.define(
       },
       beforeUpdate: async (kyc, options) => {
         sanitizeKyc(kyc);
-
+        
         if (kyc._previousDataValues.status === "approved" && !kyc._adminOverride) {
           throw new Error("Approved KYC cannot be modified without override");
         }
-
+        
         delete kyc.dataValues._adminOverride;
       },
     },

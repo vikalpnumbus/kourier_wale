@@ -11,7 +11,7 @@ class Service {
   }
 
   async read(params) {
-    const { page = 1, limit = 50, id, name, email, phone, isVerified, start_date, end_date, include } = params;
+    const { page = 1, limit = 50, id, name, email, phone, isVerified, start_date, end_date, include, isActive } = params;
 
     const whereClause = { [Op.and]: [] };
     if (id) whereClause[Op.and].push({ id });
@@ -21,7 +21,8 @@ class Service {
       });
     }
     if (phone) whereClause[Op.and].push({ phone });
-    if (isVerified) whereClause[Op.and].push({ isVerified });
+    if (isVerified) whereClause[Op.and].push({ isVerified: isVerified == "true" });
+    if (isActive) whereClause[Op.and].push({ isActive: isActive == "true" });
 
     if (name) {
       whereClause[Op.and].push(
@@ -32,10 +33,12 @@ class Service {
     }
 
     if (start_date) {
-      whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.gte]: start_date }));
+      whereClause[Op.and].push({ "$User.createdAt$": { [Op.gte]: new Date(start_date) } });
+      // whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.gte]: start_date }));
     }
     if (end_date) {
-      whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.lte]: end_date }));
+      whereClause[Op.and].push({ "$User.createdAt$": { [Op.lte]: new Date(end_date) } });
+      // whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.lte]: end_date }));
     }
 
     if (!whereClause[Op.and].length) delete whereClause[Op.and];
@@ -50,7 +53,7 @@ class Service {
     let totalCount;
 
     if (id) {
-      result = await this.repository.find(whereClause,{},[includeKyc]);
+      result = await this.repository.find(whereClause, {}, [includeKyc]);
       if (!result) {
         const error = new Error("No record found.");
         error.status = 404;
@@ -81,6 +84,30 @@ class Service {
     result = result;
 
     return { data: { total: totalCount, result } };
+  }
+
+  async update({ data }) {
+    console.log('data: ', data);
+    try {
+      const { isActive, seller_remit_cycle, id } = data;
+
+      delete data.id;
+
+      let payload = { isActive, seller_remit_cycle };
+
+      const result = await this.repository.findOneAndUpdate({ id }, payload);
+
+      return {
+        status: 201,
+        data: {
+          message: "User has been updated successfully.",
+          id: result.id,
+        },
+      };
+    } catch (error) {
+      this.error = error;
+      return false;
+    }
   }
 }
 

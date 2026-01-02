@@ -25,6 +25,7 @@ export const verify = async (req, res, next) => {
         status,
         remarks,
         id: existingKYC.id,
+        approvedBy: req.user.id,
       },
     });
     if (!result) {

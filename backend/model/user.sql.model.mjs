@@ -84,6 +84,11 @@ const UserModel = sqlDB.sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
     resetPasswordToken: {
       type: DataTypes.STRING,
       allowNull: true,
