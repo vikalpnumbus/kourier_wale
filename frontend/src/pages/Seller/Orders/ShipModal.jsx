@@ -5,8 +5,10 @@ import companyDetailsConfig from "../../../config/CompanyDetails/CompanyDetailsC
 import RateConfig from "../../../config/RateDetails/RateDetailsConfig";
 import create_shipment from "../../../config/Shipments/ShipmentsConfig";
 import api from "../../../utils/api";
+import { useAlert } from '../../../middleware/AlertContext';
+import { useSearchParams } from "react-router-dom";
 
-function ShipModal({ orderData, onClose }) {
+function ShipModal({ orderData, onClose, handleFetchData }) {
   const [shipData, setShipData] = useState({
     order_db_ids: "",
     warehouse_id: "",
@@ -24,6 +26,8 @@ function ShipModal({ orderData, onClose }) {
   const [errors, setErrors] = useState({});
   const [initialWarehouseData, setInitialWarehouseData] = useState({});
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const { showError, showSuccess } = useAlert();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     setInitialWarehouseData({
@@ -42,89 +46,88 @@ function ShipModal({ orderData, onClose }) {
 
   // Fetch Seller Plan Id Because It's Store in User Table
   const [planid, setPlanId] = useState({});
-    const fetchplanname = async () => {
-      try {
-        const response = await api.get(companyDetailsConfig.companyDetails);
-        setPlanId(response?.data?.data?.companyDetails.pricingPlanId || {});
-      } catch (error) {
-        console.error("Company Details Fetch Error:", error);
-        setPlanId({});
-      }
-    };
-  useEffect(() => {
-        fetchplanname();
-      }, []);
-
-  useEffect(() => {
-  if (!form.warehouse_id || !orderData) return;
-
-  const {
-    paymentType,
-    packageDetails,
-    shippingDetails,
-    collectableAmount,
-  } = orderData;
-
-  if (!packageDetails || !shippingDetails) return;
-
-  const { length, height, breadth, weight } = packageDetails;
-  const destination = shippingDetails?.pincode;
-  const origin = form.originpincode || orderData.originpincode; // optional if you store origin in warehouse
-  const amount = collectableAmount;
-
-  const formData = {
-    paymentType,
-    length,
-    height,
-    breadth,
-    weight,
-    destination,
-    origin,
-    amount,
-  };
-
-  const fetchRate = async () => {
+  const fetchplanname = async () => {
     try {
-      setLoading(true);
-      const url = `${RateConfig.RateCalculator}`;
-      const res = await api.post(url, formData);
-      setRatePrice(res?.data?.data?.rows || []);
-      setShowForwardReverse(true);
-      setSelectedIndex(null); // reset selected courier when warehouse changes
+      const response = await api.get(companyDetailsConfig.companyDetails);
+      setPlanId(response?.data?.data?.companyDetails.pricingPlanId || {});
     } catch (error) {
-      console.error("API Error:", error);
-      alert("Something went wrong while updating rates");
-    } finally {
-      setLoading(false);
+      console.error("Company Details Fetch Error:", error);
+      setPlanId({});
     }
   };
+  useEffect(() => {
+    fetchplanname();
+  }, []);
 
-  fetchRate();
-}, [orderData, form.warehouse_id, form.rto_warehouse_id]);
+  useEffect(() => {
+    if (!form.warehouse_id || !orderData) return;
+
+    const {
+      paymentType,
+      packageDetails,
+      shippingDetails,
+      collectableAmount,
+    } = orderData;
+
+    if (!packageDetails || !shippingDetails) return;
+
+    const { length, height, breadth, weight } = packageDetails;
+    const destination = shippingDetails?.pincode;
+    const origin = form.originpincode || orderData.originpincode; // optional if you store origin in warehouse
+    const amount = collectableAmount;
+
+    const formData = {
+      paymentType,
+      length,
+      height,
+      breadth,
+      weight,
+      destination,
+      origin,
+      amount,
+    };
+
+    const fetchRate = async () => {
+      try {
+        setLoading(true);
+        const url = `${RateConfig.RateCalculator}`;
+        const res = await api.post(url, formData);
+        setRatePrice(res?.data?.data?.rows || []);
+        setShowForwardReverse(true);
+        setSelectedIndex(null); // reset selected courier when warehouse changes
+      } catch (error) {
+        console.error("API Error:", error);
+        alert("Something went wrong while updating rates");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRate();
+  }, [orderData, form.warehouse_id, form.rto_warehouse_id]);
 
   const handleCourierSelect = (rate, index) => {
-  setSelectedIndex(index);
-  setShipData({
-    order_db_ids: orderData?.id ? [orderData.id] : [],
-    warehouse_id: form.warehouse_id || orderData?.warehouse_id || "",
-    rto_warehouse_id: form.rto_warehouse_id || orderData?.rto_warehouse_id || "",
-    courier_id: rate.courier_id || "",
-    freight_charge: Number(rate.freight_charge) || 0,
-    cod_price: Number(rate.cod_charge) || 0,
-    zone: rate.zone || "",
-    plan_id: planid || "",
-  });
-};
+    setSelectedIndex(index);
+    setShipData({
+      order_db_ids: orderData?.id ? [orderData.id] : [],
+      warehouse_id: form.warehouse_id || orderData?.warehouse_id || "",
+      rto_warehouse_id: form.rto_warehouse_id || orderData?.rto_warehouse_id || "",
+      courier_id: rate.courier_id || "",
+      freight_charge: Number(rate.freight_charge) || 0,
+      cod_price: Number(rate.cod_charge) || 0,
+      zone: rate.zone || "",
+      plan_id: planid || "",
+    });
+  };
 
-  const handleSubmit = async () =>
-  {
+  const handleSubmit = async () => {
     const newErrors = validateForm(form);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
     if (!shipData.courier_id) {
-      alert("Please select a courier before shipping.");
+      showError("Please select a courier before shipping.");
       return;
     }
     const finalPayload = {
@@ -137,12 +140,16 @@ function ShipModal({ orderData, onClose }) {
       setLoading(true);
       const url = `${create_shipment.createshipments}`;
       const res = await api.post(url, finalPayload);
-      onClose();
-      handleFetchData();
+      if (res?.data?.status === 201) {
+        showSuccess(res?.data?.message || "Shipment Created Successfully")
+        setSearchParams({});
+        onClose();
+        handleFetchData();
+      } else {
+        showError(res?.data?.message || "Something went wrong while creating shipment")
+      }
     } catch (error) {
-      console.error("❌ Error creating shipment:", error);
-      alert("Something went wrong while creating shipment");
-      handleFetchData();
+      showError(error?.response?.data?.message || "Something went wrong while creating shipment")
     } finally {
       setLoading(false);
     }
@@ -211,16 +218,15 @@ function ShipModal({ orderData, onClose }) {
                 {ratePrice.length > 0 ? (
                   <div className="row">
                     {ratePrice.map((rate, index) => (
-                      
+
                       <div
                         key={index}
                         className="col-md-6 mb-3"
                         onClick={() => handleCourierSelect(rate, index)}
                       >
                         <div
-                          className={`volume_price p-3 rounded ${
-                            selectedIndex === index ? "selected-rate" : ""
-                          }`}
+                          className={`volume_price p-3 rounded ${selectedIndex === index ? "selected-rate" : ""
+                            }`}
                           style={{
                             cursor: "pointer",
                             border:

@@ -12,15 +12,16 @@ function OrdersFilter({ setShowFilters }) {
     end_date: searchParams.get("end_date") || "",
   });
   const [orderId, setOrderId] = useState(searchParams.get("orderId") || "");
+  const [channelName, setChannelName] = useState(searchParams.get("channelName") || "");
   const [shippingName, setShippingName] = useState(
     searchParams.get("shippingName") || ""
   );
   const [warehouse, setWarehouse] = useState(
     searchParams.get("warehouse_id")
       ? {
-          value: searchParams.get("warehouse_id"),
-          label: searchParams.get("warehouse_name") || "Selected Warehouse",
-        }
+        value: searchParams.get("warehouse_id"),
+        label: searchParams.get("warehouse_name") || "Selected Warehouse",
+      }
       : null
   );
 
@@ -74,6 +75,9 @@ function OrdersFilter({ setShowFilters }) {
     if (orderId.trim()) params.orderId = orderId.trim();
     else delete params.orderId;
 
+    if (channelName.trim()) params.channelName = channelName.trim();
+    else delete params.channelName;
+
     if (shippingName.trim()) params.shippingName = shippingName.trim();
     else delete params.shippingName;
 
@@ -104,6 +108,7 @@ function OrdersFilter({ setShowFilters }) {
 
   const handleClear = () => {
     setOrderId("");
+    setChannelName("");
     setShippingName("");
     setWarehouse(null);
     setPaymentType(null);
@@ -137,6 +142,16 @@ function OrdersFilter({ setShowFilters }) {
             type="text"
             value={orderId}
             onChange={(e) => setOrderId(e.target.value)}
+          />
+        </div>
+
+        <div className="col-md-3">
+          <input
+            className="form-control py-2 px-4 pe-5"
+            placeholder="Channel Name"
+            type="text"
+            value={channelName}
+            onChange={(e) => setChannelName(e.target.value)}
           />
         </div>
 

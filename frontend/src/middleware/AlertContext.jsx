@@ -19,7 +19,7 @@ export const AlertProvider = ({ children }) => {
   return (
     <AlertContext.Provider value={{ showError, showSuccess }}>
       {/* render your alerts globally */}
-      <div className="position-fixed top-0 start-50 translate-middle-x mt-3" style={{ zIndex: 1050, minWidth: "300px", width: "60%" }}>
+      <div className="position-fixed top-0 start-50 translate-middle-x mt-3" style={{ zIndex: 9999, minWidth: "300px", width: "60%" }}>
         <AlertMessage messages={messages} setMessages={setMessages} />
       </div>
 

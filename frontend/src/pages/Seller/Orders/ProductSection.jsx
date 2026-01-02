@@ -1,15 +1,25 @@
 import React, { useEffect, useState, useRef } from "react";
 import productsConfig from "../../../config/Products/ProductsConfig";
 import api from "../../../utils/api";
+import AddProductModal from "../../../Component/AddProductModal";
 
-function ProductSection({ setForm, setErrors, initialProductData = [] }) {
+function ProductSection({ setForm, setProductsPrice, setErrors, initialProductData = [] }) {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [showList, setShowList] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
 
   const wrapperRef = useRef(null);
+
+  const handleProductAdded = (newProduct) => {
+    setSelectedProducts(prev => {
+      const exists = prev.find(p => p.id === newProduct.id);
+      if (exists) return prev;
+      return [...prev, { ...newProduct, quantity: 1 }];
+    });
+  };
 
   const handleFetchData = async (query = "") => {
     setLoading(true);
@@ -30,7 +40,7 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
   };
 
   useEffect(() => {
-    if(!showList) return;
+    if (!showList) return;
     handleFetchData(search);
   }, [search, showList]);
 
@@ -85,12 +95,17 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
         id: p.id,
         qty: p.quantity,
       })),
-      orderAmount: parseFloat(
-        selectedProducts
-          .reduce((acc, curr) => acc + curr.price * curr.quantity, 0)
-          .toFixed(2)
-      ),
+      // orderAmount: parseFloat(
+      //   selectedProducts
+      //     .reduce((acc, curr) => acc + curr.price * curr.quantity, 0)
+      //     .toFixed(2)
+      // ),
     }));
+    setProductsPrice(parseFloat(
+      selectedProducts
+        .reduce((acc, curr) => acc + curr.price * curr.quantity, 0)
+        .toFixed(2)
+    ))
     setErrors((prev) => ({ ...prev, products: "", orderAmount: "" }));
   }, [selectedProducts]);
 
@@ -99,14 +114,21 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
       <h4 className="text-start mt-2 mb-3">Products Details<span className="text-danger">*</span></h4>
       <div className="col-md-12 mb-2" ref={wrapperRef} >
         <div className="form-group text-start mb-3 position-relative">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search Products"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onFocus={() => setShowList(true)}
-          />
+          <div className="btn-group w-100" role="group">
+            <input
+              type="text"
+              className="form-control "
+              placeholder="Search Products"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onFocus={() => setShowList(true)}
+            />
+            <button style={{ width: "150px" }} className="btn btn-dark btn-md py-2 px-3" type="button" onClick={() => setShowAddProductModal(true)}>
+              Add Product
+            </button>
+
+          </div>
+
 
           {showList && (
             <div
@@ -138,7 +160,7 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
         {/* Selected products */}
         <ul
           className="list-group mt-3"
-          style={{height: "260px", maxHeight: "260px", overflowY: "auto" }}
+          style={{ maxHeight: "260px", overflowY: "auto" }}
         >
           {selectedProducts.length > 0 ? (
             selectedProducts.map((item) => (
@@ -150,7 +172,7 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
                 className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center"
               >
                 <img
-                  src={`${import.meta.env.VITE_API_URL}${item.productImage[1]}`}
+                  src={`${import.meta.env.VITE_API_URL}${item.productImage[0]}`}
                   className="img-fluid mb-2 mb-md-0 me-md-3"
                   height={100}
                   width={60}
@@ -187,10 +209,16 @@ function ProductSection({ setForm, setErrors, initialProductData = [] }) {
               </li>
             ))
           ) : (
-            <li className="list-group-item text-muted" style={{height: "200px"}}>No products selected</li>
+            <li className="list-group-item text-muted" style={{ height: "136px" }}>No products selected</li>
           )}
         </ul>
       </div>
+      {showAddProductModal && (
+        <AddProductModal
+          onClose={() => setShowAddProductModal(false)}
+          onProductAdded={handleProductAdded}
+        />
+      )}
     </>
   );
 }

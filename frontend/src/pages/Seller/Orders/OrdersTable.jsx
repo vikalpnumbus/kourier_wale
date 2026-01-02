@@ -281,12 +281,12 @@ function OrdersTable() {
                       <div className="btn-group">
                         <button
                           className={`btn btn-md py-2 px-3 ${data.shipping_status === "new"
-                              ? "btn-primary"
-                              : data.shipping_status === "cancel"
-                                ? "btn-danger kw_button_cancel"
-                                : data.shipping_status === "booked"
-                                  ? "btn-success kw_button_booked"
-                                  : "btn-secondary kw_button_booked"
+                            ? "btn-primary"
+                            : data.shipping_status === "cancel"
+                              ? "btn-danger kw_button_cancel"
+                              : data.shipping_status === "booked"
+                                ? "btn-success kw_button_booked"
+                                : "btn-secondary kw_button_booked"
                             }`}
                           onClick={() => {
                             const warehouse = warehouseList.find(
@@ -340,6 +340,7 @@ function OrdersTable() {
           <ShipModal
             onClose={() => setShowShipModal(false)}
             orderData={shipOrderDetails}
+            handleFetchData={handleFetchData}
           />
         )}
       </div>

@@ -23,7 +23,7 @@ function WarehouseTable() {
       const page = parseInt(searchParams.get("page") || "1", 10);
       const limit = parseInt(searchParams.get("limit") || "10", 10);
 
-     const params = new URLSearchParams();
+      const params = new URLSearchParams();
       params.append("page", page);
       params.append("limit", limit);
       if (search) {
@@ -87,6 +87,7 @@ function WarehouseTable() {
               <th>Contact Details</th>
               <th>City</th>
               <th>State</th>
+              <th>Pincode</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -109,6 +110,7 @@ function WarehouseTable() {
                   <td className="py-2">{data.contactName || ""}</td>
                   <td className="py-2">{data.city || ""}</td>
                   <td className="py-2">{data.state || ""}</td>
+                  <td className="py-2">{data.pincode || ""}</td>
                   <td className="py-2">
                     {data.isPrimary ? (
                       <label className="badge badge-success">Primary</label>
