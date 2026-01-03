@@ -10,6 +10,7 @@ class Service {
   constructor() {
     this.error = null;
     this.repository = FactoryRepository.getRepository("orders");
+    this.channelRepository = FactoryRepository.getRepository("channel");
   }
 
   async create({ data }) {
@@ -25,18 +26,12 @@ class Service {
         id: productIDs,
       });
 
-      const checkProductExistence = new Set(
-        foundProducts?.data?.result?.map((e) => e.id + "")
-      );
+      const checkProductExistence = new Set(foundProducts?.data?.result?.map((e) => e.id + ""));
 
-      const missingIds = productIDs.filter(
-        (id) => !checkProductExistence.has(id)
-      );
+      const missingIds = productIDs.filter((id) => !checkProductExistence.has(id));
 
       if (missingIds.length > 0) {
-        const error = new Error(
-          `Product with IDs ${missingIds.join(", ")} does not exist.`
-        );
+        const error = new Error(`Product with IDs ${missingIds.join(", ")} does not exist.`);
         error.status = 422;
         throw error;
       }
@@ -51,20 +46,12 @@ class Service {
           throw error;
         }
 
-        const checkWarehouseExistence = new Set(
-          foundWarehouses?.data?.result?.map((e) => e.id + "")
-        );
+        const checkWarehouseExistence = new Set(foundWarehouses?.data?.result?.map((e) => e.id + ""));
 
-        const missingWarehouseIds = !checkWarehouseExistence.has(warehouse_id)
-          ? [warehouse_id]
-          : [];
+        const missingWarehouseIds = !checkWarehouseExistence.has(warehouse_id) ? [warehouse_id] : [];
 
         if (missingWarehouseIds.length > 0) {
-          const error = new Error(
-            `Warehouse with IDs ${missingWarehouseIds.join(
-              ", "
-            )} does not exist.`
-          );
+          const error = new Error(`Warehouse with IDs ${missingWarehouseIds.join(", ")} does not exist.`);
           error.status = 422;
           throw error;
         }
@@ -100,36 +87,25 @@ class Service {
         productIDs = productIDs
           .split(",")
           .map((e) => e?.trim())
-          .filter(
-            (e) => e && e !== "null" && e !== "undefined" && e != "false"
-          );
+          .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
 
         const foundProducts = await ProductsService.read({
           id: productIDs,
         });
 
-        const checkProductExistence = new Set(
-          foundProducts?.data?.result?.map((e) => e.id + "")
-        );
+        const checkProductExistence = new Set(foundProducts?.data?.result?.map((e) => e.id + ""));
 
-        const missingIds = productIDs.filter(
-          (id) => !checkProductExistence.has(id)
-        );
+        const missingIds = productIDs.filter((id) => !checkProductExistence.has(id));
 
         if (missingIds.length > 0) {
-          const error = new Error(
-            `Product with IDs ${missingIds.join(", ")} does not exist.`
-          );
+          const error = new Error(`Product with IDs ${missingIds.join(", ")} does not exist.`);
           error.status = 422;
           throw error;
         }
 
         payload = { ...payload, productIDs: productIDs.join(", ") };
       }
-      const result = await this.repository.findOneAndUpdate(
-        { id: existingRecordId },
-        payload
-      );
+      const result = await this.repository.findOneAndUpdate({ id: existingRecordId }, payload);
 
       return {
         status: 201,
@@ -159,6 +135,7 @@ class Service {
         paymentType,
         start_date,
         end_date,
+        channel_name,
         ...filters
       } = params;
 
@@ -172,9 +149,7 @@ class Service {
       if (paymentType) whereClause[Op.and].push({ paymentType });
 
       if (orderId) {
-        const orderIdsArray = Array.isArray(orderId)
-          ? orderId
-          : orderId?.split(",").map((e) => e.trim());
+        const orderIdsArray = Array.isArray(orderId) ? orderId : orderId?.split(",").map((e) => e.trim());
         whereClause[Op.and].push({
           orderId: { [Op.in]: orderIdsArray },
         });
@@ -186,31 +161,9 @@ class Service {
           where(
             fn(
               "CONCAT",
-              fn(
-                "COALESCE",
-                fn(
-                  "JSON_UNQUOTE",
-                  fn(
-                    "JSON_EXTRACT",
-                    col("shippingDetails"),
-                    literal("'$.fname'")
-                  )
-                ),
-                ""
-              ),
+              fn("COALESCE", fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.fname'"))), ""),
               " ",
-              fn(
-                "COALESCE",
-                fn(
-                  "JSON_UNQUOTE",
-                  fn(
-                    "JSON_EXTRACT",
-                    col("shippingDetails"),
-                    literal("'$.lname'")
-                  )
-                ),
-                ""
-              )
+              fn("COALESCE", fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.lname'"))), "")
             ),
             { [Op.like]: `%${shipping_name}%` }
           )
@@ -221,48 +174,44 @@ class Service {
       if (shipping_phone) {
         whereClause[Op.and].push({
           [Op.or]: [
-            where(
-              fn(
-                "JSON_UNQUOTE",
-                fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.phone'"))
-              ),
-              { [Op.like]: `%${shipping_phone}%` }
-            ),
-            where(
-              fn(
-                "JSON_UNQUOTE",
-                fn(
-                  "JSON_EXTRACT",
-                  col("shippingDetails"),
-                  literal("'$.alternate_phone'")
-                )
-              ),
-              { [Op.like]: `%${shipping_phone}%` }
-            ),
+            where(fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.phone'"))), { [Op.like]: `%${shipping_phone}%` }),
+            where(fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.alternate_phone'"))), {
+              [Op.like]: `%${shipping_phone}%`,
+            }),
           ],
         });
       }
 
       // Date filters (ignore time)
       if (start_date) {
-        whereClause[Op.and].push(
-          where(fn("DATE", col("createdAt")), { [Op.gte]: start_date })
-        );
+        whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.gte]: start_date }));
       }
       if (end_date) {
-        whereClause[Op.and].push(
-          where(fn("DATE", col("createdAt")), { [Op.lte]: end_date })
-        );
+        whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.lte]: end_date }));
       }
 
       // If no conditions were added, remove Op.and
       if (!whereClause[Op.and].length) delete whereClause[Op.and];
 
+      const includeChannel = {
+        model: this.channelRepository.model, // Channels table
+        as: "channel",
+        attributes: ["channel_name"],
+        required: false, // optional
+      };
+
+      if (channel_name) {
+        includeChannel.where = {
+          channel_name: { [Op.like]: `%${channel_name}%` },
+        };
+        includeChannel.required = true; // makes it INNER JOIN for filtering
+      }
+
       let result;
       let totalCount;
 
       if (id) {
-        result = await this.repository.find(whereClause);
+        result = await this.repository.find(whereClause, {}, [includeChannel]);
         if (result.length == 0) {
           const error = new Error("No record found.");
           error.status = 404;
@@ -270,7 +219,7 @@ class Service {
         }
         totalCount = result.length;
       } else {
-        result = await this.repository.find(whereClause, { page, limit });
+        result = await this.repository.find(whereClause, { page, limit }, [includeChannel]);
         totalCount = await this.repository.countDocuments(whereClause);
 
         if (!result || result.length === 0) {
@@ -279,31 +228,19 @@ class Service {
       }
 
       // fill products in each order record
-      const channelCache = new Map();
       result = await Promise.all(
         result.map(async (e) => {
-          const channel_id = e.channel_id;
+          const modifiedData = e.dataValues;
+          const channel = e?.channel?.dataValues || {};
+          delete modifiedData.channel;
 
-          let channel_name = null;
-          if (channel_id) {
-            if (channelCache.has(channel_id)) {
-              channel_name = channelCache.get(channel_id);
-            } else {
-              channel_name = (await ChannelService.read({ id: channel_id }))
-                ?.data?.result?.[0]?.channel_name;
-              channelCache.set(channel_id, channel_name);
-            }
-          }
           let productIDs = e.products?.map((product) => product.id).join(",");
           productIDs = productIDs
             .split(",")
             .map((e) => e?.trim())
-            .filter(
-              (e) => e && e !== "null" && e !== "undefined" && e != "false"
-            );
+            .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
 
-          let foundProducts = (await ProductsService.read({ id: productIDs }))
-            .data.result;
+          let foundProducts = (await ProductsService.read({ id: productIDs })).data.result;
 
           foundProducts = foundProducts.map((product) => ({
             ...product.dataValues,
@@ -311,9 +248,9 @@ class Service {
           }));
 
           const payload = {
-            ...e.dataValues,
+            ...modifiedData,
+            ...channel,
             products: foundProducts,
-            channel_name,
           };
           delete payload.productIDs;
           return payload;
@@ -410,9 +347,7 @@ class Service {
           productIDs = productIDs
             .split(",")
             .map((e) => e?.trim())
-            .filter(
-              (e) => e && e !== "null" && e !== "undefined" && e != "false"
-            );
+            .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
 
           const foundProducts = (
             await ProductsService.read({
@@ -441,20 +376,14 @@ class Service {
             "Warehouse Pincode": null,
             "Warehouse City": null,
             "Warehouse State": null,
-            "Customer Name":
-              e["shippingDetails"].fname + " " + e["shippingDetails"].lname,
+            "Customer Name": e["shippingDetails"].fname + " " + e["shippingDetails"].lname,
             "Customer Email": e["shippingDetails"].email || null,
             "Customer Address": e["shippingDetails"].address || null,
             "Customer Pincode": e["shippingDetails"].pincode || null,
             "Customer City": e["shippingDetails"].city || null,
             "Customer State": e["shippingDetails"].state || null,
             "Product Weight": e.packageDetails.weight || null,
-            "Product LBH":
-              e.packageDetails.length +
-              " X " +
-              e.packageDetails.breadth +
-              " X " +
-              e.packageDetails.height,
+            "Product LBH": e.packageDetails.length + " X " + e.packageDetails.breadth + " X " + e.packageDetails.height,
             "Shipping Charges (By Seller)": e.charges.shipping || null,
             "Shipping TAX (By Seller)": e.charges.tax_amount || null,
             "COD Charge (By Seller)": e.charges.cod || null,
@@ -482,17 +411,12 @@ class Service {
       }
 
       const { channel_id, channel_order_id } = order;
-      const channelDataRes =
-        (await ChannelService.read({ id: channel_id })) || null;
+      const channelDataRes = (await ChannelService.read({ id: channel_id })) || null;
       const channelData = channelDataRes?.data?.result?.[0];
       if (channelData.channel == "shopify") {
         const shopDomain = channelData.channel_host;
         const accessToken = channelData.access_token;
-        const response = await ShopifyProvider.cancelOrder(
-          shopDomain,
-          accessToken,
-          channel_order_id
-        );
+        const response = await ShopifyProvider.cancelOrder(shopDomain, accessToken, channel_order_id);
         if (!response.order.cancel_reason) {
           throw new Error("Unable to cancel the order on shopify.");
         }

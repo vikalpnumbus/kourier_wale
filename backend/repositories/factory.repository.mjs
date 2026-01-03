@@ -99,7 +99,6 @@ RemittanceSellerModel.belongsTo(UserModel, {
   as: "user",
 });
 
-
 UserModel.belongsToMany(UserModel, {
   through: AdminUserMapModel,
   as: "handledUsers",
@@ -114,6 +113,16 @@ UserModel.belongsToMany(UserModel, {
   otherKey: "adminId",
 });
 
+ChannelModel.hasMany(OrdersModel, {
+  as: "orders",
+  foreignKey: "channel_id",
+  otherKey: "id",
+});
+
+OrdersModel.belongsTo(ChannelModel, {
+  foreignKey: "channel_id",
+  as: "channel",
+});
 
 const FactoryRepository = new Class();
 export default FactoryRepository;

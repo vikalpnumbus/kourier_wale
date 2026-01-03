@@ -20,21 +20,25 @@ export const create = async (req, res, next) => {
 
 export const read = async (req, res, next) => {
   try {
+    const { channel_name, page, limit, orderId, shipping_name, shipping_phone, shipping_status, warehouse_id, paymentType, start_date, end_date } =
+      req.query;
     const query = {
       userId: req.user.id,
-      page: req.query.page,
-      limit: req.query.limit,
+      page,
+      limit,
       id: req.params.id,
-      orderId: req.query?.orderId,
-      shipping_name: req.query?.shipping_name,
-      shipping_phone: req.query?.shipping_phone,
-      shipping_status: req.query?.shipping_status,
-      warehouse_id: req.query?.warehouse_id,
-      paymentType: req.query?.paymentType,
-      start_date: req.query?.start_date,
-      end_date: req.query?.end_date,
+      orderId,
+      shipping_name,
+      shipping_phone,
+      shipping_status,
+      warehouse_id,
+      paymentType,
+      start_date,
+      end_date,
+      channel_name,
     };
     const result = await OrdersService.read(query);
+    // console.log("result: ", JSON.stringify(result, null,2));
     if (!result) {
       throw OrdersService.error;
     }
@@ -63,11 +67,11 @@ export const update = async (req, res, next) => {
       error.status = 404;
       throw error;
     }
-    
-    const shipping_status =  existingRecord.data?.result[0]?.shipping_status
-    
-    if(shipping_status && shipping_status!='new'){
-       const error = new Error("Order has already been booked and cannot be edited.");
+
+    const shipping_status = existingRecord.data?.result[0]?.shipping_status;
+
+    if (shipping_status && shipping_status != "new") {
+      const error = new Error("Order has already been booked and cannot be edited.");
       error.status = 400;
       throw error;
     }
@@ -117,9 +121,7 @@ export const remove = async (req, res, next) => {
 export const bulkImport = async (req, res, next) => {
   try {
     if (!req.files || req.files?.length != 1) {
-      const error = new Error(
-        "File Required and only 1 .csv file allowed to be uploaded."
-      );
+      const error = new Error("File Required and only 1 .csv file allowed to be uploaded.");
       error.status = 400;
       throw error;
     }
@@ -127,9 +129,7 @@ export const bulkImport = async (req, res, next) => {
     let rows = await readCsvAsArray(Buffer.from(req.files[0].buffer));
 
     if (!rows || rows.length == 0) {
-      const error = new Error(
-        "Empty file is not accepatable.Add some data before proceeding."
-      );
+      const error = new Error("Empty file is not accepatable.Add some data before proceeding.");
       error.status = 400;
       throw error;
     }
@@ -166,16 +166,12 @@ export const bulkImport = async (req, res, next) => {
 
     const missing = allowedHeaders.filter((h) => !headers.includes(h));
     if (missing.length > 0) {
-      const error = new Error(
-        `Missing required headers: ${missing.join(", ")}`
-      );
+      const error = new Error(`Missing required headers: ${missing.join(", ")}`);
       error.status = 400;
       throw error;
     }
 
-    const invalid = headers.filter(
-      (h) => !allowedHeaders.includes(h) && !productHeaderRegex.test(h)
-    );
+    const invalid = headers.filter((h) => !allowedHeaders.includes(h) && !productHeaderRegex.test(h));
     if (invalid.length > 0) {
       const error = new Error(`Invalid headers found: ${invalid.join(", ")}`);
       error.status = 400;

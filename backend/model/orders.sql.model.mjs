@@ -134,7 +134,7 @@ const OrdersModel = sqlDB.sequelize.define(
     },
 
     channel_id: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
 
