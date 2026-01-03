@@ -15,25 +15,25 @@ await redisClient.connect();
 await sqlDB.connect();
 await rabbitMQ.connect();
 
-const workers = [
-  new Worker("./workers/common.worker.mjs"),
-  new Worker("./workers/orders.worker.mjs"),
-  new Worker("./workers/shipping.worker.mjs"),
-  new Worker("./workers/products.worker.mjs"),
-  new Worker("./workers/warehouse.worker.mjs"),
-];
+// const workers = [
+//   new Worker("./workers/common.worker.mjs"),
+//   new Worker("./workers/orders.worker.mjs"),
+//   new Worker("./workers/shipping.worker.mjs"),
+//   new Worker("./workers/products.worker.mjs"),
+//   new Worker("./workers/warehouse.worker.mjs"),
+// ];
 
-// Wait for workers to signal they are ready
-await Promise.all(
-  workers.map(
-    (w) =>
-      new Promise((resolve) => {
-        w.once("message", (msg) => {
-          if (msg === "ready") resolve();
-        });
-      })
-  )
-);
+// // Wait for workers to signal they are ready
+// await Promise.all(
+//   workers.map(
+//     (w) =>
+//       new Promise((resolve) => {
+//         w.once("message", (msg) => {
+//           if (msg === "ready") resolve();
+//         });
+//       })
+//   )
+// );
 
 console.info("All consumers are ready. Starting API...");
 

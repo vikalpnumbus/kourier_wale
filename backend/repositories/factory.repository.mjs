@@ -1,3 +1,4 @@
+import AdminUserMapModel from "../model/adminUserMap.sql.model.mjs";
 import BankDetailsModel from "../model/bankDetails.sql.model.mjs";
 import ChannelModel from "../model/channel.sql.model.mjs";
 import CourierModel from "../model/courier.sql.model.mjs";
@@ -55,6 +56,7 @@ class Class {
       remittanceSeller: new BaseRepositoryClass(RemittanceSellerModel),
 
       exportJobs: new BaseRepositoryClass(ExportJobs),
+      adminUserMap: new BaseRepositoryClass(AdminUserMapModel),
     };
 
     if (!repositories[model]) {
@@ -96,6 +98,22 @@ RemittanceSellerModel.belongsTo(UserModel, {
   foreignKey: "userId",
   as: "user",
 });
+
+
+UserModel.belongsToMany(UserModel, {
+  through: AdminUserMapModel,
+  as: "handledUsers",
+  foreignKey: "adminId",
+  otherKey: "userId",
+});
+
+UserModel.belongsToMany(UserModel, {
+  through: AdminUserMapModel,
+  as: "handlingAdmins",
+  foreignKey: "userId",
+  otherKey: "adminId",
+});
+
 
 const FactoryRepository = new Class();
 export default FactoryRepository;

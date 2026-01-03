@@ -38,3 +38,16 @@ export const userList = async (req, res, next) => {
     next(error);
   }
 };
+
+export const adminUserHandling = async (req, res, next) => {
+  try {
+    const { adminId, userId } = req.body;
+
+    const result = await UserService.adminUserHandling({ data: { adminId, userId } });
+    if (!result) throw UserService.error;
+
+    res.success(result);
+  } catch (error) {
+    next(error);
+  }
+};

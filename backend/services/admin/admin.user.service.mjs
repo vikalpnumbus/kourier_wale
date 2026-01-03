@@ -8,6 +8,7 @@ class Service {
     this.error = null;
     this.repository = FactoryRepository.getRepository("user");
     this.kycRepository = FactoryRepository.getRepository("kyc");
+    this.AdminUserMapRepository = FactoryRepository.getRepository("adminUserMap");
   }
 
   async read(params) {
@@ -49,11 +50,25 @@ class Service {
       attributes: ["id", "status", "createdAt", "remarks"],
     };
 
+    const includeHandlingAdmins = {
+      model: this.repository.model, // UserModel
+      as: "handlingAdmins",
+      required: false,
+      attributes: ["id", "fname", "lname", "email", "phone"],
+      through: {
+        attributes: ["assignedAt"], // from admin_user_map
+      },
+    };
+
     let result;
     let totalCount;
 
     if (id) {
-      result = await this.repository.find(whereClause, {}, [includeKyc]);
+      result = await this.repository.find(whereClause, {}, [includeKyc, includeHandlingAdmins], false, {
+        attributes: {
+          exclude: ["password", "resetPasswordToken", "resetPasswordExpires"],
+        },
+      });
       if (!result) {
         const error = new Error("No record found.");
         error.status = 404;
@@ -73,7 +88,11 @@ class Service {
 
       totalCount = result.length;
     } else {
-      result = await this.repository.find(whereClause, { page, limit }, [includeKyc]);
+      result = await this.repository.find(whereClause, { page, limit }, [includeKyc, includeHandlingAdmins], false, {
+        attributes: {
+          exclude: ["password", "resetPasswordToken", "resetPasswordExpires"],
+        },
+      });
       totalCount = await this.repository.countDocuments(whereClause);
 
       if (!result || result.length === 0) {
@@ -87,7 +106,7 @@ class Service {
   }
 
   async update({ data }) {
-    console.log('data: ', data);
+    console.log("data: ", data);
     try {
       const { isActive, seller_remit_cycle, id } = data;
 
@@ -105,6 +124,93 @@ class Service {
         },
       };
     } catch (error) {
+      this.error = error;
+      return false;
+    }
+  }
+
+  async adminUserHandling({ data }) {
+    try {
+      let { adminId, userId } = data;
+      adminId = [
+        ...new Set(
+          adminId
+            ?.toString()
+            .split(",")
+            .map((e) => Number(e.trim()))
+            .filter((e) => !isNaN(e))
+        ),
+      ];
+
+      userId = [
+        ...new Set(
+          userId
+            ?.toString()
+            .split(",")
+            .map((e) => Number(e.trim()))
+            .filter((e) => !isNaN(e))
+        ),
+      ];
+
+      if (!adminId?.length || !userId?.length) {
+        throw new Error("adminId and userId are required and that too in the form of ids.");
+      }
+
+      if (userId.filter((e) => adminId.includes(e)).length > 0) {
+        const error = new Error(`Self assignment is not possible for ids ${userId.filter((e) => adminId.includes(e)).join(", ")}`);
+        error.status = 403;
+        throw error;
+      }
+
+      const [userRes, adminRes] = await Promise.all([this.repository.find({ id: userId }), this.repository.find({ id: adminId })]);
+
+      const userResIds = new Set(userRes.map((e) => e.id));
+      const adminResIds = new Set(adminRes.map((e) => e.id));
+
+      const usersNotFound = [...userId.filter((e) => !userResIds.has(e)), ...adminId.filter((e) => !adminResIds.has(e))];
+      if (usersNotFound.length) {
+        const error = new Error(`These users are not found: ${usersNotFound}`);
+        error.status = 400;
+        throw error;
+      }
+
+      const usersInAdminIds = adminRes.filter((e) => e.role !== "admin")?.map((e) => e.id);
+
+      if (usersInAdminIds.length) {
+        const error = new Error(`These users are not admins: ${usersInAdminIds}`);
+        error.status = 400;
+        throw error;
+      }
+
+      const adminsInUserIds = userRes.filter((e) => e.role == "admin")?.map((e) => e.id);
+
+      if (adminsInUserIds.length) {
+        const error = new Error(`These users are admins: ${adminsInUserIds}. Assignment of admin to admin is not possible.`);
+        error.status = 400;
+        throw error;
+      }
+
+      const payload = [];
+
+      for (const user of userRes) {
+        const { id: userId } = user;
+        for (const admin of adminRes) {
+          const { id: adminId } = admin;
+          payload.push({ userId, adminId });
+        }
+      }
+
+      await this.AdminUserMapRepository.bulkSave(payload, { ignoreDuplicates: true });
+
+      return {
+        status: 201,
+        data: {
+          message: "Users has been updated successfully.",
+          result: payload,
+        },
+      };
+    } catch (error) {
+      console.log("error: ", error);
       this.error = error;
       return false;
     }

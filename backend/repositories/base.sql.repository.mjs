@@ -40,7 +40,6 @@ export class BaseRepositoryClass {
 
   // Update one by condition
   async findOneAndUpdate(condition, data, options = {}) {
-    console.log('condition, data: ', condition, data);
     const record = await this.model.findOne({ where: condition, ...options });
     if (!record) return null;
     return (await record.update(data))?.dataValues;
@@ -50,7 +49,7 @@ export class BaseRepositoryClass {
     return (await this.model.create(data))?.dataValues;
   }
   async bulkSave(data, options = {}) {
-    return (await this.model.bulkCreate(data), { ...options })?.dataValues;
+    return (await this.model.bulkCreate(data, options))?.dataValues;
   }
 
   // Update many (bulk update)
