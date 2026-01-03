@@ -16,18 +16,20 @@ export const update = async (req, res, next) => {
 
 export const userList = async (req, res, next) => {
   try {
+    const { page, limit, name, email, phone, isVerified, start_date, end_date, include, isActive, handlingAdmins } = req.query;
     const query = {
-      page: req.query.page,
-      limit: req.query.limit,
+      page,
+      limit,
       id: req.params.id,
-      name: req.query?.name,
-      email: req.query?.email,
-      phone: req.query?.phone,
-      isVerified: req.query?.isVerified,
-      start_date: req.query?.start_date,
-      end_date: req.query?.end_date,
-      include: req.query?.include,
-      isActive: req.query?.isActive,
+      name,
+      email,
+      phone,
+      isVerified,
+      start_date,
+      end_date,
+      include,
+      isActive,
+      handlingAdmins,
     };
 
     const userList = await UserService.read(query);
@@ -35,6 +37,7 @@ export const userList = async (req, res, next) => {
 
     res.success(userList);
   } catch (error) {
+    console.log('error: ', error);
     next(error);
   }
 };
