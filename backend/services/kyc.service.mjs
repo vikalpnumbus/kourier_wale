@@ -5,23 +5,12 @@ class Service {
   constructor() {
     this.error = null;
     this.repository = FactoryRepository.getRepository("kyc");
+    this.userRepository = FactoryRepository.getRepository("user");
   }
 
   async create({ files, data }) {
     try {
-      const {
-        userId,
-        kycType,
-        panCardNumber,
-        nameOnPanCard,
-        documentType,
-        documentId,
-        nameOnDocument,
-        coiNumber,
-        status,
-        gstNumber,
-        gstName,
-      } = data;
+      const { userId, kycType, panCardNumber, nameOnPanCard, documentType, documentId, nameOnDocument, coiNumber, status, gstNumber, gstName } = data;
 
       const result = await this.repository.save({
         userId,
@@ -51,8 +40,7 @@ class Service {
       return {
         status: 201,
         data: {
-          message:
-            "KYC created successfully. Now wait for it to be verified by our team.",
+          message: "KYC created successfully. Now wait for it to be verified by our team.",
         },
       };
     } catch (error) {
@@ -77,11 +65,7 @@ class Service {
           },
         });
       }
-      if (
-        !["public limited company", "private limited company"].includes(
-          data.kycType
-        )
-      ) {
+      if (!["public limited company", "private limited company"].includes(data.kycType)) {
         payload.coiNumber = null;
       }
       const existingKYCId = data.id;
@@ -93,8 +77,7 @@ class Service {
       return {
         status: 201,
         data: {
-          message:
-            "KYC updated successfully. Now wait for it to be verified by our team.",
+          message: "KYC updated successfully. Now wait for it to be verified by our team.",
         },
       };
     } catch (error) {
@@ -104,10 +87,9 @@ class Service {
   }
 
   async read(params) {
-    console.log('params: ', params);
     try {
       const result = await this.repository.findOne(params);
-      console.log('result: ', result);
+      console.log("result: ", result);
 
       if (!result) {
         const error = new Error("No record found.");
@@ -115,7 +97,12 @@ class Service {
         throw error;
       }
 
-      return { data: result };
+      const { userId } = result || {};
+      const { fname, lname, email } = await this.userRepository.findOne({ id: userId });
+      const approvedBy = [fname, lname, `(${email})`].join(" ");
+      const modifiedResult = { ...result, approvedBy };
+
+      return { data: modifiedResult };
     } catch (error) {
       this.error = error;
       return false;
