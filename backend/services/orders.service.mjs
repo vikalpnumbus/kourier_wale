@@ -220,7 +220,7 @@ class Service {
         totalCount = result.length;
       } else {
         result = await this.repository.find(whereClause, { page, limit }, [includeChannel]);
-        totalCount = await this.repository.countDocuments(whereClause);
+        totalCount = await this.repository.countDocuments(whereClause, { include: [includeChannel] });
 
         if (!result || result.length === 0) {
           result = [];
