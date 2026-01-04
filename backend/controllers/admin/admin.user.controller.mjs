@@ -16,7 +16,7 @@ export const update = async (req, res, next) => {
 
 export const userList = async (req, res, next) => {
   try {
-    const { page, limit, name, email, phone, isVerified, start_date, end_date, include, isActive, handlingAdmins } = req.query;
+    const { page, limit, name, email, phone, isVerified, start_date, end_date, include, isActive, handlingAdmins, userId } = req.query;
     const query = {
       page,
       limit,
@@ -30,6 +30,7 @@ export const userList = async (req, res, next) => {
       include,
       isActive,
       handlingAdmins,
+      userId,
     };
 
     const userList = await UserService.read(query);
@@ -37,7 +38,7 @@ export const userList = async (req, res, next) => {
 
     res.success(userList);
   } catch (error) {
-    console.log('error: ', error);
+    console.log("error: ", error);
     next(error);
   }
 };
