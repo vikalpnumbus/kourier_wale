@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Pagination from "../../../Component/Pagination";
 import api from "../../../utils/api";
 import { encrypt } from "../../../middleware/Encryption";
 import usersConfig from "../../../config/AdminConfig/Users/Users";
-import { formatDateTime } from "../../../middleware/CommonFunctions";
+import { formatDateTime, getLastNDaysRange } from "../../../middleware/CommonFunctions";
 import ApproveRejectModal from "./ApproveRejectModal";
+import { useAlert } from "../../../middleware/AlertContext";
 
 function UsersTable() {
   const [dataList, setDataList] = useState([]);
@@ -13,18 +14,37 @@ function UsersTable() {
   const [searchParams] = useSearchParams();
   const [totalCount, setTotalCount] = useState(0);
   const [modalData, setModalData] = useState(null);
+  const [defaultStart, defaultEnd] = useMemo(() => getLastNDaysRange(7), []);
+  const { showSuccess, showError } = useAlert();
 
   const handleFetchData = async () => {
     setLoading(true);
     try {
-      const page = parseInt(searchParams.get("page") || "1", 10);
-      const limit = parseInt(searchParams.get("limit") || "10", 10);
 
-      const params = new URLSearchParams();
-      params.append("page", page);
-      params.append("limit", limit);
+      const params = {
+        page: parseInt(searchParams.get("page") || "1", 10),
+        limit: parseInt(searchParams.get("limit") || "10", 10),
+        start_date: searchParams.get("start_date") || defaultStart,
+        end_date: searchParams.get("end_date") || defaultEnd,
+      };
+      const optionalKeys = [
+        "name",
+        "email",
+        "phone",
+        "isVerified",
+        "isActive",
+        "userId"
+      ];
+      optionalKeys.forEach((key) => {
+        const value = searchParams.get(key)?.trim();
+        if (value) params[key] = value;
+      });
 
-      const url = `${usersConfig.userList}?${params.toString()}`;
+      const query = Object.entries(params)
+        .map(([k, v]) => `${k}=${v}`)
+        .join("&");
+
+      const url = `${usersConfig.userList}?${query}`;
 
       const { data } = await api.get(url);
 
@@ -37,6 +57,26 @@ function UsersTable() {
       setLoading(false);
     }
   };
+
+  const handleToggleActive = async (userId, currentStatus) => {
+    try {
+      await api.patch(
+        `${usersConfig.userApi}/${userId}`,
+        { isActive: !currentStatus }
+      );
+
+      setDataList((prev) =>
+        prev.map((u) =>
+          u.id === userId ? { ...u, isActive: !currentStatus } : u
+        )
+      );
+      showSuccess("User status updated successfully");
+    } catch (error) {
+      console.error('error: ', error);
+      showError("Failed to update user status");
+    }
+  };
+
 
   useEffect(() => {
     handleFetchData();
@@ -68,6 +108,7 @@ function UsersTable() {
                   <th>Pricing Plan</th>
                   <th>Created At</th>
                   <th>Verified</th>
+                  <th>Active</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -75,7 +116,7 @@ function UsersTable() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="7">
+                    <td colSpan="8">
                       <div className="dot-opacity-loader">
                         <span></span>
                         <span></span>
@@ -130,6 +171,19 @@ function UsersTable() {
                           </div>
                         )}
                       </td>
+                      <td>
+                        <div className=" form-switch">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            checked={!!data?.isActive}
+                            onChange={() =>
+                              handleToggleActive(data.id, data.isActive)
+                            }
+                          />
+                        </div>
+                      </td>
+
 
                       <td>
                         <Link
@@ -149,7 +203,7 @@ function UsersTable() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center">
+                    <td colSpan="8" className="text-center">
                       No records found
                     </td>
                   </tr>

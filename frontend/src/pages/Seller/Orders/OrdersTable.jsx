@@ -172,6 +172,7 @@ function OrdersTable() {
                   />
                 </th>
                 <th>Order ID</th>
+                <th>Channel</th>
                 <th>Customer</th>
                 <th>Pickup & delivery Address</th>
                 <th>Package Details</th>
@@ -214,6 +215,10 @@ function OrdersTable() {
                           {data.createdAt ? formatDateTime(data.createdAt) : ""}
                         </span>
                       </div>
+                    </td>
+
+                    <td className="py-2 box-class">
+                      {data?.channel_name || "Custom"}
                     </td>
 
                     <td className="py-2">

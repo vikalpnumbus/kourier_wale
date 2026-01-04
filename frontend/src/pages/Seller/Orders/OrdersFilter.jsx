@@ -12,7 +12,7 @@ function OrdersFilter({ setShowFilters }) {
     end_date: searchParams.get("end_date") || "",
   });
   const [orderId, setOrderId] = useState(searchParams.get("orderId") || "");
-  const [channelName, setChannelName] = useState(searchParams.get("channelName") || "");
+  const [channelName, setChannelName] = useState(searchParams.get("channel_name") || "");
   const [shippingName, setShippingName] = useState(
     searchParams.get("shippingName") || ""
   );
@@ -75,8 +75,8 @@ function OrdersFilter({ setShowFilters }) {
     if (orderId.trim()) params.orderId = orderId.trim();
     else delete params.orderId;
 
-    if (channelName.trim()) params.channelName = channelName.trim();
-    else delete params.channelName;
+    if (channelName.trim()) params.channel_name = channelName.trim();
+    else delete params.channel_name;
 
     if (shippingName.trim()) params.shippingName = shippingName.trim();
     else delete params.shippingName;
