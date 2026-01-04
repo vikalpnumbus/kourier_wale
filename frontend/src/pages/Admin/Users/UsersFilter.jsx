@@ -1,9 +1,19 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import warehouseConfig from "../../../config/Warehouse/WarehouseConfig";
-import api from "../../../utils/api";
-import Select from "react-select";
 import DateRange from "../../../Component/DateRange";
+import Select from "react-select";
+
+const ACTIVE_OPTIONS = [
+  { label: "All", value: "" },
+  { label: "Yes", value: "true" },
+  { label: "No", value: "false" },
+];
+
+const VERIFIED_OPTIONS = [
+  { label: "All", value: "" },
+  { label: "Yes", value: "true" },
+  { label: "No", value: "false" },
+];
 
 function UsersFilter({ setShowFilters }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -11,108 +21,82 @@ function UsersFilter({ setShowFilters }) {
     start_date: searchParams.get("start_date") || "",
     end_date: searchParams.get("end_date") || "",
   });
-  const [orderId, setOrderId] = useState(searchParams.get("orderId") || "");
   const [name, setName] = useState(searchParams.get("name") || "");
-  const [warehouse, setWarehouse] = useState(
-    searchParams.get("warehouse_id")
-      ? {
-          value: searchParams.get("warehouse_id"),
-          label: searchParams.get("warehouse_name") || "Selected Warehouse",
-        }
-      : null
-  );
-
-  const PAYMENT_TYPE_LABELS = {
-    cod: "COD",
-    prepaid: "Prepaid",
-  };
-
-  const [paymentType, setPaymentType] = useState(() => {
-    const param = searchParams.get("paymentType");
-    return param
-      ? { value: param, label: PAYMENT_TYPE_LABELS[param] || param }
+  const [email, setEmail] = useState(searchParams.get("email") || "");
+  const [phone, setPhone] = useState(searchParams.get("phone") || "");
+  const [userId, setUserId] = useState(searchParams.get("userId") || "");
+  const getInitialOption = (options, key) => {
+    const value = searchParams.get(key);
+    return value
+      ? options.find((opt) => opt.value === value)
       : null;
-  });
-
-  const [warehouseList, setWarehouseList] = useState([]);
-  const [loadingWarehouses, setLoadingWarehouses] = useState(false);
-
-  const handleFetchWarehouse = async () => {
-    setLoadingWarehouses(true);
-    try {
-      const { data } = await api.get(warehouseConfig.warehouseApi);
-      setWarehouseList(data?.data?.result || []);
-    } catch (error) {
-      console.error("Fetch warehouses error:", error);
-      setWarehouseList([]);
-    } finally {
-      setLoadingWarehouses(false);
-    }
   };
 
-  useEffect(() => {
-    handleFetchWarehouse();
-  }, []);
-
-  // memoize options for react-select
-  const warehouseOptions = useMemo(
-    () =>
-      warehouseList.map((w) => ({
-        value: w.id.toString(),
-        label: w.name,
-      })),
-    [warehouseList]
+  const [isActive, setIsActive] = useState(
+    getInitialOption(ACTIVE_OPTIONS, "isActive")
   );
+
+  const [isVerified, setIsVerified] = useState(
+    getInitialOption(VERIFIED_OPTIONS, "isVerified")
+  );
+
+
 
   const handleSearch = () => {
-    // Get existing search params as an object
     const params = Object.fromEntries([...searchParams]);
 
-    // Update with filter values
-    if (orderId.trim()) params.orderId = orderId.trim();
-    else delete params.orderId;
 
     if (name.trim()) params.name = name.trim();
     else delete params.name;
+    if (email.trim()) params.email = email.trim();
+    else delete params.email;
+    if (phone.trim()) params.phone = phone.trim();
+    else delete params.phone;
+    if (userId.trim()) params.userId = userId.trim();
+    else delete params.userId;
+    if (isActive?.value) params.isActive = isActive.value;
+    else delete params.isActive;
 
-    if (warehouse) {
-      params.warehouse_id = warehouse.value;
-      params.warehouse_name = warehouse.label;
-    } else {
-      delete params.warehouse_id;
-      delete params.warehouse_name;
-    }
+    if (isVerified?.value) params.isVerified = isVerified.value;
+    else delete params.isVerified;
 
-    if (paymentType?.value) params.paymentType = paymentType.value;
-    else delete params.paymentType;
 
     if (date?.start_date && date?.end_date) {
       params.start_date = date.start_date;
       params.end_date = date.end_date;
-    } else {
-      delete params.start_date;
-      delete params.end_date;
     }
 
     setSearchParams(params);
   };
 
   const handleClear = () => {
-    setOrderId("");
     setName("");
-    setWarehouse(null);
-    setPaymentType(null);
-    setDate("");
+    setEmail("");
+    setPhone("");
+    setUserId("");
+    setDate({ start_date: "", end_date: "" });
+    setIsActive(null);
+    setIsVerified(null);
     setSearchParams({});
     setShowFilters(false);
   };
+
+
   return (
     <div className="col-md-12 mt-3">
       <div className="row gap-2">
         <div className="col-md-3">
           <DateRange />
         </div>
-        {/* Shipping name */}
+        <div className="col-md-3">
+          <input
+            className="form-control py-2 px-4 pe-5"
+            placeholder="Search by Seller Id"
+            type="text"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+          />
+        </div>
         <div className="col-md-3">
           <input
             className="form-control py-2 px-4 pe-5"
@@ -122,56 +106,49 @@ function UsersFilter({ setShowFilters }) {
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-
-        {/* Order IDs */}
         <div className="col-md-3">
           <input
             className="form-control py-2 px-4 pe-5"
-            placeholder="Search orders by comma-separated IDs"
+            placeholder="Search by Customer Email"
             type="text"
-            value={orderId}
-            onChange={(e) => setOrderId(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="col-md-3">
+          <input
+            className="form-control py-2 px-4 pe-5"
+            placeholder="Search by Customer Phone"
+            type="text"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
         </div>
 
-        {/* Warehouse dropdown */}
-        <div className="col-md-3">
-          <Select
-            options={warehouseOptions}
-            value={warehouse}
-            onChange={setWarehouse}
-            placeholder="Select warehouse"
-            isSearchable
-            isLoading={loadingWarehouses}
-            styles={{
-              menu: (provided) => ({
-                ...provided,
-                zIndex: 9999,
-              }),
-            }}
-          />
-        </div>
+
 
         <div className="col-md-3">
           <Select
-            options={[
-              { label: "All", value: "" },
-              { label: "COD", value: "cod" },
-              { label: "Prepaid", value: "prepaid" },
-            ]}
-            value={paymentType}
-            onChange={setPaymentType}
-            placeholder="Select payment type"
-            styles={{
-              menu: (provided) => ({
-                ...provided,
-                zIndex: 9999,
-              }),
-            }}
+            options={ACTIVE_OPTIONS}
+            value={isActive}
+            onChange={setIsActive}
+            placeholder="Select Active Status"
+            isClearable
           />
+
+        </div>
+        <div className="col-md-3">
+
+          <Select
+            options={VERIFIED_OPTIONS}
+            value={isVerified}
+            onChange={setIsVerified}
+            placeholder="Select Verified Status"
+            isClearable
+          />
+
         </div>
 
-        {/* Actions */}
         <div className="col-md-3 d-flex align-items-center">
           <button
             type="button"
@@ -185,7 +162,6 @@ function UsersFilter({ setShowFilters }) {
             className="btn btn-light text-dark btn-md py-2 px-4"
             onClick={handleClear}
           >
-            {/* <Icon path={mdiClose} size={0.7} /> */}
             Clear
           </button>
         </div>

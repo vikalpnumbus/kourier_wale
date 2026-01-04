@@ -6,6 +6,7 @@ import usersConfig from "../../../config/AdminConfig/Users/Users";
 import api from "../../../utils/api";
 import { formatDateTime } from "../../../middleware/CommonFunctions";
 import ApproveRejectModal from "./ApproveRejectModal";
+import { useAlert } from "../../../middleware/AlertContext";
 
 function UserView() {
     const [userData, setUserData] = useState(null);
@@ -17,10 +18,14 @@ function UserView() {
     const [modalData, setModalData] = useState(null);
     const [searchParams] = useSearchParams();
     const { id } = useParams();
+    const { showSuccess, showError } = useAlert();
 
-    // -----------------------
-    // Fetch User Data
-    // -----------------------
+    const [isEditingRemit, setIsEditingRemit] = useState(false);
+    const [remitCycle, setRemitCycle] = useState("");
+    const [remitLoading, setRemitLoading] = useState(false);
+
+
+
     const handleUserData = async () => {
         setUserDataLoading(true);
         try {
@@ -35,9 +40,6 @@ function UserView() {
         }
     };
 
-    // -----------------------
-    // Fetch KYC Data
-    // -----------------------
     const handleUserKycData = async () => {
         setKycDataLoading(true);
         try {
@@ -52,10 +54,46 @@ function UserView() {
         }
     };
 
+    const handleRemittanceCycle = async () => {
+        if (!remitCycle.trim()) return;
+
+        try {
+            setRemitLoading(true);
+
+            await api.patch(
+                `${usersConfig.userApi}/${id}`,
+                { seller_remit_cycle: remitCycle.trim() }
+            );
+
+            setUserData((prev) =>
+                prev
+                    ? { ...prev, seller_remit_cycle: remitCycle.trim() }
+                    : prev
+            );
+
+            showSuccess("Remittance cycle updated successfully");
+            setIsEditingRemit(false);
+        } catch (error) {
+            console.error(error);
+            showError("Failed to update remittance cycle");
+        } finally {
+            setRemitLoading(false);
+        }
+    };
+
     useEffect(() => {
         handleUserData();
         handleUserKycData();
     }, [id, searchParams]);
+
+
+    useEffect(() => {
+        if (!isEditingRemit && userData?.seller_remit_cycle) {
+            setRemitCycle(userData.seller_remit_cycle);
+        }
+    }, [userData, isEditingRemit]);
+
+
 
 
     const Skeleton = () => (
@@ -205,6 +243,72 @@ function UserView() {
                             )}
                         </div>
                     </div>
+
+                    <div className="col-12 col-md-6">
+                        <div className="card p-3 mb-3 border">
+                            <div className="d-flex align-items-center gap-2 mb-4">
+                                <Icon path={mdiAccountBoxOutline} size={0.9} />
+                                <h5 className="card-title mb-0">Remittance</h5>
+                            </div>
+
+                            {userDataLoading || remitLoading ? (
+                                <Skeleton />
+                            ) : !userData ? (
+                                <p>No user data available.</p>
+                            ) : (
+                                <ul className="p-0" style={{ listStyleType: "none" }}>
+                                    <li className="d-flex justify-content-between align-items-center border-bottom py-2">
+                                        <strong>Remittance Cycle:</strong>
+
+                                        {!isEditingRemit ? (
+                                            <div className="d-flex align-items-center gap-2">
+                                                <span>{userData.seller_remit_cycle || "-"}</span>
+                                                <button
+                                                    className="btn btn-sm btn-outline-primary"
+                                                    onClick={() => setIsEditingRemit(true)}
+                                                >
+                                                    Edit
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="d-flex align-items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    className="form-control form-control-sm"
+                                                    value={remitCycle}
+                                                    onChange={(e) => setRemitCycle(e.target.value)}
+                                                    disabled={remitLoading}
+                                                    style={{ width: 160 }}
+                                                />
+
+                                                <button
+                                                    className="btn btn-sm btn-dark"
+                                                    disabled={remitLoading}
+                                                    onClick={handleRemittanceCycle}
+                                                >
+                                                    Save
+                                                </button>
+
+                                                <button
+                                                    className="btn btn-sm btn-secondary"
+                                                    disabled={remitLoading}
+                                                    onClick={() => {
+                                                        setRemitCycle(userData.seller_remit_cycle);
+                                                        setIsEditingRemit(false);
+                                                    }}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        )}
+                                    </li>
+                                </ul>
+                            )}
+                        </div>
+                    </div>
+
+
+
                 </div>
             </div>
 
