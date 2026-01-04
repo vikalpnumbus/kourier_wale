@@ -15,14 +15,20 @@ class Service {
     try {
       const { page = 1, limit = 50, id, name, email, phone, isVerified, start_date, end_date, include, isActive, handlingAdmins, userId } = params;
 
-      const whereClause = { [Op.and]: [] };
+      const whereClause = {
+        [Op.and]: [
+          {
+            role: "user",
+          },
+        ],
+      };
       if (id) whereClause[Op.and].push({ id });
       if (email) {
         whereClause[Op.and].push({
           email: { [Op.like]: `%${email}%` },
         });
       }
-      if (userId) whereClause[Op.and].push({id: userId?.toString()?.split(',') });
+      if (userId) whereClause[Op.and].push({ id: userId?.toString()?.split(",") });
       if (phone) whereClause[Op.and].push({ phone });
       if (isVerified) whereClause[Op.and].push({ isVerified: isVerified == "true" });
       if (isActive) whereClause[Op.and].push({ isActive: isActive == "true" });
