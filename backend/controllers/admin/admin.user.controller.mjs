@@ -2,10 +2,10 @@ import UserService from "../../services/admin/admin.user.service.mjs";
 
 export const update = async (req, res, next) => {
   try {
-    const { isActive, seller_remit_cycle } = req.body;
+    const { isActive, seller_remit_cycle, pricingPlanId } = req.body;
     const { id } = req.params;
 
-    const result = await UserService.update({ data: { isActive, seller_remit_cycle, id } });
+    const result = await UserService.update({ data: { isActive, seller_remit_cycle, pricingPlanId, id } });
     if (!result) throw UserService.error;
 
     res.success(result);

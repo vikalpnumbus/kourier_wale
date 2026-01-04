@@ -184,10 +184,10 @@ class Service {
 
       // Date filters (ignore time)
       if (start_date) {
-        whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.gte]: start_date }));
+        whereClause[Op.and].push(where(fn("DATE", col("orders.createdAt")), { [Op.gte]: start_date }));
       }
       if (end_date) {
-        whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.lte]: end_date }));
+        whereClause[Op.and].push(where(fn("DATE", col("orders.createdAt")), { [Op.lte]: end_date }));
       }
 
       // If no conditions were added, remove Op.and

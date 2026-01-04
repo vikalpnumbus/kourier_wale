@@ -141,11 +141,11 @@ class Service {
   async update({ data }) {
     console.log("data: ", data);
     try {
-      const { isActive, seller_remit_cycle, id } = data;
+      const { isActive, seller_remit_cycle, pricingPlanId, id } = data;
 
       delete data.id;
 
-      let payload = { isActive, seller_remit_cycle };
+      let payload = { isActive, seller_remit_cycle, pricingPlanId };
 
       const result = await this.repository.findOneAndUpdate({ id }, payload);
 
