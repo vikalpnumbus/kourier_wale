@@ -4,6 +4,7 @@ import csv from "csv-parser";
 import { stringify } from "csv-stringify/sync";
 import { Readable } from "stream";
 import FactoryRepository from "../repositories/factory.repository.mjs";
+import redisClient from "../configurations/redis.config.mjs";
 
 /**
  * readCsvAsArray is a function which is used to read data from a csv file.
@@ -88,11 +89,35 @@ export const formatDate_YYYY_MM_DD_HH_MM_SS = (d = new Date()) => {
   return `${year}-${month}-${day} ${hours}:${mins}:${secs}`;
 };
 
-
 export const capitialiseFirstLetter = (input) => {
   if (!input) throw new Error("No text provided.");
   const text = input.toString();
   return text[0].toUpperCase() + text.slice(1);
+};
+
+export const withCache = async ({ key, ttl, fetcher }) => {
+  const cached = await redisClient.redis.get(key);
+  if (cached) return JSON.parse(cached);
+
+  const data = await fetcher();
+  await redisClient.redis.set(key, JSON.stringify(data), "EX", ttl);
+
+  return data;
+};
+
+export const redisScanKeys = async (pattern = "*") => {
+  let cursor = "0";
+  const keys = [];
+
+  do {
+    const [nextCursor, batch] = await redisClient.redis.scan(cursor, "MATCH", pattern, "COUNT", 100);
+
+    cursor = nextCursor;
+    keys.push(...batch);
+  } while (cursor !== "0");
+
+  console.log("keys: ", keys);
+  return keys;
 };
 
 class CustomMathClass {

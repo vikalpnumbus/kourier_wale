@@ -34,9 +34,11 @@ import AdminRemittanceRouter from "./admin/admin.remittance.route.mjs";
 import AdminExportRouter from "./admin/admin.exports.route.mjs";
 import AdminImportRouter from "./admin/admin.imports.route.mjs";
 import RemittanceRouter from "./remittance.route.mjs";
+import DashboardRouter from "./dashboard.route.mjs";
 
 const globalRouter = express.Router();
 
+globalRouter.use("/dashboard", DashboardRouter);
 globalRouter.use("/users", UserRouter);
 globalRouter.use("/kyc", KYCRouter);
 globalRouter.use("/company-details", CompanyDetailsRouter);
