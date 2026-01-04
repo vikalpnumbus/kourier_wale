@@ -137,6 +137,45 @@ function ShipmentsTable() {
       }
   };
 
+
+  const downloadLabels = async () =>
+  {
+        if (!selectedShipments.length) {
+          alert("Please select at least one booked shipment");
+          return;
+        }
+        try {
+          const apiUrl = ShipmentsConfig.shipment_bulk_label;
+          const response = await api.post(
+            apiUrl,
+            {
+              shipping_db_ids: selectedShipments,
+            },
+            {
+              responseType: "blob",
+            }
+          );
+          const blob = new Blob([response.data], {
+            type: "application/pdf",
+          });
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = "shipment-labels.pdf";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        } catch (error) {
+          console.error("Label download error:", error);
+          alert("Failed to download labels");
+        }
+  };
+
+
+
+
+
   return (
     <div className="tab-content tab-content-vertical">
       <div className="tab-pane fade show active" role="tabpanel">
@@ -150,7 +189,7 @@ function ShipmentsTable() {
                 >
                   Selected: {selectedShipments?.length}
                 </div>
-                <div className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }}>
+                <div onClick = {downloadLabels} disabled={!selectedShipments.length} className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }}>
                   <Icon path={mdiPrinter} size={0.7} /> Bulk Label
                 </div>
                 <div className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }} onClick={handleBulkCancel}>
