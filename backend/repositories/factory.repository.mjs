@@ -66,8 +66,18 @@ class Class {
   }
 }
 
-UserModel.hasOne(KycModel, { foreignKey: "userId" });
-KycModel.belongsTo(UserModel, { foreignKey: "userId" });
+UserModel.hasOne(KycModel, { foreignKey: "userId", as: "kyc" });
+KycModel.belongsTo(UserModel, { foreignKey: "userId", as: "user" });
+
+UserModel.hasMany(KycModel, {
+  foreignKey: "approvedBy",
+  as: "approvedKycs",
+});
+
+KycModel.belongsTo(UserModel, {
+  foreignKey: "approvedBy",
+  as: "approvedByUser",
+});
 
 UserModel.hasMany(ShippingModel, {
   foreignKey: "userId",

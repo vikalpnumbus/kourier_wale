@@ -56,8 +56,16 @@ class Service {
 
       const includeKyc = {
         model: this.kycRepository.model,
+        as: "kyc",
         required: false, // LEFT JOIN
-        attributes: ["id", "status", "createdAt", "remarks"],
+        attributes: ["id", "status", "createdAt", "remarks", "approvedBy"],
+        include: [
+          {
+            model: this.repository.model, // User model
+            as: "approvedByUser",
+            attributes: ["id", "fname", "lname", "email"],
+          },
+        ],
       };
 
       const includeHandlingAdmins = {
