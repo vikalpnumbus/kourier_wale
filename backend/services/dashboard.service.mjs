@@ -132,6 +132,59 @@ class Service {
       return false;
     }
   }
+
+  async productWiseStats(params) {
+    try {
+      const { start_date = "2025-08-01", end_date = formatDate_YYYY_MM_DD(Date.now()), userId } = params;
+      const key = `dashboard:${userId}:productWiseStats:${start_date}:${end_date}`;
+
+      const query = `
+        SELECT
+          p.id   AS product_id,
+          p.name AS product_name,
+          p.sku  AS product_sku,
+      
+          COUNT(*) AS total_shipments,
+      
+          SUM(s.shipping_status = 'new')       AS new_count,
+          SUM(s.shipping_status = 'booked') AS booked_count,
+          SUM(s.shipping_status = 'pending_pickup') AS pending_pickup_count,
+          SUM(s.shipping_status = 'in_transit') AS in_transit_count,
+          SUM(s.shipping_status = 'delivered') AS delivered_count,
+          SUM(s.shipping_status = 'rto')    AS rto_count
+      
+        FROM shipping s
+        JOIN JSON_TABLE(
+          s.products,
+          '$[*]' COLUMNS (
+            id   VARCHAR(50)  PATH '$.id',
+            name VARCHAR(255) PATH '$.name',
+            sku  VARCHAR(255) PATH '$.sku'
+          )
+        ) p
+        WHERE s.createdAt>= :start_date AND s.createdAt<= :end_date AND s.userId = 4
+        GROUP BY p.id, p.name, p.sku
+        LIMIT 10;
+       `;
+
+      const result = await withCache({
+        key,
+        ttl: 600,
+        fetcher: async () => {
+          const [result] = await sqlDB.sequelize.query(query, {
+            replacements: { start_date, end_date, userId },
+          });
+          return result;
+        },
+      });
+
+      return { data: result };
+    } catch (error) {
+      console.log("error: ", error);
+      this.error = error;
+      return false;
+    }
+  }
 }
 
 const DashboardService = new Service();

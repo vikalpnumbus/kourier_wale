@@ -63,3 +63,19 @@ export const cityWiseStats = async (req, res, next) => {
     next(error);
   }
 };
+
+export const productWiseStats = async (req, res, next) => {
+  try {
+    const { start_date, end_date } = req.query;
+    const query = { start_date, end_date, userId: req.user.id };
+    const result = await DashboardService.productWiseStats(query);
+
+    if (!result) {
+      throw DashboardService.error;
+    }
+
+    res.success(result);
+  } catch (error) {
+    next(error);
+  }
+};
