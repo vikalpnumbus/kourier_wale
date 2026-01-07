@@ -1,6 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
-import Home from "../pages/Seller/Home";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Theme from "../pages/Seller/Theme";
 import KYCDetails from "../pages/Seller/KYC/KYCDetails";
 import BankDetailsForm from "../pages/Seller/BankDetails/BankDetailsForm";
@@ -36,13 +35,14 @@ import ShippingCharge from "../pages/Seller/Billing/ShippingCharge";
 import ShippingChargesTable from "../pages/Seller/Billing/ShippingCharge/ShippingChargesTable";
 import WalletTransaction from "../pages/Seller/WalletTransaction";
 import WalletTransactionTable from "../pages/Seller/WalletTransaction/WalletTransactionTable";
+import SellerDashboard from "../pages/Seller/SellerDashboard/SellerDashboard";
 function AppRoutes() {
   return (
     <>
       <SellerLayout>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Home />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<SellerDashboard />} />
           <Route path="/theme" element={<Theme />} />
 
           <Route path="/profile" element={<Profile />}>

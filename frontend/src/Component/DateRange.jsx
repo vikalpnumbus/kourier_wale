@@ -9,6 +9,20 @@ export default function DateRange() {
 
   const toDO = (d) => new DateObject(d);
 
+  const isSameDay = (d1, d2) =>
+    d1.format("YYYY-MM-DD") === d2.format("YYYY-MM-DD");
+
+  const matchQuickFilter = (start, end) => {
+    for (const filter of quickFilters) {
+      const [fStart, fEnd] = filter.getRange();
+      if (isSameDay(start, fStart) && isSameDay(end, fEnd)) {
+        return filter.label;
+      }
+    }
+    return "Custom";
+  };
+
+
   const startOfDay = (date) => {
     const s = new Date(date);
     s.setHours(0, 0, 0, 0);
@@ -58,7 +72,7 @@ export default function DateRange() {
       : defaultLast7
   );
 
-  const [selectedFilter, setSelectedFilter] = useState("Last 7 Days");
+  const [selectedFilter, setSelectedFilter] = useState("");
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -123,6 +137,22 @@ export default function DateRange() {
     values && values[0] && values[1]
       ? `${formatDate(values[0])} ➛ ${formatDate(values[1])}`
       : "";
+
+  useEffect(() => {
+    if (initialStart && initialEnd) {
+      const start = new DateObject(initialStart);
+      const end = new DateObject(initialEnd);
+
+      setValues([start, end]);
+      setSelectedFilter(matchQuickFilter(start, end));
+    } else {
+      // 👇 DEFAULT CASE
+      setValues(defaultLast7);
+      setSelectedFilter("Last 7 Days");
+    }
+  }, [initialStart, initialEnd]);
+
+
 
   return (
     <div
