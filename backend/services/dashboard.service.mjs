@@ -40,6 +40,7 @@ class Service {
         SELECT 
           courier.id AS courier_id,
           courier.name AS courier_name,
+          SUM(CASE WHEN shipping.shipping_status = 'booked' THEN 1 ELSE 0 END) AS booked,
           SUM(CASE WHEN shipping.shipping_status = 'pending_pickup' THEN 1 ELSE 0 END) AS pending_pickup,
           SUM(CASE WHEN shipping.shipping_status = 'delivered' THEN 1 ELSE 0 END) AS delivered_count,
           SUM(CASE WHEN shipping.shipping_status = 'rto' THEN 1 ELSE 0 END) AS rto_count,
