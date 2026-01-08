@@ -36,10 +36,8 @@ function DashStats({ defaultStart, defaultEnd }) {
             const url = `${SellerDashboardConfig.dashStats}?${query}`;
 
             const { data } = await api.get(url);
-            console.log('url: ', url);
-            console.log('data: ', data);
 
-            setStatsData(data?.data[0] || []);
+            setStatsData(data?.data || {});
         } catch (error) {
             console.error("Fetch error:", error);
             setStatsData([]);
