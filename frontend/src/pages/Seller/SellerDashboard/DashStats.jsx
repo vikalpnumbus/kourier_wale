@@ -60,7 +60,7 @@ function DashStats({ defaultStart, defaultEnd }) {
                                 <div>
                                     <p className="statistics-title">Total Order</p>
                                     <h3 className="rate-percentage">
-                                        {statsData?.total_delivered_shipments || "--"}
+                                        {statsData?.total_orders || "--"}
                                     </h3>
                                 </div>
 
