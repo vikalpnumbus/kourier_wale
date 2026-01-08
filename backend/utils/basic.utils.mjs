@@ -97,7 +97,7 @@ export const capitialiseFirstLetter = (input) => {
 
 export const withCache = async ({ key, ttl, fetcher }) => {
   const cached = await redisClient.redis.get(key);
-  if (cached) return JSON.parse(cached);
+  // if (cached) return JSON.parse(cached);
 
   const data = await fetcher();
   await redisClient.redis.set(key, JSON.stringify(data), "EX", ttl);
