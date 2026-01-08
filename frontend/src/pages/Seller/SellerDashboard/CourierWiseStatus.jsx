@@ -26,6 +26,7 @@ function CourierWiseStatus({ statsData = [], loading }) {
                                             <tr>
                                                 <th>Courier</th>
                                                 <th>Total</th>
+                                                <th>Booked</th>
                                                 <th>Pending Pickup</th>
                                                 <th>In Transit</th>
                                                 <th>Delivered</th>
