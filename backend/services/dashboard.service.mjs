@@ -47,7 +47,7 @@ class Service {
           SUM(CASE WHEN shipping.shipping_status = 'in-transit' THEN 1 ELSE 0 END) AS in_transit_count
         FROM shipping INNER JOIN courier
         ON shipping.courier_id = courier.id
-        WHERE shipping.createdAt>= ':start_date' AND shipping.createdAt<= ':end_date' AND shipping.userId = ':userId' GROUP BY courier.id, courier.name;
+        WHERE shipping.createdAt>= :start_date AND shipping.createdAt<= :end_date AND shipping.userId = :userId GROUP BY courier.id, courier.name;
        `;
 
       const result = await withCache({
