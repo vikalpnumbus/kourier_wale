@@ -35,13 +35,14 @@ function CourierWiseStatus({ statsData = [], loading }) {
                                         <tbody>
                                             {statsData.length > 0 ? (
                                                 statsData.map((data) => {
+                                                    const booked = getNumber(data.booked);
                                                     const pending = getNumber(data.pending_pickup);
                                                     const transit = getNumber(data.in_transit_count);
                                                     const delivered = getNumber(data.delivered_count);
                                                     const rto = getNumber(data.rto_count);
 
                                                     const total =
-                                                        pending + transit + delivered + rto;
+                                                        getNumber(data.total);
 
                                                     return (
                                                         <tr key={data.courier_id}>
@@ -49,6 +50,7 @@ function CourierWiseStatus({ statsData = [], loading }) {
                                                                 {data.courier_name || "-"}
                                                             </td>
                                                             <td className="py-3">{total}</td>
+                                                            <td className="py-3">{booked}</td>
                                                             <td className="py-3">{pending}</td>
                                                             <td className="py-3">{transit}</td>
                                                             <td className="py-3">{delivered}</td>
