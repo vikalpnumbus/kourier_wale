@@ -58,19 +58,15 @@ class Service {
         email: data.email,
         subject: "Kourier Wale - Your Registration OTP",
         html: `
-        Dear ${[data?.fname, data?.lname].map((e) => e.charAt(0).toUpperCase() + e.slice(1)).join(" ")},
+        <br/>Dear ${[data?.fname, data?.lname].map((e) => e.charAt(0).toUpperCase() + e.slice(1)).join(" ")},
 
-        Thank you for registering with us. Your One-Time Password (OTP) for account verification is:
-
-        ${otpData.email_otp}
-
-        Please use this OTP to complete your registration process.
-
-        If you did not request this OTP, please ignore this email. The OTP is valid for a limited time.
-
-        Best regards,
-        Onboarding Team
-        Kourier Wale
+        <br/>Thank you for registering with us. Your One-Time Password (OTP) for account verification is:
+        <br/>${otpData.email_otp}
+        <br/>Please use this OTP to complete your registration process.
+        <br/>If you did not request this OTP, please ignore this email. The OTP is valid for a limited time.
+        <br/>Best regards,
+        <br/>Onboarding Team
+        <br/>Kourier Wale
         `,
       });
       return {
