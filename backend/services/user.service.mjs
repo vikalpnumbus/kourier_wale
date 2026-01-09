@@ -212,7 +212,7 @@ class Service {
           email: query.email,
           subject: "Kourier Wale - Your Registration OTP",
           html: `
-        <br/>Dear ${[data?.fname, data?.lname].map((e) => e.charAt(0).toUpperCase() + e.slice(1)).join(" ")},
+        <br/>Dear,
 
         <br/>Thank you for registering with us. Your One-Time Password (OTP) for account verification is:
         <br/>${otpData.email_otp}
