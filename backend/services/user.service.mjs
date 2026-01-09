@@ -27,9 +27,7 @@ class Service {
         }));
 
       if (existingUser) {
-        const error = new Error(
-          "User with this email or phone number already exists."
-        );
+        const error = new Error("User with this email or phone number already exists.");
         error.status = 422;
         throw error;
       }
@@ -58,8 +56,22 @@ class Service {
 
       await NotificationService.sendEmail({
         email: data.email,
-        subject: "Email Verification OTP",
-        html: `Your otp for email verification is <b>${otpData.email_otp}</b>`,
+        subject: "Kourier Wale - Your Registration OTP",
+        html: `
+        Dear ${[data?.fname, data?.lname].map((e) => e.charAt(0).toUpperCase() + e.slice(1)).join(" ")},
+
+        Thank you for registering with us. Your One-Time Password (OTP) for account verification is:
+
+        ${otpData.email_otp}
+
+        Please use this OTP to complete your registration process.
+
+        If you did not request this OTP, please ignore this email. The OTP is valid for a limited time.
+
+        Best regards,
+        Onboarding Team
+        Kourier Wale
+        `,
       });
       return {
         status: 201,
@@ -78,7 +90,7 @@ class Service {
       const { type, to, otp } = data;
       let query = {};
       if (type == "phone") query = { phone: to };
-      if (type == "email") query = { email: to , email_otp:otp};
+      if (type == "email") query = { email: to, email_otp: otp };
 
       let otpInstance = await this.otpRepository.findOne(query);
 
@@ -90,28 +102,19 @@ class Service {
 
       //const user = JSON.parse(JSON.stringify(otpInstance.user));
 
-      const user =
-        typeof otpInstance.user === "string"
-          ? JSON.parse(otpInstance.user)
-          : otpInstance.user;
+      const user = typeof otpInstance.user === "string" ? JSON.parse(otpInstance.user) : otpInstance.user;
 
       if (type == "email") {
         user.isEmailVerified = true;
-      } 
+      }
 
       otpInstance = { ...otpInstance, user };
 
-      if (
-        otpInstance?.user?.isEmailVerified  
-      ) {
+      if (otpInstance?.user?.isEmailVerified) {
         const newUser = await this.repository.save({
           ...JSON.parse(JSON.stringify(otpInstance.user)),
-          fname:
-            otpInstance.user.fname?.[0].toUpperCase() +
-            otpInstance.user.fname?.slice(1).toLowerCase(),
-          lname:
-            otpInstance.user.lname?.[0].toUpperCase() +
-            otpInstance.user.lname?.slice(1).toLowerCase(),
+          fname: otpInstance.user.fname?.[0].toUpperCase() + otpInstance.user.fname?.slice(1).toLowerCase(),
+          lname: otpInstance.user.lname?.[0].toUpperCase() + otpInstance.user.lname?.slice(1).toLowerCase(),
         });
 
         await this.otpRepository.deleteMany({
@@ -123,8 +126,7 @@ class Service {
           return {
             status: 500,
             data: {
-              message:
-                "User verified successfullly. Account created. Please login",
+              message: "User verified successfullly. Account created. Please login",
             },
           };
         }
@@ -153,17 +155,9 @@ class Service {
           id: newUser?.id,
         });
         const authCode = crypto.randomBytes(32).toString("hex");
-        const hashedAuthCode = crypto
-          .createHash("sha256")
-          .update(authCode)
-          .digest("hex");
+        const hashedAuthCode = crypto.createHash("sha256").update(authCode).digest("hex");
 
-        await redisClient.redis.set(
-          `authCode:${hashedAuthCode}`,
-          token,
-          "EX",
-          600
-        );
+        await redisClient.redis.set(`authCode:${hashedAuthCode}`, token, "EX", 600);
 
         return {
           status: 200,
@@ -173,18 +167,12 @@ class Service {
           },
         };
       } else {
-        await this.otpRepository.findOneAndUpdate(
-          { phone: otpInstance.phone },
-          { ...otpInstance, user }
-        );
+        await this.otpRepository.findOneAndUpdate({ phone: otpInstance.phone }, { ...otpInstance, user });
 
         return {
           status: 200,
           data: {
-            message:
-              type == "email"
-                ? `Email verified successfully.`
-                : `Phone verified successfully.`,
+            message: type == "email" ? `Email verified successfully.` : `Phone verified successfully.`,
           },
         };
       }
@@ -222,8 +210,22 @@ class Service {
         };
         await NotificationService.sendEmail({
           email: query.email,
-          subject: "Email Verification OTP",
-          html: `Your otp for email verification is <b>${query.email_otp}</b>`,
+          subject: "Kourier Wale - Your Registration OTP",
+          html: `
+        Dear ${[data?.fname, data?.lname].map((e) => e.charAt(0).toUpperCase() + e.slice(1)).join(" ")},
+
+        Thank you for registering with us. Your One-Time Password (OTP) for account verification is:
+
+        ${otpData.email_otp}
+
+        Please use this OTP to complete your registration process.
+
+        If you did not request this OTP, please ignore this email. The OTP is valid for a limited time.
+
+        Best regards,
+        Onboarding Team
+        Kourier Wale
+        `,
         });
       }
 
@@ -270,17 +272,9 @@ class Service {
       });
 
       const authCode = crypto.randomBytes(32).toString("hex");
-      const hashedAuthCode = crypto
-        .createHash("sha256")
-        .update(authCode)
-        .digest("hex");
+      const hashedAuthCode = crypto.createHash("sha256").update(authCode).digest("hex");
 
-      await redisClient.redis.set(
-        `authCode:${hashedAuthCode}`,
-        token,
-        "EX",
-        600
-      );
+      await redisClient.redis.set(`authCode:${hashedAuthCode}`, token, "EX", 600);
 
       return {
         data: {
@@ -306,10 +300,7 @@ class Service {
         throw error;
       }
       const rawToken = crypto.randomBytes(32).toString("hex");
-      existingUser.resetPasswordToken = crypto
-        .createHash("sha256")
-        .update(rawToken)
-        .digest("hex");
+      existingUser.resetPasswordToken = crypto.createHash("sha256").update(rawToken).digest("hex");
       existingUser.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
       await this.repository.findOneAndUpdate(existingUser.id, existingUser);
@@ -330,10 +321,7 @@ class Service {
 
   async resetPassword(params, data) {
     try {
-      const hashedToken = crypto
-        .createHash("sha256")
-        .update(params?.token)
-        .digest("hex");
+      const hashedToken = crypto.createHash("sha256").update(params?.token).digest("hex");
       const existingUser = await this.repository.findOneAndUpdate(
         {
           resetPasswordToken: hashedToken,
@@ -362,10 +350,7 @@ class Service {
 
   async handleTokenCallback(data) {
     try {
-      const hashedAuthCode = crypto
-        .createHash("sha256")
-        .update(data.authCode)
-        .digest("hex");
+      const hashedAuthCode = crypto.createHash("sha256").update(data.authCode).digest("hex");
 
       const result = await redisClient.redis.get(`authCode:${hashedAuthCode}`);
 
@@ -387,11 +372,7 @@ class Service {
   async read(params) {
     try {
       let existingUser;
-      if (
-        params.id &&
-        typeof params.id == "object" &&
-        Array.isArray(params.id)
-      ) {
+      if (params.id && typeof params.id == "object" && Array.isArray(params.id)) {
         existingUser = await this.repository.find(params);
       } else existingUser = await this.repository.findOne(params);
       if (!existingUser) {
