@@ -59,11 +59,15 @@ class Service {
         subject: "Kourier Wale - Your Registration OTP",
         html: `
         <br/>Dear ${[data?.fname, data?.lname].map((e) => e.charAt(0).toUpperCase() + e.slice(1)).join(" ")},
-
+        <br/>
         <br/>Thank you for registering with us. Your One-Time Password (OTP) for account verification is:
+        <br/>
         <br/>${otpData.email_otp}
+        <br/>
         <br/>Please use this OTP to complete your registration process.
+        <br/>
         <br/>If you did not request this OTP, please ignore this email. The OTP is valid for a limited time.
+        <br/>
         <br/>Best regards,
         <br/>Onboarding Team
         <br/>Kourier Wale
