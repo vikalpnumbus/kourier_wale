@@ -215,7 +215,7 @@ class Service {
         <br/>Dear,
 
         <br/>Thank you for registering with us. Your One-Time Password (OTP) for account verification is:
-        <br/>${otpData.email_otp}
+        <br/>${query.email_otp}
         <br/>Please use this OTP to complete your registration process.
         <br/>If you did not request this OTP, please ignore this email. The OTP is valid for a limited time.
         <br/>Best regards,
