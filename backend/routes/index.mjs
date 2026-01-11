@@ -35,6 +35,7 @@ import AdminExportRouter from "./admin/admin.exports.route.mjs";
 import AdminImportRouter from "./admin/admin.imports.route.mjs";
 import RemittanceRouter from "./remittance.route.mjs";
 import DashboardRouter from "./dashboard.route.mjs";
+import InvoiceSettingsRouter from "./InvoiceSettings.router.mjs";
 
 const globalRouter = express.Router();
 
@@ -55,6 +56,7 @@ globalRouter.use("/user-courier", UserCourierRouter);
 globalRouter.use("/serviceable-pincodes", ServiceablePincodesRouter);
 globalRouter.use("/shipping", ShippingRouter);
 globalRouter.use("/label-settings", LabelSettingsRouter);
+globalRouter.use("/invoice-settings", InvoiceSettingsRouter);
 globalRouter.use("/channel", ChannelRouter);
 globalRouter.use("/payments", PaymentRouter);
 globalRouter.use("/webhooks", WebhookRouter);

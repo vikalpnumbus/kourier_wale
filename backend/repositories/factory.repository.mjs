@@ -8,6 +8,7 @@ import CSVModel from "../model/csvLogs.sql.model.mjs";
 import EscalationModel from "../model/escalation.sql.model.mjs";
 import EscalationConversationsModel from "../model/escalationsConversations.sql.mode.mjs";
 import ExportJobs from "../model/exportJobs.sql.model.mjs";
+import InvoiceSettingsModel from "../model/invocieSettings.sql.model.mjs";
 import KycModel from "../model/kyc.sql.model.mjs";
 import OrdersModel from "../model/orders.sql.model.mjs";
 import OTPModel from "../model/otp.sql.model.mjs";
@@ -52,6 +53,7 @@ class Class {
       escalations_conversations: new BaseRepositoryClass(EscalationConversationsModel),
       weightReco: new BaseRepositoryClass(WeightRecoModel),
 
+      invoiceSettings: new BaseRepositoryClass(InvoiceSettingsModel),
       remittanceBatch: new BaseRepositoryClass(RemittanceBatchModel),
       remittanceSeller: new BaseRepositoryClass(RemittanceSellerModel),
 
