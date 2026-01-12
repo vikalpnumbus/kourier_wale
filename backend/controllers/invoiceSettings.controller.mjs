@@ -33,7 +33,8 @@ export const generate = async (req, res, next) => {
   try {
     const result = await InvoiceSettingsService.generate({ userId: req.user.id, ...req.body });
     if (!result) throw InvoiceSettingsService.error;
-    res.success(result);
+    console.log('result: ', result);
+    res.success({data:result});
   } catch (error) {
     next(error);
   }

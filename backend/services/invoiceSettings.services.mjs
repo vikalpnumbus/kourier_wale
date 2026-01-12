@@ -71,7 +71,7 @@ class Service {
       const result = await this.shippingRepository.find({ userId, id: shipping_db_ids, shipping_status: { [Op.notIn]: ["cancelled", "new"] } });
 
       if (!result) throw new Error("Some error occured. Please try again later.");
-      result.map(async (shipment) => {
+      const invoiceData = await Promise.all(result.map(async (shipment) => {
         const { order_db_id, warehouse_id, courier_id, shipping_status, awb_number, createdAt, products } = shipment;
         console.log("{order_db_id, warehouse_id, courier_id, shipping_status, awb_number, createdAt} : ", {
           order_db_id,
@@ -87,18 +87,14 @@ class Service {
           companyDetailsDataRes = {},
           courierDataRes = {},
           warehouseDataRes = {},
-          productsDataRes = {},
           invoiceSettingsDataRes = {},
-          orderInvoiceDateDataRes = {},
           userDataRes = {},
         ] = await Promise.all([
           await OrdersService.read({ userId, id: order_db_id }),
           await CompanyDetailsService.view({ id: userId }),
           await CourierService.read({ id: courier_id }),
           await WarehouseService.read(warehouse_id == "0" ? { userId } : { id: warehouse_id, userId }),
-          products,
           await this.repository.findOne({ userId }),
-          {},
           await UserService.read({ id: userId }),
         ]);
 
@@ -108,17 +104,12 @@ class Service {
         const warehouseData = warehouseDataRes?.data?.result?.[0];
         const productsData = orderData?.products;
         const invoiceSettingsData = invoiceSettingsDataRes;
-        const orderInvoiceDateData = orderInvoiceDateDataRes?.data?.result?.[0];
-        const userData = userDataRes
-        console.log({ orderData, companyDetailsData, courierData, warehouseData, productsData, invoiceSettingsData, orderInvoiceDateData, userData });
-      });
+        const orderInvoiceDateData = orderDataRes?.data?.result?.[0]?.createdAt;
+        const userData = userDataRes;
+        return { orderData, companyDetailsData, courierData, warehouseData, productsData, invoiceSettingsData, orderInvoiceDateData, userData };
+      }));
 
-      return {
-        status: 201,
-        data: {
-          message: "Invoice Settings updated successfully.",
-        },
-      };
+      return {...invoiceData};
     } catch (error) {
       throw error;
     }
@@ -127,3 +118,8 @@ class Service {
 
 const InvoiceSettingsService = new Service();
 export default InvoiceSettingsService;
+
+(async () => {
+  const result = await InvoiceSettingsService.generate({ userId: 2, shipping_db_ids: [131] });
+  console.log(result)
+})();

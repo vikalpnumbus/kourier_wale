@@ -1,0 +1,526 @@
+<html>
+  <head>
+    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia" /> -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+    <style>
+      /* @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;1,400&display=swap"); */
+
+      body {
+        padding: 18px;
+        /* margin-top: -230px; */
+        font-family: "Poppins", sans-serif;
+        font-size: 4px;
+        background-color: #eee;
+        /* width: 210mm;
+        height: 297mm; */
+        margin: auto;
+        /* transform: scale(2); */
+        /* transform-origin: top left; */
+        overflow: hidden;
+      }
+
+      p {
+        margin: 0pt;
+        /* line-height: 1.9; */
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin-block: 0;
+      }
+
+      table {
+        border-spacing: 0;
+      }
+
+      table.items {
+        border: 0.1mm solid #e7e7e7;
+      }
+
+      .items td {
+        border-left: 0.1mm solid #e7e7e7;
+        border-right: 0.1mm solid #e7e7e7;
+        word-wrap: break-word;
+        /* word-break: break-word; */
+      }
+
+      table thead td {
+        text-align: center;
+        border: 0.1mm solid #e7e7e7;
+      }
+
+      .abc {
+        border: 1px solid #eee;
+        height: 99%;
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 8px;
+        box-sizing: border-box;
+      }
+
+      .tableHeader {
+        background-color: #cec6c6;
+        font-size: 10px;
+        font-weight: bolder;
+        text-align: center;
+        vertical-align: middle;
+        padding: 6px 4px;
+        word-break: break-word;
+        white-space: normal;
+      }
+
+      .meta-row p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="abc">
+      <table width="100%" cellpadding="0" style="margin-top: 10px; margin-bottom: 5px">
+        <tr>
+          <td width="100%" style="padding: 22px 0; font-weight: bolder">
+            <h3>
+              <center style="font-size: 16px">TAX INVOICE</center>
+            </h3>
+          </td>
+        </tr>
+      </table>
+
+      <table width="100%" cellpadding="0">
+        <tr>
+          <td width="30%" style="padding: 0px 20px">
+            {{#if userData.companyLogo}}
+            <img src="{{userData.companyLogo}}" style="max-width: 300px; height: 80px" />
+            {{else if invoiceSettingsData.invoice_banner}}
+            <img src="{{invoiceSettingsData.invoice_banner}}" style="max-width: 300px; height: 80px" />
+            {{/if}}
+          </td>
+          <td width="70%" style="text-align: right; padding-right: 5px">
+            <h3 style="font-size: 16px">Invoice</h3>
+            <p style="font-size: 14px">
+              Invoice Number - {{#if invoiceSettingsData.invoice_prefix}}{{uppercase invoiceSettingsData.invoice_prefix}}{{orderData.orderId}}{{/if}}
+            </p>
+            <p style="font-size: 14px">Invoice Date - {{#if shipment_details.created}}{{formatDate shipment_details.created}}{{/if}}</p>
+          </td>
+        </tr>
+      </table>
+      <hr />
+      <table width="100%" cellpadding="5px">
+        <tr>
+          <td width="33.3%" style="vertical-align: top">
+            {{#if (and order.billing_fname order.billing_zip)}}
+            <h3 style="font-size: 16px">Bill To:</h3>
+
+            {{/if}}
+
+            <p style="margin-bottom: 0; line-height: 1.5; font-size: 12px">
+              {{!-- billing company name --}} {{#if order.billing_company_name}} {{ucwords order.billing_company_name}}<br />
+              {{/if}} {{!-- BILLING NAME & ADDRESS --}} {{ucwords order.billing_fname}} {{ucwords order.billing_lname}}<br />
+              {{ucwords order.billing_address}} {{#if order.billing_address_2}} , {{ucwords order.billing_address_2}} {{/if}}<br />
+              {{ucwords order.billing_city}}, {{ucwords order.billing_state}}<br />
+              {{order.billing_zip}}<br />
+              {{#if order.billing_gst_number}} GST No. : {{order.billing_gst_number}}<br />
+              {{/if}} {{#if shipment_details.destination_state_code}} State Code: {{shipment_details.destination_state_code}} {{/if}}
+            </p>
+          </td>
+
+          <td width="33.3%" style="text-align: right; vertical-align: top">
+            <h3 style="font-size: 14px">Sold By:</h3>
+
+            <p style="font-size: 10px">
+              {{#if company_details.company_name}} {{#if (eq invoice_settings.hide_compony 0)}} {{#if (eq warehouse.hide_company_name 0)}}
+              {{ucwords company_details.company_name}}<br />
+              {{/if}} {{/if}} {{/if}} 
+              
+              {{#if company_details.company_name}} {{#if (eq invoice_settings.hide_company_address 1)}} 
+                {{ucwords company_details.cmp_address}}, 
+                {{ucwords company_details.cmp_city}}, 
+                {{ucwords company_details.cmp_state}}, 
+                {{ucwords company_details.cmp_pincode}},
+              {{else}}
+                {{ucwords warehouse.name}}<br />
+                {{ucwords warehouse.address_1}}, {{#if warehouse.address_2}} {{ucwords warehouse.address_2}}, {{/if}}   {{ucwords warehouse.city}},
+                {{ucwords warehouse.state}}, {{ucwords warehouse.zip}},
+              {{/if}} {{/if}} 
+              
+              
+            </p>
+
+            {{#if warehouse.gst_number}}
+            <p style="margin-bottom: 0; line-height: 1.5; font-size: 12px">GST No. : {{warehouse.gst_number}}<br /></p>
+            {{/if}} {{#if shipment_details.origin_state_code}}
+            <p style="margin-bottom: 0; line-height: 1.5; font-size: 12px">State Code : {{shipment_details.origin_state_code}}<br /></p>
+            {{/if}}
+          </td>
+        </tr>
+        <tr>
+          <td width="33.3%" style="vertical-align: top">
+            {{#if (and order.billing_fname order.billing_zip)}}
+            <h3 style="font-size: 16px">Ship To:</h3>
+            {{else}}
+            <h3 style="font-size: 16px">Bill & Ship To:</h3>
+            {{/if}}
+
+            <p style="margin-bottom: 0; line-height: 1.5; font-size: 12px">
+              {{!-- shipping company name --}} {{#if order.shipping_company_name}} {{ucwords order.shipping_company_name}}<br />
+              {{/if}} {{!-- SHIPPING NAME & ADDRESS --}} {{ucwords order.shipping_fname}} {{ucwords order.shipping_lname}}<br />
+              {{ucwords order.shipping_address}} {{#if order.shipping_address_2}} , {{ucwords order.shipping_address_2}} {{/if}}<br />
+              {{ucwords order.shipping_city}}, {{ucwords order.shipping_state}}<br />
+              {{order.shipping_zip}}<br />
+              {{!-- STATE CODE --}} {{#unless (and order.billing_fname order.billing_zip)}} {{#if shipment_details.destination_state_code}} State
+              Code: {{shipment_details.destination_state_code}} {{/if}} {{/unless}}
+            </p>
+          </td>
+          <td width="33.3%" style="text-align: right; vertical-align: top">
+            <table style="width: 90%">
+              {{#each (split invoice_settings.custom_name ",") as |colName index|}}
+              <tr>
+                <td style="padding: 5px; font-size: 10px; background-color: #eee">
+                  <center>{{ucwords colName}}</center>
+                </td>
+
+                <td style="padding: 5px; font-size: 10px; background-color: #eee">
+                  <center>{{ucwords (lookup (split ../invoice_settings.custom_value ",") index)}}</center>
+                </td>
+              </tr>
+              {{/each}}
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <table width="100%" cellpadding="5px">
+        <!-- <tr>
+          <td width="49%" style="padding-left: 5px">
+            <span style="font-size: 16px; line-height: 1.5"
+              ><b>Payment Method: </b><span style="font-size: 14px">{{uppercase order.order_payment_type}}</span><br
+            /></span>
+            <span style="font-size: 16px; line-height: 1.5"
+              ><b>AWB No: </b><span style="font-size: 14px">{{uppercase shipment_details.awb_number}}</span><br
+            /></span>
+          </td>
+          <td width="49%" style="text-align: right">
+            <span style="margin-left: 2px; font-size: 14px; line-height: 1.5"
+              ><b>Order Date: </b><span style="font-size: 14px">{{formatDate order.order_date}}</span><br
+            /></span>
+            <span style="margin-left: 2px; font-size: 14px; line-height: 1.5"
+              ><b>Shipped By: </b><span style="font-size: 14px">{{ucwords courier.display_name}}</span><br
+            /></span>
+          </td>
+        </tr> -->
+        <tr class="meta-row">
+          <td width="50%" style="padding-left: 5px">
+            <p><strong>Payment Method:</strong> {{ucwords order.order_payment_type}}</p>
+            <p><strong>AWB No:</strong> {{uppercase shipment_details.awb_number}}</p>
+          </td>
+
+          <td width="50%" style="text-align: right">
+            <p><strong>Order Date:</strong> {{formatDate order.order_date}}</p>
+            <p><strong>Shipped By:</strong> {{ucwords courier.display_name}}</p>
+          </td>
+        </tr>
+      </table>
+
+      <table class="items" width="100%" style="font-size: 12px; border-collapse: collapse; padding-left: 12px">
+        <thead>
+          <tr>
+            <td width="17%" class="tableHeader">Product Name</td>
+            <td width="12%" class="tableHeader">Product SKU</td>
+            <td width="7%" class="tableHeader">HSN</td>
+            <td width="12%" class="tableHeader">Quantity</td>
+            <td width="12%" class="tableHeader">Unit Price</td>
+            <td width="12%" class="tableHeader">Tax Amount</td>
+
+            {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
+            <td width="12%" class="tableHeader">CGST <br/>(Value | %)</td>
+            <td width="12%" class="tableHeader">SGST <br/>(Value | %)</td>
+            {{else}}
+            <td width="12%" class="tableHeader">IGST <br/>(Value | %)</td>
+            {{/if}}
+
+            <td width="12%" class="tableHeader">
+              TOTAL<br />
+              (Including GST)
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each products}}
+
+          <tr>
+            <td style="padding: 0px 7px; font-size: 10px">
+              <center>{{substr (removeChars (replaceNbsp this.product_name) "(" ")" "+" "/" "-" "," ) 0 12 }}</center>
+            </td>
+            <td style="padding: 5px; background-color: #eee; font-size: 10px">
+              <center>{{this.product_sku}}</center>
+            </td>
+            <td style="padding: 5px; background-color: #eee; font-size: 10px">
+              <center>{{this.hsn_code}}</center>
+            </td>
+            <td style="padding: 5px; background-color: #eee; font-size: 10px">
+              <center>{{this.product_qty}}</center>
+            </td>
+            <td style="padding: 5px; background-color: #eee; font-size: 10px">
+              <center>{{this.productsprice}}</center>
+            </td>
+            <td style="padding: 5px; background-color: #eee; font-size: 10px">
+              <center>{{this.new_igst}}</center>
+            </td>
+            {{#if (eq ../shipment_details.origin_state_code ../shipment_details.destination_state_code)}}
+            <td style="padding: 5px; background-color: #eee; font-size: 10px">
+              <center>{{this.newgst}}</center>
+            </td>
+            <td style="padding: 5px; background-color: #eee; font-size: 10px">
+              <center>{{this.newgst}}</center>
+            </td>
+            {{else}}
+            <td style="padding: 5px; background-color: #eee; font-size: 10px">
+              <center>{{this.igst}}</center>
+            </td>
+            {{/if}}
+            <td style="padding: 5px; background-color: #eee; font-size: 10px">
+              <center>{{this.totalProductPrice}}</center>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+      <table width="100%" style="`font-size: " 12px;margin-top: {{padding_top}}`>
+        <tr>
+          <td>
+            <table width="30%" align="left" style="font-size: 12px">
+              {{#if (gt order.shipping_charges 0)}}
+              <tr>
+                <td style="padding: 0px; line-height: 20px">&nbsp;<br /></td>
+              </tr>
+              {{/if}} {{#if (gt order.tax_amount 0)}}
+              <tr>
+                <td style="padding: 0px; line-height: 20px">&nbsp;<br /></td>
+              </tr>
+              {{/if}} {{#if (gt order.cod_charges 0)}}
+              <tr>
+                <td style="padding: 0px; line-height: 20px">&nbsp;<br /></td>
+              </tr>
+              {{/if}} {{#if (gt order.discount 0)}}
+              <tr>
+                <td style="padding: 0px; line-height: 20px">&nbsp;<br /></td>
+              </tr>
+              {{/if}}
+
+              <tr>
+                <td style="padding: 0px; line-height: 20px">&nbsp;<br /></td>
+              </tr>
+            </table>
+            <br />
+            <table width="70%" style="font-size: 12px; float: right">
+              <thead>
+                <tr>
+                  <td width="20%" class="tableHeader">
+                    <strong>
+                      <center>Charges Applied</center>
+                    </strong>
+                  </td>
+                  <td width="12%" class="tableHeader">
+                    <strong>
+                      <center>Tax Amount</center>
+                    </strong>
+                  </td>
+                  {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
+                  <td width="12%" class="tableHeader">
+                    <strong>
+                      <center>CGST (Value | %)</center>
+                    </strong>
+                  </td>
+                  <td width="12%" class="tableHeader">
+                    <strong>
+                      <center>SGST (Value | %)</center>
+                    </strong>
+                  </td>
+                  {{else}}
+                  <td width="12%" class="tableHeader">
+                    <strong>
+                      <center>IGST (Value | %)</center>
+                    </strong>
+                  </td>
+                  {{/if}}
+                  <td width="12%" class="tableHeader">
+                    <strong>
+                      <center>
+                        TOTAL<br />
+                        (Including GST)
+                      </center>
+                    </strong>
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td width="20%" class="tableHeader">
+                    <strong>
+                      <center>Shipping Charges</center>
+                    </strong>
+                  </td>
+                  {{#if (gt order.shipping_charges 0)}}
+                  <td>
+                    <center>{{divide order.shipping_charges 1.18}}</center>
+                  </td>
+                  {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
+                  <td>
+                    <center>9</center>
+                  </td>
+                  <td>
+                    <center>9</center>
+                  </td>
+                  {{else}}
+                  <td>
+                    <center>18</center>
+                  </td>
+                  {{/if}}
+                  <td>
+                    <center>{{order.shipping_charges}}</center>
+                  </td>
+                  {{else}}
+                  <td>
+                    <center>-</center>
+                  </td>
+
+                  {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
+                  <td>
+                    <center>-</center>
+                  </td>
+                  <td>
+                    <center>-</center>
+                  </td>
+                  {{else}}
+                  <td>
+                    <center>-</center>
+                  </td>
+                  {{/if}}
+                  <td>
+                    <center>-</center>
+                  </td>
+                  {{/if}}
+                </tr>
+
+                <tr>
+                  <td width="20%" class="tableHeader">
+                    <strong>
+                      <center>COD Charges</center>
+                    </strong>
+                  </td>
+                  {{#if (gt order.cod_charges 0)}}
+                  <td>
+                    <center>{{divide order.cod_charges 1.18}}</center>
+                  </td>
+                  {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
+                  <td>
+                    <center>9</center>
+                  </td>
+                  <td>
+                    <center>9</center>
+                  </td>
+                  {{else}}
+                  <td>
+                    <center>18</center>
+                  </td>
+                  {{/if}}
+                  <td>
+                    <center>{{order.cod_charges}}</center>
+                  </td>
+                  {{else}}
+                  <td>
+                    <center>-</center>
+                  </td>
+
+                  {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
+                  <td>
+                    <center>-</center>
+                  </td>
+                  <td>
+                    <center>-</center>
+                  </td>
+                  {{else}}
+                  <td>
+                    <center>-</center>
+                  </td>
+                  {{/if}}
+                  <td>
+                    <center>-</center>
+                  </td>
+                  {{/if}}
+                </tr>
+
+                {{#if (gt order.shipping_charges 0)}} {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
+
+                <tr>
+                  <td colspan="4" style="border: 1px solid #000; font-size: 10px; padding: 5px 0">
+                    <strong> <center>Discount</center> </strong>
+                  </td>
+                  <td style="border: 1px solid #000; font-size: 10px;">
+                    <center>Rs. {{order.discount}}</center>
+                  </td>
+                </tr>
+                {{else}}
+                <tr>
+                  <td colspan="3" style="border: 1px solid #000; font-size: 10px; padding: 5px 0">
+                    <strong> <center>Discount</center> </strong>
+                  </td>
+                  <td style="border: 1px solid #000; font-size: 10px;">
+                    <center>Rs. {{order.discount}}</center>
+                  </td>
+                </tr>
+
+                {{/if}} {{/if}} {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
+                <tr>
+                  <td colspan="4" style="border: 1px solid #000; font-size: 10px; padding: 5px 0">
+                    <strong> <center>Total Amount</center> </strong>
+                  </td>
+                  <td style="border: 1px solid #000; font-size: 10px">
+                    <center>Rs. {{order.order_amount}}</center>
+                  </td>
+                </tr>
+                {{else}}
+                <tr>
+                  <td colspan="3" style="border: 1px solid #000; font-size: 10px; padding: 5px 0">
+                    <strong> <center>Total Amount</center> </strong>
+                  </td>
+                  <td style="border: 1px solid #000; font-size: 10px">
+                    <center>Rs. {{order.order_amount}}</center>
+                  </td>
+                </tr>
+                {{/if}}
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      {{#if invoice_settings.invoice_signature}}
+      <table width="100%" cellpadding="0">
+        <tr>
+          <td>
+            <img
+              src="{{invoice_settings.invoice_signature}}"
+              width="200"
+              height="60"
+              style="margin-top: 10px; margin-left: 30px"
+              alt=""
+              align="left"
+            />
+          </td>
+        </tr>
+      </table>
+      <br />
+      <h4 style="font-size: 14px; margin-left: 30px">Signature</h4>
+      {{/if}}
+    </div>
+  </body>
+</html>
