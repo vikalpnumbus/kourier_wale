@@ -34,7 +34,10 @@ export const generate = async (req, res, next) => {
     const result = await InvoiceSettingsService.generate({ userId: req.user.id, ...req.body });
     if (!result) throw InvoiceSettingsService.error;
     console.log('result: ', result);
-    res.success({data:result});
+    res.setHeader('Content-Type', 'application/pdf'); 
+    // res.setHeader('Content-Disposition', `attachment; filename=${result.fileName}.pdf`);
+    res.send(result.pdfBuffer)
+    // res.success({data:result});
   } catch (error) {
     next(error);
   }

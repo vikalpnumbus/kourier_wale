@@ -2,23 +2,12 @@ import { chromium } from "playwright";
 import Handlebars from "handlebars";
 import fs from "fs";
 import crypto from "crypto";
+import handlebarsHelpers, { registerHandlebarsHelpers } from "./handlebars.helpers.mjs";
 
 export class PdfGenerator {
-  constructor({
-    fileName,
-    fileDir,
-    templateHtml,
-    data,
-    paperSize,
-    width = null,
-    height = null,
-  }) {
+  constructor({ fileName, fileDir, templateHtml, data, paperSize, width = null, height = null }) {
     this.templateHtml = templateHtml;
-    this.data = data
-      ? typeof data == "object" && Array.isArray(data)
-        ? data
-        : [data]
-      : [];
+    this.data = data ? (typeof data == "object" && Array.isArray(data) ? data : [data]) : [];
     this.fileName = fileName || crypto.randomBytes(16).toString("hex");
     this.fileDir = fileDir || "";
     this.paperSize = paperSize || "A4";
@@ -30,6 +19,10 @@ export class PdfGenerator {
       }
       return options.inverse(this); // render {{else}} block
     });
+    Object.keys(handlebarsHelpers).forEach((name) => {
+      Handlebars.registerHelper(name, handlebarsHelpers[name]);
+    });
+    registerHandlebarsHelpers();
   }
 
   async generate({ returnBuffer = false }) {
@@ -38,9 +31,7 @@ export class PdfGenerator {
     const template = Handlebars.compile(this.templateHtml);
 
     // Generate final HTML
-    const html = this.data
-      .map((e) => template(e))
-      .join(`<div style="page-break-after: always;"></div>`);
+    const html = this.data.map((e) => template(e)).join(`<div style="page-break-after: always;"></div>`);
 
     const browser = await chromium.launch();
     const page = await browser.newPage();
@@ -70,9 +61,7 @@ export class PdfGenerator {
 
     if (returnBuffer) return { fileName: this.fileName, pdfBuffer };
 
-    const filePath = `uploads/pdfGenerator/${
-      this.fileDir ? this.fileDir + "/" : ""
-    }${this.fileName}.pdf`;
+    const filePath = `uploads/pdfGenerator/${this.fileDir ? this.fileDir + "/" : ""}${this.fileName}.pdf`;
     if (!fs.existsSync(`uploads/pdfGenerator/${this.fileDir}`)) {
       fs.mkdirSync(`uploads/pdfGenerator/${this.fileDir}`, {
         recursive: true,

@@ -107,7 +107,7 @@
             <p style="font-size: 14px">
               Invoice Number - {{#if invoiceSettingsData.invoice_prefix}}{{uppercase invoiceSettingsData.invoice_prefix}}{{orderData.orderId}}{{/if}}
             </p>
-            <p style="font-size: 14px">Invoice Date - {{#if shipment_details.created}}{{formatDate shipment_details.created}}{{/if}}</p>
+            <p style="font-size: 14px">Invoice Date - {{#if orderInvoiceDateData}}{{formatDate orderInvoiceDateData}}{{/if}}</p>
           </td>
         </tr>
       </table>
@@ -115,19 +115,12 @@
       <table width="100%" cellpadding="5px">
         <tr>
           <td width="33.3%" style="vertical-align: top">
-            {{#if (and order.billing_fname order.billing_zip)}}
-            <h3 style="font-size: 16px">Bill To:</h3>
-
-            {{/if}}
-
+            <h3 style="font-size: 16px">Ship To:</h3>
             <p style="margin-bottom: 0; line-height: 1.5; font-size: 12px">
-              {{!-- billing company name --}} {{#if order.billing_company_name}} {{ucwords order.billing_company_name}}<br />
-              {{/if}} {{!-- BILLING NAME & ADDRESS --}} {{ucwords order.billing_fname}} {{ucwords order.billing_lname}}<br />
-              {{ucwords order.billing_address}} {{#if order.billing_address_2}} , {{ucwords order.billing_address_2}} {{/if}}<br />
-              {{ucwords order.billing_city}}, {{ucwords order.billing_state}}<br />
-              {{order.billing_zip}}<br />
-              {{#if order.billing_gst_number}} GST No. : {{order.billing_gst_number}}<br />
-              {{/if}} {{#if shipment_details.destination_state_code}} State Code: {{shipment_details.destination_state_code}} {{/if}}
+              {{ucwords orderData.shippingDetails.fname}} {{ucwords orderData.shippingDetails.lname}}<br />
+              {{ucwords orderData.shippingDetails.address}} <br />
+              {{ucwords orderData.shippingDetails.city}}, {{ucwords orderData.shippingDetails.state}}<br />
+              {{orderData.shippingDetails.pincode}}<br />
             </p>
           </td>
 
@@ -135,63 +128,14 @@
             <h3 style="font-size: 14px">Sold By:</h3>
 
             <p style="font-size: 10px">
-              {{#if company_details.company_name}} {{#if (eq invoice_settings.hide_compony 0)}} {{#if (eq warehouse.hide_company_name 0)}}
-              {{ucwords company_details.company_name}}<br />
-              {{/if}} {{/if}} {{/if}} 
-              
-              {{#if company_details.company_name}} {{#if (eq invoice_settings.hide_company_address 1)}} 
-                {{ucwords company_details.cmp_address}}, 
-                {{ucwords company_details.cmp_city}}, 
-                {{ucwords company_details.cmp_state}}, 
-                {{ucwords company_details.cmp_pincode}},
-              {{else}}
-                {{ucwords warehouse.name}}<br />
-                {{ucwords warehouse.address_1}}, {{#if warehouse.address_2}} {{ucwords warehouse.address_2}}, {{/if}}   {{ucwords warehouse.city}},
-                {{ucwords warehouse.state}}, {{ucwords warehouse.zip}},
-              {{/if}} {{/if}} 
-              
-              
+              {{#if userData.companyName}} {{#if (eq invoiceSettingsData.hide_company_name 0)}} {{ucwords userData.companyName}}<br />
+              {{/if}} {{/if}} {{ucwords warehouseData.name}}<br />
+              {{ucwords warehouseData.address}}, {{ucwords warehouseData.city}}, {{ucwords warehouseData.state}}, {{ucwords warehouseData.pincode}},
             </p>
 
-            {{#if warehouse.gst_number}}
-            <p style="margin-bottom: 0; line-height: 1.5; font-size: 12px">GST No. : {{warehouse.gst_number}}<br /></p>
-            {{/if}} {{#if shipment_details.origin_state_code}}
-            <p style="margin-bottom: 0; line-height: 1.5; font-size: 12px">State Code : {{shipment_details.origin_state_code}}<br /></p>
+            {{#if warehouseData.pincode}}
+            <p style="margin-bottom: 0; line-height: 1.5; font-size: 12px">State Code : {{warehouseData.pincode}}<br /></p>
             {{/if}}
-          </td>
-        </tr>
-        <tr>
-          <td width="33.3%" style="vertical-align: top">
-            {{#if (and order.billing_fname order.billing_zip)}}
-            <h3 style="font-size: 16px">Ship To:</h3>
-            {{else}}
-            <h3 style="font-size: 16px">Bill & Ship To:</h3>
-            {{/if}}
-
-            <p style="margin-bottom: 0; line-height: 1.5; font-size: 12px">
-              {{!-- shipping company name --}} {{#if order.shipping_company_name}} {{ucwords order.shipping_company_name}}<br />
-              {{/if}} {{!-- SHIPPING NAME & ADDRESS --}} {{ucwords order.shipping_fname}} {{ucwords order.shipping_lname}}<br />
-              {{ucwords order.shipping_address}} {{#if order.shipping_address_2}} , {{ucwords order.shipping_address_2}} {{/if}}<br />
-              {{ucwords order.shipping_city}}, {{ucwords order.shipping_state}}<br />
-              {{order.shipping_zip}}<br />
-              {{!-- STATE CODE --}} {{#unless (and order.billing_fname order.billing_zip)}} {{#if shipment_details.destination_state_code}} State
-              Code: {{shipment_details.destination_state_code}} {{/if}} {{/unless}}
-            </p>
-          </td>
-          <td width="33.3%" style="text-align: right; vertical-align: top">
-            <table style="width: 90%">
-              {{#each (split invoice_settings.custom_name ",") as |colName index|}}
-              <tr>
-                <td style="padding: 5px; font-size: 10px; background-color: #eee">
-                  <center>{{ucwords colName}}</center>
-                </td>
-
-                <td style="padding: 5px; font-size: 10px; background-color: #eee">
-                  <center>{{ucwords (lookup (split ../invoice_settings.custom_value ",") index)}}</center>
-                </td>
-              </tr>
-              {{/each}}
-            </table>
           </td>
         </tr>
       </table>
@@ -200,7 +144,7 @@
         <!-- <tr>
           <td width="49%" style="padding-left: 5px">
             <span style="font-size: 16px; line-height: 1.5"
-              ><b>Payment Method: </b><span style="font-size: 14px">{{uppercase order.order_payment_type}}</span><br
+              ><b>Payment Method: </b><span style="font-size: 14px">{{uppercase orderData.order_payment_type}}</span><br
             /></span>
             <span style="font-size: 16px; line-height: 1.5"
               ><b>AWB No: </b><span style="font-size: 14px">{{uppercase shipment_details.awb_number}}</span><br
@@ -208,7 +152,7 @@
           </td>
           <td width="49%" style="text-align: right">
             <span style="margin-left: 2px; font-size: 14px; line-height: 1.5"
-              ><b>Order Date: </b><span style="font-size: 14px">{{formatDate order.order_date}}</span><br
+              ><b>Order Date: </b><span style="font-size: 14px">{{formatDate orderData.order_date}}</span><br
             /></span>
             <span style="margin-left: 2px; font-size: 14px; line-height: 1.5"
               ><b>Shipped By: </b><span style="font-size: 14px">{{ucwords courier.display_name}}</span><br
@@ -217,13 +161,13 @@
         </tr> -->
         <tr class="meta-row">
           <td width="50%" style="padding-left: 5px">
-            <p><strong>Payment Method:</strong> {{ucwords order.order_payment_type}}</p>
-            <p><strong>AWB No:</strong> {{uppercase shipment_details.awb_number}}</p>
+            <p><strong>Payment Method:</strong> {{ucwords orderData.paymentType:}}</p>
+            <p><strong>AWB No:</strong> {{uppercase shipment.awb_number}}</p>
           </td>
 
           <td width="50%" style="text-align: right">
-            <p><strong>Order Date:</strong> {{formatDate order.order_date}}</p>
-            <p><strong>Shipped By:</strong> {{ucwords courier.display_name}}</p>
+            <p><strong>Order Date:</strong> {{formatDate orderData.createdAt}}</p>
+            <p><strong>Shipped By:</strong> {{ucwords courierData.name}}</p>
           </td>
         </tr>
       </table>
@@ -231,62 +175,31 @@
       <table class="items" width="100%" style="font-size: 12px; border-collapse: collapse; padding-left: 12px">
         <thead>
           <tr>
-            <td width="17%" class="tableHeader">Product Name</td>
+            <td width="7%" class="tableHeader">Product Name</td>
             <td width="12%" class="tableHeader">Product SKU</td>
-            <td width="7%" class="tableHeader">HSN</td>
             <td width="12%" class="tableHeader">Quantity</td>
-            <td width="12%" class="tableHeader">Unit Price</td>
-            <td width="12%" class="tableHeader">Tax Amount</td>
-
-            {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
-            <td width="12%" class="tableHeader">CGST <br/>(Value | %)</td>
-            <td width="12%" class="tableHeader">SGST <br/>(Value | %)</td>
-            {{else}}
-            <td width="12%" class="tableHeader">IGST <br/>(Value | %)</td>
-            {{/if}}
-
-            <td width="12%" class="tableHeader">
-              TOTAL<br />
-              (Including GST)
-            </td>
+            <td width="12%" class="tableHeader">Price</td>
+            <td width="12%" class="tableHeader">Total</td>
           </tr>
         </thead>
         <tbody>
-          {{#each products}}
+          {{#each productsData}}
 
           <tr>
             <td style="padding: 0px 7px; font-size: 10px">
-              <center>{{substr (removeChars (replaceNbsp this.product_name) "(" ")" "+" "/" "-" "," ) 0 12 }}</center>
+              <center>{{substr (removeChars (replaceNbsp this.name) "(" ")" "+" "/" "-" "," ) 0 12 }}</center>
             </td>
             <td style="padding: 5px; background-color: #eee; font-size: 10px">
-              <center>{{this.product_sku}}</center>
+              <center>{{this.sku}}</center>
             </td>
             <td style="padding: 5px; background-color: #eee; font-size: 10px">
-              <center>{{this.hsn_code}}</center>
+              <center>{{this.qty}}</center>
             </td>
             <td style="padding: 5px; background-color: #eee; font-size: 10px">
-              <center>{{this.product_qty}}</center>
+              <center>{{this.price}}</center>
             </td>
             <td style="padding: 5px; background-color: #eee; font-size: 10px">
-              <center>{{this.productsprice}}</center>
-            </td>
-            <td style="padding: 5px; background-color: #eee; font-size: 10px">
-              <center>{{this.new_igst}}</center>
-            </td>
-            {{#if (eq ../shipment_details.origin_state_code ../shipment_details.destination_state_code)}}
-            <td style="padding: 5px; background-color: #eee; font-size: 10px">
-              <center>{{this.newgst}}</center>
-            </td>
-            <td style="padding: 5px; background-color: #eee; font-size: 10px">
-              <center>{{this.newgst}}</center>
-            </td>
-            {{else}}
-            <td style="padding: 5px; background-color: #eee; font-size: 10px">
-              <center>{{this.igst}}</center>
-            </td>
-            {{/if}}
-            <td style="padding: 5px; background-color: #eee; font-size: 10px">
-              <center>{{this.totalProductPrice}}</center>
+              <center>{{this.totalPrice}}</center>
             </td>
           </tr>
           {{/each}}
@@ -297,19 +210,19 @@
         <tr>
           <td>
             <table width="30%" align="left" style="font-size: 12px">
-              {{#if (gt order.shipping_charges 0)}}
+              {{#if (gt orderData.shipping_charges 0)}}
               <tr>
                 <td style="padding: 0px; line-height: 20px">&nbsp;<br /></td>
               </tr>
-              {{/if}} {{#if (gt order.tax_amount 0)}}
+              {{/if}} {{#if (gt orderData.tax_amount 0)}}
               <tr>
                 <td style="padding: 0px; line-height: 20px">&nbsp;<br /></td>
               </tr>
-              {{/if}} {{#if (gt order.cod_charges 0)}}
+              {{/if}} {{#if (gt orderData.cod_charges 0)}}
               <tr>
                 <td style="padding: 0px; line-height: 20px">&nbsp;<br /></td>
               </tr>
-              {{/if}} {{#if (gt order.discount 0)}}
+              {{/if}} {{#if (gt orderData.discount 0)}}
               <tr>
                 <td style="padding: 0px; line-height: 20px">&nbsp;<br /></td>
               </tr>
@@ -368,9 +281,9 @@
                       <center>Shipping Charges</center>
                     </strong>
                   </td>
-                  {{#if (gt order.shipping_charges 0)}}
+                  {{#if (gt orderData.shipping_charges 0)}}
                   <td>
-                    <center>{{divide order.shipping_charges 1.18}}</center>
+                    <center>{{divide orderData.shipping_charges 1.18}}</center>
                   </td>
                   {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
                   <td>
@@ -385,7 +298,7 @@
                   </td>
                   {{/if}}
                   <td>
-                    <center>{{order.shipping_charges}}</center>
+                    <center>{{orderData.shipping_charges}}</center>
                   </td>
                   {{else}}
                   <td>
@@ -416,9 +329,9 @@
                       <center>COD Charges</center>
                     </strong>
                   </td>
-                  {{#if (gt order.cod_charges 0)}}
+                  {{#if (gt orderData.cod_charges 0)}}
                   <td>
-                    <center>{{divide order.cod_charges 1.18}}</center>
+                    <center>{{divide orderData.cod_charges 1.18}}</center>
                   </td>
                   {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
                   <td>
@@ -433,7 +346,7 @@
                   </td>
                   {{/if}}
                   <td>
-                    <center>{{order.cod_charges}}</center>
+                    <center>{{orderData.cod_charges}}</center>
                   </td>
                   {{else}}
                   <td>
@@ -458,14 +371,14 @@
                   {{/if}}
                 </tr>
 
-                {{#if (gt order.shipping_charges 0)}} {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
+                {{#if (gt orderData.shipping_charges 0)}} {{#if (eq shipment_details.origin_state_code shipment_details.destination_state_code)}}
 
                 <tr>
                   <td colspan="4" style="border: 1px solid #000; font-size: 10px; padding: 5px 0">
                     <strong> <center>Discount</center> </strong>
                   </td>
-                  <td style="border: 1px solid #000; font-size: 10px;">
-                    <center>Rs. {{order.discount}}</center>
+                  <td style="border: 1px solid #000; font-size: 10px">
+                    <center>Rs. {{orderData.discount}}</center>
                   </td>
                 </tr>
                 {{else}}
@@ -473,8 +386,8 @@
                   <td colspan="3" style="border: 1px solid #000; font-size: 10px; padding: 5px 0">
                     <strong> <center>Discount</center> </strong>
                   </td>
-                  <td style="border: 1px solid #000; font-size: 10px;">
-                    <center>Rs. {{order.discount}}</center>
+                  <td style="border: 1px solid #000; font-size: 10px">
+                    <center>Rs. {{orderData.discount}}</center>
                   </td>
                 </tr>
 
@@ -484,7 +397,7 @@
                     <strong> <center>Total Amount</center> </strong>
                   </td>
                   <td style="border: 1px solid #000; font-size: 10px">
-                    <center>Rs. {{order.order_amount}}</center>
+                    <center>Rs. {{orderData.order_amount}}</center>
                   </td>
                 </tr>
                 {{else}}
@@ -493,7 +406,7 @@
                     <strong> <center>Total Amount</center> </strong>
                   </td>
                   <td style="border: 1px solid #000; font-size: 10px">
-                    <center>Rs. {{order.order_amount}}</center>
+                    <center>Rs. {{orderData.order_amount}}</center>
                   </td>
                 </tr>
                 {{/if}}
@@ -503,12 +416,12 @@
         </tr>
       </table>
 
-      {{#if invoice_settings.invoice_signature}}
+      {{#if invoiceSettingsData.invoice_signature}}
       <table width="100%" cellpadding="0">
         <tr>
           <td>
             <img
-              src="{{invoice_settings.invoice_signature}}"
+              src="{{invoiceSettingsData.invoice_signature}}"
               width="200"
               height="60"
               style="margin-top: 10px; margin-left: 30px"
