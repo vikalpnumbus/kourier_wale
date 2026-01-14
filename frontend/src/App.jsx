@@ -14,6 +14,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 function App() {
   return (
     <Routes>
+      <Route path="*" element={<div>Payment is required.</div>} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
