@@ -123,9 +123,13 @@ const UserModel = sqlDB.sequelize.define(
       type: DataTypes.JSON,
       defaultValue: {
         paper_size: "thermal",
+        hide_product_details: false,
+        hide_seller_gst_number: false,
+        hide_warehouse_address: false,
+        hide_warehouse_mobile_number: false,
+        hide_end_customer_contact_number: false
       },
     },
-
     seller_remit_cycle: {
       type: DataTypes.STRING,
       allowNull: false,
