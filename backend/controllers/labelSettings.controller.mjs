@@ -2,11 +2,10 @@ import LabelSettingsService from "../services/labelSettings.services.mjs";
 
 export const create = async (req, res, next) => {
   try {
-    const { paper_size } = req.body;
     const result = await LabelSettingsService.create({
       data: {
         userId: req.user.id,
-        paper_size,
+        payload: req.body,
       },
     });
     if (!result) throw LabelSettingsService.error;

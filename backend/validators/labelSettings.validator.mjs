@@ -16,12 +16,14 @@ class Validations {
   rules() {
     const allowedPaperSizes = ["standard", "thermal"];
     return [
-      this.stringValidator("paper_size", "Paper Size")
+      check("paper_size")
+        .optional()
+        .isString()
+        .withMessage("Paper Size must be a string")
         .isIn(allowedPaperSizes)
         .withMessage(
           `Invalid value. Allowed values: ${allowedPaperSizes.join(", ")}`
-        )
-        .bail(),
+        ),
     ];
   }
 

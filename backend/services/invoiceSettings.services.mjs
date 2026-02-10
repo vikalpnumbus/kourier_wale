@@ -54,7 +54,7 @@ class Service {
       const payload = { ...data };
       delete payload.userId;
       const result = await this.repository.findOneAndUpdate({ userId }, payload);
-      console.log("payload: ", payload);
+      //console.log("payload: ", payload);
 
       if (!result) throw new Error("Some error occured. Please try again later.");
 
@@ -76,14 +76,14 @@ class Service {
       const invoiceData = await Promise.all(
         result.map(async (shipment) => {
           const { order_db_id, warehouse_id, courier_id, shipping_status, awb_number, createdAt } = shipment;
-          console.log("{order_db_id, warehouse_id, courier_id, shipping_status, awb_number, createdAt} : ", {
-            order_db_id,
-            warehouse_id,
-            courier_id,
-            shipping_status,
-            awb_number,
-            createdAt,
-          });
+          // console.log("{order_db_id, warehouse_id, courier_id, shipping_status, awb_number, createdAt} : ", {
+          //   order_db_id,
+          //   warehouse_id,
+          //   courier_id,
+          //   shipping_status,
+          //   awb_number,
+          //   createdAt,
+          // });
 
           const [
             orderDataRes = {},
@@ -109,7 +109,7 @@ class Service {
             const totalPrice = Number(prod.price || 0) * Number(prod.qty);
             return { ...prod, totalPrice };
           });
-          console.log("productsData: ", JSON.stringify(productsData, null, 2));
+          //console.log("productsData: ", JSON.stringify(productsData, null, 2));
           const invoiceSettingsData = invoiceSettingsDataRes;
           const orderInvoiceDateData = orderDataRes?.data?.result?.[0]?.createdAt;
           const userData = userDataRes;
@@ -142,7 +142,7 @@ class Service {
       // console.log('pdfGenRes: ', pdfGenRes);
       // return res.send(pdfGenRes);
 
-      console.log("invoiceData: ", invoiceData);
+      //console.log("invoiceData: ", invoiceData);
       return pdfGenRes;
     } catch (error) {
       throw error;
@@ -155,5 +155,5 @@ export default InvoiceSettingsService;
 
 (async () => {
   const result = await InvoiceSettingsService.generate({ userId: 2, shipping_db_ids: [131] });
-  console.log(result);
+  //console.log(result);
 })();

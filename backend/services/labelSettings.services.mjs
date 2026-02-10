@@ -18,13 +18,13 @@ class Service {
     this.warehouseRepository = FactoryRepository.getRepository("warehouse");
   }
   async create({ data }) {
-    const { userId, paper_size } = data;
+    const { userId, payload } = data;
 
     const user = await UserService.read({ id: userId });
     if (!user) throw UserService.error;
 
     let labelSettings = user.label_settings || {};
-    labelSettings = { ...labelSettings, paper_size };
+    labelSettings = { ...labelSettings, payload };
 
     const updatedUser = await UserService.update(
       { id: userId },
