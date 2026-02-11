@@ -147,6 +147,7 @@ class Service {
               } = e.shippingDetails || {};
               console.log('alternate_phone: ', alternatePhone);
               return {
+                sellercompname: user.companyName || "",
                 shippingDetails_fname: fname || "",
                 shippingDetails_lname: lname || "",
                 shippingDetails_address: address || "",
