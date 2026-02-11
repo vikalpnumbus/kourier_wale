@@ -5,10 +5,10 @@ export const create = async (req, res, next) => {
     const result = await LabelSettingsService.create({
       data: {
         userId: req.user.id,
-        payload: req.body,
+        ...req.body,
       },
     });
-    if (!result) throw LabelSettingsService.error;
+
     res.success(result);
   } catch (error) {
     next(error);

@@ -18,28 +18,26 @@ class Service {
     this.warehouseRepository = FactoryRepository.getRepository("warehouse");
   }
   async create({ data }) {
-      const { userId, payload } = data;
+      const { userId, ...newSettings } = data;
       const user = await UserService.read({ id: userId });
       if (!user) throw UserService.error;
-      let labelSettings = user.label_settings || {};
-      labelSettings = {
-        ...labelSettings,
-        ...payload,
+      const labelSettings = {
+        ...(user.label_settings || {}),
+        ...newSettings,
       };
-      const updatedUser = await UserService.update(
+      await UserService.update(
         { id: userId },
-        {
-          label_settings: labelSettings,
-        }
+        { label_settings: labelSettings }
       );
-      if (!updatedUser) throw UserService.error;
       return {
-        status: 201,
+        status: 200,
         data: {
-          message: "Label Settings Update Successfully.",
+          message: "Label settings updated successfully",
+          label_settings: labelSettings,
         },
       };
   }
+
 
 
   async generate({ data }) {
