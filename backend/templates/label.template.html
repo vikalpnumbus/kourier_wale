@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Courier Wale Invoice</title>
     <style>
-      /* ------------------------------
-        BASE
-      --------------------------------*/
       body {
-        margin: 20px;
         font-family: Arial, sans-serif;
-        color: #000;
+        margin: 20px;
+        font-size: 14px;
       }
-
       .d-flex {
         display: flex;
       }
@@ -22,93 +18,35 @@
         justify-content: space-between;
       }
 
-      /* ------------------------------
-        PAPER SIZE CONTROL
-      --------------------------------*/
-      body.paper-standard {
-        font-size: 14px;
-      }
-
-      body.paper-thermal {
-        font-size: 11px;
-      }
-
-      /* ------------------------------
-        INVOICE CONTAINER
-      --------------------------------*/
       .invoice {
         border: 1px solid #000;
-        margin: 0 auto;
-        background: #fff;
-      }
-
-      /* Standard (A4 / 4x6) */
-      body.paper-standard .invoice {
-        width: 700px;
         padding: 20px;
+        width: 700px;
+        margin: 0 auto;
       }
-
-      /* Thermal */
-      body.paper-thermal .invoice {
-        width: 380px;
-        padding: 10px;
-      }
-
-      /* ------------------------------
-        HEADER
-      --------------------------------*/
       .header {
         display: flex;
         justify-content: space-between;
+        font-size: 12px;
+        padding-top: 10px;
         margin-bottom: 10px;
       }
-
-      body.paper-standard .header {
-        font-size: 12px;
-      }
-
-      body.paper-thermal .header {
-        font-size: 10px;
-      }
-
-      /* ------------------------------
-        TO SECTION
-      --------------------------------*/
       .to-section {
+        /* border-top: 1px solid #000; */
         border-bottom: 1px solid #000;
         padding: 10px 0;
       }
-
-      /* ------------------------------
-        ORDER INFO
-      --------------------------------*/
       .order-info {
         margin-top: 10px;
         margin-bottom: 15px;
       }
-
-      /* ------------------------------
-        BARCODE
-      --------------------------------*/
       .barcode {
         text-align: right;
       }
-
       .barcode img {
-        height: 90px;
-      }
-
-      body.paper-standard .barcode img {
+        height: 100px;
         width: 250px;
       }
-
-      body.paper-thermal .barcode img {
-        width: 200px;
-      }
-
-      /* ------------------------------
-        DETAILS SECTION
-      --------------------------------*/
       .details {
         display: flex;
         justify-content: space-between;
@@ -117,86 +55,38 @@
         padding: 10px 0;
         margin-top: 10px;
       }
-
       .details div {
         width: 45%;
         text-align: center;
       }
-
-      /* ------------------------------
-        TABLE
-      --------------------------------*/
       table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 10px;
       }
-
       table,
       th,
       td {
         border: 1px solid #000;
       }
-
-      body.paper-standard table th,
-      body.paper-standard table td {
-        font-size: 12px;
+      th,
+      td {
         padding: 6px;
+        text-align: left;
       }
-
-      body.paper-thermal table th,
-      body.paper-thermal table td {
-        font-size: 10px;
-        padding: 4px;
-      }
-
-      th {
-        font-weight: bold;
-      }
-
-      /* ------------------------------
-        FOOTER & SUPPORT
-      --------------------------------*/
       .footer {
+        text-align: left;
         margin-top: 10px;
-      }
-
-      body.paper-standard .footer {
         font-size: 12px;
       }
-
-      body.paper-thermal .footer {
-        font-size: 10px;
-      }
-
       .powered {
         text-align: right;
-        margin-top: 10px;
-      }
-
-      body.paper-standard .powered {
         font-size: 11px;
-      }
-
-      body.paper-thermal .powered {
-        font-size: 9px;
-      }
-
-      /* ------------------------------
-        PRINT OPTIMIZATION
-      --------------------------------*/
-      @media print {
-        body {
-          margin: 0;
-        }
-
-        .invoice {
-          border: none;
-        }
+        margin-top: 10px;
       }
     </style>
   </head>
-  <body class="paper-{{paper_size}}">
+  <body>
     <div class="header">
       <div>{{invoice_generated_date}}</div>
       <div>{{sellercompname}}</div>
