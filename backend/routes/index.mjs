@@ -48,7 +48,7 @@ globalRouter.use("/bank-details", BankDetailsRouter);
 globalRouter.use("/products", ProductsRouter);
 globalRouter.use("/orders", OrdersRouter);
 globalRouter.use("/warehouse", WarehouseRouter);
-globalRouter.use("/courier", CourierRouter);
+//globalRouter.use("/courier", CourierRouter);
 globalRouter.use("/pricing-plans", PricingPlansRouter);
 globalRouter.use("/pricing-card", PricingCardRouter);
 globalRouter.use("/pricing-card-courier", CourierPricingCardRouter);
@@ -76,6 +76,13 @@ const checkIfUserIsAdmin = async (req, res, next) => {
   }
 };
 // Admin Routes
+
+globalRouter.use(
+  "/admin/courier", 
+  TokenHandler.authenticateToken,
+  checkIfUserIsAdmin,
+  CourierRouter
+);
 
 globalRouter.use(
   "/admin/serviceable-pincodes", 

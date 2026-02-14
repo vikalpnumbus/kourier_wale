@@ -174,23 +174,28 @@ a
 
 #sidebar
 {
-    background: linear-gradient(to bottom, #e6e5f2, #4599cd) !important;
+    background: #001F54 !important;
     font-family: "Rubik", sans-serif !important;
 }
 
 .nav-link
 {
     margin: 0;
-    color: #3e4b5b !important;
+    color: #FFF !important;
     font-weight: bold !important;
 }
 
 .menu-icon
 {
-    color: #3e4b5b !important;
+    color: #FFF !important;
     font-weight: bold !important;
 }
 
+
+.sidebar .nav .nav-item.nav-category
+{
+    color: #1282A2 !important;
+}
 
 .navbar-brand-wrapper
 {
