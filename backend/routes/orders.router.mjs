@@ -15,7 +15,7 @@ import upload from "../middlewares/multer.mjs";
 import FileValidator from "../validators/file.validator.mjs";
 const OrdersRouter = express.Router();
 
-OrdersRouter.post("/bulk-export", TokenHandler.authenticateToken, bulkExport);
+OrdersRouter.get("/bulk-export", TokenHandler.authenticateToken, bulkExport);
 OrdersRouter.post(
   "/",
   TokenHandler.authenticateToken,
