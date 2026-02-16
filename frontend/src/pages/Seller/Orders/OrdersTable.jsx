@@ -101,9 +101,10 @@ function OrdersTable({ setExportHandler }) {
   const handleExportOrders = async () => {
     try {
       const params = {
+        page: parseInt(searchParams.get("page") || "1", 10),
+        limit: parseInt(searchParams.get("limit") || "10", 10),
         start_date: searchParams.get("start_date") || defaultStart,
         end_date: searchParams.get("end_date") || defaultEnd,
-        export: 1,
       };
 
       const optionalKeys = [
