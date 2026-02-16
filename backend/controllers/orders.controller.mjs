@@ -1,5 +1,6 @@
 import OrdersService from "../services/orders.service.mjs";
 import { readCsvAsArray } from "../utils/basic.utils.mjs";
+import { stringify } from "csv-stringify";
 
 export const create = async (req, res, next) => {
   try {
@@ -191,6 +192,28 @@ export const bulkImport = async (req, res, next) => {
   }
 };
 
+// export const bulkExport = async (req, res, next) => {
+//   try {
+//     const query = {
+//       userId: req.user.id,
+//       page: req.query.page,
+//       limit: req.query.limit,
+//       search: req.query.search,
+//       id: req.query.id || undefined,
+//     };
+
+//     const result = await OrdersService.bulkExport(query);
+//     if (!result) {
+//       throw OrdersService.error;
+//     }
+
+//     res.success(result);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
 export const bulkExport = async (req, res, next) => {
   try {
     const query = {
@@ -202,11 +225,53 @@ export const bulkExport = async (req, res, next) => {
     };
 
     const result = await OrdersService.bulkExport(query);
-    if (!result) {
-      throw OrdersService.error;
-    }
-
-    res.success(result);
+    if (!result) throw OrdersService.error;
+    const rows = result.data.result;
+    const columns = [
+      "Order ID",
+      "Order Date",
+      "Payment Type",
+      "Channel Name",
+      "Warehouse ID",
+      "Customer Name",
+      "Customer Email",
+      "Customer Address",
+      "Customer City",
+      "Customer State",
+      "Customer Pincode",
+      "Product Weight",
+      "Product LBH",
+      "Shipping Charges (By Seller)",
+      "Shipping TAX (By Seller)",
+      "COD Charge (By Seller)",
+      "Shipping Discount (By Seller)",
+      "Collectable Amount",
+      "Product Name",
+      "Product SKU",
+      "Product Price",
+    ];
+    const data = rows.map((order) => ({
+      ...order,
+      "Product Name": order["Orders Product section"]?.[0]?.name || "",
+      "Product SKU": order["Orders Product section"]?.[0]?.sku || "",
+      "Product Price": order["Orders Product section"]?.[0]?.price || "",
+    }));
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=orders_export_${Date.now()}.csv`
+    );
+    stringify(
+      data,
+      {
+        header: true,
+        columns,
+      },
+      (err, output) => {
+        if (err) return next(err);
+        res.status(200).send(output);
+      }
+    );
   } catch (error) {
     next(error);
   }

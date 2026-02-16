@@ -13,7 +13,7 @@ import Products from "../pages/Seller/Products";
 import ProductsTable from "../pages/Seller/Products/ProductsTable";
 import ProductsForm from "../pages/Seller/Products/ProductsForm";
 import Orders from "../pages/Seller/Orders";
-import OrdersTable from "../pages/Seller/Orders/OrdersTable";
+import OrdersListPage from "../pages/Seller/Orders/OrdersListPage";
 import ShipmentsTable from "../pages/Seller/Shipment/ShipmentTable";
 import OrdersForm from "../pages/Seller/Orders/OrdersForm";
 import RateCalculator from "../pages/Seller/RateCalculator/index";
@@ -67,7 +67,7 @@ function AppRoutes() {
           </Route>
 
           <Route path="/orders" element={<Orders />}>
-            <Route index element={<OrdersTable />} />
+            <Route index element={<OrdersListPage />} />
             <Route path="add" element={<OrdersForm />} />
             <Route path="edit/:id" element={<OrdersForm />} />
             <Route path="clone/:id" element={<OrdersForm />} />

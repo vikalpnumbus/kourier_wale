@@ -11,7 +11,7 @@ import {
   getLastNDaysRange,
 } from "../../../middleware/CommonFunctions";
 import warehouseConfig from "../../../config/Warehouse/WarehouseConfig";
-function OrdersTable() {
+function OrdersTable({ setExportHandler }) {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
@@ -98,6 +98,42 @@ function OrdersTable() {
     }
   };
 
+  const handleExportOrders = async () => {
+    try {
+      const params = {
+        start_date: searchParams.get("start_date") || defaultStart,
+        end_date: searchParams.get("end_date") || defaultEnd,
+        export: 1,
+      };
+
+      const optionalKeys = [
+        "orderId",
+        "shippingName",
+        "warehouse_id",
+        "paymentType",
+        "category",
+      ];
+
+      optionalKeys.forEach((key) => {
+        const value = searchParams.get(key)?.trim();
+        if (value) params[key] = value;
+      });
+      const query = Object.entries(params)
+        .map(([k, v]) => `${k}=${v}`)
+        .join("&");
+
+      const url = `${ordersConfig.ordersBulkExportApi}?${query}`;
+      const response = await api.get(url, { responseType: "blob" });
+      const blob = new Blob([response.data], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `orders_${Date.now()}.csv`;
+      link.click();
+    } catch (err) {
+      console.error("Export failed", err);
+    }
+  };
+
   const formatWeight = (weight) => {
     if (!weight) return "";
     return weight >= 1000
@@ -135,6 +171,10 @@ function OrdersTable() {
     handleFetchData();
     setSelectedOrders([]);
   }, [searchParams]);
+
+  useEffect(() => {
+  setExportHandler?.(() => handleExportOrders());
+}, [searchParams]);
 
   return (
     <div className="tab-content tab-content-vertical">

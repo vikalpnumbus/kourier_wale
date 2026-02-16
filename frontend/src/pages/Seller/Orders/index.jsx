@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Outlet,
   useLocation,
@@ -12,6 +12,7 @@ import {
   mdiCloudDownload,
   mdiFilterOutline,
   mdiPlus,
+  mdiCloudUpload,
 } from "@mdi/js";
 import OrdersFilter from "./OrdersFilter";
 import ordersConfig from "../../../config/Orders/OrdersConfig";
@@ -21,13 +22,16 @@ function Orders() {
   const navigate = useNavigate();
   const location = useLocation();
   const [showImportModal, setShowImportModal] = useState(false);
-
   const [showFilters, setShowFilters] = useState(false);
   const [searchParams] = useSearchParams();
+
+  // 🔥 export handler ref
+  const exportHandlerRef = useRef(null);
 
   useEffect(() => {
     setShowFilters(searchParams.toString().length > 0);
   }, [searchParams]);
+
   return (
     <div className="row">
       <div className="col-md-12 grid-margin stretch-card d-md-flex">
@@ -41,48 +45,41 @@ function Orders() {
                       className="btn btn-light btn-md py-1 px-1 me-2"
                       onClick={() => navigate(-1)}
                     >
-                      <Icon path={mdiChevronLeft} size={0.8} />
+                      <Icon path={mdiChevronLeft} size={0.7} />
                     </button>
                   )}
                   Orders{" "}
                   {location.pathname.includes("/orders/view") && "Details"}
                 </h4>
               </div>
-              <div className="col-md-8 col-sm-12 d-flex justify-content-end gap-2">
-                {!location.pathname.includes("/orders/edit") &&
-                  !location.pathname.includes("/orders/add") &&
-                  !location.pathname.includes("/orders/clone") &&
-                  !location.pathname.includes("/orders/view") && (
+
+              <div className="col-md-8 d-flex justify-content-end gap-2">
+                {!location.pathname.includes("/orders/view") && (
+                  <>
                     <button
-                      onClick={() => {
-                        setShowImportModal(true);
-                      }}
-                      type="button"
                       className="btn btn-dark btn-md py-2 px-4"
+                      onClick={() => exportHandlerRef.current?.()}
                     >
-                      <Icon path={mdiCloudDownload} size={0.7} /> Import
+                      <Icon path={mdiCloudDownload} size={0.7} /> Export
                     </button>
-                  )}
-                {!location.pathname.includes("/orders/edit") &&
-                  !location.pathname.includes("/orders/add") &&
-                  !location.pathname.includes("/orders/clone") &&
-                  !location.pathname.includes("/orders/view") && (
+
                     <button
-                      onClick={() => navigate("add")}
-                      type="button"
                       className="btn btn-dark btn-md py-2 px-4"
+                      onClick={() => setShowImportModal(true)}
+                    >
+                      <Icon path={mdiCloudUpload} size={0.7} /> Import
+                    </button>
+
+                    <button
+                      className="btn btn-dark btn-md py-2 px-4"
+                      onClick={() => navigate("add")}
                     >
                       <Icon path={mdiPlus} size={0.7} /> Add Order
                     </button>
-                  )}
-                {!location.pathname.includes("/orders/edit") &&
-                  !location.pathname.includes("/orders/add") &&
-                  !location.pathname.includes("/orders/clone") &&
-                  !location.pathname.includes("/orders/view") && (
+
                     <button
-                      onClick={() => setShowFilters(!showFilters)}
-                      type="button"
                       className="btn btn-dark btn-md py-2 px-4"
+                      onClick={() => setShowFilters(!showFilters)}
                     >
                       {showFilters ? (
                         <>
@@ -94,23 +91,27 @@ function Orders() {
                         </>
                       )}
                     </button>
-                  )}
+                  </>
+                )}
               </div>
-              {!location.pathname.includes("/orders/edit") &&
-                !location.pathname.includes("/orders/add") &&
-                !location.pathname.includes("/orders/view") &&
-                !location.pathname.includes("/orders/clone") &&
-                showFilters && <OrdersFilter setShowFilters={setShowFilters} />}
+
+              {showFilters && <OrdersFilter setShowFilters={setShowFilters} />}
             </div>
 
             <div className="row mt-3">
               <div className="col-12">
-                <Outlet />
+                <Outlet
+                  context={{
+                    setExportHandler: (fn) =>
+                      (exportHandlerRef.current = fn),
+                  }}
+                />
               </div>
             </div>
           </div>
         </div>
       </div>
+
       {showImportModal && (
         <ImportModal
           title="Import Orders"
