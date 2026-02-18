@@ -270,14 +270,6 @@ function OrdersForm() {
     if (!form["packageDetails.volumetricWeight"])
       errors["packageDetails.volumetricWeight"] = "Volumetric weight required";
     if (!form.orderAmount) errors.orderAmount = "Final amount required";
-    // if (!form["charges.shipping"])
-    //   errors["charges.shipping"] = "Shipping charge required";
-    if (!form["charges.tax_amount"])
-      errors["charges.tax_amount"] = "Tax amount required";
-    if (form.paymentType === "cod" && !form["charges.cod"])
-      errors["charges.cod"] = "COD charge required";
-    // if (!form["charges.discount"])
-    //   errors["charges.discount"] = "Discount required";
     if (!form.products || form.products.length === 0)
       errors.products = "At least one product must be added";
     if (!form.warehouse_id) errors.warehouse_id = "Warehouse required";
