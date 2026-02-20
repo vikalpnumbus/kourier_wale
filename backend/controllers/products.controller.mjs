@@ -3,37 +3,62 @@ import { readCsvAsArray } from "../utils/basic.utils.mjs";
 
 export const create = async (req, res, next) => {
   try {
-    const existingRecord = await ProductsService.read({
-      userId: req.user.id,
-      name: req.body.name,
-      category: req.body.category,
-    });
-    if (existingRecord && existingRecord.length > 0) {
-      const error = new Error("This product already exists.");
-      error.status = 409;
-      throw error;
+    const { name, price, category } = req.body;
+    const errors = [];
+    if (!name || name.trim() === "") {
+      errors.push({
+        field: "name",
+        message: "Product Name is required.",
+      });
     }
-
-    const files = req.files;
-
-    let requiredFiles = ["productImage"];
-
+    if (!price || price === "") {
+      errors.push({
+        field: "price",
+        message: "Price is required.",
+      });
+    } else if (isNaN(price) || Number(price) <= 0) {
+      errors.push({
+        field: "price",
+        message: "Price must be a valid positive number.",
+      });
+    }
+    if (!category || category.trim() === "") {
+      errors.push({
+        field: "category",
+        message: "Category is required.",
+      });
+    }
+    const files = req.files || [];
+    const requiredFiles = ["productImage"];
     const uploadedFileNames = files.map((f) => f.fieldname);
-
     const missingFiles = requiredFiles.filter(
       (required) => !uploadedFileNames.includes(required)
     );
-
     if (missingFiles.length > 0) {
-      const error = new Error(`Missing required files: ${missingFiles}`);
-      error.status = 400;
-      error.details = missingFiles.map((e) => ({
-        field: e,
-        message: e + " is required.",
-      }));
-      throw error;
+      missingFiles.forEach((file) => {
+        errors.push({
+          field: file,
+          message: "Product Image is required.",
+        });
+      });
     }
-
+    if (errors.length > 0) {
+      return next({
+        status: 400,
+        message: errors,
+      });
+    }
+    const existingRecord = await ProductsService.read({
+      userId: req.user.id,
+      name,
+      category,
+    });
+    if (existingRecord && existingRecord.length > 0) {
+      return next({
+        status: 409,
+        message: "This product already exists.",
+      });
+    }
     const result = await ProductsService.create({
       files: files
         .map((f) => (requiredFiles.includes(f.fieldname) ? f : null))
@@ -48,9 +73,63 @@ export const create = async (req, res, next) => {
     }
     res.success(result);
   } catch (error) {
-    next({ status: error.status, message: error.details || error.message });
+    next({
+      status: error.status || 500,
+      message: error.message || "Something went wrong.",
+    });
   }
 };
+
+// export const create = async (req, res, next) => {
+//   try {
+//     const existingRecord = await ProductsService.read({
+//       userId: req.user.id,
+//       name: req.body.name,
+//       category: req.body.category,
+//     });
+//     if (existingRecord && existingRecord.length > 0) {
+//       const error = new Error("This product already exists.");
+//       error.status = 409;
+//       throw error;
+//     }
+
+//     const files = req.files;
+
+//     let requiredFiles = ["productImage"];
+
+//     const uploadedFileNames = files.map((f) => f.fieldname);
+
+//     const missingFiles = requiredFiles.filter(
+//       (required) => !uploadedFileNames.includes(required)
+//     );
+
+//     if (missingFiles.length > 0) {
+//       const error = new Error(`Missing required files: ${missingFiles}`);
+//       error.status = 400;
+//       error.details = missingFiles.map((e) => ({
+//         field: e,
+//         message: e + " is required.",
+//       }));
+//       throw error;
+//     }
+
+//     const result = await ProductsService.create({
+//       files: files
+//         .map((f) => (requiredFiles.includes(f.fieldname) ? f : null))
+//         .filter(Boolean),
+//       data: {
+//         userId: req.user.id,
+//         ...req.body,
+//       },
+//     });
+//     if (!result) {
+//       throw ProductsService.error;
+//     }
+//     res.success(result);
+//   } catch (error) {
+//     next({ status: error.status, message: error.details || error.message });
+//   }
+// };
 
 export const read = async (req, res, next) => {
   try {

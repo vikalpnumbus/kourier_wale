@@ -58,7 +58,6 @@ export default function ProductsForm() {
   const validate = useCallback(() => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = "Name is required";
-    if (!form.sku.trim()) newErrors.sku = "SKU is required";
     if (!form.price.trim()) newErrors.price = "Price is required";
     if (!form.category.trim()) newErrors.category = "Category is required";
 
@@ -168,9 +167,9 @@ export default function ProductsForm() {
 
   const inputFields = useMemo(
     () => [
-      { label: "Product Name", name: "name" },
-      { label: "SKU", name: "sku" },
-      { label: "Price", name: "price" },
+      { label: "Product Name", name: "name", required: true },
+      { label: "SKU", name: "sku", required: false },   // 👈 SKU optional
+      { label: "Price", name: "price", required: true },
     ],
     []
   );
@@ -200,17 +199,17 @@ export default function ProductsForm() {
             <form onSubmit={handleSubmit}>
               <div className="row">
                 {/* Dynamic Fields */}
-                {inputFields.map(({ label, name }) => (
-                  <InputField
-                    key={name}
-                    label={label}
-                    name={name}
-                    value={form[name]}
-                    onChange={handleChange}
-                    error={errors[name]}
-                  />
-                ))}
-
+                {inputFields.map(({ label, name, required }) => (
+                <InputField
+                  key={name}
+                  label={label}
+                  name={name}
+                  value={form[name]}
+                  onChange={handleChange}
+                  error={errors[name]}
+                  required={required}
+                />
+              ))}
                 <div className="col-md-6 mb-2">
                   {" "}
                   <div className="form-group text-start mb-3">
@@ -290,10 +289,13 @@ export default function ProductsForm() {
   );
 }
 
-const InputField = ({ label, name, value, onChange, error }) => (
+const InputField = ({ label, name, value, onChange, error, required }) => (
   <div className={`col-md-6 mb-2`}>
     <div className="form-group text-start mb-3">
-      <label>{label}<span className="text-danger">*</span></label>
+      <label>
+        {label}
+        {required && <span className="text-danger">*</span>}
+      </label>
       <input
         type="text"
         className="form-control"

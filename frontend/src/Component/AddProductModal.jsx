@@ -56,7 +56,7 @@ function AddProductModal({ onClose, onProductAdded }) {
     const validate = useCallback(() => {
         const newErrors = {};
         if (!form.name.trim()) newErrors.name = "Name is required";
-        if (!form.sku.trim()) newErrors.sku = "SKU is required";
+        
         if (!form.price.trim()) newErrors.price = "Price is required";
         if (!form.category.trim()) newErrors.category = "Category is required";
 
