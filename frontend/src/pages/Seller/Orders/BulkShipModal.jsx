@@ -53,60 +53,60 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
     fetchplanname();
   }, []);
 
-  useEffect(() => {
-    if (!form.warehouse_id || !orderData) return;
-    const {
-      paymentType,
-      packageDetails,
-      shippingDetails,
-      collectableAmount,
-    } = orderData;
-    if (!packageDetails || !shippingDetails) return;
-    const { length, height, breadth, weight } = packageDetails;
-    const destination = shippingDetails?.pincode;
-    const origin = form.originpincode || orderData.originpincode; // optional if you store origin in warehouse
-    const amount = collectableAmount;
-    const formData = {
-      paymentType,
-      length,
-      height,
-      breadth,
-      weight,
-      destination,
-      origin,
-      amount,
-    };
-    const fetchCourier = async () => {
-      try {
-        setLoading(true);
-        const url = `${RateConfig.Plan_chart}`;
-        const res = await api.post(url, formData);
-        const rows = res?.data?.data?.result || [];
-        const uniqueCouriers = Array.from(
-        new Map(
-            rows.map(item => [
-            item.courier_id,
-            {
-                courier_id: item.courier_id,
-                courier_name: item.courier_name
-            }
-            ])
-        ).values()
-        );
+    useEffect(() => 
+    {
+        if (!form.warehouse_id || !orderData) return;
+        const {
+        paymentType,
+        packageDetails,
+        shippingDetails,
+        collectableAmount,
+        } = orderData;
+        if (!packageDetails || !shippingDetails) return;
+        const { length, height, breadth, weight } = packageDetails;
+        const destination = shippingDetails?.pincode;
+        const origin = form.originpincode || orderData.originpincode; // optional if you store origin in warehouse
+        const amount = collectableAmount;
+        const formData = {
+        paymentType,
+        length,
+        height,
+        breadth,
+        weight,
+        destination,
+        origin,
+        amount,
+        };
+        const fetchCourier = async () => {
+        try {
+            setLoading(true);
+            const url = `${RateConfig.Plan_chart}`;
+            const res = await api.post(url, formData);
+            const rows = res?.data?.data?.result || [];
+            const uniqueCouriers = Array.from(
+            new Map(
+                rows.map(item => [
+                item.courier_id,
+                {
+                    courier_id: item.courier_id,
+                    courier_name: item.courier_name
+                }
+                ])
+            ).values()
+            );
 
-        setCourierList(uniqueCouriers);
-        setShowForwardReverse(true);
-        setSelectedIndex(null); // reset selected courier when warehouse changes
-      } catch (error) {
-        console.error("API Error:", error);
-        alert("Something went wrong while updating rates");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourier();
-  }, [orderData, form.warehouse_id, form.rto_warehouse_id]);
+            setCourierList(uniqueCouriers);
+            setShowForwardReverse(true);
+            setSelectedIndex(null); // reset selected courier when warehouse changes
+        } catch (error) {
+            console.error("API Error:", error);
+            alert("Something went wrong while updating rates");
+        } finally {
+            setLoading(false);
+        }
+        };
+        fetchCourier();
+    }, [orderData, form.warehouse_id, form.rto_warehouse_id]);
 
   const handleCourierSelect = (rate, index) => {
     setSelectedIndex(index);
