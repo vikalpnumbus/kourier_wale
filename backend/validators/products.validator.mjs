@@ -51,8 +51,6 @@ class ValidationClass {
     .isString()
     .withMessage(`${label} must be a string.`)
     .bail()
-    .matches(/^[a-zA-Z0-9_-]+$/)
-    .withMessage(`${label} must be alphanumeric.`)
     .isLength({ max: 30 })
     .withMessage(`${label} can be maximum 30 characters long.`);
 }
