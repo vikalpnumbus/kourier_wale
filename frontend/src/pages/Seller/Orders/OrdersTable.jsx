@@ -5,6 +5,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import Pagination from "../../../Component/Pagination";
 import ordersConfig from "../../../config/Orders/OrdersConfig";
 import ShipModal from "../Orders/ShipModal";
+import BulkShipModal from "../Orders/BulkShipModal";
 import api from "../../../utils/api";
 import {
   formatDateTime,
@@ -19,6 +20,7 @@ function OrdersTable({ setExportHandler }) {
   const [totalCount, setTotalCount] = useState(0);
   const [defaultStart, defaultEnd] = useMemo(() => getLastNDaysRange(7), []);
   const [showShipModal, setShowShipModal] = useState(false);
+  const [showbulkShipModal, setShowbulkShipModal] = useState(false);
   const [shipOrderDetails, setShipOrderDetails] = useState("");
   const [selectedOrders, setSelectedOrders] = useState([]);
   const orderCanShip = (order) => {
@@ -192,7 +194,13 @@ function OrdersTable({ setExportHandler }) {
                 </div>
                 <div
                   className="btn btn-dark btn-md py-2 px-3"
-                  style={{ width: "fit-content" }}
+                  style={{ width: "fit-content", cursor: "pointer" }}
+                  onClick={() => {
+                    setShipOrderDetails({
+                      order_ids: selectedOrders
+                    });
+                    setShowbulkShipModal(true);
+                  }}
                 >
                   <Icon path={mdiCubeSend} size={0.7} /> Bulk Ship
                 </div>
@@ -389,6 +397,13 @@ function OrdersTable({ setExportHandler }) {
             handleFetchData={handleFetchData}
           />
         )}
+        {showbulkShipModal && shipOrderDetails && (
+            <BulkShipModal
+              onClose={() => setShowbulkShipModal(false)}
+              orderData={shipOrderDetails}
+              handleFetchData={handleFetchData}
+            />
+          )}
       </div>
     </div>
   );
