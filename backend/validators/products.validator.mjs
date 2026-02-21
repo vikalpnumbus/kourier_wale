@@ -45,6 +45,19 @@ class ValidationClass {
       .withMessage(`${label} can be maximum 300 characters long.`);
   }
 
+  optionalBasicValidator(field, label) {
+  return check(field)
+    .optional()
+    .isString()
+    .withMessage(`${label} must be a string.`)
+    .bail()
+    .matches(/^[a-zA-Z0-9_-]+$/)
+    .withMessage(`${label} must be alphanumeric.`)
+    .isLength({ min: 2, max: 50 })
+    .withMessage(`${label} must be between 2 to 50 characters long.`);
+}
+
+
   categoryValidator(field, label) {
     const allowedCategories = [
         "appliances",
