@@ -53,8 +53,8 @@ class ValidationClass {
     .bail()
     .matches(/^[a-zA-Z0-9_-]+$/)
     .withMessage(`${label} must be alphanumeric.`)
-    .isLength({ min: 2, max: 50 })
-    .withMessage(`${label} must be between 2 to 50 characters long.`);
+    .isLength({ max: 30 })
+    .withMessage(`${label} can be maximum 30 characters long.`);
 }
 
 
