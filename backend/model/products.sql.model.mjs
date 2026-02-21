@@ -43,7 +43,7 @@ const ProductsModel = sqlDB.sequelize.define(
 
     sku: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
 
     price: {
