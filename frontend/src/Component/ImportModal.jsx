@@ -106,29 +106,86 @@ function ImportModal({ onClose, title, apiURL }) {
 
           {/* Body */}
           <form onSubmit={handleSubmit}>
-            <div className="modal-body">
-              <input ref={fileInputRef} type="file" onChange={handleFileChange} accept=".csv" />
-              {error && <div className="text-danger mt-2">{error}</div>}
-              {fileName && (
-                <div className="mt-3 text-center">
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline-danger mt-2"
-                    onClick={handleClear}
-                  >
-                    Clear
-                  </button>
-                </div>
-              )}
-            </div>
+  <div className="modal-body">
 
-            {/* Footer */}
-            <div className="modal-footer">
-              <button type="submit" className="btn btn-primary">
-                Import
-              </button>
-            </div>
-          </form>
+    {/* Sample Download Section */}
+    <div
+      className="p-3 mb-3"
+      style={{
+        background: "#f8f9fa",
+        borderRadius: "8px",
+        border: "1px dashed #d6d6d6"
+      }}
+    >
+      <div className="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+          <h6 className="mb-1">Download Sample Format</h6>
+          <small className="text-muted">
+            Please download the sample CSV file and follow the same format while uploading.
+          </small>
+          <a href="/imports_files/ordersBulkImport.csv" download="ordersBulkImportSample.csv" className="btn btn-sm btn-outline-primary mt-2">
+          ⬇ Download CSV </a>
+        </div>
+      </div>
+    </div>
+
+    {/* Upload Section */}
+    <div
+      className="p-4 text-center"
+      style={{
+        border: "2px dashed #ced4da",
+        borderRadius: "10px",
+        background: "#ffffff"
+      }}
+    >
+      <input
+        ref={fileInputRef}
+        type="file"
+        onChange={handleFileChange}
+        accept=".csv"
+        style={{ display: "none" }}
+      />
+
+      <button
+        type="button"
+        className="btn btn-light"
+        onClick={() => fileInputRef.current.click()}
+      >
+        📂 Choose CSV File
+      </button>
+
+      {fileName && (
+        <div className="mt-3">
+          <div className="text-success fw-bold">
+            ✔ {fileName}
+          </div>
+
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-danger mt-2"
+            onClick={handleClear}
+          >
+            Remove File
+          </button>
+        </div>
+      )}
+
+      {error && <div className="text-danger mt-3">{error}</div>}
+    </div>
+
+  </div>
+
+  {/* Footer */}
+  <div className="modal-footer">
+    <button type="button" className="btn btn-secondary" onClick={onClose}>
+      Cancel
+    </button>
+    <button type="submit" className="btn btn-primary">
+      Import Orders
+    </button>
+  </div>
+</form>
+
         </div>
       </div>
     </div>
