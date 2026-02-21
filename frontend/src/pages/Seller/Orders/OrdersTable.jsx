@@ -196,14 +196,33 @@ function OrdersTable({ setExportHandler }) {
                   className="btn btn-dark btn-md py-2 px-3"
                   style={{ width: "fit-content", cursor: "pointer" }}
                   onClick={() => {
+                    const selectedOrderObjects = dataList.filter(order =>
+                      selectedOrders.includes(order.id)
+                    );
+                    if (!selectedOrderObjects.length) return;
+                    const firstOrder = selectedOrderObjects[0];
+                    const allSameWarehouse = selectedOrderObjects.every(
+                      order => order.warehouse_id === firstOrder.warehouse_id
+                    );
+                    if (!allSameWarehouse) {
+                      alert("Please select orders from same warehouse");
+                      return;
+                    }
+                    const warehouse = warehouseList.find(
+                      (w) => w.id == firstOrder.warehouse_id
+                    );
                     setShipOrderDetails({
-                      order_ids: selectedOrders
+                      order_ids: selectedOrders,
+                      warehouse_id: firstOrder.warehouse_id,
+                      rto_warehouse_id: firstOrder.rto_warehouse_id,
+                      originpincode: warehouse?.pincode,
                     });
                     setShowbulkShipModal(true);
                   }}
-                >
+                  >
                   <Icon path={mdiCubeSend} size={0.7} /> Bulk Ship
                 </div>
+
               </div>
             </>
           )}

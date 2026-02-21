@@ -53,60 +53,41 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
     fetchplanname();
   }, []);
 
-    useEffect(() => 
-    {
-        if (!form.warehouse_id || !orderData) return;
-        const {
-        paymentType,
-        packageDetails,
-        shippingDetails,
-        collectableAmount,
-        } = orderData;
-        if (!packageDetails || !shippingDetails) return;
-        const { length, height, breadth, weight } = packageDetails;
-        const destination = shippingDetails?.pincode;
-        const origin = form.originpincode || orderData.originpincode; // optional if you store origin in warehouse
-        const amount = collectableAmount;
-        const formData = {
-        paymentType,
-        length,
-        height,
-        breadth,
-        weight,
-        destination,
-        origin,
-        amount,
-        };
-        const fetchCourier = async () => {
+    useEffect(() => {
+    if (!form.warehouse_id) return;
+    if (!orderData) return;
+    const origin = form.originpincode || orderData.originpincode;
+    if (!origin) return;
+    const fetchCourier = async () => {
         try {
-            setLoading(true);
-            const url = `${RateConfig.Plan_chart}`;
-            const res = await api.post(url, formData);
-            const rows = res?.data?.data?.result || [];
-            const uniqueCouriers = Array.from(
-            new Map(
-                rows.map(item => [
+        setLoading(true);
+        const res = await api.get(RateConfig.Plan_chart);
+        const rows = res?.data?.data?.result || [];
+        const uniqueCouriers = [
+            ...new Map(
+            rows.map(item => [
                 item.courier_id,
                 {
-                    courier_id: item.courier_id,
-                    courier_name: item.courier_name
+                courier_id: item.courier_id,
+                courier_name: item.courier_name
                 }
-                ])
+            ])
             ).values()
-            );
-
-            setCourierList(uniqueCouriers);
-            setShowForwardReverse(true);
-            setSelectedIndex(null); // reset selected courier when warehouse changes
+        ];
+        setCourierList(uniqueCouriers);
+        setShowForwardReverse(true);
         } catch (error) {
-            console.error("API Error:", error);
-            alert("Something went wrong while updating rates");
+        console.error("❌ Courier API Error:", error);
         } finally {
-            setLoading(false);
+        setLoading(false);
         }
-        };
-        fetchCourier();
-    }, [orderData, form.warehouse_id, form.rto_warehouse_id]);
+    };
+    fetchCourier();
+    }, [
+    orderData,
+    form.warehouse_id,
+    form.rto_warehouse_id
+    ]);
 
   const handleCourierSelect = (rate, index) => {
     setSelectedIndex(index);
@@ -116,40 +97,55 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
     });
   };
 
-  const handleSubmit = async () => {
-    const newErrors = validateForm(form);
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    if (!shipData.courier_id) {
-      showError("Please select a courier before shipping.");
-      return;
-    }
-    const finalPayload = {
-      ...shipData,
-      warehouse_id: form.warehouse_id,
-      rto_warehouse_id: form.rto_warehouse_id,
-      plan_id: planid,
+    const handleSubmit = async () => 
+    {
+        console.log("orders payload", orderData);
+        if (!shipData.courier_id) {
+            showError("Please select a courier before shipping.");
+            return;
+        }
+        if (!form.warehouse_id || !form.rto_warehouse_id) {
+            showError("Please select warehouse and RTO warehouse.");
+            return;
+        }
+        const finalPayload = {
+            order_db_ids: Array.isArray(orderData?.order_ids)
+            ? orderData.order_ids
+            : [orderData?.order_ids],
+            courier_id: shipData.courier_id,
+            warehouse_id: form.warehouse_id,
+            rto_warehouse_id: form.rto_warehouse_id,
+            plan_id: planid,
+            zone: orderData?.zone || "A" // ⚠ adjust according to your backend logic
+        };
+        console.log("🚀 Final Payload:", finalPayload);
+        try {
+            setLoading(true);
+            const res = await api.post(
+            create_shipment.createshipments,
+            finalPayload
+            );
+            if (res?.data?.status === 200)
+            {
+                showSuccess(res?.data?.message || "Shipment Created Successfully");
+                setSearchParams({});
+                onClose();
+                handleFetchData();
+            }
+            else
+            {
+                showError(res?.data?.message || "Something went wrong while creating shipment");
+            }
+        } catch (error) {
+            showError(
+            error?.response?.data?.message ||
+            "Something went wrong while creating shipment"
+            );
+        } finally {
+            setLoading(false);
+        }
     };
-    try {
-      setLoading(true);
-      const url = `${create_shipment.createshipments}`;
-      const res = await api.post(url, finalPayload);
-      if (res?.data?.status === 201) {
-        showSuccess(res?.data?.message || "Shipment Created Successfully")
-        setSearchParams({});
-        onClose();
-        handleFetchData();
-      } else {
-        showError(res?.data?.message || "Something went wrong while creating shipment")
-      }
-    } catch (error) {
-      showError(error?.response?.data?.message || "Something went wrong while creating shipment")
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   return (
     <div
@@ -234,25 +230,11 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
                             transition: "all 0.3s ease",
                           }}
                         >
-                          <div className="d-flex justify-content-between align-items-center">
-                            <span className="courier-title-heading">
-                              {rate.courier_name}
-                            </span>
-                            <div className="courier-box text-center">
-                              <div className="courier-box-rs">
-                                <sup>₹</sup>
-                                <span className="price">{(Number(rate.freight_charge) || 0) + (Number(rate.cod_charge) || 0)}</span>
-                              </div>
-                              <small className="text-muted d-block mt-1">
-                                {rate.zone || "N/A"}
-                              </small>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <span className="courier-title-heading">
+                                {rate.courier_name}
+                                </span>
                             </div>
-                          </div>
-                          <div className="form-text mt-2">
-                            <i className="ti ti-info-circle menu-icon"></i>
-                            Freight Charges: ₹ {rate.freight_charge || 0} + COD
-                            Charges: ₹ {rate.cod_charge || 0}
-                          </div>
                         </div>
                       </div>
                     ))}
