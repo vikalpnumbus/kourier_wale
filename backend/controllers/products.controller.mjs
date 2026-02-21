@@ -80,57 +80,6 @@ export const create = async (req, res, next) => {
   }
 };
 
-// export const create = async (req, res, next) => {
-//   try {
-//     const existingRecord = await ProductsService.read({
-//       userId: req.user.id,
-//       name: req.body.name,
-//       category: req.body.category,
-//     });
-//     if (existingRecord && existingRecord.length > 0) {
-//       const error = new Error("This product already exists.");
-//       error.status = 409;
-//       throw error;
-//     }
-
-//     const files = req.files;
-
-//     let requiredFiles = ["productImage"];
-
-//     const uploadedFileNames = files.map((f) => f.fieldname);
-
-//     const missingFiles = requiredFiles.filter(
-//       (required) => !uploadedFileNames.includes(required)
-//     );
-
-//     if (missingFiles.length > 0) {
-//       const error = new Error(`Missing required files: ${missingFiles}`);
-//       error.status = 400;
-//       error.details = missingFiles.map((e) => ({
-//         field: e,
-//         message: e + " is required.",
-//       }));
-//       throw error;
-//     }
-
-//     const result = await ProductsService.create({
-//       files: files
-//         .map((f) => (requiredFiles.includes(f.fieldname) ? f : null))
-//         .filter(Boolean),
-//       data: {
-//         userId: req.user.id,
-//         ...req.body,
-//       },
-//     });
-//     if (!result) {
-//       throw ProductsService.error;
-//     }
-//     res.success(result);
-//   } catch (error) {
-//     next({ status: error.status, message: error.details || error.message });
-//   }
-// };
-
 export const read = async (req, res, next) => {
   try {
     const query = {

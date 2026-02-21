@@ -16,7 +16,7 @@ class ValidationClass {
   rules() {
     return [
       this.basicValidator("name", "Product Name"),
-      this.basicValidator("sku", "SKU Code"),
+      this.optionalBasicValidator("sku", "SKU Code"),
       this.categoryValidator("category", "Category"),
       this.priceValidator("price", "Price of the product"),
     ];
