@@ -167,7 +167,7 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
       >
         <div className="modal-content">
           <div className="modal-header py-1">
-            <h5 className="modal-title">Ship Your Package Now</h5>
+            <h5 className="modal-title">Bulk Ship Your Package Now</h5>
             <button
               type="button"
               className="close"
