@@ -299,7 +299,7 @@ class Service {
       this.error = error;
       return false;
     }
-}
+  }
 
   async remove(params) {
     try {
