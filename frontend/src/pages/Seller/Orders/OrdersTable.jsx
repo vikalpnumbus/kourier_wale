@@ -23,6 +23,13 @@ function OrdersTable({ setExportHandler }) {
   const [showbulkShipModal, setShowbulkShipModal] = useState(false);
   const [shipOrderDetails, setShipOrderDetails] = useState("");
   const [selectedOrders, setSelectedOrders] = useState([]);
+  const [activeTab, setActiveTab] = useState("all");
+  const [statusCounts, setStatusCounts] = useState({
+    all: 0,
+    new: 0,
+    booked: 0,
+    cancel: 0,
+  });
   const orderCanShip = (order) => {
     return (
       order.shipping_status === "new" &&
@@ -69,7 +76,14 @@ function OrdersTable({ setExportHandler }) {
         start_date: searchParams.get("start_date") || defaultStart,
         end_date: searchParams.get("end_date") || defaultEnd,
       };
-
+      if (activeTab !== "all") {
+        const statusMap = {
+          not_shipped: "new",
+          booked: "booked",
+          cancelled: "cancel",
+        };
+        params.shipping_status = statusMap[activeTab];
+      }
       const optionalKeys = [
         "orderId",
         "shippingName",
@@ -81,17 +95,19 @@ function OrdersTable({ setExportHandler }) {
         const value = searchParams.get(key)?.trim();
         if (value) params[key] = value;
       });
-
       const query = Object.entries(params)
         .map(([k, v]) => `${k}=${v}`)
         .join("&");
-
       const url = `${ordersConfig.ordersApi}?${query}`;
-
       const { data } = await api.get(url);
-
       setDataList(data?.data?.result || []);
       setTotalCount(data?.data?.total || 0);
+      setStatusCounts(data?.data?.counts || {
+        all: 0,
+        new: 0,
+        booked: 0,
+        cancel: 0,
+      });
     } catch (error) {
       console.error("Fetch orders error:", error);
       setDataList([]);
@@ -171,9 +187,9 @@ function OrdersTable({ setExportHandler }) {
   };
 
   useEffect(() => {
-    handleFetchData();
-    setSelectedOrders([]);
-  }, [searchParams]);
+  handleFetchData();
+  setSelectedOrders([]);
+}, [searchParams, activeTab]);
 
   useEffect(() => {
   setExportHandler?.(() => handleExportOrders());
@@ -226,6 +242,41 @@ function OrdersTable({ setExportHandler }) {
               </div>
             </>
           )}
+        </div>
+        <div className="d-flex gap-4 mb-3 border-bottom pb-2">
+        {[
+            { key: "all", label: "All Orders" },
+            { key: "not_shipped", label: "Not Shipped" },
+            { key: "booked", label: "Booked" },
+            { key: "cancelled", label: "Cancelled" },
+          ].map((tab) => (
+            <div
+              key={tab.key}
+              onClick={() => {
+                setActiveTab(tab.key);
+                setSelectedOrders([]);
+              }}
+              style={{
+                cursor: "pointer",
+                paddingBottom: "8px",
+                borderBottom:
+                  activeTab === tab.key
+                    ? "3px solid #000"
+                    : "3px solid transparent",
+                fontWeight: activeTab === tab.key ? "600" : "400",
+              }}
+            >
+            {tab.label}(
+                {tab.key === "all"
+                  ? statusCounts.all
+                  : tab.key === "not_shipped"
+                  ? statusCounts.new
+                  : tab.key === "booked"
+                  ? statusCounts.booked
+                  : statusCounts.cancel}
+              )
+            </div>
+          ))}
         </div>
         <div className="table-responsive h-100">
           <table className="table table-hover">

@@ -220,33 +220,67 @@ class Service {
         totalCount = result.length;
       } else {
         result = await this.repository.find(whereClause, { page, limit }, [includeChannel]);
-        totalCount = await this.repository.countDocuments(whereClause, { include: [includeChannel] });
-
+        totalCount = await this.repository.countDocuments(whereClause, {
+          include: [includeChannel],
+        });
+        const baseWhereClause = { [Op.and]: [] };
+        if (userId) baseWhereClause[Op.and].push({ userId });
+        if (warehouse_id) baseWhereClause[Op.and].push({ warehouse_id });
+        if (paymentType) baseWhereClause[Op.and].push({ paymentType });
+        if (start_date) {
+          baseWhereClause[Op.and].push(
+            where(fn("DATE", col("orders.createdAt")), { [Op.gte]: start_date })
+          );
+        }
+        if (end_date) {
+          baseWhereClause[Op.and].push(
+            where(fn("DATE", col("orders.createdAt")), { [Op.lte]: end_date })
+          );
+        }
+        if (!baseWhereClause[Op.and].length) delete baseWhereClause[Op.and];
+        const allCount = await this.repository.countDocuments(baseWhereClause, {
+          include: [includeChannel],
+        });
+        const newCount = await this.repository.countDocuments(
+          {
+            ...baseWhereClause,
+            shipping_status: "new",
+          },
+          { include: [includeChannel] }
+        );
+        const bookedCount = await this.repository.countDocuments(
+          {
+            ...baseWhereClause,
+            shipping_status: "booked",
+          },
+          { include: [includeChannel] }
+        );
+        const cancelCount = await this.repository.countDocuments(
+          {
+            ...baseWhereClause,
+            shipping_status: "cancel",
+          },
+          { include: [includeChannel] }
+        );
         if (!result || result.length === 0) {
           result = [];
         }
       }
-
-      // fill products in each order record
       result = await Promise.all(
         result.map(async (e) => {
           const modifiedData = e.dataValues;
           const channel = e?.channel?.dataValues || {};
           delete modifiedData.channel;
-
           let productIDs = e.products?.map((product) => product.id).join(",");
           productIDs = productIDs
             .split(",")
             .map((e) => e?.trim())
             .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
-
           let foundProducts = (await ProductsService.read({ id: productIDs })).data.result;
-
           foundProducts = foundProducts.map((product) => ({
             ...product.dataValues,
             ...e.products.filter((curr) => curr.id == product.id)[0],
           }));
-
           const payload = {
             ...modifiedData,
             ...channel,
@@ -256,7 +290,18 @@ class Service {
           return payload;
         })
       );
-      return { data: { total: totalCount, result } };
+      return {
+        data: {
+          total: totalCount,
+          result,
+          counts: {
+            all: allCount,
+            new: newCount,
+            booked: bookedCount,
+            cancel: cancelCount,
+          },
+        },
+      };
     } catch (error) {
       this.error = error;
       return false;
