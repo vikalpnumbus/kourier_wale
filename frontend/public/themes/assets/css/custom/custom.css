@@ -285,17 +285,18 @@ a
 
 /* Individual Tab */
 .shipment-tab {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 6px 4px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #1F3BB3;
+    cursor: pointer;
+    padding: 6px 0px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-transform: uppercase;
 }
 
 .shipment-tab:hover {
@@ -336,15 +337,15 @@ a
 
 /* Count badge */
 .tab-count {
-  min-width: 24px;
-  text-align: center;
-  background: #f3f4f6;
-  color: #374151;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 999px;
-  transition: all 0.3s ease;
+    min-width: 24px;
+    text-align: center;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 999px;
+    transition: all 0.3s ease;
 }
 
 .shipment-tab:hover .tab-count {

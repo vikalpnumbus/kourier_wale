@@ -196,22 +196,6 @@ function AddWarehouseModal({ onClose }) {
         ],
         []
     );
-
-    const checkboxFields = useMemo(
-        () => [
-            {
-                label: "Hide End Customer Contact Number",
-                name: "hide_end_customer_contact_number",
-            },
-            {
-                label: "Hide Warehouse Mobile Number",
-                name: "hide_warehouse_mobile_number",
-            },
-            { label: "Hide Warehouse Address", name: "hide_warehouse_address" },
-            { label: "Hide Product Details", name: "hide_product_details" },
-        ],
-        []
-    );
     return (
         <div
             className="modal fade show modal-lg"
@@ -255,19 +239,7 @@ function AddWarehouseModal({ onClose }) {
                                                     disabled={disabled}
                                                 />
                                             ))}
-
-                                            {checkboxFields.map(({ label, name }) => (
-                                                <CheckboxField
-                                                    key={name}
-                                                    label={label}
-                                                    name={name}
-                                                    checked={form[name]}
-                                                    onChange={handleChange}
-                                                />
-                                            ))}
                                         </div>
-
-
                                     </form>
                                 </div>
                             </div>

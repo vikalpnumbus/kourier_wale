@@ -14,10 +14,6 @@ const defaultForm = {
   pincode: "",
   support_email: "",
   support_phone: "+91",
-  hide_end_customer_contact_number: false,
-  hide_warehouse_mobile_number: false,
-  hide_warehouse_address: false,
-  hide_product_details: false,
 };
 
 function WarehouseForm() {
@@ -240,22 +236,6 @@ function WarehouseForm() {
     ],
     []
   );
-
-  const checkboxFields = useMemo(
-    () => [
-      {
-        label: "Hide End Customer Contact Number",
-        name: "hide_end_customer_contact_number",
-      },
-      {
-        label: "Hide Warehouse Mobile Number",
-        name: "hide_warehouse_mobile_number",
-      },
-      { label: "Hide Warehouse Address", name: "hide_warehouse_address" },
-      { label: "Hide Product Details", name: "hide_product_details" },
-    ],
-    []
-  );
   return (
     <>
       <div className="row text-center">
@@ -276,18 +256,7 @@ function WarehouseForm() {
                       disabled={disabled}
                     />
                   ))}
-
-                  {checkboxFields.map(({ label, name }) => (
-                    <CheckboxField
-                      key={name}
-                      label={label}
-                      name={name}
-                      checked={form[name]}
-                      onChange={handleChange}
-                    />
-                  ))}
                 </div>
-
                 <button
                   type="submit"
                   className="btn btn-primary w-100"

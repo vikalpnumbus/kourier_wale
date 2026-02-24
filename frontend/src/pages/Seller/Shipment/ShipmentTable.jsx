@@ -20,8 +20,8 @@ function ShipmentsTable() {
   
   const shipmentTabs = [
     "All",
-    "booked",
     "new",
+    "booked",
     "pending_pickup",
     "in_transit",
     "out_for_delivery",
