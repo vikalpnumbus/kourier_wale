@@ -15,6 +15,9 @@ function ShipmentsTable() {
   const [totalCount, setTotalCount] = useState(0);
   const [defaultStart, defaultEnd] = useMemo(() => getLastNDaysRange(7), []);
   const [warehouseList, setWarehouseList] = useState([]);
+  const [statusCounts, setStatusCounts] = useState({});
+  const [activeTab, setActiveTab] = useState("All");
+  
   const handleWarehouseData = async () => {
     try {
       const url = warehouseConfig.warehouseApi;
@@ -33,6 +36,7 @@ function ShipmentsTable() {
       ? `Wt: ${(weight / 1000).toFixed(2)} kg`
       : `Wt: ${weight} gm`;
   };
+  
   const handleFetchData = async () => {
     setLoading(true);
     try {
@@ -42,18 +46,13 @@ function ShipmentsTable() {
         start_date: searchParams.get("start_date") || defaultStart,
         end_date: searchParams.get("end_date") || defaultEnd,
       };
-
-      const optionalKeys = [
-        "orderId",
-        "shippingName",
-        "warehouse_id",
-        "paymentType",
-        "category",
-      ];
-      optionalKeys.forEach((key) => {
-        const value = searchParams.get(key)?.trim();
-        if (value) params[key] = value;
-      });
+      if (activeTab !== "All") {
+        if (activeTab === "Stuck") {
+          params.shipping_status = "new";
+        } else {
+          params.shipping_status = activeTab.toLowerCase();
+        }
+      }
       const query = Object.entries(params)
         .map(([k, v]) => `${k}=${v}`)
         .join("&");
@@ -61,13 +60,15 @@ function ShipmentsTable() {
       const { data } = await api.get(url);
       setDataList(data?.data?.result || []);
       setTotalCount(data?.data?.total || 0);
+      setStatusCounts(data?.data?.counts || {});
     } catch (error) {
-      console.error("Fetch orders error:", error);
+      console.error("Fetch shipment error:", error);
       setDataList([]);
     } finally {
       setLoading(false);
     }
   };
+  
   const findWarehouse = (warehouseId) => {
     const warehouse = warehouseList.find((w) => w.id == warehouseId);
 
@@ -78,9 +79,10 @@ function ShipmentsTable() {
   useEffect(() => {
     handleWarehouseData();
   }, []);
+  
   useEffect(() => {
     handleFetchData();
-  }, [searchParams]);
+  }, [searchParams, activeTab]);
 
   const handleSelect = (id) => {
   setselectedShipments((prev) =>
@@ -198,6 +200,40 @@ function ShipmentsTable() {
               </div>
             </>
           )}
+        </div>
+        {/* 🔥 SHIPMENT STATUS TABS */}
+        <div className="shipment-tabs-container">
+          {[
+            "All",
+            "Stuck",
+            "booked",
+            "pending_pickups",
+            "in_transit",
+            "out_for_delivery",
+            "delivered",
+            "ndr"
+          ].map((tab, index) => (
+            <div
+              key={tab}
+              className={`shipment-tab ${activeTab === tab ? "active" : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              <span className="tab-label">
+                {tab.replaceAll("_", " ")}
+              </span>
+
+              <span className="tab-count">
+                {tab === "All"
+                  ? statusCounts?.All || 0
+                  : tab === "Stuck"
+                  ? statusCounts?.new || 0
+                  : statusCounts?.[tab] || 0}
+              </span>
+
+              {/* Divider */}
+              {index !== 7 && <span className="tab-divider"></span>}
+            </div>
+          ))}
         </div>
         <div className="table-responsive h-100">
           <table className="table table-hover">

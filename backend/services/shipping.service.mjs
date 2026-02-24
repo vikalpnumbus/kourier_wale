@@ -214,38 +214,35 @@ class Service {
         awb_number,
         exclude_shipping_status,
       } = params;
-
       const whereClause = { [Op.and]: [] };
-
-      // Direct equality filters
       if (userId) whereClause[Op.and].push({ userId });
       if (id) whereClause[Op.and].push({ id });
       if (shipping_status) whereClause[Op.and].push({ shipping_status });
       if (warehouse_id) whereClause[Op.and].push({ warehouse_id });
       if (courier_id) whereClause[Op.and].push({ courier_id });
       if (paymentType) whereClause[Op.and].push({ paymentType });
-
-      if (orderId) {
-        const orderIdsArray = Array.isArray(orderId) ? orderId : orderId?.split(",").map((e) => e.trim());
+      if (orderId){
+        const orderIdsArray = Array.isArray(orderId)
+          ? orderId
+          : orderId.split(",").map((e) => e.trim());
         whereClause[Op.and].push({
           orderId: { [Op.in]: orderIdsArray },
         });
       }
-
       if (exclude_shipping_status) {
         whereClause[Op.and].push({
           shipping_status: { [Op.ne]: exclude_shipping_status },
         });
       }
-
       if (awb_number) {
-        const idsArray = Array.isArray(awb_number) ? awb_number : awb_number?.split(",").map((e) => e.trim());
+        const idsArray = Array.isArray(awb_number)
+          ? awb_number
+          : awb_number.split(",").map((e) => e.trim());
+
         whereClause[Op.and].push({
           awb_number: { [Op.in]: idsArray },
         });
       }
-
-      // Shipping name (JSON concat)
       if (shipping_name) {
         whereClause[Op.and].push(
           where(
@@ -259,82 +256,110 @@ class Service {
           )
         );
       }
-
-      // Shipping phone (JSON phone / alternate_phone)
       if (shipping_phone) {
         whereClause[Op.and].push({
           [Op.or]: [
-            where(fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.phone'"))), { [Op.like]: `%${shipping_phone}%` }),
-            where(fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.alternate_phone'"))), {
-              [Op.like]: `%${shipping_phone}%`,
-            }),
+            where(
+              fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.phone'"))),
+              { [Op.like]: `%${shipping_phone}%` }
+            ),
+            where(
+              fn("JSON_UNQUOTE", fn("JSON_EXTRACT", col("shippingDetails"), literal("'$.alternate_phone'"))),
+              { [Op.like]: `%${shipping_phone}%` }
+            ),
           ],
         });
       }
-
-      // Date filters (ignore time)
       if (start_date) {
-        whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.gte]: start_date }));
+        whereClause[Op.and].push(
+          where(fn("DATE", col("createdAt")), { [Op.gte]: start_date })
+        );
       }
       if (end_date) {
-        whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.lte]: end_date }));
+        whereClause[Op.and].push(
+          where(fn("DATE", col("createdAt")), { [Op.lte]: end_date })
+        );
       }
-
-      // If no conditions were added, remove Op.and
       if (!whereClause[Op.and].length) delete whereClause[Op.and];
-
       let result;
       let totalCount;
-
       if (id) {
         result = await this.repository.find(whereClause);
-        if (!result) {
-          const error = new Error("No record found.");
-          error.status = 404;
-          throw error;
-        }
         totalCount = result.length;
       } else {
         result = await this.repository.find(whereClause, { page, limit });
         totalCount = await this.repository.countDocuments(whereClause);
-
-        if (!result || result.length === 0) {
-          result = [];
-        }
       }
-
-      // fill products in each order record
+      if (!result) result = [];
       const courierCache = {};
       const getCourier = async (id) => {
         if (courierCache[id]) return courierCache[id];
-        return await CourierService.read({ id });
+        const data = await CourierService.read({ id });
+        courierCache[id] = data;
+        return data;
       };
       result = await Promise.all(
         result.map(async (e) => {
-          let productIDs = e.products.map((product) => product.id).join(",");
-          productIDs = productIDs
-            .split(",")
-            .map((e) => e?.trim())
-            .filter((e) => e && e !== "null" && e !== "undefined" && e != "false");
-
-          let courierID = e.courier_id;
-
-          let [foundProductsRes, courierRes] = await Promise.all([await ProductsService.read({ id: productIDs }), await getCourier(courierID)]);
-
-          if (!courierCache[courierID]) courierCache[courierID] = courierRes;
-          let foundProducts = foundProductsRes?.data?.result || [];
-
+          const productIDs = e.products
+            .map((p) => p.id)
+            .filter(Boolean)
+            .join(",");
+          const [productsRes, courierRes] = await Promise.all([
+            ProductsService.read({ id: productIDs }),
+            getCourier(e.courier_id),
+          ]);
+          let foundProducts = productsRes?.data?.result || [];
           foundProducts = foundProducts.map((product) => ({
             ...product.dataValues,
-            ...e.products.filter((curr) => curr.id == product.id)[0],
+            ...e.products.find((p) => p.id == product.id),
           }));
-
-          const payload = { ...e.dataValues, products: foundProducts, courier_name: courierRes?.data?.result?.[0]?.name };
-          delete payload.productIDs;
-          return payload;
+          return {
+            ...e.dataValues,
+            products: foundProducts,
+            courier_name: courierRes?.data?.result?.[0]?.name,
+          };
         })
       );
-      return { data: { total: totalCount, result } };
+      const baseWhere = { ...whereClause };
+      if (baseWhere[Op.and]) {
+        baseWhere[Op.and] = baseWhere[Op.and].filter(
+          (cond) => !cond.shipping_status
+        );
+      }
+      const statusGroupCounts = await this.repository.model.findAll({
+        attributes: [
+          "shipping_status",
+          [fn("COUNT", col("id")), "count"],
+        ],
+        where: baseWhere,
+        group: ["shipping_status"],
+        raw: true,
+      });
+      const counts = {
+        All: await this.repository.countDocuments(baseWhere),
+        booked: 0,
+        new: 0,
+        in_transit: 0,
+        out_for_delivery: 0,
+        delivered: 0,
+        ndr: 0,
+        cancelled: 0,
+        Stuck: 0,
+      };
+      statusGroupCounts.forEach((row) => {
+        counts[row.shipping_status] = Number(row.count);
+      });
+      counts.Stuck = await this.repository.countDocuments({
+        ...baseWhere,
+        shipment_error: { [Op.ne]: null },
+      });
+      return {
+        data: {
+          total: totalCount,
+          result,
+          counts,
+        },
+      };
     } catch (error) {
       console.error(error);
       this.error = error;

@@ -248,3 +248,97 @@ a
   white-space: normal;    /* allow wrap */
   word-break: break-word; /* break long words */
 }
+
+
+/* ============================= */
+/* PREMIUM SHIPMENT TABS */
+/* ============================= */
+
+.shipment-tabs-container {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+}
+
+.shipment-tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual Tab */
+.shipment-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 6px 4px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.shipment-tab:hover {
+  color: #111827;
+  transform: translateY(-1px);
+}
+
+/* Active tab */
+.shipment-tab.active {
+  color: #111827;
+  font-weight: 600;
+}
+
+/* Smooth underline animation */
+.shipment-tab::after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background-color: #111827;
+  border-radius: 6px;
+  transition: width 0.35s ease;
+}
+
+.shipment-tab.active::after {
+  width: 100%;
+}
+
+/* Divider between tabs */
+.tab-divider {
+  height: 18px;
+  width: 1px;
+  background: #e5e7eb;
+  margin-left: 14px;
+}
+
+/* Count badge */
+.tab-count {
+  min-width: 24px;
+  text-align: center;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+}
+
+.shipment-tab:hover .tab-count {
+  background: #e5e7eb;
+}
+
+.shipment-tab.active .tab-count {
+  background: #111827;
+  color: #ffffff;
+  transform: scale(1.05);
+}
