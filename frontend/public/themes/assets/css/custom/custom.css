@@ -1,3 +1,8 @@
+
+:root {
+  --kw-blue: #1F3BB3;
+}
+
 .cmp_input_gm
 {
     color: #04c !important;
@@ -185,10 +190,19 @@ a
     font-weight: bold !important;
 }
 
-.menu-icon
+.sidebar-icon-only .sidebar .nav .nav-item .nav-link i.menu-icon
 {
-    color: #FFF !important;
-    font-weight: bold !important;
+    color: #fff
+}
+
+.sidebar-icon-only .sidebar .nav .nav-item .nav-link i.menu-icon:hover
+{
+    color: #1F3BB3
+}
+
+.sidebar .nav .nav-item .nav-link i.menu-icon
+{
+    color: #fff;
 }
 
 
