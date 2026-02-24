@@ -18,6 +18,25 @@ function ShipmentsTable() {
   const [statusCounts, setStatusCounts] = useState({});
   const [activeTab, setActiveTab] = useState("All");
   
+  const shipmentTabs = [
+    "All",
+    "booked",
+    "new",
+    "pending_pickup",
+    "in_transit",
+    "out_for_delivery",
+    "delivered",
+    "ndr",
+    "cancelled",
+    "rto",
+  ];
+
+  const formatTabLabel = (tab) => {
+    if (tab === "All") return "All";
+    if (tab === "rto") return "RTO";
+    return tab.replace(/_/g, " ");
+  };
+
   const handleWarehouseData = async () => {
     try {
       const url = warehouseConfig.warehouseApi;
@@ -46,28 +65,33 @@ function ShipmentsTable() {
         start_date: searchParams.get("start_date") || defaultStart,
         end_date: searchParams.get("end_date") || defaultEnd,
       };
+
       if (activeTab !== "All") {
-        if (activeTab === "Stuck") {
-          params.shipping_status = "new";
-        } else {
-          params.shipping_status = activeTab.toLowerCase();
-        }
+        params.shipping_status = activeTab;
       }
-      const query = Object.entries(params)
-        .map(([k, v]) => `${k}=${v}`)
-        .join("&");
+
+      const query = new URLSearchParams(params).toString();
       const url = `${ShipmentsConfig.fetchshipmentlist}?${query}`;
+
       const { data } = await api.get(url);
+
       setDataList(data?.data?.result || []);
       setTotalCount(data?.data?.total || 0);
       setStatusCounts(data?.data?.counts || {});
     } catch (error) {
-      console.error("Fetch shipment error:", error);
       setDataList([]);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    handleWarehouseData();
+  }, []);
+
+  useEffect(() => {
+    handleFetchData();
+  }, [searchParams, activeTab]);
   
   const findWarehouse = (warehouseId) => {
     const warehouse = warehouseList.find((w) => w.id == warehouseId);
@@ -80,10 +104,6 @@ function ShipmentsTable() {
     handleWarehouseData();
   }, []);
   
-  useEffect(() => {
-    handleFetchData();
-  }, [searchParams, activeTab]);
-
   const handleSelect = (id) => {
   setselectedShipments((prev) =>
     prev.includes(id)
@@ -139,6 +159,13 @@ function ShipmentsTable() {
       }
   };
 
+  const formatStatus = (status) => {
+    if (!status) return "";
+    return status
+      .toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
 
   const downloadLabels = async () =>
   {
@@ -174,9 +201,28 @@ function ShipmentsTable() {
         }
   };
 
-
-
-
+  const getStatusClass = (status) => {
+  switch (status) {
+    case "new":
+      return "btn-warning kw_button_ship";
+    case "cancelled":
+      return "btn-danger kw_button_cancel";
+    case "booked":
+      return "btn-success kw_button_booked";
+    case "pending_pickup":
+      return "btn-warning";
+    case "in_transit":
+      return "btn-primary";
+    case "out_for_delivery":
+      return "btn-info";
+    case "delivered":
+      return "btn-success";
+    case "rto":
+      return "btn-dark";
+    default:
+      return "btn-secondary";
+  }
+};
 
   return (
     <div className="tab-content tab-content-vertical">
@@ -203,38 +249,28 @@ function ShipmentsTable() {
         </div>
         {/* 🔥 SHIPMENT STATUS TABS */}
         <div className="shipment-tabs-container">
-          {[
-            "All",
-            "Stuck",
-            "booked",
-            "pending_pickups",
-            "in_transit",
-            "out_for_delivery",
-            "delivered",
-            "ndr"
-          ].map((tab, index) => (
-            <div
-              key={tab}
-              className={`shipment-tab ${activeTab === tab ? "active" : ""}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              <span className="tab-label">
-                {tab.replaceAll("_", " ")}
-              </span>
+        {shipmentTabs.map((tab, index) => (
+          <div
+            key={tab}
+            className={`shipment-tab ${activeTab === tab ? "active" : ""}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            <span className="tab-label">
+              {formatTabLabel(tab)}
+            </span>
 
-              <span className="tab-count">
-                {tab === "All"
-                  ? statusCounts?.All || 0
-                  : tab === "Stuck"
-                  ? statusCounts?.new || 0
-                  : statusCounts?.[tab] || 0}
-              </span>
+            <span className="tab-count">
+              {tab === "All"
+                ? statusCounts?.All || 0
+                : statusCounts?.[tab] || 0}
+            </span>
 
-              {/* Divider */}
-              {index !== 7 && <span className="tab-divider"></span>}
-            </div>
-          ))}
-        </div>
+            {index !== shipmentTabs.length - 1 && (
+              <span className="tab-divider"></span>
+            )}
+          </div>
+        ))}
+      </div>
         <div className="table-responsive h-100">
           <table className="table table-hover">
             <thead>
@@ -353,18 +389,12 @@ function ShipmentsTable() {
                     <td className="py-2">
                       <div className="btn-group">
                         <button
-                          className={`btn btn-md py-2 px-3 ${data?.shipping_status === "new"
-                            ? "btn-warning kw_button_ship"
-                            : data?.shipping_status === "cancelled"
-                              ? "btn-danger kw_button_cancel"
-                              : data?.shipping_status === "booked"
-                                ? "btn-success kw_button_booked"
-                                : "btn-secondary kw_button_booked"
-                            }`}
+                          className={`btn btn-md py-2 px-3 ${getStatusClass(data?.shipping_status)}`}
                         >
-                          {data?.shipping_status === "new" ? "Processing" : data?.shipping_status}
+                          {data?.shipping_status === "new"
+                            ? "Processing"
+                            : formatStatus(data?.shipping_status)}
                         </button>
-
                       </div>{" "}
                       {
                         data?.shipment_error && (
