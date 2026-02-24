@@ -28,7 +28,7 @@ export const create = async (req, res, next) => {
         message: "Category is required.",
       });
     }
-    const files = req.files || [];
+    const files = req.file ? [req.file] : [];
     const requiredFiles = ["productImage"];
     const uploadedFileNames = files.map((f) => f.fieldname);
     const missingFiles = requiredFiles.filter(
