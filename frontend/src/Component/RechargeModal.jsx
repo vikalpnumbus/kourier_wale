@@ -45,7 +45,7 @@ function RechargeModal({ onClose, handleFetchData }) {
         key: import.meta.env.VITE_RAZORPAY_KEY,
         amount: order.amount,
         currency: order.currency,
-        name: "Kourier Wale",
+        name: "Veygo",
         description: "Wallet Recharge",
         image:
           "https://kourierwale.in/wp-content/uploads/2024/06/cropped-KW-32x32.png",

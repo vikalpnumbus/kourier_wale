@@ -56,7 +56,7 @@ class Service {
 
       await NotificationService.sendEmail({
         email: data.email,
-        subject: "Kourier Wale - Your Registration OTP",
+        subject: "Veygo - Your Registration OTP",
         html: `
         <br/>Dear ${[data?.fname, data?.lname].map((e) => e.charAt(0).toUpperCase() + e.slice(1)).join(" ")},
         <br/>
@@ -70,7 +70,7 @@ class Service {
         <br/>
         <br/>Best regards,
         <br/>Onboarding Team
-        <br/>Kourier Wale
+        <br/>Veygo
         `,
       });
       return {
@@ -210,7 +210,7 @@ class Service {
         };
         await NotificationService.sendEmail({
           email: query.email,
-          subject: "Kourier Wale - Your Registration OTP",
+          subject: "Veygo - Your Registration OTP",
           html: `
         <br/>Dear,
 
@@ -220,7 +220,7 @@ class Service {
         <br/>If you did not request this OTP, please ignore this email. The OTP is valid for a limited time.
         <br/>Best regards,
         <br/>Onboarding Team
-        <br/>Kourier Wale
+        <br/>Veygo
         `,
         });
       }

@@ -58,7 +58,7 @@ function ForgotPassword() {
                 <img
                   className="mb-3"
                   src={company_logo}
-                  alt="Kourier Wale"
+                  alt="Veygo"
                   width={180}
                 />
                 <form onSubmit={handleSubmit}>

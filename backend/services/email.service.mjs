@@ -27,7 +27,7 @@ class Class {
 
     const mailOptions = {
       to: email,
-      from: `Kourier Wale <${EMAIL_USER}>`,
+      from: `Veygo <${EMAIL_USER}>`,
       subject: subject,
       text: message,
       html,
