@@ -349,10 +349,6 @@ class Service {
       statusGroupCounts.forEach((row) => {
         counts[row.shipping_status] = Number(row.count);
       });
-      counts.Stuck = await this.repository.countDocuments({
-        ...baseWhere,
-        shipment_error: { [Op.ne]: null },
-      });
       return {
         data: {
           total: totalCount,
