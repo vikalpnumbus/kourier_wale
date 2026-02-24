@@ -53,10 +53,10 @@ class Validations {
       ),
 
       // ---- Charges ----
-      this.numericStringValidator("charges.shipping", "Shipping Charge"),
-      this.numericStringValidator("charges.cod", "COD Charge"),
-      this.numericStringValidator("charges.tax_amount", "Tax Amount"),
-      this.numericStringValidator("charges.discount", "Discount"),
+      this.optionalNumericStringValidator("charges.shipping", "Shipping Charge"),
+      this.optionalNumericStringValidator("charges.cod", "COD Charge"),
+      this.optionalNumericStringValidator("charges.tax_amount", "Tax Amount"),
+      this.optionalNumericStringValidator("charges.discount", "Discount"),
     ];
   }
 
@@ -95,6 +95,15 @@ class Validations {
         `${label} must be a numeric string (e.g. "100" or "99.99").`
       );
   }
+
+  optionalNumericStringValidator(field, label) {
+  return this.fieldCheck(field, label)
+    .optional({ nullable: true, checkFalsy: true }) // ✅ optional banaya
+    .matches(/^\d+(\.\d{1,2})?$/)
+    .withMessage(
+      `${label} must be a numeric string (e.g. "100" or "99.99").`
+    );
+}
 
   phoneValidator(field, label) {
     return this.fieldCheck(field, label)
