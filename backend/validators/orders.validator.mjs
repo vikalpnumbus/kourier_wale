@@ -98,7 +98,7 @@ class Validations {
 
   optionalNumericStringValidator(field, label) {
   return this.fieldCheck(field, label)
-    .optional({ nullable: true, checkFalsy: true }) // ✅ optional banaya
+    .optional({ nullable: true, checkFalsy: true })
     .matches(/^\d+(\.\d{1,2})?$/)
     .withMessage(
       `${label} must be a numeric string (e.g. "100" or "99.99").`

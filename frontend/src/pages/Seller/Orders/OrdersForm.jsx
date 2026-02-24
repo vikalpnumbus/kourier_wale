@@ -10,8 +10,8 @@ import { stringifyPayload } from "../../../middleware/CommonFunctions";
 import AddWarehouseModal from "../../../Component/AddWarehouseModal";
 
 const defaultForm = {
-  orderId: "",
-  paymentType: "",
+  "orderId": "",
+  "paymentType": "",
   "shippingDetails.fname": "",
   "shippingDetails.lname": "",
   "shippingDetails.address": "",
@@ -25,15 +25,15 @@ const defaultForm = {
   "packageDetails.breadth": "",
   "packageDetails.length": "",
   "packageDetails.volumetricWeight": "",
-  orderAmount: "",
+  "orderAmount": "",
   "charges.shipping": "",
   "charges.tax_amount": "",
   "charges.cod": "",
   "charges.discount": "",
-  collectableAmount: "",
+  "collectableAmount": "",
   products: [],
-  warehouse_id: "",
-  rto_warehouse_id: "",
+  "warehouse_id": "",
+  "rto_warehouse_id": "",
 };
 
 function OrdersForm() {
@@ -313,18 +313,20 @@ function OrdersForm() {
       );
 
       payload.order_source = "portal";
-      // payload.rto_warehouse_id = "12";
+      const chargeFields = [
+        "charges.shipping",
+        "charges.tax_amount",
+        "charges.cod",
+        "charges.discount",
+      ];
 
-      if (payload.paymentType === "prepaid") {
-        if (!payload["charges.cod"]) payload["charges.cod"] = "0";
-      }
-      if (!payload["charges.discount"]) payload["charges.discount"] = "0";
-      if (!payload["charges.shipping"]) payload["charges.shipping"] = "0";
-
+      chargeFields.forEach((field) => {
+        if (!payload[field] || payload[field] === "") {
+          payload[field] = "0";
+        }
+      });
       const payloadString = stringifyPayload(payload);
-
       const response = await api[method](url, payloadString);
-
       if (response.status === 201 || response?.data?.status === 201) {
         showSuccess(
           response.data?.data?.message || "Warehouse saved successfully!"
