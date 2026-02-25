@@ -203,10 +203,7 @@ class Service {
     } = data;
     const volumetricDivisor = 5000;
     const deadWeight = CustomMath.roundOff(weight);
-
     const calculatedZone = this.calculateZone(origin, destination);
-    console.log('calculatedZone: ', calculatedZone);
-
     const volumetricWeight = CustomMath.roundOff(
       (CustomMath.roundOff(length) *
         CustomMath.roundOff(breadth) *
@@ -214,24 +211,16 @@ class Service {
         1000.0) /
         volumetricDivisor
     );
-
     const finalWeight = Math.max(volumetricWeight, deadWeight);
-
     const [UserServiceRes, UserCourierServiceRes] = await Promise.all([
       await UserService.read({
         id: userId,
       }),
       await UserCourierService.read({ userId }),
     ]);
-
     const plan_id = UserServiceRes?.pricingPlanId;
-    console.log('plan_id: ', plan_id);
-
     if (!plan_id) throw new Error("No pricing plan found for userId." + userId);
-
     let pricingCard = (await this.read({ plan_id }))?.data?.result;
-    console.log('pricingCard: ', pricingCard);
-
     if (!pricingCard || pricingCard.length == 0) {
       const error = new Error(
         "Error fetching Pricing Card details or it is empty.."
@@ -239,111 +228,82 @@ class Service {
       error.status = 400;
       throw error;
     }
-
     const userCouriers = UserCourierServiceRes?.data?.result?.flatMap((e) =>
       e.assigned_courier_ids.map((curr) => curr.id.trim())
   );
-  
-    if (!userCouriers || userCouriers.length == 0) {
-      const error = new Error(
-        "Error fetching user courier details or it is empty."
-      );
-      error.status = 400;
-      throw error;
-    }
-
-    console.log("userCouriers: ", userCouriers);
-
-    // filter-in all the couriers which are  available to the user.
-    pricingCard = pricingCard?.filter((e) =>
-      userCouriers?.includes(e.courier_id + "")
+  if (!userCouriers || userCouriers.length == 0) {
+    const error = new Error(
+      "Error fetching user courier details or it is empty."
     );
+    error.status = 400;
+    throw error;
+  }
+  pricingCard = pricingCard?.filter((e) =>
+    userCouriers?.includes(e.courier_id + "")
+  );
 
-    if (!pricingCard || pricingCard.length == 0) {
-      throw new Error("No available plans.");
-    }
+  if (!pricingCard || pricingCard.length == 0) {
+    throw new Error("No available plans.");
+  }
+  const filteredForwardPlans = pricingCard.filter(
+    (e) => e.type === "forward" || e.type === "weight"
+  );
+  const courierCache = {};
+  const forwardPlanResults = (
+    await Promise.all(
+      filteredForwardPlans.map(async (e) => {
+        let courierPromise;
 
-    console.log(
-      "pricingCard: ",
-      pricingCard.map((e) => e.dataValues)
-    );
-    const filteredForwardPlans = pricingCard.filter(
-      (e) => e.type === "forward" || e.type === "weight"
-    );
+        if (courierCache[e.courier_id]) {
+          courierPromise = courierCache[e.courier_id];
+        } else {
+          // Store the PROMISE immediately → ensures parallel fetching
+          courierPromise = CourierService.read({ id: e.courier_id });
+          courierCache[e.courier_id] = courierPromise;
+        }
 
-    console.log(
-      "filteredForwardPlans: ",
-      filteredForwardPlans.map((e) => e.dataValues)
-    );
+        const [courierDetailsRes, pincodeServiceabilityDetailsRes] =
+          await Promise.all([
+            await CourierService.read({ id: e.courier_id }),
+            await ServiceablePincodesService.read({
+              courier_id: e.courier_id,
+            }),
+          ]);
+        const courierDetails = courierDetailsRes?.data?.result?.[0];
+        console.log('courierDetails: ', courierDetails);
+        const { name, weight, additional_weight, show_to_users } =
+          courierDetails;
 
-    const courierCache = {};
+        const pincodeServiceabilityDetails =
+          pincodeServiceabilityDetailsRes?.data?.result?.[0];
 
-    const forwardPlanResults = (
-      await Promise.all(
-        filteredForwardPlans.map(async (e) => {
-          let courierPromise;
-
-          if (courierCache[e.courier_id]) {
-            courierPromise = courierCache[e.courier_id];
-          } else {
-            // Store the PROMISE immediately → ensures parallel fetching
-            courierPromise = CourierService.read({ id: e.courier_id });
-            courierCache[e.courier_id] = courierPromise;
-          }
-
-          const [courierDetailsRes, pincodeServiceabilityDetailsRes] =
-            await Promise.all([
-              await CourierService.read({ id: e.courier_id }),
-              await ServiceablePincodesService.read({
-                courier_id: e.courier_id,
-              }),
-            ]);
-          const courierDetails = courierDetailsRes?.data?.result?.[0];
-          console.log('courierDetails: ', courierDetails);
-          const { name, weight, additional_weight, show_to_users } =
-            courierDetails;
-
-          const pincodeServiceabilityDetails =
-            pincodeServiceabilityDetailsRes?.data?.result?.[0];
-
-          console.log("courier_id: ", e.courier_id, name, {
-            courier_id: e.courier_id,
-            plan: {
-              ...e.dataValues,
-              name,
-              weight,
-              additional_weight,
-              show_to_users,
-            },
-          });
-          console.log(
-            "pincodeServiceabilityDetails: ",
-            pincodeServiceabilityDetails
-          );
-          if (!pincodeServiceabilityDetails) return null;
-
-          if (
-            paymentType?.toLowerCase() == "cod" &&
-            pincodeServiceabilityDetails.cod?.toLowerCase() != "y"
-          )
-            return null;
-
-          return {
-            courier_id: e.courier_id,
-            plan: {
-              ...e.dataValues,
-              name,
-              weight,
-              additional_weight,
-              show_to_users,
-            },
-          };
-        })
-      )
-    )?.filter((e) => e != null);
-
-    console.log("forwardPlanResults: ", forwardPlanResults);
-    // Group by courier_id
+        console.log("courier_id: ", e.courier_id, name, {
+        courier_id: e.courier_id,
+        plan: {
+            ...e.dataValues,
+            name,
+            weight,
+            additional_weight,
+            show_to_users,
+          },
+        });
+        console.log("pincodeServiceabilityDetails: ",pincodeServiceabilityDetails);
+        if (!pincodeServiceabilityDetails) return null;
+        if (paymentType?.toLowerCase() == "cod" && pincodeServiceabilityDetails.cod?.toLowerCase() != "y")
+        return null;
+        return {
+          courier_id: e.courier_id,
+          plan: {
+            ...e.dataValues,
+            name,
+            weight,
+            additional_weight,
+            show_to_users,
+          },
+        };
+      })
+    )
+  )?.filter((e) => e != null);
     const forwardPlans = forwardPlanResults.reduce(
       (acc, { courier_id, plan }) => {
         if (!acc[courier_id]) acc[courier_id] = [];
@@ -352,56 +312,40 @@ class Service {
       },
       {}
     );
-
     const rows = Object.keys(forwardPlans).map((courierId) => {
-      const data = { courierId, finalWeight };
-
-      const currentCourier = forwardPlans[courierId];
-      console.log('currentCourier: ', currentCourier);
-      const firstEntry = currentCourier.filter(curr=>curr.type == "forward")?.[0];
-      console.log('firstEntry: ', firstEntry);
-
-      data["courier_id"] = firstEntry.courier_id;
-      data["courier_name"] = firstEntry.name;
-      data["cod_amount"] = CustomMath.roundOff(firstEntry.cod);
-      data["cod_percentage"] = CustomMath.roundOff(firstEntry.cod_percentage);
-
-      let baseWeightDetails, additionalWeightDetails;
-
-      for (const row of currentCourier) {
-        if (row.type == "forward") baseWeightDetails = row;
-        else if (row.type === "weight") additionalWeightDetails = row;
-      }
-
+    const data = { courierId, finalWeight };
+    const currentCourier = forwardPlans[courierId];
+    const firstEntry = currentCourier.filter(curr=>curr.type == "forward")?.[0];
+    data["courier_id"] = firstEntry.courier_id;
+    data["courier_name"] = firstEntry.name;
+    data["cod_amount"] = CustomMath.roundOff(firstEntry.cod);
+    data["cod_percentage"] = CustomMath.roundOff(firstEntry.cod_percentage);
+    let baseWeightDetails, additionalWeightDetails;
+    for (const row of currentCourier) {
+      if (row.type == "forward") baseWeightDetails = row;
+      else if (row.type === "weight") additionalWeightDetails = row;
+    }
       data["calculatedZone"] = calculatedZone;
       if (baseWeightDetails) {
         const zoneBasePrice = baseWeightDetails[calculatedZone];
-
         data["zoneBasePrice"] = zoneBasePrice;
         data["baseWeight"] = baseWeightDetails.weight;
       }
-
       if (additionalWeightDetails) {
         const zoneAdditionalPrice = additionalWeightDetails[calculatedZone];
-
         data["zoneAdditionalPrice"] = CustomMath.roundOff(zoneAdditionalPrice);
         data["additionalWeight"] =
           additionalWeightDetails.additional_weight || 0;
       }
-
       const calculatedBasePrice = CustomMath.roundOff(data.zoneBasePrice);
       const leftWeight = data.finalWeight - data.baseWeight;
-
-
       const multiplier = Math.floor(leftWeight / data.additionalWeight);
-
       const calculatedAdditionalPrice =
         multiplier * data.zoneAdditionalPrice +
         (leftWeight - data.additionalWeight * multiplier > 0
           ? data.zoneAdditionalPrice
           : 0);
       data["calculatedAdditionalPrice"] = calculatedAdditionalPrice;
-
       let totalPrice = calculatedBasePrice + calculatedAdditionalPrice;
       if (paymentType == "cod") {
         const codPercentage = CustomMath.roundOff(
@@ -411,9 +355,8 @@ class Service {
         totalPrice += Math.max(codPercentage, data.cod_amount);
       }
       data["totalPrice"] = totalPrice;
-
       return {
-        courier_id: data.courier_id,
+        courier_id: data.courierId,
         courier_name: data.courier_name,
         cod_charge: Math.max(data.codPercentagePrice, data.cod_amount),
         freight_charge: data.zoneBasePrice,
@@ -421,7 +364,6 @@ class Service {
         zone: data.calculatedZone,
       };
     });
-console.log('courierCache', JSON.stringify(courierCache, null, 2))
     return {
       rows,
     };
