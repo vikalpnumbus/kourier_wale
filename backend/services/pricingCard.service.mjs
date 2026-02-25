@@ -270,24 +270,9 @@ class Service {
             }),
           ]);
         const courierDetails = courierDetailsRes?.data?.result?.[0];
-        console.log('courierDetails: ', courierDetails);
-        const { name, weight, additional_weight, show_to_users } =
-          courierDetails;
-
-        const pincodeServiceabilityDetails =
-          pincodeServiceabilityDetailsRes?.data?.result?.[0];
-
-        console.log("courier_id: ", e.courier_id, name, {
-        courier_id: e.courier_id,
-        plan: {
-            ...e.dataValues,
-            name,
-            weight,
-            additional_weight,
-            show_to_users,
-          },
-        });
-        console.log("pincodeServiceabilityDetails: ",pincodeServiceabilityDetails);
+        const { name, weight, additional_weight, show_to_users } = courierDetails;
+        const pincodeServiceabilityDetails = pincodeServiceabilityDetailsRes?.data?.result?.[0];
+        console.log("pincodeServiceabilityDetails For COD: ",pincodeServiceabilityDetails);
         if (!pincodeServiceabilityDetails) return null;
         if (paymentType?.toLowerCase() == "cod" && pincodeServiceabilityDetails.cod?.toLowerCase() != "y")
         return null;
