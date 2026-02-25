@@ -190,7 +190,7 @@ class Service {
     }
   }
 
-  async priceCalculator(data) {
+    async priceCalculator(data) {
     let {
       origin,
       destination,
@@ -201,9 +201,11 @@ class Service {
       paymentType,
       userId,
     } = data;
+
     const volumetricDivisor = 5000;
     const deadWeight = CustomMath.roundOff(weight);
     const calculatedZone = this.calculateZone(origin, destination);
+
     const volumetricWeight = CustomMath.roundOff(
       (CustomMath.roundOff(length) *
         CustomMath.roundOff(breadth) *
@@ -211,17 +213,23 @@ class Service {
         1000) /
         volumetricDivisor
     );
+
     const finalWeight = Math.max(volumetricWeight, deadWeight);
+
+    /* ---------------- USER + COURIER ---------------- */
     const [UserServiceRes, UserCourierServiceRes] = await Promise.all([
       UserService.read({ id: userId }),
       UserCourierService.read({ userId }),
     ]);
+
     const plan_id = UserServiceRes?.pricingPlanId;
     if (!plan_id) throw new Error(`No pricing plan found for userId ${userId}`);
+
     let pricingCard = (await this.read({ plan_id }))?.data?.result;
     if (!pricingCard?.length) {
       throw new Error("Pricing card empty or not found");
     }
+
     const userCouriers =
       UserCourierServiceRes?.data?.result
         ?.flatMap((e) =>
@@ -229,36 +237,56 @@ class Service {
             ? e.assigned_courier_ids.split(",").map((x) => x.trim())
             : []
         ) || [];
+
     if (!userCouriers.length) {
       throw new Error("No couriers assigned to user");
     }
+
     pricingCard = pricingCard.filter((e) =>
       userCouriers.includes(String(e.courier_id))
     );
+
     if (!pricingCard.length) {
       throw new Error("No available pricing plans");
     }
+
     const filteredPlans = pricingCard.filter(
       (e) => e.type === "forward" || e.type === "weight"
     );
+
+    /* ---------------- COURIER + PINCODE VALIDATION ---------------- */
     const courierCache = {};
+
     const forwardPlanResults = (
       await Promise.all(
         filteredPlans.map(async (e) => {
           if (!courierCache[e.courier_id]) {
             courierCache[e.courier_id] = Promise.all([
               CourierService.read({ id: e.courier_id }),
-              ServiceablePincodesService.read({ courier_id: e.courier_id }),
+              ServiceablePincodesService.read({
+                courier_id: e.courier_id,
+                pincode: origin,
+              }),
+              ServiceablePincodesService.read({
+                courier_id: e.courier_id,
+                pincode: destination,
+              }),
             ]);
           }
-          const [courierDetailsRes, pincodeRes] =
-            await courierCache[e.courier_id];
+
+          const [
+            courierDetailsRes,
+            pickupPincodeRes,
+            deliveryPincodeRes,
+          ] = await courierCache[e.courier_id];
+
           const courierDetails = courierDetailsRes?.data?.result?.[0];
-          const pincodeServiceabilityDetails = pincodeRes?.data?.result?.[0];
-          if (!courierDetails || !pincodeServiceabilityDetails) return null;
+          const pickupPincode = pickupPincodeRes?.data?.result?.[0];
+          const deliveryPincode = deliveryPincodeRes?.data?.result?.[0];
+          if (!courierDetails || !pickupPincode || !deliveryPincode) return null;
           if (
             paymentType?.toLowerCase() === "cod" &&
-            pincodeServiceabilityDetails.cod?.toLowerCase() !== "y"
+            deliveryPincode.cod?.toLowerCase() !== "y"
           ) {
             return null;
           }
@@ -293,41 +321,42 @@ class Service {
       return acc;
     }, {});
 
-    /* ---------------- CALCULATE PRICES ---------------- */
-    const rows = Object.keys(forwardPlans).map((courierId) => {
-      const currentCourier = forwardPlans[courierId];
-      const base = currentCourier.find((x) => x.type === "forward");
-      const weightRow = currentCourier.find((x) => x.type === "weight");
+    /* ---------------- PRICE CALCULATION ---------------- */
+    const rows = Object.keys(forwardPlans)
+      .map((courierId) => {
+        const currentCourier = forwardPlans[courierId];
+        const base = currentCourier.find((x) => x.type === "forward");
+        const weightRow = currentCourier.find((x) => x.type === "weight");
 
-      if (!base) return null;
+        if (!base) return null;
 
-      const zoneBasePrice = Number(base[calculatedZone] || 0);
-      const additionalWeight = weightRow?.additional_weight || 0;
-      const zoneAdditionalPrice = Number(weightRow?.[calculatedZone] || 0);
+        const zoneBasePrice = Number(base[calculatedZone] || 0);
+        const additionalWeight = weightRow?.additional_weight || 0;
+        const zoneAdditionalPrice = Number(weightRow?.[calculatedZone] || 0);
 
-      const leftWeight = finalWeight - base.weight;
-      const multiplier =
-        additionalWeight > 0 ? Math.ceil(leftWeight / additionalWeight) : 0;
+        const leftWeight = finalWeight - base.weight;
+        const multiplier =
+          additionalWeight > 0 ? Math.ceil(leftWeight / additionalWeight) : 0;
 
-      let totalPrice =
-        zoneBasePrice + multiplier * zoneAdditionalPrice;
+        let totalPrice =
+          zoneBasePrice + multiplier * zoneAdditionalPrice;
 
-      let codCharge = 0;
-      if (paymentType === "cod") {
-        const codPercent = (totalPrice * base.cod_percentage) / 100;
-        codCharge = Math.max(codPercent, base.cod);
-        totalPrice += codCharge;
-      }
-
-      return {
-        courier_id: base.courier_id,
-        courier_name: base.name,
-        freight_charge: zoneBasePrice,
-        cod_charge: codCharge,
-        total: CustomMath.roundOff(totalPrice),
-        zone: calculatedZone,
-      };
-    }).filter(Boolean);
+        let codCharge = 0;
+        if (paymentType === "cod") {
+          const codPercent = (totalPrice * base.cod_percentage) / 100;
+          codCharge = Math.max(codPercent, base.cod);
+          totalPrice += codCharge;
+        }
+        return {
+          courier_id: base.courier_id,
+          courier_name: base.name,
+          freight_charge: zoneBasePrice,
+          cod_charge: codCharge,
+          total: CustomMath.roundOff(totalPrice),
+          zone: calculatedZone,
+        };
+      })
+      .filter(Boolean);
 
     return { rows };
   }
