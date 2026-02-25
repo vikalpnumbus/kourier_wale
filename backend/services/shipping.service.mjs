@@ -6,11 +6,11 @@ import WarehouseService from "./warehouse.service.mjs";
 import OrdersService from "./orders.service.mjs";
 import UserService from "./user.service.mjs";
 import CourierService from "./courier.service.mjs";
-import XpressBeesProvider from "../providers/couriers/xpressbees.provider.mjs";
 import CourierAWBListService from "./courierAWBList.service.mjs";
 import ChannelService from "./channel.service.mjs";
 import ShadowfaxProvider from "../providers/couriers/shadowfax.provider.mjs";
-
+import XpressBeesProvider from "../providers/couriers/xpressbees.provider.mjs";
+import ATSProvider from "../providers/couriers/ats.provider.mjs";
 class Service {
   constructor() {
     this.error = null;
@@ -390,7 +390,6 @@ class Service {
 
       if (code.includes("xpressbees")) {
         const shipmentRes = await XpressBeesProvider.createShipment({ ...data, shipmentId: id });
-
         if (!shipmentRes) {
           await ShippingService.update({
             data: {
@@ -407,11 +406,9 @@ class Service {
               shipment_error: null,
             },
           });
-
           if (!updatedShipmentData) {
             console.error(ShippingService.error);
           }
-
           const updatedAWBData = await CourierAWBListService.update({
             data: {
               id: shipmentRes?.courierAWBListData?.id,
@@ -421,23 +418,20 @@ class Service {
           if (!updatedAWBData) {
             console.error(CourierAWBListService.error);
           }
-
           const existingUser = await UserService.read({ id: userId });
-
           const updatedUser = await UserService.update(
             { id: userId },
             {
               wallet_balance: existingUser.wallet_balance - ((freight_charge || 0) + (cod_price || 0)),
             }
           );
-
           if (!updatedUser) {
             console.error("shipping/create/userWalletUpdate", UserService.error);
           }
         }
-      } else if (code.includes("Shadow_Fax")) {
+      }
+      else if (code.includes("Shadow_Fax")) {
         const shipmentRes = await ShadowfaxProvider.createShipment(data);
-
         if (!shipmentRes) {
           await ShippingService.update({
             data: {
@@ -454,20 +448,51 @@ class Service {
               shipment_error: null,
             },
           });
-
           if (!updatedShipmentData) {
             console.error(ShippingService.error);
           }
-
           const existingUser = await UserService.read({ id: userId });
-
           const updatedUser = await UserService.update(
             { id: userId },
             {
               wallet_balance: existingUser.wallet_balance - total_price,
             }
           );
-
+          if (!updatedUser) {
+            console.error("shipping/create/userWalletUpdate", UserService.error);
+          }
+        }
+      }
+      else if (code.includes("ats")) {
+        const shipmentRes = await ATSProvider.createShipment({ ...data, shipmentId: id });
+        if (!shipmentRes) {
+          await ShippingService.update({
+            data: {
+              id,
+              shipment_error: ATSProvider.error.message,
+            },
+          });
+        }
+        else
+        {
+          const updatedShipmentData = await ShippingService.update({
+            data: {
+              id,
+              shipping_status: "booked",
+              awb_number: shipmentRes.AWBNo,
+              shipment_error: null,
+            },
+          });
+          if (!updatedShipmentData) {
+            console.error(ShippingService.error);
+          }
+          const existingUser = await UserService.read({ id: userId });
+          const updatedUser = await UserService.update(
+            { id: userId },
+            {
+              wallet_balance: existingUser.wallet_balance - ((freight_charge || 0) + (cod_price || 0)),
+            }
+          );
           if (!updatedUser) {
             console.error("shipping/create/userWalletUpdate", UserService.error);
           }
@@ -479,6 +504,7 @@ class Service {
       return false;
     }
   }
+
   async handleCancelSingleShipment({ data }) {
     try {
       const { id, userId } = data;
