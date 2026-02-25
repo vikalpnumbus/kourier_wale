@@ -342,6 +342,37 @@ function index() {
                     </div>
                 </div>
             </div>
+            <div className="card mt-4">
+                <div className="card-body">
+                    <h5 className="card-title mb-3">Terms &amp; Conditions</h5>
+                    <ul className="list-unstyled rate-terms">
+                    <li>• The above prices are inclusive of GST.</li>
+                    <li>• Chargeable Weight will be Physical / Dead Weight or Volumetric Weight, whichever is Higher.</li>
+                    <li>• COD Charges will be fixed COD charge or a COD % of the order value, whichever is Higher.</li>
+                    <li>
+                        • Volumetric Weight (Kilogram) calculation as per IATA – Length (cm) × Breadth (cm) × Height (cm) / 5000
+                    </li>
+                    <li>
+                        • Other Charges like Octroi charges, state entry tax and fees, and address correction charges if applicable,
+                        shall be charged extra.
+                    </li>
+                    <li>
+                        • RTO (return to origin) shipment will be charged separately from the forward delivery rate, which will be
+                        the same as the forward rates.
+                    </li>
+                    <li>• For any queries, a ticket has to be raised on the panel.</li>
+                    <li>
+                        • The maximum liability, if any, is limited to Rs. 2000/- in the event of a claim by the Merchant, provided
+                        such claim is raised within one (1) month from the date of damage, loss, or theft.
+                    </li>
+                    <li>
+                        • The Merchant shall not book or handover any Product which is banned, restricted, illegal, prohibited,
+                        hazardous, liquid, stolen, or in breach of any law in force in India.
+                    </li>
+                    <li>• Other terms and conditions will be applicable as defined in the agreement.</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
   )
