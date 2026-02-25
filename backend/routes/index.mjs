@@ -48,12 +48,12 @@ globalRouter.use("/bank-details", BankDetailsRouter);
 globalRouter.use("/products", ProductsRouter);
 globalRouter.use("/orders", OrdersRouter);
 globalRouter.use("/warehouse", WarehouseRouter);
-//globalRouter.use("/courier", CourierRouter);
+globalRouter.use("/courier", CourierRouter);
 globalRouter.use("/pricing-plans", PricingPlansRouter);
 globalRouter.use("/pricing-card", PricingCardRouter);
 globalRouter.use("/pricing-card-courier", CourierPricingCardRouter);
 globalRouter.use("/user-courier", UserCourierRouter);
-// globalRouter.use("/serviceable-pincodes", ServiceablePincodesRouter);
+globalRouter.use("/serviceable-pincodes", ServiceablePincodesRouter);
 globalRouter.use("/shipping", ShippingRouter);
 globalRouter.use("/label-settings", LabelSettingsRouter);
 globalRouter.use("/invoice-settings", InvoiceSettingsRouter);
@@ -77,19 +77,19 @@ const checkIfUserIsAdmin = async (req, res, next) => {
 };
 // Admin Routes
 
-globalRouter.use(
-  "/admin/courier", 
-  TokenHandler.authenticateToken,
-  checkIfUserIsAdmin,
-  CourierRouter
-);
+// globalRouter.use(
+//   "/admin/courier", 
+//   TokenHandler.authenticateToken,
+//   checkIfUserIsAdmin,
+//   CourierRouter
+// );
 
-globalRouter.use(
-  "/admin/serviceable-pincodes", 
-  TokenHandler.authenticateToken,
-  checkIfUserIsAdmin,
-  ServiceablePincodesRouter
-);
+// globalRouter.use(
+//   "/admin/serviceable-pincodes", 
+//   TokenHandler.authenticateToken,
+//   checkIfUserIsAdmin,
+//   ServiceablePincodesRouter
+// );
 
 globalRouter.use(
   "/admin/courier-awb-list",
