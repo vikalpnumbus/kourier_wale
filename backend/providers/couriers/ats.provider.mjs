@@ -146,12 +146,13 @@ class ATSProvider {
       console.log("Final Payload of shipments", payload);
       console.log("create shipment url", ATS_CREATE_SHIPMENT_FORWARD);
       const response = await axios.post(
-        "https://sellingpartnerapi-eu.amazon.com/shipping/v2/oneClickShipment",
+        ATS_CREATE_SHIPMENT_FORWARD,
         payload,
         {
           headers: {
             "Content-Type": "application/json",
-            "x-amz-access-token": tokenRes.access_token,          // Atza
+            "x-amz-access-token": token.access_token,
+            "Authorization": `Bearer ${ATS_REFRESH_TOKEN}`,
             "x-amzn-shipping-business-id": "AmazonShipping_IN",
           },
           timeout: 20000,
