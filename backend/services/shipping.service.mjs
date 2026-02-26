@@ -387,14 +387,9 @@ class Service {
   }
 
   async handleCreateSingleShipment(data) {
-    console.log("Payload Data In Panel:", data);
     try {
       const { id, userId, courier, total_price, freight_charge, cod_price } = data;
-
       const { code } = courier?.data?.result?.[0];
-      console.log("courier: ", courier.data);
-      console.log("code: ", code);
-
       if (code.includes("xpressbees")) {
         const shipmentRes = await XpressBeesProvider.createShipment({ ...data, shipmentId: id });
         if (!shipmentRes) {

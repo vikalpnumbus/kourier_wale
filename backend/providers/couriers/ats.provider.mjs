@@ -51,124 +51,119 @@ class ATSProvider {
       return false;
     }
   }
-
-  /**
-   * Create Amazon Shipment (ONE CLICK SHIPMENT)
-   */
-  async createShipment(data) {
-  try {
-    const { orderId, itemIdentifier, packageDetails, shipTo, shipFrom } = data;
-
-    const tokenRes = await this.generateATSToken();
-    if (!tokenRes?.access_token) {
-      throw new Error("Amazon token generate failed");
-    }
-
-    const payload = {
-      "channelDetails": {
-        "channelType": "EXTERNAL"
-      },
-
-      "labelSpecifications": {
-        "dpi": 300,
-        "format": "PNG",
-        "needFileJoining": false,
-        "pageLayout": "DEFAULT",
-        "requestedDocumentTypes": ["LABEL"],
-        "size": {
-          "length": 6,
-          "width": 4,
-          "unit": "INCH"
-        }
-      },
-
-      "packages": [
-        {
-          "dimensions": {
-            "length": 15,
-            "width": 10,
-            "height": 10,
-            "unit": "CENTIMETER"
-          },
-
-          "weight": {
-            "unit": "GRAM",
-            "value": 190
-          },
-
-          "insuredValue": {
-            "value": 1,
-            "unit": "INR"
-          },
-
-          "items": [
-            {
-              "description": "Item",
-              "itemIdentifier": "STATIC_ITEM_001",
-              "quantity": 1,
-              "itemValue": {
-                "value": 1,
-                "unit": "INR"
-              },
-              "weight": {
-                "unit": "GRAM",
-                "value": 190
-              }
-            }
-          ],
-
-          "packageClientReferenceId": "STATIC_ORDER_001"
-        }
-      ],
-
-      "serviceSelection": {
-        "serviceId": ["SWA-IN-OA"]
-      },
-
-      "shipTo": {
-        "name": "Test Customer",
-        "addressLine1": "Test Address Line 1",
-        "addressLine2": "Test Area",
-        "city": "Chennai",
-        "stateOrRegion": "Tamil Nadu",
-        "postalCode": "600028",
-        "countryCode": "IN",
-        "phoneNumber": "9999999999",
-        "email": "customer@test.com"
-      },
-
-      "shipFrom": {
-        "name": "Test Warehouse",
-        "addressLine1": "Warehouse Address Line 1",
-        "city": "Chennai",
-        "stateOrRegion": "Tamil Nadu",
-        "postalCode": "600002",
-        "countryCode": "IN",
-        "phoneNumber": "9999999999",
-        "email": "warehouse@test.com"
+  async createShipment(data)
+  {
+    try 
+    {
+      const { orderId, itemIdentifier, packageDetails, shipTo, shipFrom } = data;
+      const tokenRes = await this.generateATSToken();
+      if (!tokenRes?.access_token) {
+        throw new Error("Amazon token generate failed");
       }
-    }
-    const response = await axios.post(
-      ATS_CREATE_SHIPMENT_FORWARD,
-      payload,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "x-amz-access-token": tokenRes.access_token,          // Atza
-          "x-amzn-shipping-business-id": "AmazonShipping_IN",
+      const payload = {
+        "channelDetails": {
+          "channelType": "EXTERNAL"
         },
-        timeout: 20000,
+        "labelSpecifications": {
+          "dpi": 300,
+          "format": "PNG",
+          "needFileJoining": false,
+          "pageLayout": "DEFAULT",
+          "requestedDocumentTypes": ["LABEL"],
+          "size": {
+            "length": 6,
+            "width": 4,
+            "unit": "INCH"
+          }
+        },
+
+        "packages": [
+          {
+            "dimensions": {
+              "length": 15,
+              "width": 10,
+              "height": 10,
+              "unit": "CENTIMETER"
+            },
+
+            "weight": {
+              "unit": "GRAM",
+              "value": 190
+            },
+
+            "insuredValue": {
+              "value": 1,
+              "unit": "INR"
+            },
+
+            "items": [
+              {
+                "description": "Item",
+                "itemIdentifier": "STATIC_ITEM_001",
+                "quantity": 1,
+                "itemValue": {
+                  "value": 1,
+                  "unit": "INR"
+                },
+                "weight": {
+                  "unit": "GRAM",
+                  "value": 190
+                }
+              }
+            ],
+
+            "packageClientReferenceId": "STATIC_ORDER_001"
+          }
+        ],
+
+        "serviceSelection": {
+          "serviceId": ["SWA-IN-OA"]
+        },
+
+        "shipTo": {
+          "name": "Test Customer",
+          "addressLine1": "Test Address Line 1",
+          "addressLine2": "Test Area",
+          "city": "Chennai",
+          "stateOrRegion": "Tamil Nadu",
+          "postalCode": "600028",
+          "countryCode": "IN",
+          "phoneNumber": "9999999999",
+          "email": "customer@test.com"
+        },
+
+        "shipFrom": {
+          "name": "Test Warehouse",
+          "addressLine1": "Warehouse Address Line 1",
+          "city": "Chennai",
+          "stateOrRegion": "Tamil Nadu",
+          "postalCode": "600002",
+          "countryCode": "IN",
+          "phoneNumber": "9999999999",
+          "email": "warehouse@test.com"
+        }
       }
-    );
-    return response.data;
-  } catch (err) {
-    console.error(
-      "[AMAZON CREATE SHIPMENT ERROR]",
-      err?.response?.data || err.message
-    );
-    return false;
+      console.log("Final Payload of shipments", payload);
+      const response = await axios.post(
+        ATS_CREATE_SHIPMENT_FORWARD,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-amz-access-token": tokenRes.access_token,          // Atza
+            "x-amzn-shipping-business-id": "AmazonShipping_IN",
+          },
+          timeout: 20000,
+        }
+      );
+      return response.data;
+    }
+    catch (err)
+    {
+      console.error("[AMAZON CREATE SHIPMENT ERROR]",err?.response?.data || err.message);
+      return false;
+    }
   }
-}
 }
 
 export default new ATSProvider();
