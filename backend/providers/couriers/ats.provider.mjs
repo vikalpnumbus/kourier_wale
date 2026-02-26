@@ -75,7 +75,7 @@ class ATSProvider {
           {
             dimensions: {
               length: packageDetails.length,
-              width: packageDetails.width,
+              width: packageDetails.width || packageDetails.breadth,
               height: packageDetails.height,
               unit: "CENTIMETER"
             },

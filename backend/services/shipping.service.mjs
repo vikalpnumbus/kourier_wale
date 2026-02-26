@@ -465,8 +465,50 @@ class Service {
         }
       }
       else if (code.includes("Amazon_500_Gram")) {
-        const shipmentRes = await ATSProvider.createShipment({ ...data, shipmentId: id });
-        if (!shipmentRes) {
+      const pickupWarehouse = warehouses.find(w => w.id == data.warehouse_id);
+      const rtoWarehouse = warehouses.find(w => w.id == data.rto_warehouse_id);
+      const shipFrom = {
+        name: pickupWarehouse.contact_person,
+        addressLine1: pickupWarehouse.address_1,
+        addressLine2: pickupWarehouse.address_2 || "",
+        city: pickupWarehouse.city,
+        stateOrRegion: pickupWarehouse.state,
+        postalCode: pickupWarehouse.pincode,
+        countryCode: "IN",
+        phoneNumber: pickupWarehouse.phone,
+        email: pickupWarehouse.email
+      };
+
+      const shipTo = {
+        name: data.customer_name,
+        addressLine1: data.shipping_address.address_1,
+        addressLine2: data.shipping_address.address_2 || "",
+        city: data.shipping_address.city,
+        stateOrRegion: data.shipping_address.state,
+        postalCode: data.shipping_address.pincode,
+        countryCode: "IN",
+        phoneNumber: data.shipping_address.phone,
+        email: data.shipping_address.email
+      };
+
+      const packageDetails = {
+        length: data.length,
+        width: data.breadth,   // 👈 IMPORTANT
+        height: data.height,
+        weight: data.weight
+      };
+
+      const shipmentRes = await ATSProvider.createShipment({
+        ...data,
+        shipmentId: id,
+        shipFrom,
+        shipTo,
+        packageDetails,
+        itemIdentifier: data.order_id,
+        orderId: data.order_id
+      });
+      console.log("First ATS Response:", shipmentRes);
+      if (!shipmentRes) {
           await ShippingService.update({
             data: {
               id,
@@ -476,6 +518,7 @@ class Service {
         }
         else
         {
+          console.log("Second ATS Response:", shipmentRes);
           const updatedShipmentData = await ShippingService.update({
             data: {
               id,
