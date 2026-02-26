@@ -466,95 +466,88 @@ class Service {
       }
       else if (code.includes("Amazon_500_Gram"))
       {
-        try {
-          const { warehouses } = data;
-          if (!warehouses || !warehouses.length) {
-            throw new Error("Warehouses not found");
-          }
-          const pickupWarehouseObj = warehouses.find(
-            w => w.dataValues.id == data.warehouse_id
-          );
-          if (!pickupWarehouseObj) {
-            throw new Error("Pickup warehouse not found");
-          }
-          const pickupWarehouse = pickupWarehouseObj.dataValues;
-          const shipFrom = {
-            name: pickupWarehouse.contact_person || "Sender",
-            addressLine1: pickupWarehouse.address_1,
-            addressLine2: pickupWarehouse.address_2 || "",
-            city: pickupWarehouse.city,
-            stateOrRegion: pickupWarehouse.state,
-            postalCode: pickupWarehouse.pincode,
-            countryCode: "IN",
-            phoneNumber: pickupWarehouse.phone,
-            email: pickupWarehouse.email || "noreply@yourdomain.com"
-          };
-          const shipTo = {
-            name: `${data.shippingDetails.fname} ${data.shippingDetails.lname}`,
-            addressLine1: data.shippingDetails.address,
-            addressLine2: "",
-            city: data.shippingDetails.city,
-            stateOrRegion: data.shippingDetails.state,
-            postalCode: data.shippingDetails.pincode,
-            countryCode: "IN",
-            phoneNumber: data.shippingDetails.phone,
-            email: "customer@yourdomain.com"
-          };
-          const packageDetails = {
-            length: Number(data.packageDetails.length),
-            width: Number(data.packageDetails.breadth), // 🔥 AMAZON NEEDS WIDTH
-            height: Number(data.packageDetails.height),
-            weight: Number(data.packageDetails.weight)
-          };
-          const shipmentRes = await ATSProvider.createShipment({
-            shipFrom,
-            shipTo,
-            packageDetails,
-            itemIdentifier: data.orderId,
-            orderId: data.orderId
-          });
-          console.log("Amazon ATS Response:", shipmentRes);
-          if (!shipmentRes) {
-            await ShippingService.update({
-              data: {
-                id,
-                shipment_error: ATSProvider.error?.message || "Amazon shipment failed"
-              }
-            });
-            return false;
-          }
-          const updatedShipmentData = await ShippingService.update({
-            data: {
-              id,
-              shipping_status: "booked",
-              awb_number: shipmentRes?.shipmentId || shipmentRes?.AWBNo || null,
-              shipment_error: null
-            }
-          });
-          if (!updatedShipmentData) {
-            console.error("Shipment update failed", ShippingService.error);
-          }
-          const existingUser = await UserService.read({ id: userId });
-          await UserService.update(
-            { id: userId },
-            {
-              wallet_balance:
-                existingUser.wallet_balance -
-                ((freight_charge || 0) + (cod_price || 0))
-            }
-          );
-          return true;
-        } catch (error) {
-          console.error("[AMAZON 500 GRAM ERROR]", error.message);
+      try {
+        const { warehouses } = data;
+        const pickupWarehouseObj = warehouses.find(
+          w => w.dataValues.id == data.warehouse_id
+        );
+        if (!pickupWarehouseObj) {
+          throw new Error("Pickup warehouse not found");
+        }
+        const w = pickupWarehouseObj.dataValues;
+        const shipFrom = {
+          name: w.contact_person || "Sender",
+          addressLine1: w.address_1 || "Warehouse Address", // ✅ MUST NOT BE NULL
+          addressLine2: w.address_2 || "",
+          city: w.city || "NA",
+          stateOrRegion: w.state || "NA",
+          postalCode: w.pincode || "000000",
+          countryCode: "IN",
+          phoneNumber: w.phone || "9999999999", // ✅ REQUIRED
+          email: w.email || "noreply@yourdomain.com"
+        };
+        const shipTo = {
+          name: `${data.shippingDetails.fname} ${data.shippingDetails.lname}`,
+          addressLine1: data.shippingDetails.address,
+          addressLine2: "",
+          city: data.shippingDetails.city,
+          stateOrRegion: data.shippingDetails.state,
+          postalCode: data.shippingDetails.pincode,
+          countryCode: "IN",
+          phoneNumber: data.shippingDetails.phone,
+          email: "customer@yourdomain.com"
+        };
+        const packageDetails = {
+          length: Number(data.packageDetails.length),
+          width: Number(data.packageDetails.breadth), // 🔥 VERY IMPORTANT
+          height: Number(data.packageDetails.height),
+          weight: Number(data.packageDetails.weight)
+        };
+        const shipmentRes = await ATSProvider.createShipment({
+          shipFrom,
+          shipTo,
+          packageDetails,
+          itemIdentifier: data.orderId,
+          orderId: data.orderId
+        });
+        if (!shipmentRes) {
           await ShippingService.update({
             data: {
               id,
-              shipment_error: error.message
+              shipment_error: ATSProvider.error?.message || "Amazon shipment failed"
             }
           });
           return false;
         }
+        await ShippingService.update({
+          data: {
+            id,
+            shipping_status: "booked",
+            awb_number: shipmentRes.shipmentId || shipmentRes.AWBNo,
+            shipment_error: null
+          }
+        });
+        const existingUser = await UserService.read({ id: userId });
+        await UserService.update(
+          { id: userId },
+          {
+            wallet_balance:
+              existingUser.wallet_balance -
+              ((freight_charge || 0) + (cod_price || 0))
+          }
+        );
+        return true;
+      } catch (error) {
+        console.error("[AMAZON 500 GRAM ERROR]", error.message);
+       await ShippingService.update({
+          data: {
+            id,
+            shipment_error: error.message
+          }
+        });
+        return false;
       }
+    }
       return true;
     } catch (error) {
       this.error = error;
