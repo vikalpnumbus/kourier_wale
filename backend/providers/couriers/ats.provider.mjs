@@ -54,6 +54,8 @@ class ATSProvider {
         shipTo,
         shipFrom
       } = data;
+      console.log("shipto wala data:", shipTo);
+      console.log("shipfrom wala data:", shipFrom);
       const tokenRes = await this.generateATSToken();
       if (!tokenRes || !tokenRes.access_token) {
         throw new Error("Unable to generate Amazon access token");
