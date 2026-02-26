@@ -65,61 +65,89 @@ class ATSProvider {
     }
 
     const payload = {
-      channelDetails: { channelType: "EXTERNAL" },
-
-      orderValue: {
-        value: Number(data.orderAmount || 1),
-        unit: "INR"
+      "channelDetails": {
+        "channelType": "EXTERNAL"
       },
 
-      labelSpecifications: {
-        dpi: 300,
-        format: "PNG",
-        pageLayout: "DEFAULT",
-        requestedDocumentTypes: ["LABEL"],
-        size: { length: 6, width: 4, unit: "INCH" }
+      "labelSpecifications": {
+        "dpi": 300,
+        "format": "PNG",
+        "needFileJoining": false,
+        "pageLayout": "DEFAULT",
+        "requestedDocumentTypes": ["LABEL"],
+        "size": {
+          "length": 6,
+          "width": 4,
+          "unit": "INCH"
+        }
       },
 
-      packages: [
+      "packages": [
         {
-          dimensions: {
-            length: num(packageDetails.length),
-            width: num(packageDetails.width),
-            height: num(packageDetails.height),
-            unit: "CENTIMETER"
+          "dimensions": {
+            "length": 15,
+            "width": 10,
+            "height": 10,
+            "unit": "CENTIMETER"
           },
 
-          weight: {
-            unit: "GRAM",
-            value: num(packageDetails.weight)
+          "weight": {
+            "unit": "GRAM",
+            "value": 190
           },
 
-          insuredValue: { value: 1, unit: "INR" },
+          "insuredValue": {
+            "value": 1,
+            "unit": "INR"
+          },
 
-          items: [
+          "items": [
             {
-              description: "Item",
-              itemIdentifier,
-              quantity: 1,
-              itemValue: { value: 1, unit: "INR" },
-              weight: {
-                unit: "GRAM",
-                value: num(packageDetails.weight)
+              "description": "Item",
+              "itemIdentifier": "STATIC_ITEM_001",
+              "quantity": 1,
+              "itemValue": {
+                "value": 1,
+                "unit": "INR"
+              },
+              "weight": {
+                "unit": "GRAM",
+                "value": 190
               }
             }
           ],
 
-          packageClientReferenceId: orderId
+          "packageClientReferenceId": "STATIC_ORDER_001"
         }
       ],
 
-      serviceSelection: {
-        serviceId: ["AMZL_IN_EASY_SHIP"]
+      "serviceSelection": {
+        "serviceId": ["SWA-IN-OA"]
       },
 
-      shipFrom,
-      shipTo
-    };
+      "shipTo": {
+        "name": "Test Customer",
+        "addressLine1": "Test Address Line 1",
+        "addressLine2": "Test Area",
+        "city": "Chennai",
+        "stateOrRegion": "Tamil Nadu",
+        "postalCode": "600028",
+        "countryCode": "IN",
+        "phoneNumber": "9999999999",
+        "email": "customer@test.com"
+      },
+
+      "shipFrom": {
+        "name": "Test Warehouse",
+        "addressLine1": "Warehouse Address Line 1",
+        "city": "Chennai",
+        "stateOrRegion": "Tamil Nadu",
+        "postalCode": "600002",
+        "countryCode": "IN",
+        "phoneNumber": "9999999999",
+        "email": "warehouse@test.com"
+      }
+    }
     const response = await axios.post(
       ATS_CREATE_SHIPMENT_FORWARD,
       payload,
