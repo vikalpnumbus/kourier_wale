@@ -164,8 +164,6 @@ export const remove = async (req, res, next) => {
 
 export const priceCalculator = async (req, res, next) => {
   const start = process.hrtime.bigint();
-  console.log("REQUEST BODY:", req.body);
-  console.log("USER:", req.user);
   let { origin, destination, weight, length, breadth, height, paymentType } =
     req.body;
   let { id: userId } = req.user;
@@ -180,6 +178,5 @@ export const priceCalculator = async (req, res, next) => {
     userId,
   });
   const end = process.hrtime.bigint();
-  console.log(`API Execution Time: ${(Number(end - start) / 1e6).toFixed(2)} ms`);
   return res.success({ data: result });
 };

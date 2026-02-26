@@ -190,8 +190,8 @@ class Service {
     }
   }
 
-    async priceCalculator(data) {
-    let {
+  async priceCalculator(data) {
+    const {
       origin,
       destination,
       weight,
@@ -202,158 +202,176 @@ class Service {
       userId,
     } = data;
 
+    /* -------------------- WEIGHT CALCULATION -------------------- */
     const volumetricDivisor = 5000;
-    const deadWeight = CustomMath.roundOff(weight);
-    const calculatedZone = this.calculateZone(origin, destination);
+
+    const deadWeight = CustomMath.roundOff(Number(weight) || 0);
 
     const volumetricWeight = CustomMath.roundOff(
-      (CustomMath.roundOff(length) *
-        CustomMath.roundOff(breadth) *
-        CustomMath.roundOff(height) *
+      ((Number(length) || 0) *
+        (Number(breadth) || 0) *
+        (Number(height) || 0) *
         1000) /
         volumetricDivisor
     );
 
-    const finalWeight = Math.max(volumetricWeight, deadWeight);
+    const finalWeight = Math.max(deadWeight, volumetricWeight);
 
-    /* ---------------- USER + COURIER ---------------- */
-    const [UserServiceRes, UserCourierServiceRes] = await Promise.all([
+    const calculatedZone = this.calculateZone(origin, destination);
+
+    /* -------------------- USER & COURIER MAPPING -------------------- */
+    const [userRes, userCourierRes] = await Promise.all([
       UserService.read({ id: userId }),
       UserCourierService.read({ userId }),
     ]);
 
-    const plan_id = UserServiceRes?.pricingPlanId;
-    if (!plan_id) throw new Error(`No pricing plan found for userId ${userId}`);
+    const plan_id = userRes?.pricingPlanId;
+    if (!plan_id) {
+      throw new Error(`No pricing plan found for userId ${userId}`);
+    }
 
-    let pricingCard = (await this.read({ plan_id }))?.data?.result;
-    if (!pricingCard?.length) {
+    /* -------------------- PRICING CARD -------------------- */
+    let pricingCard = (await this.read({ plan_id }))?.data?.result || [];
+    if (!pricingCard.length) {
       throw new Error("Pricing card empty or not found");
     }
 
-    const userCouriers =
-      UserCourierServiceRes?.data?.result
-        ?.flatMap((e) =>
-          typeof e.assigned_courier_ids === "string"
-            ? e.assigned_courier_ids.split(",").map((x) => x.trim())
-            : []
-        ) || [];
+    /* -------------------- USER COURIERS -------------------- */
+    const userCourierRows = userCourierRes?.data?.result || [];
+
+    const userCouriers = userCourierRows.flatMap((row) => {
+      if (!row?.assigned_courier_ids) return [];
+      return String(row.assigned_courier_ids)
+        .split(",")
+        .map((x) => x.trim());
+    });
 
     if (!userCouriers.length) {
       throw new Error("No couriers assigned to user");
     }
 
-    pricingCard = pricingCard.filter((e) =>
-      userCouriers.includes(String(e.courier_id))
+    /* -------------------- FILTER PRICING CARD BY USER COURIERS -------------------- */
+    pricingCard = pricingCard.filter((row) =>
+      userCouriers.includes(String(row.courier_id))
     );
 
     if (!pricingCard.length) {
-      throw new Error("No available pricing plans");
+      throw new Error("No available pricing plans for assigned couriers");
     }
 
+    /* -------------------- FORWARD + WEIGHT PLANS -------------------- */
     const filteredPlans = pricingCard.filter(
-      (e) => e.type === "forward" || e.type === "weight"
+      (row) => row.type === "forward" || row.type === "weight"
     );
 
-    /* ---------------- COURIER + PINCODE VALIDATION ---------------- */
     const courierCache = {};
 
-    const forwardPlanResults = (
+    const validPlans = (
       await Promise.all(
-        filteredPlans.map(async (e) => {
-          if (!courierCache[e.courier_id]) {
-            courierCache[e.courier_id] = Promise.all([
-              CourierService.read({ id: e.courier_id }),
+        filteredPlans.map(async (row) => {
+          if (!courierCache[row.courier_id]) {
+            courierCache[row.courier_id] = Promise.all([
+              CourierService.read({ id: row.courier_id }),
               ServiceablePincodesService.read({
-                courier_id: e.courier_id,
+                courier_id: row.courier_id,
                 pincode: origin,
               }),
               ServiceablePincodesService.read({
-                courier_id: e.courier_id,
+                courier_id: row.courier_id,
                 pincode: destination,
               }),
             ]);
           }
 
           const [
-            courierDetailsRes,
-            pickupPincodeRes,
-            deliveryPincodeRes,
-          ] = await courierCache[e.courier_id];
+            courierRes,
+            pickupRes,
+            deliveryRes,
+          ] = await courierCache[row.courier_id];
 
-          const courierDetails = courierDetailsRes?.data?.result?.[0];
-          const pickupPincode = pickupPincodeRes?.data?.result?.[0];
-          const deliveryPincode = deliveryPincodeRes?.data?.result?.[0];
-          if (!courierDetails || !pickupPincode || !deliveryPincode) return null;
+          const courier = courierRes?.data?.result?.[0];
+          const pickupPincode = pickupRes?.data?.result?.[0];
+          const deliveryPincode = deliveryRes?.data?.result?.[0];
+
+          // pincode / courier validation
+          if (!courier || !pickupPincode || !deliveryPincode) return null;
+
+          // COD validation
           if (
             paymentType?.toLowerCase() === "cod" &&
             deliveryPincode.cod?.toLowerCase() !== "y"
           ) {
             return null;
           }
+
           return {
-            courier_id: e.courier_id,
+            courier_id: row.courier_id,
             plan: {
-              ...e.dataValues,
-              name: courierDetails.name,
-              weight: courierDetails.weight,
-              additional_weight: courierDetails.additional_weight,
-              show_to_users: courierDetails.show_to_users,
+              ...row.dataValues,
+              name: courier.name,
+              weight: courier.weight,
+              additional_weight: courier.additional_weight,
+              show_to_users: courier.show_to_users,
             },
           };
         })
       )
     ).filter(Boolean);
 
-    if (!forwardPlanResults.length) {
+    if (!validPlans.length) {
       return {
         rows: [],
         message:
           paymentType === "cod"
             ? "COD not serviceable for this pincode"
-            : "No courier available",
+            : "No courier available for this pincode",
       };
     }
 
-    /* ---------------- GROUP BY COURIER ---------------- */
-    const forwardPlans = forwardPlanResults.reduce((acc, { courier_id, plan }) => {
+    /* -------------------- GROUP BY COURIER -------------------- */
+    const groupedPlans = validPlans.reduce((acc, { courier_id, plan }) => {
       if (!acc[courier_id]) acc[courier_id] = [];
       acc[courier_id].push(plan);
       return acc;
     }, {});
 
-    /* ---------------- PRICE CALCULATION ---------------- */
-    const rows = Object.keys(forwardPlans)
+    /* -------------------- PRICE CALCULATION -------------------- */
+    const rows = Object.keys(groupedPlans)
       .map((courierId) => {
-        const currentCourier = forwardPlans[courierId];
-        const base = currentCourier.find((x) => x.type === "forward");
-        const weightRow = currentCourier.find((x) => x.type === "weight");
+        const plans = groupedPlans[courierId];
 
-        if (!base) return null;
+        const basePlan = plans.find((p) => p.type === "forward");
+        const weightPlan = plans.find((p) => p.type === "weight");
 
-        const zoneBasePrice = Number(base[calculatedZone] || 0);
-        const additionalWeight = weightRow?.additional_weight || 0;
-        const zoneAdditionalPrice = Number(weightRow?.[calculatedZone] || 0);
+        if (!basePlan) return null;
 
-        const leftWeight = finalWeight - base.weight;
+        const basePrice = Number(basePlan[calculatedZone] || 0);
+        const additionalWeight = weightPlan?.additional_weight || 0;
+        const additionalPrice = Number(weightPlan?.[calculatedZone] || 0);
+
+        const extraWeight = Math.max(finalWeight - basePlan.weight, 0);
         const multiplier =
-          additionalWeight > 0 ? Math.ceil(leftWeight / additionalWeight) : 0;
+          additionalWeight > 0
+            ? Math.ceil(extraWeight / additionalWeight)
+            : 0;
 
-        let totalPrice =
-          zoneBasePrice + multiplier * zoneAdditionalPrice;
+        let totalPrice = basePrice + multiplier * additionalPrice;
 
         let codCharge = 0;
         if (paymentType === "cod") {
-          const codPercent = (totalPrice * base.cod_percentage) / 100;
-          codCharge = Math.max(codPercent, base.cod);
+          const percentCharge = (totalPrice * basePlan.cod_percentage) / 100;
+          codCharge = Math.max(percentCharge, basePlan.cod || 0);
           totalPrice += codCharge;
         }
+
         return {
-          courier_id: base.courier_id,
-          courier_name: base.name,
-          freight_charge: zoneBasePrice,
+          courier_id: basePlan.courier_id,
+          courier_name: basePlan.name,
+          freight_charge: basePrice,
           cod_charge: codCharge,
           total: CustomMath.roundOff(totalPrice),
           zone: calculatedZone,
+          chargeable_weight: finalWeight,
         };
       })
       .filter(Boolean);
