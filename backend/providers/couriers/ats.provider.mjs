@@ -67,10 +67,14 @@ class ATSProvider {
     const payload = {
       channelDetails: { channelType: "EXTERNAL" },
 
+      orderValue: {
+        value: Number(data.orderAmount || 1),
+        unit: "INR"
+      },
+
       labelSpecifications: {
         dpi: 300,
         format: "PNG",
-        needFileJoining: false,
         pageLayout: "DEFAULT",
         requestedDocumentTypes: ["LABEL"],
         size: { length: 6, width: 4, unit: "INCH" }
@@ -85,36 +89,36 @@ class ATSProvider {
             unit: "CENTIMETER"
           },
 
-          insuredValue: { value: 1, unit: "INR" },
-          isHazmat: false,
-
-          items: [
-            {
-              itemValue: { value: 1, unit: "INR" },
-              description: "Item",
-              itemIdentifier,
-              quantity: 1,
-              weight: {
-                unit: "GRAM",
-                value: num(packageDetails.weight)
-              },
-              isHazmat: false
-            }
-          ],
-
-          packageClientReferenceId: orderId,
-
           weight: {
             unit: "GRAM",
             value: num(packageDetails.weight)
-          }
+          },
+
+          insuredValue: { value: 1, unit: "INR" },
+
+          items: [
+            {
+              description: "Item",
+              itemIdentifier,
+              quantity: 1,
+              itemValue: { value: 1, unit: "INR" },
+              weight: {
+                unit: "GRAM",
+                value: num(packageDetails.weight)
+              }
+            }
+          ],
+
+          packageClientReferenceId: orderId
         }
       ],
 
-      serviceSelection: { serviceId: ["SWA-IN-OA"] },
+      serviceSelection: {
+        serviceId: ["AMZL_IN_EASY_SHIP"]
+      },
 
-      shipTo,
-      shipFrom
+      shipFrom,
+      shipTo
     };
     const response = await axios.post(
       ATS_CREATE_SHIPMENT_FORWARD,
@@ -123,7 +127,6 @@ class ATSProvider {
         headers: {
           "Content-Type": "application/json",
           "x-amz-access-token": tokenRes.access_token,          // Atza
-          "Authorization": `Bearer ${ATS_REFRESH_TOKEN}`, // Atzr
           "x-amzn-shipping-business-id": "AmazonShipping_IN",
         },
         timeout: 20000,
