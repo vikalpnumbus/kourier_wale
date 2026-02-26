@@ -257,17 +257,25 @@ class Service {
 
   /* ---------------- USER COURIERS ---------------- */
   const userCourierRows = userCourierRes?.data?.result || [];
-
-  console.log("USER COURIER ROWS:", userCourierRows);
-
   const userCouriers = userCourierRows.flatMap((row) => {
-    if (!row?.assigned_courier_ids) return [];
-    return String(row.assigned_courier_ids)
-      .split(",")
-      .map((x) => x.trim());
-  });
+    const value = row.assigned_courier_ids;
 
-  console.log("USER ASSIGNED COURIERS:", userCouriers);
+    // CASE 1: DB STRING "4,5,7,8"
+    if (typeof value === "string") {
+      return value.split(",").map((x) => x.trim());
+    }
+
+    // CASE 2: ORM ASSOCIATION ARRAY [{id:4},{id:5}]
+    if (Array.isArray(value)) {
+      return value
+        .map((v) => v.id || v.courier_id)
+        .filter(Boolean)
+        .map(String);
+    }
+
+    return [];
+  });
+  console.log("✅ NORMALIZED USER COURIERS:", userCouriers);
 
   if (!userCouriers.length) {
     throw new Error("No couriers assigned to user");
