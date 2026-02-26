@@ -381,128 +381,129 @@ class Service {
   }
 
   async handleCreateSingleShipment(data) {
-    try {
-      const { id, userId, courier, total_price, freight_charge, cod_price } = data;
+    console.log("Payload Data In Panel:", data);
+    // try {
+    //   const { id, userId, courier, total_price, freight_charge, cod_price } = data;
 
-      const { code } = courier?.data?.result?.[0];
-      console.log("courier: ", courier.data);
-      console.log("code: ", code);
+    //   const { code } = courier?.data?.result?.[0];
+    //   console.log("courier: ", courier.data);
+    //   console.log("code: ", code);
 
-      if (code.includes("xpressbees")) {
-        const shipmentRes = await XpressBeesProvider.createShipment({ ...data, shipmentId: id });
-        if (!shipmentRes) {
-          await ShippingService.update({
-            data: {
-              id,
-              shipment_error: XpressBeesProvider.error.message,
-            },
-          });
-        } else {
-          const updatedShipmentData = await ShippingService.update({
-            data: {
-              id,
-              shipping_status: "booked",
-              awb_number: shipmentRes.AWBNo,
-              shipment_error: null,
-            },
-          });
-          if (!updatedShipmentData) {
-            console.error(ShippingService.error);
-          }
-          const updatedAWBData = await CourierAWBListService.update({
-            data: {
-              id: shipmentRes?.courierAWBListData?.id,
-              used: 1,
-            },
-          });
-          if (!updatedAWBData) {
-            console.error(CourierAWBListService.error);
-          }
-          const existingUser = await UserService.read({ id: userId });
-          const updatedUser = await UserService.update(
-            { id: userId },
-            {
-              wallet_balance: existingUser.wallet_balance - ((freight_charge || 0) + (cod_price || 0)),
-            }
-          );
-          if (!updatedUser) {
-            console.error("shipping/create/userWalletUpdate", UserService.error);
-          }
-        }
-      }
-      else if (code.includes("Shadow_Fax")) {
-        const shipmentRes = await ShadowfaxProvider.createShipment(data);
-        if (!shipmentRes) {
-          await ShippingService.update({
-            data: {
-              id,
-              shipment_error: ShadowfaxProvider.error.message,
-            },
-          });
-        } else {
-          const updatedShipmentData = await ShippingService.update({
-            data: {
-              id,
-              shipping_status: "booked",
-              awb_number: shipmentRes.AWBNo,
-              shipment_error: null,
-            },
-          });
-          if (!updatedShipmentData) {
-            console.error(ShippingService.error);
-          }
-          const existingUser = await UserService.read({ id: userId });
-          const updatedUser = await UserService.update(
-            { id: userId },
-            {
-              wallet_balance: existingUser.wallet_balance - total_price,
-            }
-          );
-          if (!updatedUser) {
-            console.error("shipping/create/userWalletUpdate", UserService.error);
-          }
-        }
-      }
-      else if (code.includes("ats")) {
-        const shipmentRes = await ATSProvider.createShipment({ ...data, shipmentId: id });
-        if (!shipmentRes) {
-          await ShippingService.update({
-            data: {
-              id,
-              shipment_error: ATSProvider.error.message,
-            },
-          });
-        }
-        else
-        {
-          const updatedShipmentData = await ShippingService.update({
-            data: {
-              id,
-              shipping_status: "booked",
-              awb_number: shipmentRes.AWBNo,
-              shipment_error: null,
-            },
-          });
-          if (!updatedShipmentData) {
-            console.error(ShippingService.error);
-          }
-          const existingUser = await UserService.read({ id: userId });
-          const updatedUser = await UserService.update(
-            { id: userId },
-            {
-              wallet_balance: existingUser.wallet_balance - ((freight_charge || 0) + (cod_price || 0)),
-            }
-          );
-          if (!updatedUser) {
-            console.error("shipping/create/userWalletUpdate", UserService.error);
-          }
-        }
-      }
-      return true;
-    } catch (error) {
-      this.error = error;
-      return false;
-    }
+    //   if (code.includes("xpressbees")) {
+    //     const shipmentRes = await XpressBeesProvider.createShipment({ ...data, shipmentId: id });
+    //     if (!shipmentRes) {
+    //       await ShippingService.update({
+    //         data: {
+    //           id,
+    //           shipment_error: XpressBeesProvider.error.message,
+    //         },
+    //       });
+    //     } else {
+    //       const updatedShipmentData = await ShippingService.update({
+    //         data: {
+    //           id,
+    //           shipping_status: "booked",
+    //           awb_number: shipmentRes.AWBNo,
+    //           shipment_error: null,
+    //         },
+    //       });
+    //       if (!updatedShipmentData) {
+    //         console.error(ShippingService.error);
+    //       }
+    //       const updatedAWBData = await CourierAWBListService.update({
+    //         data: {
+    //           id: shipmentRes?.courierAWBListData?.id,
+    //           used: 1,
+    //         },
+    //       });
+    //       if (!updatedAWBData) {
+    //         console.error(CourierAWBListService.error);
+    //       }
+    //       const existingUser = await UserService.read({ id: userId });
+    //       const updatedUser = await UserService.update(
+    //         { id: userId },
+    //         {
+    //           wallet_balance: existingUser.wallet_balance - ((freight_charge || 0) + (cod_price || 0)),
+    //         }
+    //       );
+    //       if (!updatedUser) {
+    //         console.error("shipping/create/userWalletUpdate", UserService.error);
+    //       }
+    //     }
+    //   }
+    //   else if (code.includes("Shadow_Fax")) {
+    //     const shipmentRes = await ShadowfaxProvider.createShipment(data);
+    //     if (!shipmentRes) {
+    //       await ShippingService.update({
+    //         data: {
+    //           id,
+    //           shipment_error: ShadowfaxProvider.error.message,
+    //         },
+    //       });
+    //     } else {
+    //       const updatedShipmentData = await ShippingService.update({
+    //         data: {
+    //           id,
+    //           shipping_status: "booked",
+    //           awb_number: shipmentRes.AWBNo,
+    //           shipment_error: null,
+    //         },
+    //       });
+    //       if (!updatedShipmentData) {
+    //         console.error(ShippingService.error);
+    //       }
+    //       const existingUser = await UserService.read({ id: userId });
+    //       const updatedUser = await UserService.update(
+    //         { id: userId },
+    //         {
+    //           wallet_balance: existingUser.wallet_balance - total_price,
+    //         }
+    //       );
+    //       if (!updatedUser) {
+    //         console.error("shipping/create/userWalletUpdate", UserService.error);
+    //       }
+    //     }
+    //   }
+    //   else if (code.includes("ats")) {
+    //     const shipmentRes = await ATSProvider.createShipment({ ...data, shipmentId: id });
+    //     if (!shipmentRes) {
+    //       await ShippingService.update({
+    //         data: {
+    //           id,
+    //           shipment_error: ATSProvider.error.message,
+    //         },
+    //       });
+    //     }
+    //     else
+    //     {
+    //       const updatedShipmentData = await ShippingService.update({
+    //         data: {
+    //           id,
+    //           shipping_status: "booked",
+    //           awb_number: shipmentRes.AWBNo,
+    //           shipment_error: null,
+    //         },
+    //       });
+    //       if (!updatedShipmentData) {
+    //         console.error(ShippingService.error);
+    //       }
+    //       const existingUser = await UserService.read({ id: userId });
+    //       const updatedUser = await UserService.update(
+    //         { id: userId },
+    //         {
+    //           wallet_balance: existingUser.wallet_balance - ((freight_charge || 0) + (cod_price || 0)),
+    //         }
+    //       );
+    //       if (!updatedUser) {
+    //         console.error("shipping/create/userWalletUpdate", UserService.error);
+    //       }
+    //     }
+    //   }
+    //   return true;
+    // } catch (error) {
+    //   this.error = error;
+    //   return false;
+    // }
   }
 
   async handleCancelSingleShipment({ data }) {
