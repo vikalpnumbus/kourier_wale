@@ -89,8 +89,6 @@ class Service {
         if (courierCache[id]) return courierCache[id];
         return await CourierService.read({ id });
       };
-
-      console.log('result: ', result);
       result = await Promise.all(
         result.map(async (curr) => {
           const { assigned_courier_ids } = curr;
