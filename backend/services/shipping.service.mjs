@@ -471,94 +471,54 @@ class Service {
         }
       }
       if (code.includes("Amazon_500_Gram")) {
-        try {
-          const { warehouses } = data;
-          const pickupWarehouseObj = warehouses?.find(
-            w => Number(w.dataValues.id) === Number(data.warehouse_id)
-          );
-
-          if (!pickupWarehouseObj) {
-            throw new Error("Pickup warehouse not found");
-          }
-
-          const w = pickupWarehouseObj.dataValues;
-
-          // ✅ AMAZON SAFE shipFrom
-          const shipFrom = {
-            name: w.name || "Warehouse",
-            addressLine1: w.address || "Warehouse Address",
-            addressLine2: "",
-            city: w.city || "NA",
-            stateOrRegion: w.state || "NA",
-            postalCode: String(w.pincode || "600000"),
-            countryCode: "IN",
-            phoneNumber: w.contactPhone || "9999999999",
-            email: w.email || "noreply@company.com"
-          };
-
-          // ✅ AMAZON SAFE shipTo
-          const shipTo = {
-            name: `${data.shippingDetails.fname} ${data.shippingDetails.lname}`,
-            addressLine1: data.shippingDetails.address || "Customer Address",
-            addressLine2: "",
-            city: data.shippingDetails.city || "NA",
-            stateOrRegion: data.shippingDetails.state || "NA",
-            postalCode: String(data.shippingDetails.pincode || "600000"),
-            countryCode: "IN",
-            phoneNumber: data.shippingDetails.phone || "9999999999",
-            email: "customer@company.com"
-          };
-
-          // ✅ DIMENSION FIX
-          const packageDetails = {
-            length: num(data.packageDetails.length),
-            width: num(
-              data.packageDetails.width || data.packageDetails.breadth
-            ),
-            height: num(data.packageDetails.height),
-            weight: num(data.packageDetails.weight)
-          };
-
-          const shipmentRes = await ATSProvider.createShipment({
-            shipFrom,
-            shipTo,
-            packageDetails,
-            itemIdentifier: data.orderId,
-            orderId: data.orderId
-          });
-
-          if (!shipmentRes?.payload) {
-            throw new Error("Amazon booking failed");
-          }
-
-          const payload = shipmentRes.payload;
-
+        const shipmentRes = await ATSProvider.createShipment({
+          ...data,
+          shipmentId: id
+        });
+        if (!shipmentRes) {
           await ShippingService.update({
             data: {
               id,
-              shipping_status: "booked",
-              awb_number:
-                payload.packageDocumentDetails?.[0]?.trackingId || null,
-              amazon_shipment_id: payload.shipmentId || null,
-              pickup_date: payload.promise?.pickupWindow?.start
-                ? new Date(payload.promise.pickupWindow.start)
-                : null,
-              delivered_date: payload.promise?.deliveryWindow?.end
-                ? new Date(payload.promise.deliveryWindow.end)
-                : null,
-              shipment_error: null
-            }
-          });
-          return true;
-        } catch (error) {
-          console.error("[AMAZON 500 GRAM ERROR]", error.message);
-          await ShippingService.update({
-            data: {
-              id,
-              shipment_error: error.message
+              shipment_error:
+                ATSProvider.error?.message || "Amazon booking failed"
             }
           });
           return false;
+        }
+        const payload = shipmentRes.payload;
+        const updatedShipment = await ShippingService.update({
+          data: {
+            id,
+            shipping_status: "booked",
+            awb_number:
+              payload?.packageDocumentDetails?.[0]?.trackingId || null,
+            amazon_shipment_id: payload?.shipmentId || null,
+            pickup_date: payload?.promise?.pickupWindow?.start
+              ? new Date(payload.promise.pickupWindow.start)
+              : null,
+            delivered_date: payload?.promise?.deliveryWindow?.end
+              ? new Date(payload.promise.deliveryWindow.end)
+              : null,
+            shipment_error: null
+          }
+        });
+        if (!updatedShipment) {
+          console.error("shipping/create/amazon/update", ShippingService.error);
+        }
+        const existingUser = await UserService.read({ id: userId });
+        const updatedUser = await UserService.update(
+          { id: userId },
+          {
+            wallet_balance:
+              existingUser.wallet_balance -
+              ((freight_charge || 0) + (cod_price || 0))
+          }
+        );
+        if (!updatedUser) {
+          console.error(
+            "shipping/create/amazon/userWalletUpdate",
+            UserService.error
+          );
         }
       }
       return true;
