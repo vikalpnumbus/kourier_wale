@@ -466,88 +466,89 @@ class Service {
       }
       else if (code.includes("Amazon_500_Gram"))
       {
-      try {
-        const { warehouses } = data;
-        const pickupWarehouseObj = warehouses.find(
-          w => w.dataValues.id == data.warehouse_id
-        );
-        if (!pickupWarehouseObj) {
-          throw new Error("Pickup warehouse not found");
-        }
-        const w = pickupWarehouseObj.dataValues;
-        const shipFrom = {
-          name: w.contact_person || "Sender",
-          addressLine1: w.address_1 || "Warehouse Address", // ✅ MUST NOT BE NULL
-          addressLine2: w.address_2 || "",
-          city: w.city || "NA",
-          stateOrRegion: w.state || "NA",
-          postalCode: w.pincode || "000000",
-          countryCode: "IN",
-          phoneNumber: w.phone || "9999999999", // ✅ REQUIRED
-          email: w.email || "noreply@yourdomain.com"
-        };
-        const shipTo = {
-          name: `${data.shippingDetails.fname} ${data.shippingDetails.lname}`,
-          addressLine1: data.shippingDetails.address,
-          addressLine2: "",
-          city: data.shippingDetails.city,
-          stateOrRegion: data.shippingDetails.state,
-          postalCode: data.shippingDetails.pincode,
-          countryCode: "IN",
-          phoneNumber: data.shippingDetails.phone,
-          email: "customer@yourdomain.com"
-        };
-        const packageDetails = {
-          length: Number(data.packageDetails.length),
-          width: Number(data.packageDetails.breadth), // 🔥 VERY IMPORTANT
-          height: Number(data.packageDetails.height),
-          weight: Number(data.packageDetails.weight)
-        };
-        const shipmentRes = await ATSProvider.createShipment({
-          shipFrom,
-          shipTo,
-          packageDetails,
-          itemIdentifier: data.orderId,
-          orderId: data.orderId
-        });
-        if (!shipmentRes) {
+        try
+        {
+          const { warehouses } = data;
+          const pickupWarehouseObj = warehouses.find(
+            w => w.dataValues.id == data.warehouse_id
+          );
+          if (!pickupWarehouseObj) {
+            throw new Error("Pickup warehouse not found");
+          }
+          const w = pickupWarehouseObj.dataValues;
+          const shipFrom = {
+            name: w.name || "Sender",
+            addressLine1: w.address || "Warehouse Address", // ✅ MUST NOT BE NULL
+            addressLine2: w.address || "Warehouse Address 2",
+            city: w.city || "NA",
+            stateOrRegion: w.state || "NA",
+            postalCode: w.pincode || "000000",
+            countryCode: "IN",
+            phoneNumber: w.contactPhone || "9999999999", // ✅ REQUIRED
+            email: w.email || "noreply@yourdomain.com"
+          };
+          const shipTo = {
+            name: `${data.shippingDetails.fname} ${data.shippingDetails.lname}`,
+            addressLine1: data.shippingDetails.address,
+            addressLine2: "",
+            city: data.shippingDetails.city,
+            stateOrRegion: data.shippingDetails.state,
+            postalCode: data.shippingDetails.pincode,
+            countryCode: "IN",
+            phoneNumber: data.shippingDetails.phone,
+            email: "customer@yourdomain.com"
+          };
+          const packageDetails = {
+            length: Number(data.packageDetails.length),
+            width: Number(data.packageDetails.breadth), // 🔥 VERY IMPORTANT
+            height: Number(data.packageDetails.height),
+            weight: Number(data.packageDetails.weight)
+          };
+          const shipmentRes = await ATSProvider.createShipment({
+            shipFrom,
+            shipTo,
+            packageDetails,
+            itemIdentifier: data.orderId,
+            orderId: data.orderId
+          });
+          if (!shipmentRes) {
+            await ShippingService.update({
+              data: {
+                id,
+                shipment_error: ATSProvider.error?.message || "Amazon shipment failed"
+              }
+            });
+            return false;
+          }
           await ShippingService.update({
             data: {
               id,
-              shipment_error: ATSProvider.error?.message || "Amazon shipment failed"
+              shipping_status: "booked",
+              awb_number: shipmentRes.shipmentId || shipmentRes.AWBNo,
+              shipment_error: null
+            }
+          });
+          const existingUser = await UserService.read({ id: userId });
+          await UserService.update(
+            { id: userId },
+            {
+              wallet_balance:
+                existingUser.wallet_balance -
+                ((freight_charge || 0) + (cod_price || 0))
+            }
+          );
+          return true;
+        } catch (error) {
+          console.error("[AMAZON 500 GRAM ERROR]", error.message);
+        await ShippingService.update({
+            data: {
+              id,
+              shipment_error: error.message
             }
           });
           return false;
         }
-        await ShippingService.update({
-          data: {
-            id,
-            shipping_status: "booked",
-            awb_number: shipmentRes.shipmentId || shipmentRes.AWBNo,
-            shipment_error: null
-          }
-        });
-        const existingUser = await UserService.read({ id: userId });
-        await UserService.update(
-          { id: userId },
-          {
-            wallet_balance:
-              existingUser.wallet_balance -
-              ((freight_charge || 0) + (cod_price || 0))
-          }
-        );
-        return true;
-      } catch (error) {
-        console.error("[AMAZON 500 GRAM ERROR]", error.message);
-       await ShippingService.update({
-          data: {
-            id,
-            shipment_error: error.message
-          }
-        });
-        return false;
       }
-    }
       return true;
     } catch (error) {
       this.error = error;

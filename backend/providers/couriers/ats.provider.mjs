@@ -45,8 +45,10 @@ class ATSProvider {
     }
   }
 
-  async createShipment(data) {
-    try {
+  async createShipment(data)
+  {
+    try
+    {
       const {
         itemIdentifier,
         orderId,
@@ -61,9 +63,14 @@ class ATSProvider {
         throw new Error("Unable to generate Amazon access token");
       }
       const accessToken = tokenRes.access_token;
-      const payload = {
-        channelDetails: { channelType: "EXTERNAL" },
-        labelSpecifications: {
+      const payload = 
+      {
+        channelDetails:
+        { 
+          channelType: "EXTERNAL"
+        },
+        labelSpecifications:
+        {
           dpi: 300,
           format: "PDF",
           needFileJoining: false,
@@ -71,37 +78,39 @@ class ATSProvider {
           requestedDocumentTypes: ["LABEL"],
           size: { length: 6, width: 4, unit: "INCH" }
         },
-        packages: [
-          {
-            dimensions: {
-              length: packageDetails.length,
-              width: packageDetails.width || packageDetails.breadth,
-              height: packageDetails.height,
-              unit: "CENTIMETER"
-            },
-            insuredValue: {
-              value: Math.max(1, Number(data.orderAmount || 1)),
-              unit: "INR"
-            },
-            isHazmat: false,
-            items: [
-              {
-                itemValue: { value: data.orderAmount, unit: "INR" },
-                description: "Item",
-                itemIdentifier,
-                quantity: 1,
-                weight: {
-                  unit: "GRAM",
-                  value: packageDetails.weight
-                },
-                isHazmat: false
-              }
-            ],
-            packageClientReferenceId: orderId,
-            weight: { unit: "GRAM", value: packageDetails.weight }
-          }
+        packages:
+        [
+            {
+              dimensions: {
+                length: packageDetails.length,
+                width: packageDetails.width || packageDetails.breadth,
+                height: packageDetails.height,
+                unit: "CENTIMETER"
+              },
+              insuredValue: {
+                value: Math.max(1, Number(data.orderAmount || 1)),
+                unit: "INR"
+              },
+              isHazmat: false,
+              items: [
+                {
+                  itemValue: { value: data.orderAmount, unit: "INR" },
+                  description: "Item",
+                  itemIdentifier,
+                  quantity: 1,
+                  weight: {
+                    unit: "GRAM",
+                    value: packageDetails.weight
+                  },
+                  isHazmat: false
+                }
+              ],
+              packageClientReferenceId: orderId,
+              weight: { unit: "GRAM", value: packageDetails.weight }
+            }
         ],
-        serviceSelection: {
+        serviceSelection:
+        {
           serviceId: ["SWA-IN-OA"]
         },
         shipTo,
@@ -125,11 +134,10 @@ class ATSProvider {
       console.log("[AMAZON CREATE SHIPMENT RESPONSE]");
       console.log(response.data);
       return response.data;
-    } catch (error) {
-      console.error(
-        "[AMAZON CREATE SHIPMENT ERROR]",
-        error?.response?.data || error.message
-      );
+    } 
+    catch (error)
+    {
+      console.error("[AMAZON CREATE SHIPMENT ERROR]",error?.response?.data || error.message);
       return false;
     }
   }
