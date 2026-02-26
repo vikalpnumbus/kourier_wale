@@ -79,7 +79,10 @@ class ATSProvider {
               height: packageDetails.height,
               unit: "CENTIMETER"
             },
-            insuredValue: { value: 0.01, unit: "INR" },
+            insuredValue: {
+              value: Math.max(1, Number(data.orderAmount || 1)),
+              unit: "INR"
+            },
             isHazmat: false,
             items: [
               {
