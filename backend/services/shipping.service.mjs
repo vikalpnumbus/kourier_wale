@@ -11,6 +11,12 @@ import ChannelService from "./channel.service.mjs";
 import ShadowfaxProvider from "../providers/couriers/shadowfax.provider.mjs";
 import XpressBeesProvider from "../providers/couriers/xpressbees.provider.mjs";
 import ATSProvider from "../providers/couriers/ats.provider.mjs";
+const num = (v, fallback = 1) => {
+  const n = Number(v);
+  if (!Number.isFinite(n) || n <= 0) return fallback;
+  return Math.round(n);
+};
+
 class Service {
   constructor() {
     this.error = null;
