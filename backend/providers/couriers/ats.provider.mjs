@@ -8,21 +8,26 @@ import {
   ATS_CREATE_SHIPMENT_FORWARD,
 } from "../../configurations/base.config.mjs";
 
+/**
+ * Helper – Amazon ATS STRICT number requirement
+ */
+const num = (v, fallback = 1) => {
+  const n = Number(v);
+  if (!Number.isFinite(n) || n <= 0) return fallback;
+  return Math.round(n);
+};
+
 class ATSProvider {
   constructor() {
     if (!ATS_GENERATE_TOKEN_URL) throw new Error("ATS_GENERATE_TOKEN_URL missing");
     if (!ATS_REFRESH_TOKEN) throw new Error("ATS_REFRESH_TOKEN missing");
     if (!ATS_CLIENT_IDENTIFIER) throw new Error("ATS_CLIENT_IDENTIFIER missing");
     if (!ATS_CLIENT_SECRET) throw new Error("ATS_CLIENT_SECRET missing");
-    // 🔐 Token cache
-    this.cachedToken = null;
-    this.tokenExpiry = null;
-    this.isRefreshing = false;
   }
 
-  /* =========================
-     🔐 TOKEN GENERATION
-  ========================== */
+  /**
+   * Generate Amazon LWA Access Token
+   */
   async generateATSToken() {
     try {
       const payload = qs.stringify({
@@ -32,97 +37,51 @@ class ATSProvider {
         client_secret: ATS_CLIENT_SECRET,
       });
 
-      const response = await axios.post(
-        ATS_GENERATE_TOKEN_URL,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          timeout: 15000,
-        }
-      );
+      const res = await axios.post(ATS_GENERATE_TOKEN_URL, payload, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        timeout: 15000,
+      });
 
-      return response.data;
-    } catch (error) {
+      return res.data; // { access_token }
+    } catch (err) {
       console.error(
         "[ATS TOKEN ERROR]",
-        error?.response?.data || error.message
+        err?.response?.data || err.message
       );
-      return null;
+      return false;
     }
   }
 
-  /* =========================
-     ✅ VALID TOKEN GETTER
-  ========================== */
-  async getValidToken() {
-    // Token valid hai
-    if (
-      this.cachedToken &&
-      this.tokenExpiry &&
-      new Date() < this.tokenExpiry
-    ) {
-      return this.cachedToken;
-    }
-
-    // Parallel refresh avoid
-    if (this.isRefreshing) {
-      await new Promise((r) => setTimeout(r, 500));
-      return this.cachedToken;
-    }
-
-    this.isRefreshing = true;
-    console.log("🔁 Generating new Amazon ATS token");
-
-    const tokenRes = await this.generateATSToken();
-    if (!tokenRes?.access_token) {
-      this.isRefreshing = false;
-      throw new Error("Amazon ATS token generation failed");
-    }
-
-    this.cachedToken = tokenRes.access_token;
-
-    const expiresIn = tokenRes.expires_in || 3600;
-    this.tokenExpiry = new Date(
-      Date.now() + (expiresIn - 60) * 1000 // 60 sec buffer
-    );
-
-    this.isRefreshing = false;
-    return this.cachedToken;
-  }
-
-  /* =========================
-     📦 CREATE SHIPMENT
-  ========================== */
+  /**
+   * Create Amazon Shipment (ONE CLICK SHIPMENT)
+   */
   async createShipment(data) {
     try {
       const {
-        itemIdentifier,
         orderId,
-        orderAmount,
+        itemIdentifier,
         packageDetails,
         shipTo,
         shipFrom,
       } = data;
 
-      /* ---------- BASIC VALIDATION ---------- */
-      if (!shipFrom?.addressLine1 || !shipFrom?.phoneNumber) {
-        throw new Error("Invalid shipFrom address");
-      }
-      if (!shipTo?.addressLine1 || !shipTo?.phoneNumber) {
-        throw new Error("Invalid shipTo address");
+      // 1️⃣ Generate token
+      const tokenRes = await this.generateATSToken();
+      if (!tokenRes || !tokenRes.access_token) {
+        throw new Error("Amazon token generate failed");
       }
 
-      const accessToken = await this.getValidToken();
+      const accessToken = tokenRes.access_token;
 
+      // 2️⃣ Build payload (MATCHING CURL)
       const payload = {
         channelDetails: {
           channelType: "EXTERNAL",
         },
+
         labelSpecifications: {
           dpi: 300,
-          format: "PDF",
+          format: "PNG",
           needFileJoining: false,
           pageLayout: "DEFAULT",
           requestedDocumentTypes: ["LABEL"],
@@ -132,79 +91,112 @@ class ATSProvider {
             unit: "INCH",
           },
         },
+
         packages: [
           {
             dimensions: {
-              length: Number(packageDetails.length),
-              width: Number(packageDetails.width || packageDetails.breadth),
-              height: Number(packageDetails.height),
+              length: num(packageDetails.length),
+              width: num(packageDetails.width || packageDetails.breadth),
+              height: num(packageDetails.height),
               unit: "CENTIMETER",
             },
+
             insuredValue: {
-              value: Math.max(1, Number(orderAmount || 1)),
+              value: 1, // IMPORTANT: never 0 / decimal
               unit: "INR",
             },
+
             isHazmat: false,
+
             items: [
               {
                 itemValue: {
-                  value: Math.max(1, Number(orderAmount || 1)),
+                  value: 1,
                   unit: "INR",
                 },
                 description: "Item",
-                itemIdentifier,
+                itemIdentifier: itemIdentifier,
                 quantity: 1,
                 weight: {
                   unit: "GRAM",
-                  value: Number(packageDetails.weight),
+                  value: num(packageDetails.weight),
                 },
                 isHazmat: false,
               },
             ],
+
             packageClientReferenceId: orderId,
+
             weight: {
               unit: "GRAM",
-              value: Number(packageDetails.weight),
+              value: num(packageDetails.weight),
             },
           },
         ],
+
         serviceSelection: {
           serviceId: ["SWA-IN-OA"],
         },
-        shipTo,
-        shipFrom,
+
+        shipTo: {
+          name: shipTo.name,
+          addressLine1: shipTo.addressLine1,
+          addressLine2: shipTo.addressLine2 || "",
+          addressLine3: "",
+          city: shipTo.city,
+          stateOrRegion: shipTo.stateOrRegion,
+          postalCode: shipTo.postalCode,
+          countryCode: "IN",
+          phoneNumber: shipTo.phoneNumber,
+          email: shipTo.email,
+        },
+
+        shipFrom: {
+          name: shipFrom.name,
+          addressLine1: shipFrom.addressLine1,
+          addressLine2: shipFrom.addressLine2 || "",
+          addressLine3: "",
+          city: shipFrom.city,
+          stateOrRegion: shipFrom.stateOrRegion,
+          postalCode: shipFrom.postalCode,
+          countryCode: "IN",
+          phoneNumber: shipFrom.phoneNumber,
+          email: shipFrom.email,
+        },
       };
 
-      console.log("[AMAZON CREATE SHIPMENT PAYLOAD]");
+      console.log("✅ AMAZON PAYLOAD");
       console.log(JSON.stringify(payload, null, 2));
 
+      // 3️⃣ API Call
       const response = await axios.post(
         ATS_CREATE_SHIPMENT_FORWARD,
         payload,
         {
           headers: {
             "Content-Type": "application/json",
+
+            // 🔑 ONLY THIS TOKEN (VERY IMPORTANT)
             "x-amz-access-token": accessToken,
+
             "x-amzn-shipping-business-id": "AmazonShipping_IN",
-            Authorization: `Bearer ${accessToken}`,
           },
           timeout: 20000,
         }
       );
 
-      console.log("[AMAZON CREATE SHIPMENT RESPONSE]");
-      console.log(response.data);
+      console.log("✅ AMAZON RESPONSE");
+      console.log(JSON.stringify(response.data, null, 2));
 
       return response.data;
-    } catch (error) {
+    } catch (err) {
       console.error(
         "[AMAZON CREATE SHIPMENT ERROR]",
-        error?.response?.data || error.message
+        err?.response?.data || err.message
       );
       return false;
     }
   }
 }
 
-const atsProvider = new ATSProvider();
-export default atsProvider;
+export default new ATSProvider();
