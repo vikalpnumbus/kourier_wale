@@ -431,7 +431,7 @@ class Service {
           }
         }
       }
-      else if (code.includes("Shadow_Fax")) {
+      if (code.includes("Shadow_Fax")) {
         const shipmentRes = await ShadowfaxProvider.createShipment(data);
         if (!shipmentRes) {
           await ShippingService.update({
@@ -464,11 +464,9 @@ class Service {
           }
         }
       }
-      else if (code.includes("Amazon_500_Gram"))
-      {
+      if (code.includes("Amazon_500_Gram")) {
         try {
           const { warehouses } = data;
-
           const pickupWarehouseObj = warehouses?.find(
             w => Number(w.dataValues.id) === Number(data.warehouse_id)
           );
