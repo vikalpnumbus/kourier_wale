@@ -86,7 +86,7 @@ class ATSProvider {
             isHazmat: false,
             items: [
               {
-                itemValue: { value: 0.01, unit: "INR" },
+                itemValue: { value: data.orderAmount, unit: "INR" },
                 description: "Item",
                 itemIdentifier,
                 quantity: 1,
