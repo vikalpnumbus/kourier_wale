@@ -464,7 +464,7 @@ class Service {
           }
         }
       }
-      else if (code.includes("ats")) {
+      else if (code.includes("Amazon_500_Gram")) {
         const shipmentRes = await ATSProvider.createShipment({ ...data, shipmentId: id });
         if (!shipmentRes) {
           await ShippingService.update({
