@@ -520,12 +520,23 @@ class Service {
             });
             return false;
           }
+          const payload = shipmentRes?.payload;
+          if (!payload) {
+            throw new Error("Invalid Amazon booking response: payload missing");
+          }
+          const amazonShipmentId = payload.shipmentId || null;
+          const awbNumber = payload.packageDocumentDetails?.[0]?.trackingId || null;
+          const pickupDate = payload.promise?.pickupWindow?.start ? new Date(payload.promise.pickupWindow.start): null;
+          const deliveredDate = payload.promise?.deliveryWindow?.end ? new Date(payload.promise.deliveryWindow.end) : null;
           await ShippingService.update({
             data: {
               id,
               shipping_status: "booked",
-              awb_number: shipmentRes.shipmentId || shipmentRes.AWBNo,
-              shipment_error: null
+              awb_number: awbNumber,
+              amazon_shipment_id: amazonShipmentId,
+              shipment_error: null,
+              pickup_date: pickupDate,
+              delivered_date: deliveredDate,
             }
           });
           const existingUser = await UserService.read({ id: userId });
