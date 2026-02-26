@@ -151,7 +151,7 @@ class ATSProvider {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-amz-access-token": token.access_token,
+            "x-amz-access-token": tokenRes.access_token,
             "Authorization": `Bearer ${ATS_REFRESH_TOKEN}`,
             "x-amzn-shipping-business-id": "AmazonShipping_IN",
           },
