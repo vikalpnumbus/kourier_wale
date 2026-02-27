@@ -4,6 +4,7 @@ import warehouseConfig from "../../../config/Warehouse/WarehouseConfig";
 import api from "../../../utils/api";
 import Select from "react-select";
 import DateRange from "../../../Component/DateRange";
+import sellerCourier from "../../../config/SellerCouirers/CourierConfig"
 
 function OrdersFilter({ setShowFilters }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -67,6 +68,37 @@ function OrdersFilter({ setShowFilters }) {
     [warehouseList]
   );
 
+
+  const [sellercourierList, setsellercourierList] = useState([]);
+  const [loadingsellercourier, setsellercourier] = useState(false);
+
+  const handleFetchsellercourier = async () => {
+    setsellercourier(true);
+    try {
+      const { data } = await api.get(sellerCourier.CourierList);
+      setsellercourierList(data?.data?.result || []);
+    } catch (error) {
+      console.error("Fetch Courier error:", error);
+      setsellercourierList([]);
+    } finally {
+      setsellercourier(false);
+    }
+  };
+
+  useEffect(() => {
+    handleFetchWarehouse();
+  }, []);
+
+  // memoize options for react-select
+  const courierOptions = useMemo(
+    () =>
+      sellercourierList.map((w) => ({
+        value: w.id.toString(),
+        label: w.name,
+      })),
+    [sellercourierList]
+  );
+
   const handleSearch = () => {
     // Get existing search params as an object
     const params = Object.fromEntries([...searchParams]);
@@ -118,9 +150,9 @@ function OrdersFilter({ setShowFilters }) {
   };
 
   return (
-    <div className="col-md-12 mt-3">
-      <div className="row gap-2">
-        <div className="col-md-3">
+    <div className="col-md-12">
+      <div className="row mt-3">
+        <div className="col-md-3 py-2">
           <DateRange />
         </div>
         {/* Shipping name */}
