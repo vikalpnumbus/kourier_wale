@@ -365,15 +365,13 @@ class Service {
         if (!amazonLabelRes) {
           throw new Error("Amazon label download failed");
         }
-        console.log("amazon content", amazonLabelRes);
-
         const pdfBuffer = await convertPngToPdf(amazonLabelRes.buffer);
-        console.log("pdfBuffer", pdfBuffer);
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader(
           "Content-Disposition",
           `attachment; filename="amazon_label_${amazonShipment.amazon_shipment_id}.pdf"`
         );
+        res.setHeader("Content-Length", pdfBuffer.length);
         return res.end(pdfBuffer);
       }
       const label = {
