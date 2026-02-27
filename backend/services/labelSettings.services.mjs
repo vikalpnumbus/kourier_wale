@@ -371,8 +371,7 @@ class Service {
           "Content-Disposition",
           `attachment; filename="${amazonLabelRes.fileName}"`
         );
-        res.send(amazonLabelRes.buffer);
-        return;
+        res.end(amazonLabelRes.buffer);
       }
       const label = {
         paper_size: "standard",

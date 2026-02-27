@@ -217,22 +217,20 @@ class ATSProvider {
         headers: {
           "x-amz-access-token": tokenRes.access_token,
           "x-amzn-shipping-business-id": "AmazonShipping_IN",
+          "format": "PDF", // ✅ IMPORTANT
+          "Content-Type": "application/json"
         },
         timeout: 20000,
       });
-      console.log("Amazon Response:", response);
-      const document = response?.data?.documents?.find(
-        (d) => d.documentType === "LABEL"
-      );
-      if (!document?.downloadUrl) {
-        throw new Error("Amazon label downloadUrl not found");
+      const document =
+        response?.data?.payload?.packageDocumentDetail?.packageDocuments
+          ?.find(d => d.type === "LABEL");
+      if (!document?.contents) {
+        throw new Error("Amazon label document not found");
       }
-      const pdfRes = await axios.get(document.downloadUrl, {
-        responseType: "arraybuffer",
-        timeout: 20000,
-      });
+      const pdfBuffer = Buffer.from(document.contents, "base64");
       return {
-        buffer: Buffer.from(pdfRes.data),
+        buffer: pdfBuffer,
         fileName: `amazon_label_${data.amazon_shipment_id}.pdf`,
         contentType: "application/pdf",
       };
