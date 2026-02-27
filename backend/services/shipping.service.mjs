@@ -167,17 +167,50 @@ class Service {
     }
   }
 
+  // async update({ data }) {
+  //   try {
+  //     const existingRecordId = data.id;
+
+  //     delete data.id;
+  //     const { shipping_status, shipment_error, awb_number } = data;
+  //     let payload = {};
+  //     if (shipping_status) payload.shipping_status = shipping_status;
+  //     if (shipment_error) payload.shipment_error = shipment_error;
+  //     if (awb_number) payload.awb_number = awb_number;
+  //     if (Object.keys(payload).length == 0) {
+  //       return {
+  //         status: 200,
+  //         data: {
+  //           message: "Nothing to update.",
+  //           id: existingRecordId,
+  //         },
+  //       };
+  //     }
+  //     const result = await this.repository.findOneAndUpdate({ id: existingRecordId }, payload);
+
+  //     return {
+  //       status: 201,
+  //       data: {
+  //         message: "Shipment has been updated successfully.",
+  //         id: result.id,
+  //       },
+  //     };
+  //   } catch (error) {
+  //     this.error = error;
+  //     return false;
+  //   }
+  // }
+
   async update({ data }) {
     try {
       const existingRecordId = data.id;
-
+      if (!existingRecordId) throw new Error("Record ID missing");
       delete data.id;
-      const { shipping_status, shipment_error, awb_number } = data;
-      let payload = {};
-      if (shipping_status) payload.shipping_status = shipping_status;
-      if (shipment_error) payload.shipment_error = shipment_error;
-      if (awb_number) payload.awb_number = awb_number;
-      if (Object.keys(payload).length == 0) {
+      const payload = {};
+      Object.keys(data).forEach((key) => {
+        if (data[key] !== undefined) payload[key] = data[key];
+      });
+      if (Object.keys(payload).length === 0) {
         return {
           status: 200,
           data: {
@@ -186,8 +219,10 @@ class Service {
           },
         };
       }
-      const result = await this.repository.findOneAndUpdate({ id: existingRecordId }, payload);
-
+      const result = await this.repository.findOneAndUpdate(
+        { id: existingRecordId },
+        payload
+      );
       return {
         status: 201,
         data: {
@@ -480,18 +515,20 @@ class Service {
           });
           return false;
         }
-        console.log("amazon response: ", shipmentRes);
+        const payload = shipmentRes.payload;
+        console.log("amazon", payload);
         const updatedShipment = await ShippingService.update({
           data: {
             id,
             shipping_status: "booked",
-            awb_number: shipmentRes?.packageDocumentDetails?.[0]?.trackingId || null,
-            amazon_shipment_id: shipmentRes?.shipmentId || null,
-            pickup_date: shipmentRes?.promise?.pickupWindow?.start
-              ? new Date(shipmentRes.promise.pickupWindow.start)
+            awb_number:
+              payload?.packageDocumentDetails?.[0]?.trackingId || null,
+            amazon_shipment_id: payload?.shipmentId || null,
+            pickup_date: payload?.promise?.pickupWindow?.start
+              ? new Date(payload.promise.pickupWindow.start)
               : null,
-            delivered_date: shipmentRes?.promise?.deliveryWindow?.end
-              ? new Date(shipmentRes.promise.deliveryWindow.end)
+            delivered_date: payload?.promise?.deliveryWindow?.end
+              ? new Date(payload.promise.deliveryWindow.end)
               : null,
             shipment_error: null
           }
