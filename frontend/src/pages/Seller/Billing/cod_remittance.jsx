@@ -41,10 +41,11 @@ function CodRemittance() {
           <thead>
             <tr>
               <th>Date / Time</th>
-              <th>Particulars</th>
-              <th>Transaction</th>
+              <th>Transaction Id</th>
+              <th>Transaction By</th>
               <th>Amount</th>
               <th>Status</th>
+              <th>Remittanced Date</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -58,9 +59,10 @@ function CodRemittance() {
               codDataList.map((item) => (
                 <tr key={item.id}>
                   <td>{item.createdAt}</td>
-                  <td>{item.user?.companyName}</td>
-                  <td>{item.awb_numbers}</td>
+                  <td>{item.utr_number}</td>
+                  <td>{item.utr_uploaded_by}</td>
                   <td>₹ {item.remittance_amount}</td>
+                  <td>{item.remittance_paid_date}</td>
                   <td>
                     <span
                       className={`badge ${
