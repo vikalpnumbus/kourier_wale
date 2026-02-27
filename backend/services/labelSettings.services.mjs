@@ -358,6 +358,7 @@ class Service {
       const amazonShipment = shippingRes.data.result.find(
         (s) => s.amazon_shipment_id
       );
+      console.log("amazon id hai db may", amazonShipment.amazon_shipment_id);
       if (amazonShipment) {
         const amazonLabelRes = await ATSProvider.downloadShipmentLabel({
           amazon_shipment_id: amazonShipment.amazon_shipment_id,
