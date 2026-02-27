@@ -6,6 +6,7 @@ import {
   ATS_CLIENT_IDENTIFIER,
   ATS_CLIENT_SECRET,
   ATS_CREATE_SHIPMENT_FORWARD,
+  ATS_CANCEL_SHIPMENT_FORWARD
 } from "../../configurations/base.config.mjs";
 
 /**
@@ -169,7 +170,36 @@ class ATSProvider {
 
   async cancelShipment(data)
   {
-    console.log("while cancel shipment", data);
+    try {
+      if (!data?.amazon_shipment_id) {
+        throw new Error("amazon_shipment_id is required for cancel");
+      }
+      const tokenRes = await this.generateATSToken();
+      if (!tokenRes?.access_token) {
+        throw new Error("Amazon token generate failed");
+      }
+      const cancelUrl = `${ATS_CANCEL_SHIPMENT_FORWARD}/${data.amazon_shipment_id}/cancel`;
+      const response = await axios.put(
+        cancelUrl,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-amz-access-token": tokenRes.access_token,
+            "x-amzn-shipping-business-id": "AmazonShipping_IN",
+          },
+          timeout: 20000,
+        }
+      );
+      console.log("[AMAZON CANCEL SHIPMENT RESPONSE]", response.data);
+      return response.data;
+    } catch (err) {
+      console.error(
+        "[AMAZON CANCEL SHIPMENT ERROR]",
+        err?.response?.data || err.message
+      );
+      return false;
+    }
   }
 }
 

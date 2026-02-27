@@ -591,7 +591,6 @@ class Service {
 
       return { data: { message: "Cancelled successfully." } };
     } catch (error) {
-      console.log("i am here",error);
       this.error = error;
       return false;
     }
