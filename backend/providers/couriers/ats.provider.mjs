@@ -220,6 +220,7 @@ class ATSProvider {
         },
         timeout: 20000,
       });
+      console.log("Amazon Response:", response);
       const document = response?.data?.documents?.find(
         (d) => d.documentType === "LABEL"
       );
