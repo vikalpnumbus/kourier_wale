@@ -17,7 +17,7 @@ import OrdersListPage from "../pages/Seller/Orders/OrdersListPage";
 import ShipmentsTable from "../pages/Seller/Shipment/ShipmentTable";
 import OrdersForm from "../pages/Seller/Orders/OrdersForm";
 import RateCalculator from "../pages/Seller/RateCalculator/index";
-import Cod_Remittance from "../pages/Seller/Billing/cod_remittance";
+import Cod_Remittance from "../pages/Seller/Billing/Remittance/cod_remittance";
 import OrderView from "../pages/Seller/Orders/OrderView";
 import SellerLayout from "../layouts/SellerLayout";
 import LabelSettings from "../pages/Seller/Settings/LabelSettings";
@@ -80,8 +80,10 @@ function AppRoutes() {
           </Route>
 
           <Route path="/rate_calculator" element={<RateCalculator />}></Route>
-          <Route path="/cod_remittance" element={<Cod_Remittance />}></Route>
-
+          <Route path="/cod_remittance" element={<Cod_Remittance />}>
+            <Route index element={<Cod_Remittance />} />
+          </Route>
+          
           <Route path="/shippingcharges" element={<ShippingCharge />}>
             <Route index element={<ShippingChargesTable />} />
           </Route>
