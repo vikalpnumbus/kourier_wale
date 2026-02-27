@@ -1,32 +1,56 @@
 import React, { useEffect, useState } from "react";
-import { mdiDelete, mdiPencil } from "@mdi/js";
-import Icon from "@mdi/react";
 import { Link, useSearchParams } from "react-router-dom";
 import Pagination from "../../../Component/Pagination";
+import RemittanceConfig from "../../../config/Remittance/Remittanceconfig";
+import api from "../../../utils/api"; // axios instance
+
 function cod_remittance() {
-  const [dataList, setDataList] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [searchParams] = useSearchParams();
-    const [totalCount, setTotalCount] = useState(0);
-  
+  const [codDataList, setCodDataList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+  const [searchParams] = useSearchParams();
+
+  const page = searchParams.get("page") || 1;
+
+  useEffect(() => {
+    fetchRemittance();
+  }, [page]);
+
+  const fetchRemittance = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get(RemittanceConfig.remittance_list, {
+        params: { page },
+      });
+      setCodDataList(res?.data?.data || []);
+      setTotalCount(res?.data?.total || 0);
+    } catch (error) {
+      console.error("Remittance fetch error", error);
+      setCodDataList([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <div className="table-responsive h-100">
         <table className="table table-hover">
           <thead>
             <tr>
-              <th>Date/Time</th>
+              <th>Date / Time</th>
               <th>Particulars</th>
               <th>Transaction</th>
               <th>Amount</th>
               <th>Type</th>
               <th>Action</th>
             </tr>
-          </thead>				
+          </thead>
+
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="5">
+                <td colSpan="6" className="text-center">
                   <div className="dot-opacity-loader">
                     <span></span>
                     <span></span>
@@ -34,39 +58,31 @@ function cod_remittance() {
                   </div>
                 </td>
               </tr>
-            ) : dataList.length > 0 ? (
-              dataList.map((data) => (
-                <tr key={data.id}>
-                  <td className="py-2">
-                    <img
-                      src={`${import.meta.env.VITE_API_URL}${
-                        data.productImage[1]
+            ) : codDataList.length ? (
+              codDataList.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.created_at || "-"}</td>
+                  <td>{item.particulars || "-"}</td>
+                  <td>{item.transaction_id || "-"}</td>
+                  <td>₹ {item.amount || 0}</td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        item.type === "credit"
+                          ? "bg-success"
+                          : "bg-danger"
                       }`}
-                      alt={data.name}
-                      className="img-fluid rounded me-3"
-                      height={200}
-                      width={200}
-                    />
-                    {data.name || ""}
+                    >
+                      {item.type}
+                    </span>
                   </td>
-                  <td className="py-2">{data.sku || ""}</td>
-                  <td className="py-2">{data.price || ""}</td>
-                  <td className="py-2">{data.category || ""}</td>
-                  <td className="py-2">
-                    <div className="btn-group">
-                      <Link
-                        to={`edit/${data.id}`}
-                        className="btn btn-outline-primary btn-md py-2 px-3"
-                      >
-                        <Icon path={mdiPencil} size={0.6} />
-                      </Link>
-                      <button
-                        className="btn btn-outline-primary btn-md py-2 px-3"
-                        onClick={() => deleteProduct(data.id)}
-                      >
-                        <Icon path={mdiDelete} size={0.6} />
-                      </button>
-                    </div>
+                  <td>
+                    <Link
+                      to={`view/${item.id}`}
+                      className="btn btn-outline-primary btn-sm"
+                    >
+                      View
+                    </Link>
                   </td>
                 </tr>
               ))
@@ -80,9 +96,10 @@ function cod_remittance() {
           </tbody>
         </table>
       </div>
+
       <Pagination totalCount={totalCount} />
     </>
-  )
+  );
 }
 
-export default cod_remittance
+export default cod_remittance;
