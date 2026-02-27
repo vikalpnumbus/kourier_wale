@@ -359,20 +359,18 @@ class Service {
         (s) => s.amazon_shipment_id
       );
       if (amazonShipment) {
-        const amazonLabelRes = await ATSProvider.downloadShipmentLabel({
-          amazon_shipment_id: amazonShipment.amazon_shipment_id,
-        });
-        if (!amazonLabelRes) {
-          throw new Error("Amazon label download failed");
-        }
-        const pdfBuffer = await convertPngToPdf(amazonLabelRes.buffer);
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader(
-          "Content-Disposition",
-          `attachment; filename="amazon_label_${amazonShipment.amazon_shipment_id}.pdf"`
-        );
-        res.setHeader("Content-Length", pdfBuffer.length);
-        return res.end(pdfBuffer);
+          const amazonLabelRes = await ATSProvider.downloadShipmentLabel({
+            amazon_shipment_id: amazonShipment.amazon_shipment_id,
+          });
+          if (!amazonLabelRes) {
+            throw new Error("Amazon label download failed");
+          }
+          const pdfBuffer = await convertPngToPdf(amazonLabelRes.buffer);
+          return {
+            buffer: pdfBuffer,
+            fileName: `amazon_label_${amazonShipment.amazon_shipment_id}.pdf`,
+            contentType: "application/pdf",
+          };
       }
       const label = {
         paper_size: "standard",
