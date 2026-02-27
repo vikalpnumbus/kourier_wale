@@ -229,7 +229,6 @@ class Service {
           UserService.read({ id: userId }),
           ShippingService.read({ userId, id: shipping_db_ids }),
         ]);
-        console.log("shipment records", ShippingService);
         if (!user) throw new Error("User not found");
         const label = {
           paper_size: "standard",
@@ -240,6 +239,7 @@ class Service {
           hide_end_customer_contact_number: false,
           ...user.label_settings,
         };
+        console.log("shipment records", shippingRes);
         if (!shippingRes?.data?.result?.length)
           throw new Error("No shipments found");
         const shipments = await Promise.all(
