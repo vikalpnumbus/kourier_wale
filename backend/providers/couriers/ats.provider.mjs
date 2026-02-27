@@ -166,6 +166,11 @@ class ATSProvider {
       return false;
     }
   }
+
+  async cancelShipment(data)
+  {
+    console.log("while cancel shipment", data);
+  }
 }
 
 export default new ATSProvider();

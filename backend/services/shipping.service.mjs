@@ -167,40 +167,6 @@ class Service {
     }
   }
 
-  // async update({ data }) {
-  //   try {
-  //     const existingRecordId = data.id;
-
-  //     delete data.id;
-  //     const { shipping_status, shipment_error, awb_number } = data;
-  //     let payload = {};
-  //     if (shipping_status) payload.shipping_status = shipping_status;
-  //     if (shipment_error) payload.shipment_error = shipment_error;
-  //     if (awb_number) payload.awb_number = awb_number;
-  //     if (Object.keys(payload).length == 0) {
-  //       return {
-  //         status: 200,
-  //         data: {
-  //           message: "Nothing to update.",
-  //           id: existingRecordId,
-  //         },
-  //       };
-  //     }
-  //     const result = await this.repository.findOneAndUpdate({ id: existingRecordId }, payload);
-
-  //     return {
-  //       status: 201,
-  //       data: {
-  //         message: "Shipment has been updated successfully.",
-  //         id: result.id,
-  //       },
-  //     };
-  //   } catch (error) {
-  //     this.error = error;
-  //     return false;
-  //   }
-  // }
-
   async update({ data }) {
     try {
       const existingRecordId = data.id;
@@ -564,24 +530,20 @@ class Service {
       const { id, userId } = data;
       const isShipmentExistsRes = await this.read({ id, userId });
       const existingShipmentData = isShipmentExistsRes?.data?.result?.[0] || null;
-
+      console.log("Existing Data in DB",existingShipmentData);
       const existingShipmentCount = isShipmentExistsRes?.data?.total || null;
       if (!existingShipmentCount || existingShipmentCount == 0) {
         const error = new Error("No record found.");
         error.status = 404;
         throw error;
       }
-
       const shipping_status = existingShipmentData.shipping_status;
-
       const allowedStatusesForCancellation = ["new", "booked", "pending-pickup"];
-
       if (!allowedStatusesForCancellation.includes(shipping_status)) {
         const error = new Error(`Shipment status is ${shipping_status}. It cannot be cancelled.`);
         error.status = 400;
         throw error;
       }
-
       const isCourierExist = await CourierService.read({
         id: existingShipmentData.courier_id,
       });
@@ -590,16 +552,28 @@ class Service {
         error.status = 400;
         throw error;
       }
-
-      if (existingShipmentData.shipment_error == null) {
-        const shipmentRes = await XpressBeesProvider.cancelShipment({
-          awb_number: existingShipmentData.awb_number,
-        });
-        if (!shipmentRes) {
-          throw XpressBeesProvider.error;
+      if (code.includes("xpressbees")) {
+        if (existingShipmentData.shipment_error == null)
+        {
+          const shipmentRes = await XpressBeesProvider.cancelShipment({
+            awb_number: existingShipmentData.awb_number,
+          });
+          if (!shipmentRes) {
+            throw XpressBeesProvider.error;
+          }
         }
       }
-
+      if (code.includes("Amazon_500_Gram")) {
+        if (existingShipmentData.shipment_error == null)
+        {
+          const shipmentRes = await ATSProvider.cancelShipment({
+            awb_number: existingShipmentData.awb_number,
+          });
+          if (!shipmentRes) {
+            throw XpressBeesProvider.error;
+          }
+        }
+      }
       await Promise.all([
         OrdersService.update({
           data: {
