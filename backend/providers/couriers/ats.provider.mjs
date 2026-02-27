@@ -6,7 +6,8 @@ import {
   ATS_CLIENT_IDENTIFIER,
   ATS_CLIENT_SECRET,
   ATS_CREATE_SHIPMENT_FORWARD,
-  ATS_CANCEL_SHIPMENT_FORWARD
+  ATS_CANCEL_SHIPMENT_FORWARD,
+  ATS_LABEL_DOWNLOAD_FORWARD,
 } from "../../configurations/base.config.mjs";
 
 /**
@@ -196,6 +197,46 @@ class ATSProvider {
     } catch (err) {
       console.error(
         "[AMAZON CANCEL SHIPMENT ERROR]",
+        err?.response?.data || err.message
+      );
+      return false;
+    }
+  }
+
+  async downloadShipmentLabel(data) {
+    try {
+      if (!data?.amazon_shipment_id) {
+        throw new Error("amazon_shipment_id is required");
+      }
+      const tokenRes = await this.generateATSToken();
+      if (!tokenRes?.access_token) {
+        throw new Error("Amazon token generate failed");
+      }
+      const labelUrl = `${ATS_LABEL_DOWNLOAD_FORWARD}/${data.amazon_shipment_id}/documents`;
+      const response = await axios.get(labelUrl, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-amz-access-token": tokenRes.access_token,
+          "x-amzn-shipping-business-id": "AmazonShipping_IN",
+        },
+        timeout: 20000,
+      });
+      const document =
+        response?.data?.documents?.find(
+          (d) => d.documentType === "LABEL"
+        );
+      if (!document?.contents) {
+        throw new Error("Amazon label document not found");
+      }
+      const pdfBuffer = Buffer.from(document.contents, "base64");
+      return {
+        buffer: pdfBuffer,
+        fileName: `amazon_label_${data.amazon_shipment_id}.pdf`,
+        contentType: "application/pdf",
+      };
+    } catch (err) {
+      console.error(
+        "[AMAZON LABEL DOWNLOAD ERROR]",
         err?.response?.data || err.message
       );
       return false;
