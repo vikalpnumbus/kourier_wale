@@ -553,6 +553,7 @@ class Service {
         throw error;
       }
       if (code.includes("xpressbees")) {
+        console.log("xb");
         if (existingShipmentData.shipment_error == null)
         {
           const shipmentRes = await XpressBeesProvider.cancelShipment({
@@ -564,10 +565,11 @@ class Service {
         }
       }
       if (code.includes("Amazon_500_Gram")) {
+        console.log("ats");
         if (existingShipmentData.shipment_error == null)
         {
           const shipmentRes = await ATSProvider.cancelShipment({
-            awb_number: existingShipmentData.awb_number,
+            amazon_shipment_id: existingShipmentData.amazon_shipment_id,
           });
           if (!shipmentRes) {
             throw XpressBeesProvider.error;
@@ -591,6 +593,7 @@ class Service {
 
       return { data: { message: "Cancelled successfully." } };
     } catch (error) {
+      console.log("i am here",error);
       this.error = error;
       return false;
     }
