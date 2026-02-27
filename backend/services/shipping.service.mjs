@@ -480,19 +480,18 @@ class Service {
           });
           return false;
         }
-        const payload = shipmentRes.payload;
-        console.log("amazon response: ", payload);
+        console.log("amazon response: ", shipmentRes);
         const updatedShipment = await ShippingService.update({
           data: {
             id,
             shipping_status: "booked",
-            awb_number: payload?.packageDocumentDetails?.[0]?.trackingId || null,
-            amazon_shipment_id: payload?.shipmentId || null,
-            pickup_date: payload?.promise?.pickupWindow?.start
-              ? new Date(payload.promise.pickupWindow.start)
+            awb_number: shipmentRes?.packageDocumentDetails?.[0]?.trackingId || null,
+            amazon_shipment_id: shipmentRes?.shipmentId || null,
+            pickup_date: shipmentRes?.promise?.pickupWindow?.start
+              ? new Date(shipmentRes.promise.pickupWindow.start)
               : null,
-            delivered_date: payload?.promise?.deliveryWindow?.end
-              ? new Date(payload.promise.deliveryWindow.end)
+            delivered_date: shipmentRes?.promise?.deliveryWindow?.end
+              ? new Date(shipmentRes.promise.deliveryWindow.end)
               : null,
             shipment_error: null
           }
