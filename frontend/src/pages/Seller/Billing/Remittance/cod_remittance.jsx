@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import Pagination from "../../../Component/Pagination";
-import RemittanceConfig from "../../../config/RemittanceDetails/RemittanceConfig";
-import api from "../../../utils/api";
+import Pagination from "../../../../Component/Pagination";
+import RemittanceConfig from "../../../../config/RemittanceDetails/RemittanceConfig";
+import api from "../../../../utils/api";
 
 function CodRemittance() {
   const [codDataList, setCodDataList] = useState([]);
@@ -31,19 +31,8 @@ function CodRemittance() {
       setLoading(false);
     }
   };
-
-  console.log("Remittance List", codDataList);
-
   return (
     <>
-    <div className="remittance-header">
-      <div>
-        <h4 className="remittance-title">Remittance</h4>
-        <p className="remittance-subtitle">
-          View your COD remittance history and settlement status
-        </p>
-      </div>
-    </div>
       <div className="table-responsive remittance-table-wrapper">
         <table className="table remittance-table">
           <thead>
