@@ -153,7 +153,7 @@ class ATSProvider {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-amz-access-token": "Atza|IwEBICaC3E30bcoUnWOqxEU_6dUh0CUGV4KOmqc5ZCCNMsi0Dv2-HQ_Z1Rl4sRoM8EzeIBiL2pU4JdkxL36a9YVhXGir8iu2g1NApYYc0NDbRNqr4nOGjZic5jQUYAHBVECNH8r7HhbsvWsPWx9XWR-dm2RhbCdME_OwLT7Wu0V8c1u5fgmGdJi9rhoBRXdOj8u0krg4umUjEVGMEGCYE7GLnm7FTM230F9VjtyBNvZWcYZ3dWKWvk2CL85fCVGVtp1RTmnRP4kE02elD_sEu35oYQ0qe8vtvhBqQugnLu3PqDID9TD7TZSYcr2WUUvByJxkE3-ewVXRfi9qRYbO9Y5FtOD_",
+            "x-amz-access-token": "Atza|IwEBICbHr3F1Kooux4LyDiovJkRksSMQmbaP0A1XrAyYVdL9oWj0Uz2BwoXtyS13UgwkixhQJGWaGBxAqsVsd-DlaLfEq0YVIYGGqWFIN02JdrWzPTjgJX_cj3kXG4sTF6ky7vlzrPYHZKdOUrT2Wb-buluQjCkDvoqxbzFhlUBR7N_egLJIopGUctdo7esNO0wOxWJq6KCYRHXeDPcjGsSX9B2tPItpIVmjkTCvDBa3qjfu9l8rQu_DNwsmUCv5fgyTeAaJXhxbHwF0tLddTqYljyBGoXxCnmcY5YoxhRoHHd-iaEnERgPyP78xOgAMJ1CelBq-4lEhkea7_nsGwjSQdS9n",
             "Authorization": `Bearer Atzr|IwEBIBm3jY2qR73uSTWGXVyiP4KsQwNH84phOaIkAUDsUXBWIHz4O7O9HThrj9CENk_CwEaxRhIjFkhxnx7O9q0fl6c4XKXQkZ_zRJyORjWMJdd9rp8DqNlNST-gyNVqdhLdaLFxRobcdAuvApZ-Q3xPM7xt0ENSwxhKPUxjBm77k7cUce4AqZvvNwpPWCHDXR-OslJCPrZs7lZX-JcjXUWVsO2XB3B-HQHtVMOGtiFiO2lxeejZIvkMt_qxt-w1Cg6mVDjJiy4foE5D0e9U2IdtnBoFScQ03LnpybmIsQt5zGhq1YkJvduJ6v09SSnGwG0qduU`,
             "x-amzn-shipping-business-id": "AmazonShipping_IN",
           },
@@ -186,7 +186,7 @@ class ATSProvider {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-amz-access-token": tokenRes.access_token,
+            "x-amz-access-token": "Atza|IwEBICbHr3F1Kooux4LyDiovJkRksSMQmbaP0A1XrAyYVdL9oWj0Uz2BwoXtyS13UgwkixhQJGWaGBxAqsVsd-DlaLfEq0YVIYGGqWFIN02JdrWzPTjgJX_cj3kXG4sTF6ky7vlzrPYHZKdOUrT2Wb-buluQjCkDvoqxbzFhlUBR7N_egLJIopGUctdo7esNO0wOxWJq6KCYRHXeDPcjGsSX9B2tPItpIVmjkTCvDBa3qjfu9l8rQu_DNwsmUCv5fgyTeAaJXhxbHwF0tLddTqYljyBGoXxCnmcY5YoxhRoHHd-iaEnERgPyP78xOgAMJ1CelBq-4lEhkea7_nsGwjSQdS9n",
             "x-amzn-shipping-business-id": "AmazonShipping_IN",
           },
           timeout: 20000,
@@ -215,9 +215,9 @@ class ATSProvider {
       const labelUrl = `${ATS_LABEL_DOWNLOAD_FORWARD}/${data.amazon_shipment_id}/documents`;
       const response = await axios.get(labelUrl, {
         headers: {
-          "x-amz-access-token": tokenRes.access_token,
+          "x-amz-access-token": "Atza|IwEBICbHr3F1Kooux4LyDiovJkRksSMQmbaP0A1XrAyYVdL9oWj0Uz2BwoXtyS13UgwkixhQJGWaGBxAqsVsd-DlaLfEq0YVIYGGqWFIN02JdrWzPTjgJX_cj3kXG4sTF6ky7vlzrPYHZKdOUrT2Wb-buluQjCkDvoqxbzFhlUBR7N_egLJIopGUctdo7esNO0wOxWJq6KCYRHXeDPcjGsSX9B2tPItpIVmjkTCvDBa3qjfu9l8rQu_DNwsmUCv5fgyTeAaJXhxbHwF0tLddTqYljyBGoXxCnmcY5YoxhRoHHd-iaEnERgPyP78xOgAMJ1CelBq-4lEhkea7_nsGwjSQdS9n",
           "x-amzn-shipping-business-id": "AmazonShipping_IN",
-          "format": "PDF", // ✅ IMPORTANT
+          "format": "PDF",
           "Content-Type": "application/json"
         },
         timeout: 20000,
