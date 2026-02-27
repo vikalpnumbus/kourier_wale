@@ -36,63 +36,60 @@ function CodRemittance() {
 
   return (
     <>
-      <div className="table-responsive h-100">
-        <table className="table table-hover">
+      <div className="table-responsive remittance-table-wrapper">
+        <table className="table remittance-table">
           <thead>
             <tr>
               <th>Date / Time</th>
-              <th>Transaction Id</th>
+              <th>Transaction ID</th>
               <th>Amount</th>
               <th>Status</th>
-              <th>Remittanced Date</th>
-              <th>Action</th>
+              <th>Remitted Date</th>
+              <th className="text-end">Action</th>
             </tr>
           </thead>
 
           <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="6" className="text-center">Loading...</td>
-              </tr>
-            ) : codDataList.length > 0 ? (
-              codDataList.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.createdAt}</td>
-                  <td>{item.utr_number}</td>
-                  <td>₹ {item.remittance_amount}</td>
-                  <td>{item.remittance_paid_date}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        item.remittance_status === "paid"
-                          ? "bg-success"
-                          : "bg-warning"
-                      }`}
-                    >
-                      {item.remittance_status}
-                    </span>
-                  </td>
-                  <td>
-                    <Link
-                      to={`view/${item.id}`}
-                      className="btn btn-outline-primary btn-sm"
-                    >
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="text-center">
-                  No records found
+            {codDataList.map((item) => (
+              <tr key={item.id}>
+                <td>
+                  <div className="date-text">{item.createdAt}</div>
+                </td>
+
+                <td className="text-muted">
+                  {item.utr_number || "—"}
+                </td>
+
+                <td className="amount-text">
+                  ₹ {item.remittance_amount}
+                </td>
+
+                <td>
+                  <span
+                    className={`status-pill ${
+                      item.remittance_status === "paid"
+                        ? "paid"
+                        : "pending"
+                    }`}
+                  >
+                    {item.remittance_status}
+                  </span>
+                </td>
+
+                <td className="text-muted">
+                  {item.remittance_paid_date || "—"}
+                </td>
+
+                <td className="text-end">
+                  <button className="btn btn-outline-primary btn-sm px-3">
+                    View
+                  </button>
                 </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
-
       <Pagination totalCount={totalCount} />
     </>
   );
