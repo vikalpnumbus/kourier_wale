@@ -215,22 +215,23 @@ class ATSProvider {
       const labelUrl = `${ATS_LABEL_DOWNLOAD_FORWARD}/${data.amazon_shipment_id}/documents`;
       const response = await axios.get(labelUrl, {
         headers: {
-          "Content-Type": "application/json",
           "x-amz-access-token": tokenRes.access_token,
           "x-amzn-shipping-business-id": "AmazonShipping_IN",
         },
         timeout: 20000,
       });
-      const document =
-        response?.data?.documents?.find(
-          (d) => d.documentType === "LABEL"
-        );
-      if (!document?.contents) {
-        throw new Error("Amazon label document not found");
+      const document = response?.data?.documents?.find(
+        (d) => d.documentType === "LABEL"
+      );
+      if (!document?.downloadUrl) {
+        throw new Error("Amazon label downloadUrl not found");
       }
-      const pdfBuffer = Buffer.from(document.contents, "base64");
+      const pdfRes = await axios.get(document.downloadUrl, {
+        responseType: "arraybuffer",
+        timeout: 20000,
+      });
       return {
-        buffer: pdfBuffer,
+        buffer: Buffer.from(pdfRes.data),
         fileName: `amazon_label_${data.amazon_shipment_id}.pdf`,
         contentType: "application/pdf",
       };
