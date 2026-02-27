@@ -33,6 +33,27 @@ function CodRemittance() {
   };
   return (
     <>
+      <div className="remittance-summary">
+        <div className="summary-card">
+          <p className="summary-label">Total</p>
+          <h3 className="summary-value">₹ 1,80,000</h3>
+        </div>
+
+        <div className="summary-card">
+          <p className="summary-label">Remittance</p>
+          <h3 className="summary-value">₹ 1,56,230</h3>
+        </div>
+
+        <div className="summary-card">
+          <p className="summary-label">Early COD</p>
+          <h3 className="summary-value">₹ 12,540</h3>
+        </div>
+
+        <div className="summary-card">
+          <p className="summary-label">Remittance Cycle</p>
+          <h3 className="summary-value">7 Days</h3>
+        </div>
+      </div>
       <div className="table-responsive remittance-table-wrapper">
         <table className="table remittance-table">
           <thead>
