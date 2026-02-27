@@ -27,7 +27,6 @@ function OrdersTable({ setExportHandler }) {
   const [statusCounts, setStatusCounts] = useState({
     all: 0,
     new: 0,
-    booked: 0,
     cancel: 0,
   });
   const orderCanShip = (order) => {
@@ -79,7 +78,6 @@ function OrdersTable({ setExportHandler }) {
       if (activeTab !== "all") {
         const statusMap = {
           not_shipped: "new",
-          booked: "booked",
           cancelled: "cancel",
         };
         params.shipping_status = statusMap[activeTab];
@@ -105,7 +103,6 @@ function OrdersTable({ setExportHandler }) {
       setStatusCounts(data?.data?.counts || {
         all: 0,
         new: 0,
-        booked: 0,
         cancel: 0,
       });
     } catch (error) {
@@ -247,7 +244,6 @@ function OrdersTable({ setExportHandler }) {
         {[
             { key: "all", label: "All Orders" },
             { key: "not_shipped", label: "Not Shipped" },
-            { key: "booked", label: "Booked" },
             { key: "cancelled", label: "Cancelled" },
           ].map((tab) => (
             <div
@@ -271,8 +267,6 @@ function OrdersTable({ setExportHandler }) {
                   ? statusCounts.all
                   : tab.key === "not_shipped"
                   ? statusCounts.new
-                  : tab.key === "booked"
-                  ? statusCounts.booked
                   : statusCounts.cancel}
               )
             </div>
