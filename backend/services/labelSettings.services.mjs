@@ -374,7 +374,7 @@ class Service {
           "Content-Disposition",
           `attachment; filename="amazon_label_${amazonShipment.amazon_shipment_id}.pdf"`
         );
-        res.end(pdfBuffer);
+        return res.end(pdfBuffer);
       }
       const label = {
         paper_size: "standard",
