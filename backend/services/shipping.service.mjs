@@ -481,12 +481,12 @@ class Service {
           return false;
         }
         const payload = shipmentRes.payload;
+        console.log("amazon response: ", payload);
         const updatedShipment = await ShippingService.update({
           data: {
             id,
             shipping_status: "booked",
-            awb_number:
-              payload?.packageDocumentDetails?.[0]?.trackingId || null,
+            awb_number: payload?.packageDocumentDetails?.[0]?.trackingId || null,
             amazon_shipment_id: payload?.shipmentId || null,
             pickup_date: payload?.promise?.pickupWindow?.start
               ? new Date(payload.promise.pickupWindow.start)
