@@ -52,24 +52,18 @@ function Orders() {
                   {location.pathname.includes("/orders/view") && "Details"}
                 </h4>
               </div>
-
               <div className="col-md-8 d-flex justify-content-end gap-2">
                 {!location.pathname.includes("/orders/view") && (
                   <>
-                    <button
-                      className="btn btn-dark btn-md py-2 px-4"
-                      onClick={() => exportHandlerRef.current?.()}
-                    >
+                    <Link className="nav-link" to="/channel"><i className="mdi mdi-webhook menu-icon"></i>
+                      <span className="menu-title">Channel Integration</span>
+                    </Link>
+                    <button className="btn btn-dark btn-md py-2 px-4" onClick={() => exportHandlerRef.current?.()}>
                       <Icon path={mdiCloudDownload} size={0.7} /> Export
                     </button>
-
-                    <button
-                      className="btn btn-dark btn-md py-2 px-4"
-                      onClick={() => setShowImportModal(true)}
-                    >
+                    <button className="btn btn-dark btn-md py-2 px-4" onClick={() => setShowImportModal(true)}>
                       <Icon path={mdiCloudUpload} size={0.7} /> Import
                     </button>
-
                     <button
                       className="btn btn-dark btn-md py-2 px-4"
                       onClick={() => navigate("add")}
