@@ -30,6 +30,7 @@ function cod_remittance() {
         setLoading(false);
       }
     };
+    console.log("Remittance List", codDataList);
     return (
       <>
         <div className="table-responsive h-100">
