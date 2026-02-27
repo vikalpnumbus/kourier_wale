@@ -42,7 +42,6 @@ function CodRemittance() {
             <tr>
               <th>Date / Time</th>
               <th>Transaction Id</th>
-              <th>Transaction By</th>
               <th>Amount</th>
               <th>Status</th>
               <th>Remittanced Date</th>
@@ -60,7 +59,6 @@ function CodRemittance() {
                 <tr key={item.id}>
                   <td>{item.createdAt}</td>
                   <td>{item.utr_number}</td>
-                  <td>{item.utr_uploaded_by}</td>
                   <td>₹ {item.remittance_amount}</td>
                   <td>{item.remittance_paid_date}</td>
                   <td>
