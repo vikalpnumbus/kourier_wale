@@ -56,7 +56,7 @@ function Orders() {
               <div className="col-md-8 d-flex justify-content-end gap-2">
                 {!location.pathname.includes("/orders/view") && (
                   <>
-                    <Link className="nav-link" to="/channel"><i className="mdi mdi-webhook menu-icon"></i>
+                    <Link className="btn btn-success btn-md py-2 px-4" to="/channel/add"><i className="mdi mdi-webhook menu-icon"></i>
                       <span className="menu-title">Channel Integration</span>
                     </Link>
                     <button className="btn btn-dark btn-md py-2 px-4" onClick={() => exportHandlerRef.current?.()}>
