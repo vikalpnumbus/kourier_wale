@@ -144,9 +144,9 @@ class ATSProvider {
         }
       }
       console.log("Final Payload of shipments", payload);
-      console.log("create shipment url", ATS_CREATE_SHIPMENT_FORWARD);
+      console.log("create shipment url", "https://sandbox.sellingpartnerapi-eu.amazon.com/shipping/v2/oneClickShipment");
       const response = await axios.post(
-        ATS_CREATE_SHIPMENT_FORWARD,
+        "https://sandbox.sellingpartnerapi-eu.amazon.com/shipping/v2/oneClickShipment",
         payload,
         {
           headers: {
