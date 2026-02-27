@@ -36,6 +36,14 @@ function CodRemittance() {
 
   return (
     <>
+    <div className="remittance-header">
+      <div>
+        <h4 className="remittance-title">Remittance</h4>
+        <p className="remittance-subtitle">
+          View your COD remittance history and settlement status
+        </p>
+      </div>
+    </div>
       <div className="table-responsive remittance-table-wrapper">
         <table className="table remittance-table">
           <thead>

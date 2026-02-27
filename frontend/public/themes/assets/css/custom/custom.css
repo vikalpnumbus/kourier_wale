@@ -366,6 +366,26 @@ a
 }
 
 
+
+.remittance-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.remittance-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.remittance-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+}
+
 /* Wrapper */
 .remittance-table-wrapper {
   background: #fff;
