@@ -39,6 +39,7 @@
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.10",
     "p-limit": "^7.1.0",
+    "pdfkit": "^0.17.2",
     "playwright": "^1.55.1",
     "razorpay": "^2.9.6",
     "sequelize": "^6.37.7",

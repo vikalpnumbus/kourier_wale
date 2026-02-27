@@ -11,7 +11,7 @@ import UserService from "./user.service.mjs";
 import fs from "fs";
 import WarehouseService from "./warehouse.service.mjs";
 import ATSProvider from "../providers/couriers/ats.provider.mjs"
-
+import { convertPngToPdf } from "../utils/pngtopdf.utils.mjs";
 class Service {
   constructor() {
     this.error = null;
@@ -365,12 +365,13 @@ class Service {
         if (!amazonLabelRes) {
           throw new Error("Amazon label download failed");
         }
+        const pdfBuffer = await convertPngToPdf(amazonLabelRes.buffer);
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader(
           "Content-Disposition",
-          `attachment; filename="${amazonLabelRes.fileName}"`
+          `attachment; filename="amazon_label_${amazonShipment.amazon_shipment_id}.pdf"`
         );
-        res.end(amazonLabelRes.buffer);
+        res.end(pdfBuffer);
       }
       const label = {
         paper_size: "standard",

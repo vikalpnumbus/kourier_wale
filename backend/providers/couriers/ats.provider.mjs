@@ -217,22 +217,21 @@ class ATSProvider {
         headers: {
           "x-amz-access-token": "Atza|IwEBICbHr3F1Kooux4LyDiovJkRksSMQmbaP0A1XrAyYVdL9oWj0Uz2BwoXtyS13UgwkixhQJGWaGBxAqsVsd-DlaLfEq0YVIYGGqWFIN02JdrWzPTjgJX_cj3kXG4sTF6ky7vlzrPYHZKdOUrT2Wb-buluQjCkDvoqxbzFhlUBR7N_egLJIopGUctdo7esNO0wOxWJq6KCYRHXeDPcjGsSX9B2tPItpIVmjkTCvDBa3qjfu9l8rQu_DNwsmUCv5fgyTeAaJXhxbHwF0tLddTqYljyBGoXxCnmcY5YoxhRoHHd-iaEnERgPyP78xOgAMJ1CelBq-4lEhkea7_nsGwjSQdS9n",
           "x-amzn-shipping-business-id": "AmazonShipping_IN",
-          "format": "PDF",
+          "format": "PNG",
           "Content-Type": "application/json"
         },
         timeout: 20000,
       });
       console.log(":response:", response);
       const document = response?.data?.payload?.packageDocumentDetail?.packageDocuments ?.find(d => d.type === "LABEL");
-      console.log(":documents:", document);
       if (!document?.contents) {
         throw new Error("Amazon label document not found");
       }
-      const pdfBuffer = Buffer.from(document.contents, "base64");
+      const pngBuffer = Buffer.from(document.contents, "base64");
       return {
-        buffer: pdfBuffer,
-        fileName: `amazon_label_${data.amazon_shipment_id}.pdf`,
-        contentType: "application/pdf",
+        buffer: pngBuffer,
+        format: document.format, // PNG
+        fileName: `amazon_label_${data.amazon_shipment_id}.png`,
       };
     } catch (err) {
       console.error(
