@@ -365,7 +365,10 @@ class Service {
         if (!amazonLabelRes) {
           throw new Error("Amazon label download failed");
         }
+        console.log("amazon content", amazonLabelRes);
+
         const pdfBuffer = await convertPngToPdf(amazonLabelRes.buffer);
+        console.log("pdfBuffer", pdfBuffer);
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader(
           "Content-Disposition",

@@ -222,7 +222,6 @@ class ATSProvider {
         },
         timeout: 20000,
       });
-      console.log(":response:", response);
       const document = response?.data?.payload?.packageDocumentDetail?.packageDocuments ?.find(d => d.type === "LABEL");
       if (!document?.contents) {
         throw new Error("Amazon label document not found");
