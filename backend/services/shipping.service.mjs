@@ -552,27 +552,25 @@ class Service {
         error.status = 400;
         throw error;
       }
-      if (code.includes("xpressbees")) {
-        console.log("xb");
-        if (existingShipmentData.shipment_error == null)
+      if (existingShipmentData.shipment_error == null)
+      {
+        if (existingShipmentData.courier_id == "5")
         {
-          const shipmentRes = await XpressBeesProvider.cancelShipment({
-            awb_number: existingShipmentData.awb_number,
-          });
-          if (!shipmentRes) {
+          const shipmentRes = await XpressBeesProvider.cancelShipment({awb_number: existingShipmentData.awb_number});
+          if (!shipmentRes)
+          {
             throw XpressBeesProvider.error;
           }
         }
       }
-      if (code.includes("Amazon_500_Gram")) {
-        console.log("ats");
-        if (existingShipmentData.shipment_error == null)
+      if (existingShipmentData.shipment_error == null)
+      {
+        if (existingShipmentData.courier_id == "7")
         {
-          const shipmentRes = await ATSProvider.cancelShipment({
-            amazon_shipment_id: existingShipmentData.amazon_shipment_id,
-          });
-          if (!shipmentRes) {
-            throw XpressBeesProvider.error;
+          const shipmentRes = await ATSProvider.cancelShipment({amazon_shipment_id: existingShipmentData.amazon_shipment_id});
+          if (!shipmentRes)
+          {
+            throw ATSProvider.error;
           }
         }
       }
