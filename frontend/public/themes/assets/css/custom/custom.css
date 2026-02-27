@@ -357,3 +357,9 @@ a
   color: #ffffff;
   transform: scale(1.05);
 }
+
+.btn-info
+{
+    background-color: #001f54!important;
+    color: #fff !important;
+}
