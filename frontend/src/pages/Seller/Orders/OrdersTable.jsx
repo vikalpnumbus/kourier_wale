@@ -240,35 +240,29 @@ function OrdersTable({ setExportHandler }) {
             </>
           )}
         </div>
-        <div className="d-flex gap-4 mb-3 border-bottom pb-2">
-        {[
-            { key: "all", label: "All Orders" },
-            { key: "not_shipped", label: "Not Shipped" },
-            { key: "cancelled", label: "Cancelled" },
-          ].map((tab) => (
+        <div className="shipment-tabs-container">
+          {[
+            { key: "all", label: "All Orders", count: statusCounts?.all || 0 },
+            { key: "not_shipped", label: "Not Shipped", count: statusCounts?.new || 0 },
+            { key: "cancelled", label: "Cancelled", count: statusCounts?.cancel || 0 },
+          ].map((tab, index, arr) => (
             <div
               key={tab.key}
+              className={`shipment-tab ${activeTab === tab.key ? "active" : ""}`}
               onClick={() => {
                 setActiveTab(tab.key);
                 setSelectedOrders([]);
               }}
-              style={{
-                cursor: "pointer",
-                paddingBottom: "8px",
-                borderBottom:
-                  activeTab === tab.key
-                    ? "3px solid #000"
-                    : "3px solid transparent",
-                fontWeight: activeTab === tab.key ? "600" : "400",
-              }}
             >
-            {tab.label}(
-                {tab.key === "all"
-                  ? statusCounts.all
-                  : tab.key === "not_shipped"
-                  ? statusCounts.new
-                  : statusCounts.cancel}
-              )
+              <span className="tab-label">
+                {tab.label}
+              </span>
+              <span className="tab-count">
+                {tab.count}
+              </span>
+              {index !== arr.length - 1 && (
+                <span className="tab-divider"></span>
+              )}
             </div>
           ))}
         </div>
