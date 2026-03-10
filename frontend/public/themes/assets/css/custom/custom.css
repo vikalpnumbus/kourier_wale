@@ -530,3 +530,37 @@ a
   font-weight: 700;
   color: #111827;
 }
+
+
+.dashboard-stats{
+margin-bottom:25px;
+}
+
+.stat-card{
+background:#fff;
+padding:22px;
+border-radius:10px;
+border:1px solid #f1f1f1;
+box-shadow:0 2px 8px rgba(0,0,0,0.05);
+transition:all .25s ease;
+height:100%;
+}
+
+.stat-card:hover{
+transform:translateY(-4px);
+box-shadow:0 8px 22px rgba(0,0,0,0.08);
+}
+
+.statistics-title{
+font-size:13px;
+font-weight:500;
+color:#8b8b8b;
+margin-bottom:8px;
+}
+
+.stat-value{
+font-size:28px;
+font-weight:700;
+color:#111;
+margin:0;
+}

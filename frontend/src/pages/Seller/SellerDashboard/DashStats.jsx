@@ -50,47 +50,55 @@ function DashStats({ defaultStart, defaultEnd }) {
     }, [searchParams]);
     return (
         <>
-            <div className="row">
-                <div className="col-sm-12">
-                    <div className="statistics-details d-flex align-items-center justify-content-between">
-                        {loading ? (
-                            <StatsSkeleton />
-                        ) : (
-                            <>
-                                <div>
-                                    <p className="statistics-title">Total Order</p>
-                                    <h3 className="rate-percentage">
-                                        {statsData?.total_orders || "--"}
-                                    </h3>
-                                </div>
+            <div className="row dashboard-stats">
+            <div className="col-sm-12">
+                {loading ? (
+                <StatsSkeleton />
+                ) : (
+                <div className="row g-3">
 
-                                <div>
-                                    <p className="statistics-title">Total Shipment</p>
-                                    <h3 className="rate-percentage">
-                                        {statsData?.total_shipments || "--"}
-                                    </h3>
-                                </div>
-
-                                <div>
-                                    <p className="statistics-title">Total Revenue</p>
-                                    <h3 className="rate-percentage">
-                                        {statsData?.revenue || "--"}
-                                    </h3>
-                                </div>
-
-                                <div>
-                                    <p className="statistics-title">Total RTO</p>
-                                    <h3 className="rate-percentage">
-                                        {getPercentage(
-                                            statsData?.rto || 0,
-                                            statsData?.total_delivered_shipments || 0
-                                        )}
-                                    </h3>
-                                </div>
-                            </>
-                        )}
+                    <div className="col-md-3">
+                    <div className="stat-card">
+                        <p className="statistics-title">Total Orders</p>
+                        <h3 className="stat-value">
+                        {statsData?.total_orders || "--"}
+                        </h3>
                     </div>
+                    </div>
+
+                    <div className="col-md-3">
+                    <div className="stat-card">
+                        <p className="statistics-title">Total Shipments</p>
+                        <h3 className="stat-value">
+                        {statsData?.total_shipments || "--"}
+                        </h3>
+                    </div>
+                    </div>
+
+                    <div className="col-md-3">
+                    <div className="stat-card">
+                        <p className="statistics-title">Total Revenue</p>
+                        <h3 className="stat-value">
+                        {statsData?.revenue || "--"}
+                        </h3>
+                    </div>
+                    </div>
+
+                    <div className="col-md-3">
+                    <div className="stat-card">
+                        <p className="statistics-title">Total RTO</p>
+                        <h3 className="stat-value">
+                        {getPercentage(
+                            statsData?.rto || 0,
+                            statsData?.total_delivered_shipments || 0
+                        )}
+                        </h3>
+                    </div>
+                    </div>
+
                 </div>
+                )}
+            </div>
             </div>
         </>
     )
