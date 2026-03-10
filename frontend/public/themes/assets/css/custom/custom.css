@@ -543,23 +543,38 @@ border-radius:12px;
 border:1px solid #f1f1f1;
 box-shadow:0 4px 14px rgba(0,0,0,0.04);
 transition:all .25s ease;
+position:relative;
+overflow:hidden;
 }
 
-.stat-card.c-blue::before
-{
-    background: #3d6bff !important;
+/* COMMON BEFORE STYLE */
+
+.stat-card::before{
+content:"";
+position:absolute;
+left:0;
+top:0;
+width:4px;
+height:100%;
+border-radius:12px 0 0 12px;
 }
-.stat-card.c-green::before
-{
-    background: #2D8A4E !important;
+
+/* COLOR VARIANTS */
+
+.stat-card.c-blue::before{
+background:#3d6bff;
 }
-.stat-card.c-silver::before
-{
-    background: #C8CDD8 !important;
+
+.stat-card.c-green::before{
+background:#2D8A4E;
 }
-.stat-card.c-gold::before
-{
-    background: #F5A623 !important;
+
+.stat-card.c-silver::before{
+background:#C8CDD8;
+}
+
+.stat-card.c-gold::before{
+background:#F5A623;
 }
 
 
