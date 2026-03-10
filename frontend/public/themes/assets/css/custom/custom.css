@@ -549,17 +549,27 @@ overflow:hidden;
 
 /* COMMON BEFORE STYLE */
 
+.stat-card{
+background:#fff;
+padding:15px;
+border-radius:12px;
+border:1px solid #f1f1f1;
+box-shadow:0 4px 14px rgba(0,0,0,0.04);
+transition:all .25s ease;
+position:relative;
+overflow:hidden;
+}
+
+/* TOP COLOR LINE */
+
 .stat-card::before{
 content:"";
 position:absolute;
-left:0;
 top:0;
-width:4px;
-height:100%;
-border-radius:12px 0 0 12px;
+left:0;
+width:100%;
+height:4px;
 }
-
-/* COLOR VARIANTS */
 
 .stat-card.c-blue::before{
 background:#3d6bff;
