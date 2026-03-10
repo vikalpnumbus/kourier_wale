@@ -60,7 +60,7 @@ function DashStats({ defaultStart, defaultEnd }) {
       <div className="row g-3">
 
         <div className="col-md-3">
-          <div className="stat-card">
+          <div className="stat-card c-blue">
             <div className="stat-top">
               <div className="stat-icon blue">
                 <Icon path={mdiPackageVariantClosed} size={0.8} />
@@ -76,7 +76,7 @@ function DashStats({ defaultStart, defaultEnd }) {
         </div>
 
         <div className="col-md-3">
-          <div className="stat-card">
+          <div className="stat-card c-green">
             <div className="stat-top">
               <div className="stat-icon purple">
                 <Icon path={mdiTruckFast} size={0.8} />
@@ -92,7 +92,7 @@ function DashStats({ defaultStart, defaultEnd }) {
         </div>
 
         <div className="col-md-3">
-          <div className="stat-card">
+          <div className="stat-card c-silver">
             <div className="stat-top">
               <div className="stat-icon green">
                 <Icon path={mdiCurrencyInr} size={0.8} />
@@ -108,7 +108,7 @@ function DashStats({ defaultStart, defaultEnd }) {
         </div>
 
         <div className="col-md-3">
-          <div className="stat-card">
+          <div className="stat-card c-gold">
             <div className="stat-top">
               <div className="stat-icon red">
                 <Icon path={mdiBackupRestore} size={0.8} />

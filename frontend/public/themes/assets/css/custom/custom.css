@@ -545,6 +545,24 @@ box-shadow:0 4px 14px rgba(0,0,0,0.04);
 transition:all .25s ease;
 }
 
+.stat-card.c-blue::before
+{
+    background: #3d6bff !important;
+}
+.stat-card.c-green::before
+{
+    background: #2D8A4E !important;
+}
+.stat-card.c-silver::before
+{
+    background: #C8CDD8 !important;
+}
+.stat-card.c-gold::before
+{
+    background: #F5A623 !important;
+}
+
+
 .stat-card:hover{
 transform:translateY(-3px);
 box-shadow:0 10px 25px rgba(0,0,0,0.08);
