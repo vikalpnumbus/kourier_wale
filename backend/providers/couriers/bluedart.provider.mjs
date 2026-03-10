@@ -7,22 +7,30 @@ import {
   BLUEDART_CUSTOMER_CODE,
   BLUEDART_VENDOR_CODE,
   BLUEDART_CREATE_SHIPMENT_FORWARD,
-  BLUEDART_CANCEL_SHIPMENT_FORWARD,
 } from "../../configurations/base.config.mjs";
 import CustomMath from "../../utils/basic.utils.mjs";
 
 class Provider {
   constructor() {
     this.error = null;
-
     this.BLUEDART_LICENCE_KEY = BLUEDART_LICENCE_KEY;
     this.BLUEDART_LOGIN_ID = BLUEDART_LOGIN_ID;
     this.BLUEDART_CUSTOMER_CODE = BLUEDART_CUSTOMER_CODE;
     this.BLUEDART_VENDOR_CODE = BLUEDART_VENDOR_CODE;
-
-    this.BLUEDART_CREATE_SHIPMENT_FORWARD =
-      BLUEDART_CREATE_SHIPMENT_FORWARD;
-
+    this.BLUEDART_CREATE_SHIPMENT_FORWARD = BLUEDART_CREATE_SHIPMENT_FORWARD;
+    
+    if (!this.BLUEDART_LICENCE_KEY) {
+      throw new Error("BLUEDART_LICENCE_KEY is required.");
+    }
+    if (!this.BLUEDART_LOGIN_ID) {
+      throw new Error("BLUEDART_LOGIN_ID is required.");
+    }
+    if (!this.BLUEDART_CUSTOMER_CODE) {
+      throw new Error("BLUEDART_CUSTOMER_CODE is required.");
+    }
+    if (!this.BLUEDART_VENDOR_CODE) {
+      throw new Error("BLUEDART_VENDOR_CODE is required.");
+    }
     if (!this.BLUEDART_CREATE_SHIPMENT_FORWARD) {
       throw new Error("BLUEDART_CREATE_SHIPMENT_FORWARD is required.");
     }
