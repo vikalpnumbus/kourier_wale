@@ -66,6 +66,7 @@ function DashStats({ defaultStart, defaultEnd }) {
                 <Icon path={mdiPackageVariantClosed} size={0.8} />
               </div>
               <p className="statistics-title">Total Orders</p>
+              <p className="stat-subtitle">All orders created on platform</p>
             </div>
 
             <h3 className="stat-value">
@@ -81,6 +82,7 @@ function DashStats({ defaultStart, defaultEnd }) {
                 <Icon path={mdiTruckFast} size={0.8} />
               </div>
               <p className="statistics-title">Total Shipments</p>
+              <p className="stat-subtitle">Orders shipped via couriers</p>
             </div>
 
             <h3 className="stat-value">
@@ -96,6 +98,7 @@ function DashStats({ defaultStart, defaultEnd }) {
                 <Icon path={mdiCurrencyInr} size={0.8} />
               </div>
               <p className="statistics-title">Total Revenue</p>
+              <p className="stat-subtitle">Revenue generated from deliveries</p>
             </div>
 
             <h3 className="stat-value">
@@ -111,6 +114,7 @@ function DashStats({ defaultStart, defaultEnd }) {
                 <Icon path={mdiBackupRestore} size={0.8} />
               </div>
               <p className="statistics-title">RTO Rate</p>
+              <p className="stat-subtitle">Return to origin shipment rate</p>
             </div>
 
             <h3 className="stat-value">
