@@ -639,3 +639,24 @@ background:#16a34a;
 .stat-icon.red{
 background:#dc2626;
 }
+
+.navbar .navbar-brand-wrapper
+{
+  height: 70px !important;
+  background-color: #0A0A0F !important;
+}
+
+.navbar .navbar-menu-wrapper
+{
+  background-color: #0A0A0F !important;
+}
+
+.welcome-text
+{
+  color: #fff !important;
+  font-size: 18px !important;
+}
+.text-black
+{
+  color: #fff !important;
+}

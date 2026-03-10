@@ -11,6 +11,7 @@ import ChannelService from "./channel.service.mjs";
 import ShadowfaxProvider from "../providers/couriers/shadowfax.provider.mjs";
 import XpressBeesProvider from "../providers/couriers/xpressbees.provider.mjs";
 import ATSProvider from "../providers/couriers/ats.provider.mjs";
+import BluedartProvider from "../providers/couriers/bluedart.provider.mjs";
 const num = (v, fallback = 1) => {
   const n = Number(v);
   if (!Number.isFinite(n) || n <= 0) return fallback;
@@ -483,6 +484,58 @@ class Service {
         }
         const payload = shipmentRes.payload;
         console.log("amazon", payload);
+        const updatedShipment = await ShippingService.update({
+          data: {
+            id,
+            shipping_status: "booked",
+            awb_number:
+              payload?.packageDocumentDetails?.[0]?.trackingId || null,
+            amazon_shipment_id: payload?.shipmentId || null,
+            pickup_date: payload?.promise?.pickupWindow?.start
+              ? new Date(payload.promise.pickupWindow.start)
+              : null,
+            delivered_date: payload?.promise?.deliveryWindow?.end
+              ? new Date(payload.promise.deliveryWindow.end)
+              : null,
+            shipment_error: null
+          }
+        });
+        if (!updatedShipment) {
+          console.error("shipping/create/amazon/update", ShippingService.error);
+        }
+        const existingUser = await UserService.read({ id: userId });
+        const updatedUser = await UserService.update(
+          { id: userId },
+          {
+            wallet_balance:
+              existingUser.wallet_balance -
+              ((freight_charge || 0) + (cod_price || 0))
+          }
+        );
+        if (!updatedUser) {
+          console.error(
+            "shipping/create/amazon/userWalletUpdate",
+            UserService.error
+          );
+        }
+      }
+      if (code.includes("Bluedart_500_Gram")) {
+        const shipmentRes = await BluedartProvider.createShipment({
+          ...data,
+          shipmentId: id
+        });
+        if (!shipmentRes) {
+          await ShippingService.update({
+            data: {
+              id,
+              shipment_error:
+                BluedartProvider.error?.message || "Amazon booking failed"
+            }
+          });
+          return false;
+        }
+        const payload = shipmentRes.payload;
+        console.log("Bluedart", payload);
         const updatedShipment = await ShippingService.update({
           data: {
             id,
