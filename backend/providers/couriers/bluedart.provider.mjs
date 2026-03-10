@@ -122,7 +122,7 @@ class Provider {
             CustomerMobile: warehouse.contactPhone,
             CustomerCode: this.BLUEDART_CUSTOMER_CODE,
             VendorCode: this.BLUEDART_VENDOR_CODE,
-            OriginArea: "GGN",
+            OriginArea: "DEL",
             Sender: warehouse.contactName,
             IsToPayCustomer: false,
           },
