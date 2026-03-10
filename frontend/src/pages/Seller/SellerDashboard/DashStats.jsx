@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom';
 import SellerDashboardConfig from '../../../config/SellerDashboard/SellerDashboardConfig';
 import api from '../../../utils/api';
+import Icon from "@mdi/react";
+import {mdiPackageVariantClosed, mdiTruckFast,mdiCurrencyInr,mdiBackupRestore} from "@mdi/js";
 
 function DashStats({ defaultStart, defaultEnd }) {
     const [loading, setLoading] = useState(false);
@@ -51,55 +53,79 @@ function DashStats({ defaultStart, defaultEnd }) {
     return (
         <>
             <div className="row dashboard-stats">
-            <div className="col-sm-12">
-                {loading ? (
-                <StatsSkeleton />
-                ) : (
-                <div className="row g-3">
+  <div className="col-sm-12">
+    {loading ? (
+      <StatsSkeleton />
+    ) : (
+      <div className="row g-3">
 
-                    <div className="col-md-3">
-                    <div className="stat-card">
-                        <p className="statistics-title">Total Orders</p>
-                        <h3 className="stat-value">
-                        {statsData?.total_orders || "--"}
-                        </h3>
-                    </div>
-                    </div>
-
-                    <div className="col-md-3">
-                    <div className="stat-card">
-                        <p className="statistics-title">Total Shipments</p>
-                        <h3 className="stat-value">
-                        {statsData?.total_shipments || "--"}
-                        </h3>
-                    </div>
-                    </div>
-
-                    <div className="col-md-3">
-                    <div className="stat-card">
-                        <p className="statistics-title">Total Revenue</p>
-                        <h3 className="stat-value">
-                        {statsData?.revenue || "--"}
-                        </h3>
-                    </div>
-                    </div>
-
-                    <div className="col-md-3">
-                    <div className="stat-card">
-                        <p className="statistics-title">Total RTO</p>
-                        <h3 className="stat-value">
-                        {getPercentage(
-                            statsData?.rto || 0,
-                            statsData?.total_delivered_shipments || 0
-                        )}
-                        </h3>
-                    </div>
-                    </div>
-
-                </div>
-                )}
+        <div className="col-md-3">
+          <div className="stat-card">
+            <div className="stat-top">
+              <div className="stat-icon blue">
+                <Icon path={mdiPackageVariantClosed} size={0.8} />
+              </div>
+              <p className="statistics-title">Total Orders</p>
             </div>
+
+            <h3 className="stat-value">
+              {statsData?.total_orders || "--"}
+            </h3>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="stat-card">
+            <div className="stat-top">
+              <div className="stat-icon purple">
+                <Icon path={mdiTruckFast} size={0.8} />
+              </div>
+              <p className="statistics-title">Total Shipments</p>
             </div>
+
+            <h3 className="stat-value">
+              {statsData?.total_shipments || "--"}
+            </h3>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="stat-card">
+            <div className="stat-top">
+              <div className="stat-icon green">
+                <Icon path={mdiCurrencyInr} size={0.8} />
+              </div>
+              <p className="statistics-title">Total Revenue</p>
+            </div>
+
+            <h3 className="stat-value">
+              ₹ {statsData?.revenue || "--"}
+            </h3>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="stat-card">
+            <div className="stat-top">
+              <div className="stat-icon red">
+                <Icon path={mdiBackupRestore} size={0.8} />
+              </div>
+              <p className="statistics-title">RTO Rate</p>
+            </div>
+
+            <h3 className="stat-value">
+              {getPercentage(
+                statsData?.rto || 0,
+                statsData?.total_delivered_shipments || 0
+              )}
+            </h3>
+          </div>
+        </div>
+
+      </div>
+    )}
+  </div>
+</div>
         </>
     )
 }

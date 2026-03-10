@@ -539,23 +539,30 @@ margin-bottom:25px;
 .stat-card{
 background:#fff;
 padding:22px;
-border-radius:10px;
+border-radius:12px;
 border:1px solid #f1f1f1;
-box-shadow:0 2px 8px rgba(0,0,0,0.05);
+box-shadow:0 4px 14px rgba(0,0,0,0.04);
 transition:all .25s ease;
 height:100%;
 }
 
 .stat-card:hover{
 transform:translateY(-4px);
-box-shadow:0 8px 22px rgba(0,0,0,0.08);
+box-shadow:0 12px 28px rgba(0,0,0,0.08);
+}
+
+.stat-top{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:10px;
 }
 
 .statistics-title{
 font-size:13px;
 font-weight:500;
-color:#8b8b8b;
-margin-bottom:8px;
+color:#8a8a8a;
+margin:0;
 }
 
 .stat-value{
@@ -563,4 +570,32 @@ font-size:28px;
 font-weight:700;
 color:#111;
 margin:0;
+}
+
+/* ICON STYLE */
+
+.stat-icon{
+width:36px;
+height:36px;
+border-radius:8px;
+display:flex;
+align-items:center;
+justify-content:center;
+color:#fff;
+}
+
+.stat-icon.blue{
+background:#4f46e5;
+}
+
+.stat-icon.purple{
+background:#7c3aed;
+}
+
+.stat-icon.green{
+background:#16a34a;
+}
+
+.stat-icon.red{
+background:#dc2626;
 }
