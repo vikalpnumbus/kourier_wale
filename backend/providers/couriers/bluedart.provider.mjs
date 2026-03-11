@@ -1,10 +1,14 @@
 import axios from "axios";
 import https from "https";
 import {
-  BLUEDART_LICENCE_KEY,
-  BLUEDART_LOGIN_ID,
-  BLUEDART_CUSTOMER_CODE,
-  BLUEDART_VENDOR_CODE
+    BLUEDART_API_KEY,
+    BLUEDART_API_SECRATE,
+    BLUEDART_CREATE_SHIPMENT_FORWARD,
+    BLUEDART_CANCEL_SHIPMENT_FORWARD,
+    BLUEDART_LICENCE_KEY,
+    BLUEDART_LOGIN_ID,
+    BLUEDART_CUSTOMER_CODE,
+    BLUEDART_VENDOR_CODE
 } from "../../configurations/base.config.mjs";
 
 class Provider {
