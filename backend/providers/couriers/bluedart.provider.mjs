@@ -32,69 +32,80 @@ class Provider {
   }
   async createShipment(data) {
     try {
-      if (!data) {
+        if (!data) {
         console.log("❌ Shipment data missing");
         return false;
-      }
-      console.log("shipment Data:", data);
-      const {
+        }
+        console.log("📦 Shipment Data:", data);
+        const {
         orderId,
         paymentType,
         total_price,
         shippingDetails,
-        warehouse,
-        packageDetails
-      } = data;
-      if (!shippingDetails) console.log("❌ shippingDetails missing");
-      if (!warehouse) console.log("❌ warehouse details missing");
-      if (!packageDetails) console.log("❌ packageDetails missing");
-      if (!shippingDetails?.pincode)
-        console.log("❌ Consignee pincode missing");
-      if (!shippingDetails?.phone)
-        console.log("❌ Consignee phone missing");
-      if (!warehouse?.pincode)
-        console.log("❌ Warehouse pincode missing");
-      const weight = Math.max((packageDetails?.weight || 500) / 1000, 0.5);
-      const payload = {
+        packageDetails,
+        warehouses
+        } = data;
+        // extract warehouse from array
+        const warehouseData = warehouses?.[0]?.dataValues || warehouses?.[0] || null;
+        if (!shippingDetails) console.log("❌ shippingDetails missing");
+        if (!warehouseData) {
+        console.log("❌ warehouse details missing");
+        return false;
+        }
+        if (!packageDetails) console.log("❌ packageDetails missing");
+        if (!shippingDetails?.pincode) console.log("❌ Consignee pincode missing");
+        if (!shippingDetails?.phone) console.log("❌ Consignee phone missing");
+        if (!warehouseData?.pincode) console.log("❌ Warehouse pincode missing");
+        // safe warehouse mapping
+        const warehouse = {
+        address: warehouseData.address || "",
+        city: warehouseData.city || "",
+        state: warehouseData.state || "",
+        pincode: warehouseData.pincode || "",
+        contactPhone: warehouseData.phone || warehouseData.contactPhone || "",
+        contactName: warehouseData.contact_name || warehouseData.contactName || "",
+        origin: warehouseData.origin || "DEL"
+        };
+        // convert weight safely
+        const weight = Math.max(Number(packageDetails?.weight || 500) / 1000, 0.5);
+        const payload = {
         Request: {
-          Consignee: {
-            ConsigneeName:
-              shippingDetails.fname + " " + shippingDetails.lname,
+            Consignee: {
+            ConsigneeName: shippingDetails.fname + " " + shippingDetails.lname,
             ConsigneeAddress1: shippingDetails.address,
             ConsigneeAddress2: "",
-            ConsigneeAddress3:
-              shippingDetails.city + "," + shippingDetails.state,
+            ConsigneeAddress3: shippingDetails.city + "," + shippingDetails.state,
             ConsigneePincode: shippingDetails.pincode,
             ConsigneeMobile: shippingDetails.phone
-          },
-          Returnadds: {
+            },
+            Returnadds: {
             ReturnAddress1: warehouse.address,
             ReturnAddress2: warehouse.city + "," + warehouse.state,
             ReturnAddress3: "",
             ReturnPincode: warehouse.pincode,
             ReturnMobile: warehouse.contactPhone,
             ReturnContact: warehouse.contactName
-          },
-          Services: {
+            },
+            Services: {
             ActualWeight: weight,
             CollectableAmount:
-              paymentType === "cod" ? total_price : "0",
+                paymentType === "cod" ? total_price : "0",
             SubProductCode:
-              paymentType === "cod" ? "C" : "P",
+                paymentType === "cod" ? "C" : "P",
             Commodity: {
-              CommodityDetail1: "Order Item",
-              CommodityDetail2: "",
-              CommodityDetail3: ""
+                CommodityDetail1: "Order Item",
+                CommodityDetail2: "",
+                CommodityDetail3: ""
             },
             CreditReferenceNo: orderId,
             DeclaredValue: total_price,
             Dimensions: {
-              Dimension: {
+                Dimension: {
                 Length: packageDetails.length || 10,
                 Breadth: packageDetails.breadth || 10,
                 Height: packageDetails.height || 10,
                 Count: "1"
-              }
+                }
             },
             PickupDate: this.generateDateFormat(),
             PickupTime: "1800",
@@ -103,70 +114,68 @@ class Provider {
             ProductType: "1",
             RegisterPickup: false,
             PDFOutputNotRequired: true
-          },
-
-          Shipper: {
+            },
+            Shipper: {
             CustomerName: warehouse.contactName,
             CustomerAddress1: warehouse.address,
-            CustomerAddress2:
-              warehouse.city + "," + warehouse.state,
+            CustomerAddress2: warehouse.city + "," + warehouse.state,
             CustomerPincode: warehouse.pincode,
             CustomerMobile: warehouse.contactPhone,
             CustomerCode: this.customerCode,
-            OriginArea: warehouse.origin || "DEL",
+            OriginArea: warehouse.origin,
             Sender: warehouse.contactName,
             VendorCode: this.vendorCode,
             IsToPayCustomer: false
-          }
+            }
         },
         Profile: {
-          Api_type: "S",
-          LicenceKey: this.licenceKey,
-          LoginID: this.loginId
+            Api_type: "S",
+            LicenceKey: this.licenceKey,
+            LoginID: this.loginId
         }
-      };
-      console.log("📦 Bluedart Shipment Payload");
-      console.log(JSON.stringify(payload, null, 2));
-      const response = await axios.post(
-        BLUEDART_CREATE_SHIPMENT_FORWARD,
-        payload,
-        {
-          httpsAgent: this.agent,
-          headers: {
-            "Content-Type": "application/json"
-          }
+    };
+    console.log("📦 Bluedart Shipment Payload");
+    console.log(JSON.stringify(payload, null, 2));
+    const response = await axios.post(
+    BLUEDART_CREATE_SHIPMENT_FORWARD,
+    payload,
+    {
+        httpsAgent: this.agent,
+        headers: {
+        "Content-Type": "application/json"
         }
-      );
-      console.log("📦 Bluedart API Response");
-      console.log(JSON.stringify(response.data, null, 2));
-      const result = response.data;
-      if (
-        !result.GenerateWayBillResult ||
-        result.GenerateWayBillResult.IsError === "1"
-      ) {
-        throw new Error(
-          result.GenerateWayBillResult?.Status?.[0]
-            ?.StatusInformation || "Shipment failed"
-        );
-      }
-      return {
-        awb: result.GenerateWayBillResult.AWBNo,
-        destination:
-          result.GenerateWayBillResult.DestinationArea +
-          " / " +
-          result.GenerateWayBillResult.DestinationLocation
-      };
+    }
+    );
+    console.log("📦 Bluedart API Response");
+    console.log(JSON.stringify(response.data, null, 2));
+    const result = response.data;
+    if (
+    !result.GenerateWayBillResult ||
+    result.GenerateWayBillResult.IsError === "1"
+    ) {
+    throw new Error(
+        result.GenerateWayBillResult?.Status?.[0]?.StatusInformation ||
+        "Shipment failed"
+    );
+    }
+    return {
+    awb: result.GenerateWayBillResult.AWBNo,
+    destination:
+        result.GenerateWayBillResult.DestinationArea +
+        " / " +
+        result.GenerateWayBillResult.DestinationLocation
+    };
     } catch (error) {
-      console.error("❌ Bluedart Create Shipment Error");
-      if (error.response) {
+        console.error("❌ Bluedart Create Shipment Error");
+        if (error.response) {
         console.error("Status:", error.response.status);
         console.error("Data:", error.response.data);
-      } else {
+        } else {
         console.error(error.message);
-      }
-      return false;
+        }
+        return false;
     }
-  }
+    }
 
   async cancelAWB(awb) {
     try {
