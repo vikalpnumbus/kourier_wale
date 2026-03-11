@@ -36,6 +36,7 @@ class Provider {
         console.log("❌ Shipment data missing");
         return false;
       }
+      console.log("shipment Data:", data);
       const {
         orderId,
         paymentType,
