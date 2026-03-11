@@ -519,7 +519,8 @@ class Service {
           );
         }
       }
-      if (code.includes("Bluedart_500_Gram")) {
+      if (code.includes("Bluedart_500_Gram"))
+      {
         const shipmentRes = await BluedartProvider.createShipment({
           ...data,
           shipmentId: id

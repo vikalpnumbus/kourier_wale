@@ -1,171 +1,186 @@
-import https from "https";
 import axios from "axios";
-
+import https from "https";
 import {
   BLUEDART_LICENCE_KEY,
   BLUEDART_LOGIN_ID,
   BLUEDART_CUSTOMER_CODE,
-  BLUEDART_VENDOR_CODE,
-  BLUEDART_CREATE_SHIPMENT_FORWARD,
+  BLUEDART_VENDOR_CODE
 } from "../../configurations/base.config.mjs";
-import CustomMath from "../../utils/basic.utils.mjs";
 
 class Provider {
   constructor() {
-    this.error = null;
-    this.BLUEDART_LICENCE_KEY = BLUEDART_LICENCE_KEY;
-    this.BLUEDART_LOGIN_ID = BLUEDART_LOGIN_ID;
-    this.BLUEDART_CUSTOMER_CODE = BLUEDART_CUSTOMER_CODE;
-    this.BLUEDART_VENDOR_CODE = BLUEDART_VENDOR_CODE;
-    this.BLUEDART_CREATE_SHIPMENT_FORWARD = BLUEDART_CREATE_SHIPMENT_FORWARD;
-    
-    if (!this.BLUEDART_LICENCE_KEY) {
-      throw new Error("BLUEDART_LICENCE_KEY is required.");
-    }
-    if (!this.BLUEDART_LOGIN_ID) {
-      throw new Error("BLUEDART_LOGIN_ID is required.");
-    }
-    if (!this.BLUEDART_CUSTOMER_CODE) {
-      throw new Error("BLUEDART_CUSTOMER_CODE is required.");
-    }
-    if (!this.BLUEDART_VENDOR_CODE) {
-      throw new Error("BLUEDART_VENDOR_CODE is required.");
-    }
-    if (!this.BLUEDART_CREATE_SHIPMENT_FORWARD) {
-      throw new Error("BLUEDART_CREATE_SHIPMENT_FORWARD is required.");
-    }
+    this.licenceKey = BLUEDART_LICENCE_KEY;
+    this.loginId = BLUEDART_LOGIN_ID;
+    this.customerCode = BLUEDART_CUSTOMER_CODE;
+    this.vendorCode = BLUEDART_VENDOR_CODE;
+    this.agent = new https.Agent({
+      rejectUnauthorized: false
+    });
   }
-
   generateDateFormat() {
     return `/Date(${Date.now()})/`;
   }
-
   async createShipment(data) {
     try {
+
       const {
-        courier_id,
         orderId,
         paymentType,
         total_price,
         shippingDetails,
         warehouse,
-        rtoWarehouse,
-        packageDetails,
+        packageDetails
       } = data;
+      const weight = Math.max(packageDetails.weight / 1000, 0.5);
       const payload = {
         Request: {
           Consignee: {
-            ConsigneeName: shippingDetails.fname + " " + shippingDetails.lname,
-            ConsigneeAddress1: shippingDetails.address,
-            ConsigneeAddress2: "",
-            ConsigneeAddress3: shippingDetails.city + "," + shippingDetails.state,
-            ConsigneePincode: shippingDetails.pincode,
-            ConsigneeMobile: shippingDetails.phone,
-            ConsigneeTelephone: shippingDetails.phone,
-          },
-          Returnadds: {
-            ReturnAddress1: rtoWarehouse.address,
-            ReturnAddress2: rtoWarehouse.city + "," + rtoWarehouse.state,
-            ReturnAddress3: "",
-            ReturnPincode: rtoWarehouse.pincode,
-            ReturnMobile: rtoWarehouse.contactPhone,
-            ReturnContact: rtoWarehouse.contactPhone,
-          },
-          Services: {
-            ProductCode: "A",
-            SubProductCode: "P",
-            ProductType: paymentType === "cod" ? "C" : "P",
-            PieceCount: 1,
-            ActualWeight: CustomMath.roundOff(
-              packageDetails.weight / 1000
-            ),
-            CollectableAmount:
-              paymentType === "cod" ? total_price : "0",
-            DeclaredValue: total_price,
-            Commodity: {
-              CommodityDetail1: "Order Items",
-              CommodityDetail2: "",
-              CommodityDetail3: "",
+            ConsigneeName:
+                shippingDetails.fname + " " + shippingDetails.lname,
+                ConsigneeAddress1: shippingDetails.address,
+                ConsigneeAddress2: "",
+                ConsigneeAddress3:
+                shippingDetails.city + "," + shippingDetails.state,
+                ConsigneePincode: shippingDetails.pincode,
+                ConsigneeMobile: shippingDetails.phone
             },
-            Dimensions: {
-              Dimension: {
-                Length: packageDetails.length,
-                Breadth: packageDetails.breadth,
-                Height: packageDetails.height,
-                Count: "1",
-              },
+            Returnadds: {
+                ReturnAddress1: warehouse.address,
+                ReturnAddress2: warehouse.city + "," + warehouse.state,
+                ReturnAddress3: "",
+                ReturnPincode: warehouse.pincode,
+                ReturnMobile: warehouse.contactPhone,
+                ReturnContact: warehouse.contactName
             },
-            PickupDate: this.generateDateFormat(),
-            PickupTime: "1800",
-            RegisterPickup: true,
-            PDFOutputNotRequired: true,
-            OTPBasedDelivery: "0",
-          },
-          itemdtl: [
-            {
-              ItemID: orderId,
-              ItemName: "Order Product",
-              ItemValue: total_price,
-              Itemquantity: 1,
-              InvoiceNumber: orderId,
-              InvoiceDate: this.generateDateFormat(),
-              TotalValue: total_price,
-              SellerName: warehouse.contactName,
-              SellerGSTNNumber: "",
-              HSCode: "0",
-              SKUNumber: "0",
-              PlaceofSupply: warehouse.city,
-              CGSTAmount: 0,
-              SGSTAmount: 0,
-              IGSTAmount: 0,
-              cessAmount: "0",
-              countryOfOrigin: "IN",
+            Services: {
+                ActualWeight: weight,
+                CollectableAmount:
+                paymentType === "cod" ? total_price : "0",
+                SubProductCode:
+                paymentType === "cod" ? "C" : "P",
+                Commodity: {
+                CommodityDetail1: "Order Item",
+                CommodityDetail2: "",
+                CommodityDetail3: ""
+                },
+                CreditReferenceNo: orderId,
+                DeclaredValue: total_price,
+                Dimensions: {
+                Dimension: {
+                    Length: packageDetails.length || 10,
+                    Breadth: packageDetails.breadth || 10,
+                    Height: packageDetails.height || 10,
+                    Count: "1"
+                }
+                },
+                PickupDate: this.generateDateFormat(),
+                PickupTime: "1800",
+                PieceCount: "1",
+                ProductCode: "A",
+                ProductType: "1",
+                RegisterPickup: false,
+                PDFOutputNotRequired: true
             },
-          ],
-          Shipper: {
-            CustomerName: warehouse.contactName,
-            CustomerAddress1: warehouse.address,
-            CustomerAddress2: warehouse.city + "," + warehouse.state,
-            CustomerAddress3: "",
-            CustomerPincode: warehouse.pincode,
-            CustomerMobile: warehouse.contactPhone,
-            CustomerCode: this.BLUEDART_CUSTOMER_CODE,
-            VendorCode: this.BLUEDART_VENDOR_CODE,
-            OriginArea: "DEL",
-            Sender: warehouse.contactName,
-            IsToPayCustomer: false,
-          },
+            Shipper: {
+                CustomerName: warehouse.contactName,
+                CustomerAddress1: warehouse.address,
+                CustomerAddress2: warehouse.city + "," + warehouse.state,
+                CustomerPincode: warehouse.pincode,
+                CustomerMobile: warehouse.contactPhone,
+                CustomerCode: this.customerCode,
+                OriginArea: "DEL",
+                Sender: warehouse.contactName,
+                VendorCode: this.vendorCode,
+                IsToPayCustomer: false
+            }
         },
         Profile: {
           Api_type: "S",
-          LicenceKey: this.BLUEDART_LICENCE_KEY,
-          LoginID: this.BLUEDART_LOGIN_ID,
-        },
-      };
-      const agent = new https.Agent({
-        rejectUnauthorized: false,
-      });
-      const response = await axios.post(
-        this.BLUEDART_CREATE_SHIPMENT_FORWARD,
-        payload,
-        {
-          httpsAgent: agent,
-          headers: {
-            "Content-Type": "application/json",
-          },
+          LicenceKey: this.licenceKey,
+          LoginID: this.loginId
         }
-      );
+      };
+      const url = "https://apigateway.bluedart.com/in/transportation/waybill/v1/GenerateWayBill";
+      const response = await axios.post(url, payload, {
+        httpsAgent: this.agent,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      const result = response.data;
+      if (
+        !result.GenerateWayBillResult ||
+        result.GenerateWayBillResult.IsError === "1"
+      ) {
+        throw new Error(
+          result.GenerateWayBillResult?.Status?.[0]
+            ?.StatusInformation || "Shipment failed"
+        );
+      }
       return {
-        ...response.data,
-        courierAWBListData: courierAWBListRes.dataValues,
+        awb: result.GenerateWayBillResult.AWBNo,
+        destination:
+          result.GenerateWayBillResult.DestinationArea +
+          " / " +
+          result.GenerateWayBillResult.DestinationLocation
       };
     } catch (error) {
-      console.error("[Bluedart.provider/createShipment]:", error);
-      this.error = error;
+      console.error("Bluedart Create Shipment Error:", error);
       return false;
     }
   }
+
+  async cancelAWB(awb) {
+    try {
+      const payload = {
+        Request: {
+          AWBNo: awb
+        },
+        Profile: {
+          Api_type: "S",
+          LicenceKey: this.licenceKey,
+          LoginID: this.loginId
+        }
+      };
+      const url = "https://apigateway.bluedart.com/in/transportation/waybill/v1/CancelWaybill";
+      const response = await axios.post(url, payload, {
+        httpsAgent: this.agent
+      });
+      const result = response.data;
+      if (
+        result.CancelWaybillResult &&
+        result.CancelWaybillResult.IsError === "0"
+      ) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Bluedart Cancel Error:", error);
+      return false;
+    }
+  }
+
+//   async trackOrder(awb) {
+//     try {
+//       const url =
+//         "https://api.bluedart.com/servlet/RoutingServlet";
+//       const params = {
+//         handler: "tnt",
+//         action: "custawbquery",
+//         loginid: this.loginId,
+//         awb: "awb",
+//         numbers: awb,
+//         format: "json",
+//         verno: "1.9",
+//         scan: "1"
+//       };
+//       const response = await axios.get(url, { params });
+//       return response.data;
+//     } catch (error) {
+//       console.error("Bluedart Tracking Error:", error);
+//       return false;
+//     }
+//   }
 }
 
-const BluedartProvider = new Provider();
-export default BluedartProvider;
+export default new Provider();
