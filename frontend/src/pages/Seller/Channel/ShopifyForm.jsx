@@ -108,14 +108,34 @@ function ShopifyForm() {
 
  
   return (
-    <div className="row text-center">
-      <div className="col-lg-10 col-md-10 mx-auto">
+    <div className="row">
+      <div className="col-lg-6 col-md-6">
+        <div className="card m-b-30">
+          <div className="card-header">
+            <h5 className="m-b-0">Shopify Add Information</h5>
+          </div>
+          <div className="card-body">
+            <h5 className="text-success">
+              Use the following instructions to integrate Shopify:
+            </h5>
+            <ol className="pl-lg amazon-ints">
+              <li>Login to Shopify Admin Panel.</li>
+              <li>Go to Apps.</li>
+              <li>Click on Private Apps Button.</li>
+              <li>Click on Create a Private App.</li>
+              <li>Enter Title name under the Description tab and click on Save.</li>
+              <li>Click on Title, as you entered earlier.</li>
+              <li>Here you will find Shopify API Key, password, Shared Secret.</li>
+              <li>Copy the identifiers and integrate the channel.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div className="col-lg-6 col-md-6">
         <div className="card custom-card">
           <div className="card-body pd-45">
             <form onSubmit={handleSubmit}>
               <div className="row">
-                
-
                 <InputField
                   label="Channel Name"
                   name="channel_name"
@@ -123,7 +143,6 @@ function ShopifyForm() {
                   onChange={handleChange}
                   error={errors.channel_name}
                 />
-
                 <InputField
                   label="Channel Host"
                   name="channel_host"
@@ -131,7 +150,6 @@ function ShopifyForm() {
                   onChange={handleChange}
                   error={errors.channel_host}
                 />
-
                 <InputField
                   label="API Key"
                   name="api_key"
@@ -139,7 +157,6 @@ function ShopifyForm() {
                   onChange={handleChange}
                   error={errors.api_key}
                 />
-
                 <InputField
                   label="API Secret"
                   name="api_secret"
@@ -147,7 +164,6 @@ function ShopifyForm() {
                   onChange={handleChange}
                   error={errors.api_secret}
                 />
-
                 <InputField
                   label="Access Token"
                   name="access_token"
@@ -156,10 +172,9 @@ function ShopifyForm() {
                   error={errors.access_token}
                 />
               </div>
-
               <button
                 type="submit"
-                className="btn btn-primary w-100"
+                className="btn btn-primary w-100 mt-3"
                 disabled={loading}
               >
                 {loading ? "Processing..." : "Submit"}
@@ -171,9 +186,7 @@ function ShopifyForm() {
     </div>
   )
 }
-
 export default ShopifyForm
-
 
 const InputField = ({ label, name, value, onChange, error, disabled }) => (
   <div className="col-md-6 mb-3">
