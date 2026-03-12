@@ -481,16 +481,14 @@ a
 
 .btninfochanneladd
 {
-    background-color: #FFFFFF;
-    color: #4B5270;
-    border: 1px solid #E4E7EF;
-    font-size: 0.78rem;
+    background-color: #fff;
+    color: #4b5270 !important;
+    border: 1px solid #E4E7EF !important;
     font-family: 'DM Sans', sans-serif;
     font-size: 13px;
     font-weight: 600;
     padding: 0.42rem 0.95rem;
     border-radius: 6px;
-    border: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
