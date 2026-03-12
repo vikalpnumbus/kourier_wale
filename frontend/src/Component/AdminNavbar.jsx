@@ -59,6 +59,7 @@ function AdminNavbar({ setSideNavActive, sideNavActive }) {
             type="button"
             data-bs-toggle="minimize"
             onClick={() => handleToggleSidebar()}
+            style={{color: "#fff"}}
           >
             <span className="icon-menu"></span>
           </button>
