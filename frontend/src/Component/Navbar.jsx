@@ -162,7 +162,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <Icon path={mdiCurrencyInr} size={1} />
+              <Icon path={mdiCurrencyInr} size={0.7} />
               {companyData?.wallet_balance}
             </div>
           </li>
