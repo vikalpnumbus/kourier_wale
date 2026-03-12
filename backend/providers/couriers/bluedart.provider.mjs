@@ -283,6 +283,74 @@ class BluedartProvider {
       return false;
     }
   }
+
+  async cancelShipment(awbNo) {
+    try {
+
+      if (!awbNo) {
+        console.log("❌ AWB number missing");
+        return false;
+      }
+
+      const token = await this.getToken();
+
+      if (!token) {
+        console.log("❌ Token not available");
+        return false;
+      }
+
+      const payload = {
+        Request: {
+          AWBNo: String(awbNo)
+        },
+        Profile: {
+          LoginID: BLUEDART_LOGIN_ID,
+          LicenceKey: BLUEDART_LICENCE_KEY,
+          Api_type: "S"
+        }
+      };
+
+      console.log("📦 Bluedart Cancel Payload");
+      console.log(JSON.stringify(payload, null, 2));
+
+      const response = await axios.post(
+        BLUEDART_CANCEL_SHIPMENT_FORWARD,
+        payload,
+        {
+          httpsAgent: this.agent,
+          headers: {
+            "Content-Type": "application/json",
+            JWTToken: token
+          }
+        }
+      );
+
+      console.log("📦 Bluedart Cancel Response");
+      console.log(JSON.stringify(response.data, null, 2));
+
+      const result = response.data;
+
+      if (!result || result.IsError) {
+        console.log("❌ Cancel shipment failed");
+        return false;
+      }
+
+      return result;
+
+    } catch (error) {
+
+      console.log("❌ Bluedart Cancel Shipment Error");
+
+      if (error.response) {
+        console.log("Status:", error.response.status);
+        console.log("Data:", error.response.data);
+      } else {
+        console.log(error.message);
+      }
+
+      return false;
+    }
+  }
 }
 
 export default new BluedartProvider();

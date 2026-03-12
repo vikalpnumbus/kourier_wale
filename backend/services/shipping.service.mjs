@@ -632,6 +632,17 @@ class Service {
           }
         }
       }
+      if (existingShipmentData.shipment_error == null)
+      {
+        if (existingShipmentData.courier_id == "8")
+        {
+          const shipmentRes = await BluedartProvider.cancelShipment({awb_number: existingShipmentData.awb_number});
+          if (!shipmentRes)
+          {
+            throw BluedartProvider.error;
+          }
+        }
+      }
       await Promise.all([
         OrdersService.update({
           data: {
