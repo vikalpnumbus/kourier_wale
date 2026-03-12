@@ -483,7 +483,7 @@ a
 {
     background-color: #fff;
     color: #4b5270 !important;
-    border: 1px solid #E4E7EF !important;
+    border: 1px solid #b6b9c0 !important;
     font-family: 'DM Sans', sans-serif;
     font-size: 13px;
     font-weight: 600;
@@ -502,7 +502,7 @@ a
 {
   background-color: #F7F8FB;
   color: #0A0A0F !important;
-  border: #C8CDD8;
+  border: #C8CDD8 !important;
   border-radius: 6px;
   text-decoration: none;
 }
