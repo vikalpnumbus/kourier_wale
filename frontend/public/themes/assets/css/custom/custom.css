@@ -187,6 +187,10 @@ a
 {
   padding-top: 70px !important;
 }
+.sidebar .nav:not(.sub-menu)
+{
+  margin-top: 45px;
+}
 .nav-link
 {
     margin: 0;
@@ -205,6 +209,10 @@ a
     margin: 1px 0.6rem !important;
     border-left: 2.5px solid transparent;
     font-family: 'DM Sans', sans-serif !important;
+}
+.sidebar .nav .nav-item.active>.nav-link .menu-title
+{
+  color: #3D6BFF !important;
 }
 .sidebar .nav .nav-item.active>.nav-link
 {
@@ -233,7 +241,12 @@ a
 
 .sidebar .nav .nav-item.nav-category
 {
-    color: #1282A2 !important;
+    color: #B0B7C9 !important;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 1.1rem 1.25rem 0.4rem;
 }
 
 .navbar-brand-wrapper
