@@ -22,59 +22,44 @@ class BluedartProvider {
   generateDateFormat() {
     return `/Date(${Date.now()})/`;
   }
-  async getToken() {
 
-  if (this.token && Date.now() < this.tokenExpiry) {
-    return this.token;
-  }
-
-  try {
-
-    const url = `${TOKEN_URL}?ClientID=${BLUEDART_LICENCE_KEY}`;
-
-    const response = await axios.get(url, {
-      httpsAgent: this.agent,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-
-    console.log("🔐 Token API Response:", response.data);
-
-    const token =
-      response.data?.access_token ||
-      response.data?.JwtToken ||
-      response.data?.token;
-
-    if (!token) {
-      throw new Error("Bluedart token missing");
+    async getToken()
+    {
+        if (this.token && Date.now() < this.tokenExpiry) {
+            return this.token;
+        }
+        try
+        {
+            const url = `${TOKEN_URL}?ClientID=${BLUEDART_LICENCE_KEY}`;
+            const response = await axios.get(url, {
+            httpsAgent: this.agent,
+            headers: {
+                "Content-Type": "application/json"
+            }
+            });
+            console.log("🔐 Token API Response:", response.data);
+            const token = response.data.JWTToken;
+            if (!token) {
+            console.log("❌ Bluedart token missing");
+            return null;
+            }
+            this.token = token;
+            this.tokenExpiry = Date.now() + (1000 * 60 * 110);
+            console.log("✅ Bluedart token generated");
+            return token;
+        }
+        catch (error)
+        {
+            console.log("❌ Token generation failed");
+            if (error.response) {
+            console.log(error.response.status);
+            console.log(error.response.data);
+            } else {
+            console.log(error.message);
+            }
+            return null;
+        }
     }
-
-    this.token = token;
-
-    const expires =
-      response.data?.expires_in || 7200;
-
-    this.tokenExpiry = Date.now() + expires * 1000 - 60000;
-
-    console.log("✅ Bluedart token generated");
-
-    return token;
-
-  } catch (error) {
-
-    console.log("❌ Token generation failed");
-
-    if (error.response) {
-      console.log(error.response.status);
-      console.log(error.response.data);
-    } else {
-      console.log(error.message);
-    }
-
-    return null;
-  }
-}
 
   async createShipment(data) {
     try {
