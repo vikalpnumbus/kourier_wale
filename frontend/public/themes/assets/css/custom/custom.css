@@ -479,13 +479,33 @@ a
   transform: scale(1.05);
 }
 
-.btn-info
+.btninfochanneladd
 {
-    background-color: #001f54!important;
-    color: #fff !important;
-    border: 1px solid #001f54 !important;
+    background-color: #FFFFFF !important;
+    color: #4B5270 !important;
+    border: 1px solid #E4E7EF !important;
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.42rem 0.95rem;
+    border-radius: var(--r-sm);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.14s;
+    white-space: nowrap;
+    line-height: 1;
 }
+.btninfochanneladd:hover
+{
+  background-color: #F7F8FB;
+  color: #0A0A0F;
+  border: #C8CDD8;
 
+}
 
 
 .remittance-header {
