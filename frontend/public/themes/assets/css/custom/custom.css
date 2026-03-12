@@ -479,7 +479,7 @@ a
   transform: scale(1.05);
 }
 
-.btninfochanneladd
+.btninfoorder
 {
     background-color: #fff;
     color: #4b5270 !important;
@@ -498,7 +498,7 @@ a
     line-height: 1;
     text-decoration: none;
 }
-.btninfochanneladd:hover
+.btninfoorder:hover
 {
   background-color: #F7F8FB;
   color: #0A0A0F !important;
