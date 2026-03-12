@@ -206,6 +206,14 @@ a
     border-left: 2.5px solid transparent;
     font-family: 'DM Sans', sans-serif !important;
 }
+.sidebar .nav .nav-item.active>.nav-link
+{
+    background: #EEF3FF;
+    color: #3D6BFF !important;
+    font-weight: 600 !important;
+    border-left-color: #3D6BFF !important;
+    font-family: 'DM Sans', sans-serif !important;
+}
 
 .sidebar-icon-only .sidebar .nav .nav-item .nav-link i.menu-icon
 {
