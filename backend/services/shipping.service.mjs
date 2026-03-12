@@ -519,8 +519,7 @@ class Service {
           );
         }
       }
-      if (code.includes("Bluedart_500_Gram"))
-      {
+      if (code.includes("Bluedart_500_Gram")) {
         const shipmentRes = await BluedartProvider.createShipment({
           ...data,
           shipmentId: id
@@ -530,44 +529,49 @@ class Service {
             data: {
               id,
               shipment_error:
-                BluedartProvider.error?.message || "Amazon booking failed"
+                BluedartProvider.error?.message || "BlueDart Booking Failed"
             }
           });
           return false;
         }
-        const payload = shipmentRes.payload;
-        console.log("Bluedart", payload);
+        const result = shipmentRes.GenerateWayBillResult;
+        console.log("Bluedart Result", result);
+        const awb = result?.AWBNo || null;
+        let pickupDate = null;
+        if (result?.ShipmentPickupDate) {
+          const match = result.ShipmentPickupDate.match(/\d+/);
+          if (match) {
+            pickupDate = new Date(parseInt(match[0]));
+          }
+        }
         const updatedShipment = await ShippingService.update({
           data: {
             id,
             shipping_status: "booked",
-            awb_number:
-              payload?.packageDocumentDetails?.[0]?.trackingId || null,
-            amazon_shipment_id: payload?.shipmentId || null,
-            pickup_date: payload?.promise?.pickupWindow?.start
-              ? new Date(payload.promise.pickupWindow.start)
-              : null,
-            delivered_date: payload?.promise?.deliveryWindow?.end
-              ? new Date(payload.promise.deliveryWindow.end)
-              : null,
+            awb_number: awb,
+            amazon_shipment_id: result?.CCRCRDREF || null,
+            pickup_date: pickupDate,
+            delivered_date: null,
             shipment_error: null
           }
         });
         if (!updatedShipment) {
-          console.error("shipping/create/amazon/update", ShippingService.error);
+          console.error("shipping/create/bluedart/update", ShippingService.error);
         }
         const existingUser = await UserService.read({ id: userId });
+        const totalDeduct =
+          Number(freight_charge || 0) +
+          Number(cod_price || 0);
         const updatedUser = await UserService.update(
           { id: userId },
           {
             wallet_balance:
-              existingUser.wallet_balance -
-              ((freight_charge || 0) + (cod_price || 0))
+              Number(existingUser.wallet_balance) - totalDeduct
           }
         );
         if (!updatedUser) {
           console.error(
-            "shipping/create/amazon/userWalletUpdate",
+            "shipping/create/bluedart/userWalletUpdate",
             UserService.error
           );
         }
