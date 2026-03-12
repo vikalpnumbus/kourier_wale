@@ -160,8 +160,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              {" "}
-              Balance:{" "}{companyData?.wallet_balance}
+              {companyData?.wallet_balance}
             </div>
           </li>
           <li className="nav-item">
