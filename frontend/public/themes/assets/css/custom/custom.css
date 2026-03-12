@@ -223,6 +223,22 @@ a
     font-family: 'DM Sans', sans-serif !important;
 }
 
+
+.sidebar .nav .nav-item.active>.nav-link:hover
+{
+    background: #EEF3FF;
+    color: #3D6BFF !important;
+    font-weight: 600 !important;
+    border-left-color: #3D6BFF !important;
+    font-family: 'DM Sans', sans-serif !important;
+}
+
+.sidebar .nav:not(.sub-menu)>.nav-item>.nav-link:hover
+{ 
+  background-color: #F4F5F9 !important;
+  color: #0A0A0F !important;
+}
+
 .sidebar-icon-only .sidebar .nav .nav-item .nav-link i.menu-icon
 {
     color: #6B7280;
