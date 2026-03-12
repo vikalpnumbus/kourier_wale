@@ -4,6 +4,7 @@ import companyDetailsConfig from "../config/CompanyDetails/CompanyDetailsConfig"
 import company_logo from "../../public/themes/assets/company_image/veygo-logo.svg";
 import api from "../utils/api";
 import RechargeModal from "./RechargeModal";
+import { mdiCurrencyInr } from "@mdi/js";
 function Navbar({ setSideNavActive, sideNavActive }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -160,6 +161,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
+              <Icon path={mdiCurrencyInr} size={1} />
               {companyData?.wallet_balance}
             </div>
           </li>
