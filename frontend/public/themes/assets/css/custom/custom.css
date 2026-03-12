@@ -502,7 +502,7 @@ a
 {
   background-color: #F7F8FB;
   color: #0A0A0F !important;
-  border: #C8CDD8 !important;
+  border: 1px solid #C8CDD8 !important;
   border-radius: 6px;
   text-decoration: none;
 }
