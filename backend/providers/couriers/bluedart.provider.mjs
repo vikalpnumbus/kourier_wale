@@ -1,258 +1,275 @@
 import axios from "axios";
 import https from "https";
+const TOKEN_URL = "https://apigateway.bluedart.com/in/transportation/token/v1/login";
+const BLUEDART_LICENCE_KEY = "elqrnftfqjtfksrqrmlhmkmq3ntimlgf";
+const BLUEDART_CUSTOMER_CODE = 908014;
+const BLUEDART_LOGIN_ID = "DEL28808";
+const BLUEDART_VENDOR_CODE = "C47646875";
+const BLUEDART_API_KEY = "4AYuiEkp1mhpuFGVbNqx3eMThSO3VtWG";
+const BLUEDART_API_SECRATE = "Ei8ubHdmaWEg3Ffl"
+const BLUEDART_CREATE_SHIPMENT_FORWARD = "https://apigateway.bluedart.com/in/transportation/waybill/v1/GenerateWayBill";
+const BLUEDART_CANCEL_SHIPMENT_FORWARD = "https://apigateway.bluedart.com/in/transportation/waybill/v1/CancelWaybill";
 
-import {
-  BLUEDART_CUSTOMER_CODE,
-  BLUEDART_LICENCE_KEY,
-  BLUEDART_LOGIN_ID,
-  BLUEDART_VENDOR_CODE,
-  BLUEDART_CREATE_SHIPMENT_FORWARD,
-  BLUEDART_CANCEL_SHIPMENT_FORWARD
-} from "../../configurations/base.config.mjs";
 
-class Provider {
+class BluedartProvider {
   constructor() {
-    this.licenceKey = BLUEDART_LICENCE_KEY;
-    this.loginId = BLUEDART_LOGIN_ID;
-    this.customerCode = BLUEDART_CUSTOMER_CODE;
-    this.vendorCode = BLUEDART_VENDOR_CODE;
-
     this.agent = new https.Agent({
       rejectUnauthorized: false
     });
-    // ENV validation
-    if (!this.licenceKey) console.log("❌ BLUEDART_LICENCE_KEY missing in .env");
-    if (!this.loginId) console.log("❌ BLUEDART_LOGIN_ID missing in .env");
-    if (!this.customerCode) console.log("❌ BLUEDART_CUSTOMER_CODE missing in .env");
-    if (!this.vendorCode) console.log("❌ BLUEDART_VENDOR_CODE missing in .env");
-    console.log("✅ Bluedart Provider Loaded");
   }
   generateDateFormat() {
     return `/Date(${Date.now()})/`;
   }
+  async getToken() {
+    if (this.token && Date.now() < this.tokenExpiry) {
+      return this.token;
+    }
+    try {
+      const url = `${TOKEN_URL}?ClientID=${BLUEDART_LICENCE_KEY}`;
+      const response = await axios.get(url, {
+        httpsAgent: this.agent
+      });
+      const token = response.data?.JwtToken;
+      if (!token) {
+        throw new Error("Bluedart token missing");
+      }
+      this.token = token;
+      this.tokenExpiry = Date.now() + 1000 * 60 * 100;
+      console.log("✅ Bluedart token generated");
+      return token;
+    } catch (error) {
+      console.log("❌ Token generation failed");
+      if (error.response) {
+        console.log(error.response.data);
+      } else {
+        console.log(error.message);
+      }
+      return null;
+    }
+  }
+
   async createShipment(data) {
     try {
-        if (!data) {
+      if (!data) {
         console.log("❌ Shipment data missing");
         return false;
-        }
-        console.log("📦 Shipment Data:", data);
-        const {
+      }
+      const token = await this.getToken();
+      if (!token) {
+        console.log("❌ Token not available");
+        return false;
+      }
+      const {
         orderId,
         paymentType,
         total_price,
         shippingDetails,
         packageDetails,
         warehouses
-        } = data;
-        // extract warehouse from array
-        const warehouseData = warehouses?.[0]?.dataValues || warehouses?.[0] || null;
-        if (!shippingDetails) console.log("❌ shippingDetails missing");
-        if (!warehouseData) {
-        console.log("❌ warehouse details missing");
+      } = data;
+      const warehouseData =
+        warehouses?.[0]?.dataValues || warehouses?.[0] || null;
+      if (!warehouseData) {
+        console.log("❌ warehouse missing");
         return false;
-        }
-        if (!packageDetails) console.log("❌ packageDetails missing");
-        if (!shippingDetails?.pincode) console.log("❌ Consignee pincode missing");
-        if (!shippingDetails?.phone) console.log("❌ Consignee phone missing");
-        if (!warehouseData?.pincode) console.log("❌ Warehouse pincode missing");
-        // safe warehouse mapping
-        const warehouse = {
+      }
+      const warehouse = {
         address: warehouseData.address || "",
         city: warehouseData.city || "",
         state: warehouseData.state || "",
         pincode: warehouseData.pincode || "",
-        contactPhone: warehouseData.phone || warehouseData.contactPhone || "",
-        contactName: warehouseData.contact_name || warehouseData.contactName || "",
+        contactPhone:
+          warehouseData.phone || warehouseData.contactPhone || "",
+        contactName:
+          warehouseData.contact_name || warehouseData.contactName || "",
         origin: warehouseData.origin || "DEL"
-        };
-        // convert weight safely
-        const weight = Math.max(Number(packageDetails?.weight || 500) / 1000, 0.5);
-        const payload = {
-        Request: {
-            Consignee: {
-            ConsigneeName: shippingDetails.fname + " " + shippingDetails.lname,
-            ConsigneeAddress1: shippingDetails.address,
-            ConsigneeAddress2: "",
-            ConsigneeAddress3: shippingDetails.city + "," + shippingDetails.state,
-            ConsigneePincode: shippingDetails.pincode,
-            ConsigneeMobile: shippingDetails.phone
-            },
-            Returnadds: {
-            ReturnAddress1: warehouse.address,
-            ReturnAddress2: warehouse.city + "," + warehouse.state,
-            ReturnAddress3: "",
-            ReturnPincode: warehouse.pincode,
-            ReturnMobile: warehouse.contactPhone,
-            ReturnContact: warehouse.contactName
-            },
-            Services: {
-            ActualWeight: weight,
-            CollectableAmount:
-                paymentType === "cod" ? total_price : "0",
-            SubProductCode:
-                paymentType === "cod" ? "C" : "P",
-            Commodity: {
-                CommodityDetail1: "Order Item",
-                CommodityDetail2: "",
-                CommodityDetail3: ""
-            },
-            CreditReferenceNo: orderId,
-            DeclaredValue: total_price,
-            Dimensions: {
-                Dimension: {
-                Length: packageDetails.length || 10,
-                Breadth: packageDetails.breadth || 10,
-                Height: packageDetails.height || 10,
-                Count: "1"
-                }
-            },
-            PickupDate: this.generateDateFormat(),
-            PickupTime: "1800",
-            PieceCount: "1",
-            ProductCode: "A",
-            ProductType: "1",
-            RegisterPickup: false,
-            PDFOutputNotRequired: true
-            },
-            Shipper: {
-            CustomerName: warehouse.contactName,
-            CustomerAddress1: warehouse.address,
-            CustomerAddress2: warehouse.city + "," + warehouse.state,
-            CustomerPincode: warehouse.pincode,
-            CustomerMobile: warehouse.contactPhone,
-            CustomerCode: this.customerCode,
-            OriginArea: warehouse.origin,
-            Sender: warehouse.contactName,
-            VendorCode: this.vendorCode,
-            IsToPayCustomer: false
-            }
-        },
-        Profile: {
-            Api_type: "S",
-            LicenceKey: this.licenceKey,
-            LoginID: this.loginId
-        }
-    };
-    console.log("📦 Bluedart Shipment Payload");
-    console.log(JSON.stringify(payload, null, 2));
-    const response = await axios.post(
-    BLUEDART_CREATE_SHIPMENT_FORWARD,
-    payload,
-    {
-        httpsAgent: this.agent,
-        headers: {
-        "Content-Type": "application/json"
-        }
-    }
-    );
-    console.log("📦 Bluedart API Response");
-    console.log(JSON.stringify(response.data, null, 2));
-    const result = response.data;
-    if (
-    !result.GenerateWayBillResult ||
-    result.GenerateWayBillResult.IsError === "1"
-    ) {
-    throw new Error(
-        result.GenerateWayBillResult?.Status?.[0]?.StatusInformation ||
-        "Shipment failed"
-    );
-    }
-    return {
-    awb: result.GenerateWayBillResult.AWBNo,
-    destination:
-        result.GenerateWayBillResult.DestinationArea +
-        " / " +
-        result.GenerateWayBillResult.DestinationLocation
-    };
-    } catch (error) {
-        console.error("❌ Bluedart Create Shipment Error");
-        if (error.response) {
-        console.error("Status:", error.response.status);
-        console.error("Data:", error.response.data);
-        } else {
-        console.error(error.message);
-        }
-        return false;
-    }
-    }
-
-  async cancelAWB(awb) {
-    try {
-      if (!awb) {
-        console.log("❌ AWB missing for cancel");
-        return false;
-      }
+      };
+      const weight = Math.max(
+        Number(packageDetails?.weight || 500) / 1000,
+        0.5
+      );
       const payload = {
         Request: {
-          AWBNo: awb
+          Consignee: {
+            AvailableDays: "",
+            AvailableTiming: "",
+            ConsigneeAddress1: shippingDetails.address,
+            ConsigneeAddress2: "",
+            ConsigneeAddress3:
+              shippingDetails.city + " " + shippingDetails.state,
+            ConsigneeAddressType: "",
+            ConsigneeAddressinfo: "",
+            ConsigneeAttention: "",
+            ConsigneeEmailID:
+              shippingDetails.email || "",
+            ConsigneeFullAddress: "",
+            ConsigneeGSTNumber: "",
+            ConsigneeLatitude: "",
+            ConsigneeLongitude: "",
+            ConsigneeMaskedContactNumber: "",
+            ConsigneeMobile: shippingDetails.phone,
+            ConsigneeName:
+              shippingDetails.fname +
+              " " +
+              shippingDetails.lname,
+            ConsigneePincode: shippingDetails.pincode,
+            ConsigneeTelephone: ""
+          },
+          Returnadds: {
+            ManifestNumber: "",
+            ReturnAddress1: warehouse.address,
+            ReturnAddress2:
+              warehouse.city + " " + warehouse.state,
+            ReturnAddress3: "",
+            ReturnAddressinfo: "",
+            ReturnContact: warehouse.contactName,
+            ReturnEmailID: "",
+            ReturnLatitude: "",
+            ReturnLongitude: "",
+            ReturnMaskedContactNumber: "",
+            ReturnMobile: warehouse.contactPhone,
+            ReturnPincode: warehouse.pincode,
+            ReturnTelephone: ""
+          },
+          Services: {
+            AWBNo: "",
+            ActualWeight: weight.toFixed(2),
+            CollectableAmount:
+              paymentType === "cod"
+                ? Number(total_price)
+                : 0,
+            Commodity: {
+              CommodityDetail1: "Order Item",
+              CommodityDetail2: "",
+              CommodityDetail3: ""
+            },
+            CreditReferenceNo: orderId,
+            CreditReferenceNo2: "",
+            CreditReferenceNo3: "",
+            DeclaredValue: Number(total_price),
+            DeliveryTimeSlot: "",
+            Dimensions: [
+              {
+                Breadth: Number(packageDetails.breadth) || 10,
+                Count: 1,
+                Height: Number(packageDetails.height) || 10,
+                Length: Number(packageDetails.length) || 10
+              }
+            ],
+            FavouringName: "",
+            IsDedicatedDeliveryNetwork: false,
+            IsDutyTaxPaidByShipper: false,
+            IsForcePickup: false,
+            IsPartialPickup: false,
+            IsReversePickup: false,
+            ItemCount: 1,
+            Officecutofftime: "",
+            PDFOutputNotRequired: true,
+            PackType: "",
+            ParcelShopCode: "",
+            PayableAt: "",
+            PickupDate: this.generateDateFormat(),
+            PickupMode: "",
+            PickupTime: "1600",
+            PickupType: "",
+            PieceCount: "1",
+            PreferredPickupTimeSlot: "",
+            ProductCode: "A",
+            ProductFeature: "",
+            ProductType: 1,
+            RegisterPickup: true,
+            SpecialInstruction: "",
+            SubProductCode: paymentType === "cod" ? "C" : "P",
+            TotalCashPaytoCustomer: 0,
+            itemdtl: [
+              {
+                CGSTAmount: 0,
+                HSCode: "",
+                IGSTAmount: 0,
+                Instruction: "",
+                InvoiceDate: this.generateDateFormat(),
+                InvoiceNumber: "",
+                ItemID: orderId,
+                ItemName: "Order Item",
+                ItemValue: Number(total_price),
+                Itemquantity: 1,
+                PlaceofSupply: "",
+                ProductDesc1: "",
+                ProductDesc2: "",
+                ReturnReason: "",
+                SGSTAmount: 0,
+                SKUNumber: "",
+                SellerGSTNNumber: "",
+                SellerName: "",
+                SubProduct1: "",
+                SubProduct2: "",
+                TaxableAmount: 0,
+                TotalValue: Number(total_price),
+                cessAmount: "0.0",
+                countryOfOrigin: "",
+                docType: "",
+                subSupplyType: 0,
+                supplyType: ""
+              }
+            ],
+            noOfDCGiven: 0
+          },
+          Shipper: {
+            CustomerAddress1: warehouse.address,
+            CustomerAddress2:
+              warehouse.city + " " + warehouse.state,
+            CustomerAddress3: "",
+            CustomerAddressinfo: "",
+            CustomerBusinessPartyTypeCode: "",
+            CustomerCode: BLUEDART_CUSTOMER_CODE,
+            CustomerEmailID: "",
+            CustomerGSTNumber: "",
+            CustomerLatitude: "",
+            CustomerLongitude: "",
+            CustomerMaskedContactNumber: "",
+            CustomerMobile: warehouse.contactPhone,
+            CustomerName: warehouse.contactName,
+            CustomerPincode: warehouse.pincode,
+            CustomerTelephone: "",
+            IsToPayCustomer: false,
+            OriginArea: warehouse.origin,
+            Sender: warehouse.contactName,
+            VendorCode: BLUEDART_VENDOR_CODE
+          }
         },
         Profile: {
-          Api_type: "S",
-          LicenceKey: this.licenceKey,
-          LoginID: this.loginId
+          LoginID: BLUEDART_LOGIN_ID,
+          LicenceKey: BLUEDART_LICENCE_KEY,
+          Api_type: "S"
         }
       };
-      console.log("📦 Cancel AWB:", awb);
+      console.log("📦 Bluedart Payload");
+      console.log(JSON.stringify(payload, null, 2));
       const response = await axios.post(
-        BLUEDART_CANCEL_SHIPMENT_FORWARD,
+        SHIPMENT_URL,
         payload,
         {
-          httpsAgent: this.agent
+          httpsAgent: this.agent,
+          headers: {
+            "Content-Type": "application/json",
+            JWTToken: token
+          }
         }
       );
-      console.log("📦 Cancel Response");
-      console.log(response.data);
-      const result = response.data;
-      if (
-        result.CancelWaybillResult &&
-        result.CancelWaybillResult.IsError === "0"
-      ) {
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("❌ Bluedart Cancel Error");
-      if (error.response) {
-        console.error(error.response.data);
-      } else {
-        console.error(error.message);
-      }
-      return false;
-    }
-  }
-
-  async trackOrder(awb) {
-    try {
-      if (!awb) {
-        console.log("❌ AWB missing for tracking");
-        return false;
-      }
-      const url =
-        "https://api.bluedart.com/servlet/RoutingServlet";
-      const params = {
-        handler: "tnt",
-        action: "custawbquery",
-        loginid: this.loginId,
-        awb: "awb",
-        numbers: awb,
-        format: "json",
-        verno: "1.9",
-        scan: "1"
-      };
-      const response = await axios.get(url, { params });
-      console.log("📦 Tracking Response");
+      console.log("📦 Bluedart Response");
       console.log(response.data);
       return response.data;
     } catch (error) {
-      console.error("❌ Bluedart Tracking Error");
+      console.log("❌ Bluedart Shipment Error");
       if (error.response) {
-        console.error(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.data);
       } else {
-        console.error(error.message);
+        console.log(error.message);
       }
       return false;
     }
   }
 }
-export default new Provider();
+
+export default new BluedartProvider();
