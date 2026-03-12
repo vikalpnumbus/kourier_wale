@@ -5,7 +5,7 @@ import company_logo from "../../public/themes/assets/company_image/veygo-logo.sv
 import api from "../utils/api";
 import RechargeModal from "./RechargeModal";
 import Icon from "@mdi/react";
-import { mdiCurrencyInr } from "@mdi/js";
+import { mdiCurrencyInr, mdiClock } from "@mdi/js";
 function Navbar({ setSideNavActive, sideNavActive }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -112,12 +112,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
         <ul className="navbar-nav ms-auto">
           <li className="nav-item dropdown d-lg-block user-dropdown">
             <div className="nav-link dropdown-bordered  dropdown-toggle-split" id="messageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.3"></circle>
-              <path d="M6 3.5v2.5l1.5 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></path>
-            </svg>
-              {" "}
-              Quick Action{" "}
+            <Icon path={mdiClock} size={0.7} />Quick Action
             </div>
             <div className="dropdown-menu dropdown-menu-right navbar-dropdown p-0" aria-labelledby="messageDropdown">
               <Link to="/orders/add" className="dropdown-item ">
