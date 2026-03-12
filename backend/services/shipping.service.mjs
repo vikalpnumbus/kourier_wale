@@ -632,15 +632,15 @@ class Service {
           }
         }
       }
-      if (existingShipmentData.shipment_error == null)
-      {
-        if (existingShipmentData.courier_id == "8")
-        {
-          const shipmentRes = await BluedartProvider.cancelShipment({awb_number: existingShipmentData.awb_number});
-          if (!shipmentRes)
-          {
+      if (existingShipmentData.shipment_error == null) {
+        if (existingShipmentData.courier_id == "8") {
+          const shipmentRes = await BluedartProvider.cancelShipment(
+            existingShipmentData.awb_number
+          );
+          if (!shipmentRes) {
             throw BluedartProvider.error;
           }
+          console.log("✅ Bluedart shipment cancelled");
         }
       }
       await Promise.all([
