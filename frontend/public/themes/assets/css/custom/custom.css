@@ -498,6 +498,7 @@ a
     transition: all 0.14s;
     white-space: nowrap;
     line-height: 1;
+    text-decoration: none;
 }
 .btninfochanneladd:hover
 {
@@ -505,6 +506,7 @@ a
   color: #0A0A0F !important;
   border: #C8CDD8;
   border-radius: 6px;
+  text-decoration: none;
 }
 
 
