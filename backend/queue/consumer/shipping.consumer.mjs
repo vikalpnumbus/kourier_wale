@@ -39,12 +39,13 @@ class Class {
   }
 
   async handleShipmentCreateConsumer() {
+    console.log("🚀 Shipping Consumer Started");
     try {
       await rabbitMQ.consume(
         this.queue,
         async (msg) => {
+          console.log("📦 Message Received:", msg);
           console.time("single-ship-orders");
-
           let {
             order_db_ids,
             warehouse_id,
