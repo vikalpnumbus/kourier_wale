@@ -262,6 +262,53 @@ a
     font-weight: 500 !important;
 }
 
+#rechargebutton
+{
+    transform: translateY(-0.0143977px);
+    box-shadow: rgba(61, 107, 255, 0.25) 0px 4.0288px 16.0576px 0px;
+    background-color: #3B6CFF;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.42rem 0.95rem;
+    border-radius: var(--r-sm);
+    border: none;
+    cursor: pointer;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.14s;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+#balancechip
+{
+  font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.42rem 0.875rem;
+    border-radius: 10px;
+    background: rgba(61, 107, 255, 0.2);
+    color: #89a8ff;
+    border: 1px solid rgba(61, 107, 255, 0.3);
+    letter-spacing: 0.03em;
+    cursor: default;
+}
+#balancechip:hover
+{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.42rem 0.875rem;
+    border-radius: 10px;
+    background: #2952E3;
+    color: #89a8ff;
+    border: 1px solid rgba(61, 107, 255, 0.3);
+    letter-spacing: 0.03em;
+    cursor: default;
+}
+
 .navbar-brand-wrapper
 {
     background: #E6E5F3 !important;

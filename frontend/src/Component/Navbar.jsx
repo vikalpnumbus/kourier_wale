@@ -140,13 +140,15 @@ function Navbar({ setSideNavActive, sideNavActive }) {
           <li className="nav-item custom_width">
             <div
               className="nav-link dropdown-bordered  dropdown-toggle-split "
-              id="messageDropdown"
+              id="rechargebutton"
               data-bs-toggle="dropdown"
               aria-expanded="false"
               style={{ cursor: "pointer" }}
               onClick={()=>setShowRechargeModal(true)}
             >
-              {" "}
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 1.5v9M1.5 6h9" stroke="white" stroke-width="1.6" stroke-linecap="round"></path>
+            </svg>
               Recharge
             </div>
           </li>
@@ -154,7 +156,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
           <li className="nav-item">
             <div
               className="nav-link dropdown-bordered  dropdown-toggle-split"
-              id="messageDropdown"
+              id="balancechip"
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
