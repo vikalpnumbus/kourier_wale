@@ -238,7 +238,10 @@ a
     color: #6B7280;
 }
 
-
+.home-tab .tab-content
+{
+  font-family: 'JetBrains Mono', monospace;
+}
 .sidebar .nav .nav-item.nav-category
 {
     color: #B0B7C9 !important;

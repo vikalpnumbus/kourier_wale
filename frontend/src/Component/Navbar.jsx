@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import companyDetailsConfig from "../config/CompanyDetails/CompanyDetailsConfig";
-import company_logo from "../../public/themes/assets/company_image/logo_company.png";
+import company_logo from "../../public/themes/assets/company_image/veygo-logo.svg";
 import api from "../utils/api";
 import RechargeModal from "./RechargeModal";
 function Navbar({ setSideNavActive, sideNavActive }) {

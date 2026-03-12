@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useAlert } from "../../../middleware/AlertContext";
 import authConfig from "../../../config/Auth/AuthConfig";
-import company_logo from "../../../../public/themes/assets/company_image/logo_company.png";
+import company_logo from "../../../../public/themes/assets/company_image/veygo-logo.svg";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");

@@ -6,7 +6,7 @@ import { mdiEye, mdiEyeOff, mdiPencil } from "@mdi/js";
 import { useAlert } from "../../../middleware/AlertContext";
 import authConfig from "../../../config/Auth/AuthConfig";
 import { encrypt } from "../../../middleware/Encryption";
-import company_logo from "../../../../public/themes/assets/company_image/logo_company.png";
+import company_logo from "../../../../public/themes/assets/company_image/veygo-logo.svg";
 
 function Register() {
   const navigate = useNavigate();

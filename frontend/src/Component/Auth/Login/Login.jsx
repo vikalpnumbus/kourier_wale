@@ -8,7 +8,7 @@ import authConfig from "../../../config/Auth/AuthConfig";
 import api from "../../../utils/api";
 import companyDetailsConfig from "../../../config/CompanyDetails/CompanyDetailsConfig";
 import { encrypt } from "../../../middleware/Encryption";
-import company_logo from "../../../../public/themes/assets/company_image/logo_company.png";
+import company_logo from "../../../../public/themes/assets/company_image/veygo-logo.svg";
 import ChannelConfig from "../../../config/Channel/ChannelConfig";
 
 function Login() {
