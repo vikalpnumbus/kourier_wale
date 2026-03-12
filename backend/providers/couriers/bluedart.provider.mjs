@@ -14,39 +14,67 @@ const BLUEDART_CANCEL_SHIPMENT_FORWARD = "https://apigateway.bluedart.com/in/tra
 class BluedartProvider {
   constructor() {
     this.agent = new https.Agent({
-      rejectUnauthorized: false
+    rejectUnauthorized: false
     });
+    this.token = null;
+    this.tokenExpiry = 0;
   }
   generateDateFormat() {
     return `/Date(${Date.now()})/`;
   }
   async getToken() {
-    if (this.token && Date.now() < this.tokenExpiry) {
-      return this.token;
-    }
-    try {
-      const url = `${TOKEN_URL}?ClientID=${BLUEDART_LICENCE_KEY}`;
-      const response = await axios.get(url, {
-        httpsAgent: this.agent
-      });
-      const token = response.data?.JwtToken;
-      if (!token) {
-        throw new Error("Bluedart token missing");
-      }
-      this.token = token;
-      this.tokenExpiry = Date.now() + 1000 * 60 * 100;
-      console.log("✅ Bluedart token generated");
-      return token;
-    } catch (error) {
-      console.log("❌ Token generation failed");
-      if (error.response) {
-        console.log(error.response.data);
-      } else {
-        console.log(error.message);
-      }
-      return null;
-    }
+
+  if (this.token && Date.now() < this.tokenExpiry) {
+    return this.token;
   }
+
+  try {
+
+    const url = `${TOKEN_URL}?ClientID=${BLUEDART_LICENCE_KEY}`;
+
+    const response = await axios.get(url, {
+      httpsAgent: this.agent,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    console.log("🔐 Token API Response:", response.data);
+
+    const token =
+      response.data?.access_token ||
+      response.data?.JwtToken ||
+      response.data?.token;
+
+    if (!token) {
+      throw new Error("Bluedart token missing");
+    }
+
+    this.token = token;
+
+    const expires =
+      response.data?.expires_in || 7200;
+
+    this.tokenExpiry = Date.now() + expires * 1000 - 60000;
+
+    console.log("✅ Bluedart token generated");
+
+    return token;
+
+  } catch (error) {
+
+    console.log("❌ Token generation failed");
+
+    if (error.response) {
+      console.log(error.response.status);
+      console.log(error.response.data);
+    } else {
+      console.log(error.message);
+    }
+
+    return null;
+  }
+}
 
   async createShipment(data) {
     try {
@@ -246,7 +274,7 @@ class BluedartProvider {
       console.log("📦 Bluedart Payload");
       console.log(JSON.stringify(payload, null, 2));
       const response = await axios.post(
-        SHIPMENT_URL,
+        BLUEDART_CREATE_SHIPMENT_FORWARD,
         payload,
         {
           httpsAgent: this.agent,
