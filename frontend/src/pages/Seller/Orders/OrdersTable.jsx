@@ -318,7 +318,7 @@ function OrdersTable({ setExportHandler }) {
                     <td className="py-2">
                       <div className="d-flex flex-column gap-3">
                         <Link to={`view/${data.id}`}>{data.orderId || ""}</Link>
-                        <span>
+                        <span className="date">
                           {data.createdAt ? formatDateTime(data.createdAt) : ""}
                         </span>
                       </div>
@@ -328,13 +328,13 @@ function OrdersTable({ setExportHandler }) {
                     </td>
                     <td className="py-2">
                       <div className="d-flex flex-column gap-3">
-                        <span>
+                        <span className="customer-name">
                           {data.shippingDetails.fname &&
                             data.shippingDetails.lname
                             ? `${data.shippingDetails.fname} ${data.shippingDetails.lname}`
                             : ""}
                         </span>
-                        <span>{data.shippingDetails.phone || ""}</span>
+                        <span className="customer-phone">{data.shippingDetails.phone || ""}</span>
                       </div>
                     </td>
 
@@ -359,7 +359,7 @@ function OrdersTable({ setExportHandler }) {
                     <td className="py-2">
                       <div className="d-flex flex-column gap-3">
                         {data.packageDetails.weight && (
-                          <span>
+                          <span className="pkg-wt">
                             {formatWeight(data.packageDetails.weight)}
                           </span>
                         )}
@@ -367,7 +367,7 @@ function OrdersTable({ setExportHandler }) {
                         {data.packageDetails["length"] &&
                           data.packageDetails.breadth &&
                           data.packageDetails.height && (
-                            <span>
+                            <span className="pkg-dm">
                               Dim: {data.packageDetails.length} x{" "}
                               {data.packageDetails.breadth} x{" "}
                               {data.packageDetails.height} cm
@@ -377,7 +377,7 @@ function OrdersTable({ setExportHandler }) {
                     </td>
                     <td className="py-2">
                       <div className="d-flex flex-column gap-3">
-                        <span>
+                        <span className="pay-payment">
                           {data.orderAmount ? `₹ ${data.orderAmount}` : ""}
                         </span>
                         <span>
