@@ -141,11 +141,35 @@
 }
 a
 {
-    color: #1F3BB3 !important;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: #3D6BFF;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    display: block;
 }
-.box-class
+span
 {
+    text-shadow: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: #8B93B0;
+    margin-top: 0.22rem;
+    letter-spacing: 0.02em;
+}
+.box-class {
     font-weight: 700;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem !important;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.6rem !important;
+    border-radius: 4px;
+    background: #0A0A0F;
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-weight: 400;
 }
 
 .custom-option
@@ -509,7 +533,7 @@ a
 
 .card
 {
-  background-color: none !important;
+    background-color: #F4F5F7 !important;
 }
 
 .card .card-title {
@@ -522,6 +546,25 @@ a
     color: #0A0A0F;
     letter-spacing: -0.025em;
     line-height: 1.1;
+}
+
+
+.table thead th, .jsgrid .jsgrid-table thead th {
+    border-top: 0;
+    border-bottom-width: 1px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: #8B93B0;
+    padding: 0.7rem 1rem;
+    text-align: left;
+    background: #FFFFFF;
+    white-space: nowrap;
+    user-select: none;
 }
 
 .tab-content.tab-content-vertical
