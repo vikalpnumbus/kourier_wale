@@ -158,18 +158,18 @@ span
     margin-top: 0.22rem;
     letter-spacing: 0.02em;
 }
-.box-class {
-    font-weight: 700;
+.channel-badge {
     align-items: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.6rem !important;
-    letter-spacing: 0.1em;
+    font-family: JetBrains Mono, monospace;
+    font-size: .6rem !important;
+    letter-spacing: .1em;
     text-transform: uppercase;
     padding: 0.22rem 0.6rem !important;
     border-radius: 4px;
-    background: #0A0A0F !important;
-    color: rgba(255, 255, 255, 0.8) !important;
+    background: #0a0a0f !important;
+    color: #fffc !important;
     font-weight: 400;
+    display: inline-flex;
 }
 
 .custom-option

@@ -323,11 +323,9 @@ function OrdersTable({ setExportHandler }) {
                         </span>
                       </div>
                     </td>
-
-                    <td className="py-2 box-class">
-                      {data?.channel_name || "Custom"}
+                    <td className="py-2">
+                      <span className="channel-badge">{data?.channel_name || "Custom"}</span>
                     </td>
-
                     <td className="py-2">
                       <div className="d-flex flex-column gap-3">
                         <span>
