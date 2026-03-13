@@ -377,10 +377,10 @@ function OrdersTable({ setExportHandler }) {
                     </td>
                     <td className="py-2">
                       <div className="d-flex flex-column gap-3">
-                        <span className="pay-payment">
+                        <span className="pay-amt">
                           {data.orderAmount ? `₹ ${data.orderAmount}` : ""}
                         </span>
-                        <span>
+                        <span className="pay-payment">
                           {data.paymentType
                             ? data.paymentType.toUpperCase()
                             : ""}
