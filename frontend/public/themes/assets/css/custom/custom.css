@@ -91,7 +91,6 @@
 .mile-container
 {
     box-sizing: border-box;
-    height: 4.5%;
     padding: 1.0625rem .08125rem;
     position: absolute;
 }
@@ -100,7 +99,7 @@
     border-color: #525b7a;
     border-style: dashed;
     border-left-width: 1.4px;
-    height: 25px;
+    height: 18px;
     width: 0px;
 }
 
