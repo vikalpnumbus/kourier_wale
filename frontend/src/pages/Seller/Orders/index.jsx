@@ -36,7 +36,7 @@ function Orders() {
   return (
     <div className="row">
       <div className="col-md-12 grid-margin stretch-card d-md-flex">
-        <div className="card">
+        <div className="card order-page">
           <div className="card-body">
             <div className="row">
               <div className="col-md-4">
