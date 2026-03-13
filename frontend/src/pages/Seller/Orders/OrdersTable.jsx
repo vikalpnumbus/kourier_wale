@@ -380,10 +380,8 @@ function OrdersTable({ setExportHandler }) {
                         <span className="pay-amt">
                           {data.orderAmount ? `₹ ${data.orderAmount}` : ""}
                         </span>
-                        <span className="pay-payment">
-                          {data.paymentType
-                            ? data.paymentType.toUpperCase()
-                            : ""}
+                        <span className={data.paymentType?.toLowerCase() === "cod" ? "pay-cod" : "pay-prepaid"}>
+                            {data.paymentType ? data.paymentType.toUpperCase() : ""}
                         </span>
                       </div>
                     </td>

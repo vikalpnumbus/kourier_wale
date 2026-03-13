@@ -199,12 +199,12 @@ a
     color: #0A0A0F;
 }
 
-.pay-payment {
+.pay-cod {
     background: #FFF3DC;
     color: #A06200;
     border: 1px solid #FBDFA0;
     display: inline-block;
-    font-family: var(--font-mono);
+    font-family: JetBrains Mono, monospace;
     font-size: 0.58rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -212,8 +212,24 @@ a
     padding: 0.14rem 0.42rem;
     border-radius: 4px;
     margin-top: 0.22rem;
+    width: fit-content;
 }
-
+.pay-prepaid
+{
+    background: #E6F7EE;
+    color: #2D8A4E;
+    border: 1px solid #B3E8C8;
+    display: inline-block;
+    font-family: JetBrains Mono, monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 0.14rem 0.42rem;
+    border-radius: 4px;
+    margin-top: 0.22rem;
+    width: fit-content;
+}
 
 .channel-badge {
     align-items: center;
