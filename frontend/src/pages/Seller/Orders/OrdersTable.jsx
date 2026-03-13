@@ -316,7 +316,7 @@ function OrdersTable({ setExportHandler }) {
                       )}
                     </td>
                     <td className="py-2">
-                      <div className="d-flex flex-column gap-3 box-class">
+                      <div className="d-flex flex-column gap-3">
                         <Link to={`view/${data.id}`}>{data.orderId || ""}</Link>
                         <span>
                           {data.createdAt ? formatDateTime(data.createdAt) : ""}
@@ -329,7 +329,7 @@ function OrdersTable({ setExportHandler }) {
                     </td>
 
                     <td className="py-2">
-                      <div className="d-flex flex-column gap-3 box-class">
+                      <div className="d-flex flex-column gap-3">
                         <span>
                           {data.shippingDetails.fname &&
                             data.shippingDetails.lname
@@ -341,7 +341,7 @@ function OrdersTable({ setExportHandler }) {
                     </td>
 
                     <td className="py-2">
-                      <div className="d-flex flex-column gap-3 org_des_box box-class">
+                      <div className="d-flex flex-column gap-3 org_des_box">
                         <div className="mile-container">
                           <div className="mile-path"></div>
                         </div>
@@ -359,7 +359,7 @@ function OrdersTable({ setExportHandler }) {
                     </td>
 
                     <td className="py-2">
-                      <div className="d-flex flex-column gap-3 box-class">
+                      <div className="d-flex flex-column gap-3">
                         {data.packageDetails.weight && (
                           <span>
                             {formatWeight(data.packageDetails.weight)}
@@ -378,7 +378,7 @@ function OrdersTable({ setExportHandler }) {
                       </div>
                     </td>
                     <td className="py-2">
-                      <div className="d-flex flex-column gap-3 box-class">
+                      <div className="d-flex flex-column gap-3">
                         <span>
                           {data.orderAmount ? `₹ ${data.orderAmount}` : ""}
                         </span>
