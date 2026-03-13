@@ -84,14 +84,14 @@
 
 .org_des_box
 {
-    height: 65px;
+    height: 60px;
     padding: inherit;
     margin-left: -15px;
 }
 .mile-container
 {
     box-sizing: border-box;
-    height: 5%;
+    height: 8%;
     padding: 1.0625rem .08125rem;
     position: absolute;
 }
@@ -100,33 +100,39 @@
     border-color: #525b7a;
     border-style: dashed;
     border-left-width: 1.4px;
-    height: 100%;
+    height: 25px;
     width: 0px;
 }
 
 .mile-container .mile-path:before {
-    background-color: #525b7a;
+    background-color: #3D6BFF;
     border-radius: 9999px;
     height: .5rem;
-    margin-right: 10px;
+    margin-right: 9px;
     width: .5rem;
     position: absolute;
-    top: 0px;
+    top: 2px;
     content: "";
     right: -.65rem;
     z-index: 2;
 }
 
 .mile-container .mile-path:after {
-    background-color: #525b7a;
+    background-color: #F5A623;
     height: .5rem;
-    margin-right: 10px;
+    margin-right: 9px;
     width: .5rem;
     position: absolute;
     bottom: 0px;
     content: "";
     right: -.65rem;
     z-index: 2;
+    border-radius: 9999px;
+}
+
+table-hover:hover
+{
+  background-color: #f4f5f7!important;
 }
 
 .fromclass
