@@ -59,22 +59,23 @@ class ShiprocketProvider {
   }
 
   async createPickupLocation(warehouse) {
-    console.log("Warehouse Data", warehouse);
+  
     try {
       const token = await this.getToken();
       if (!token) throw new Error("Token failed");
       const payload = {
-        pickup_location: warehouse.name,
-        name: warehouse.contact_person,
-        email: warehouse.email,
-        phone: warehouse.phone,
+        pickup_location: `WH_${warehouse.id}`,
+        name: warehouse.contactName,
+        email: warehouse.labelDetails?.support_email || "support@gamil.com",
+        phone: warehouse.contactPhone,
         address: warehouse.address,
-        address_2: warehouse.address2 || "",
+        address_2: "",
         city: warehouse.city,
         state: warehouse.state,
         country: "India",
         pin_code: warehouse.pincode
       };
+      console.log("Shiprocket Pickup Payload", payload);
       const response = await axios.post(
         "https://apiv2.shiprocket.in/v1/external/settings/company/addpickup",
         payload,
@@ -89,7 +90,11 @@ class ShiprocketProvider {
       return response.data;
     } catch (error) {
       console.log("❌ Shiprocket pickup create failed");
-      if (error.response) console.log(error.response.data);
+      if (error.response) {
+        console.log(error.response.data);
+      } else {
+        console.log(error.message);
+      }
       this.error = error;
       return null;
     }
