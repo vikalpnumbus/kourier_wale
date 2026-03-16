@@ -611,7 +611,7 @@ class Service {
         const shipment_id = orderRes.shipment_id;
         const awbRes = await ShiprocketProvider.assignAWB({
           shipment_id,
-          courier_id: data.courier_id
+          courier_id: "753"
         });
         if (!awbRes) {
           await ShippingService.update({
