@@ -59,6 +59,7 @@ class ShiprocketProvider {
   }
 
   async createPickupLocation(warehouse) {
+    console.log("Warehouse Data", warehouse);
     try {
       const token = await this.getToken();
       if (!token) throw new Error("Token failed");
