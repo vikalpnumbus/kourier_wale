@@ -738,6 +738,19 @@ class Service {
           console.log("✅ Bluedart shipment cancelled");
         }
       }
+      if (existingShipmentData.shipment_error == null) {
+        if (existingShipmentData.courier_id == "9") {
+          const shipmentRes = await ShiprocketProvider.cancelShipment({
+            awb_number: existingShipmentData.awb_number
+          });
+
+          if (!shipmentRes) {
+            throw ShiprocketProvider.error;
+          }
+
+          console.log("✅ Shiprocket shipment cancelled");
+        }
+      }
       await Promise.all([
         OrdersService.update({
           data: {

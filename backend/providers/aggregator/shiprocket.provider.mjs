@@ -187,6 +187,39 @@ class ShiprocketProvider {
       this.error = error;
       return null;
     }
-}
+  }
+
+    async cancelShipment({ awb_number }) {
+      try {
+        const token = await this.getToken();
+        if (!token) throw new Error("Shiprocket token failed");
+        const payload = {
+          awbs: [awb_number]
+        };
+        console.log("Shiprocket Cancel Payload", payload);
+        const response = await axios.post(
+          "https://apiv2.shiprocket.in/v1/external/orders/cancel/shipment/awbs",
+          payload,
+          {
+            httpsAgent: this.agent,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        console.log("Shiprocket Cancel Response", response.data);
+        return response.data;
+      } catch (error) {
+        console.log("❌ Shiprocket cancel failed");
+        if (error.response) {
+          console.log(error.response.data);
+        } else {
+          console.log(error.message);
+        }
+        this.error = error;
+        return null;
+      }
+    }
 }
 export default new ShiprocketProvider();
