@@ -578,84 +578,99 @@ class Service {
         }
       }
       if (code.includes("Delhivery_DS_500gm_Shiprocket")) {
-        const warehouse = warehouse.find(
-          (w) => w.id == data.warehouse_id
-        );
-        const pickupRes = await ShiprocketProvider.createPickupLocation(warehouse);
-        if (!pickupRes) {
-          await ShippingService.update({
-            data: {
-              id,
-              shipment_error:
-                ShiprocketProvider.error?.message || "Shiprocket pickup failed"
-            }
-          });
-          return false;
-        }
-        const pickup_location = pickupRes.address.pickup_code;
-        const orderRes = await ShiprocketProvider.createOrder({
-          ...data,
-          pickup_location
-        });
-        if (!orderRes) {
-          await ShippingService.update({
-            data: {
-              id,
-              shipment_error:
-                ShiprocketProvider.error?.message || "Shiprocket order failed"
-            }
-          });
-          return false;
-        }
-        console.log("Shiprocket Order Response", orderRes);
-        const shipment_id = orderRes.shipment_id;
-        const awbRes = await ShiprocketProvider.assignAWB({
-          shipment_id,
-          courier_id: "753"
-        });
-        if (!awbRes) {
-          await ShippingService.update({
-            data: {
-              id,
-              shipment_error:
-                ShiprocketProvider.error?.message || "Shiprocket AWB failed"
-            }
-          });
-          return false;
-        }
-        const awb = awbRes?.awb_assign_status
-          ? awbRes?.response?.data?.awb_code
-          : null;
-        const updatedShipment = await ShippingService.update({
-          data: {
-            id,
-            shipping_status: "booked",
-            awb_number: awb,
-            amazon_shipment_id: shipment_id,
-            shipment_error: null
-          }
-        });
-        if (!updatedShipment) {
-          console.error("shipping/create/shiprocket/update", ShippingService.error);
-        }
-        const existingUser = await UserService.read({ id: userId });
-        const totalDeduct =
-          Number(freight_charge || 0) +
-          Number(cod_price || 0);
-        const updatedUser = await UserService.update(
-          { id: userId },
-          {
-            wallet_balance:
-              Number(existingUser.wallet_balance) - totalDeduct
-          }
-        );
-        if (!updatedUser) {
-          console.error(
-            "shipping/create/shiprocket/userWalletUpdate",
-            UserService.error
-          );
-        }
+
+  const warehouse = data.warehouses.find(
+    (w) => w.id == data.warehouse_id
+  );
+
+  const pickupRes = await ShiprocketProvider.createPickupLocation(warehouse);
+
+  if (!pickupRes) {
+    await ShippingService.update({
+      data: {
+        id,
+        shipment_error:
+          ShiprocketProvider.error?.message || "Shiprocket pickup failed"
       }
+    });
+    return false;
+  }
+
+  const pickup_location = pickupRes.address.pickup_code;
+
+  const orderRes = await ShiprocketProvider.createOrder({
+    ...data,
+    pickup_location
+  });
+
+  if (!orderRes) {
+    await ShippingService.update({
+      data: {
+        id,
+        shipment_error:
+          ShiprocketProvider.error?.message || "Shiprocket order failed"
+      }
+    });
+    return false;
+  }
+
+  console.log("Shiprocket Order Response", orderRes);
+
+  const shipment_id = orderRes.shipment_id;
+
+  const awbRes = await ShiprocketProvider.assignAWB({
+    shipment_id,
+    courier_id: "753"
+  });
+
+  if (!awbRes) {
+    await ShippingService.update({
+      data: {
+        id,
+        shipment_error:
+          ShiprocketProvider.error?.message || "Shiprocket AWB failed"
+      }
+    });
+    return false;
+  }
+
+  const awb = awbRes?.response?.data?.awb_code || null;
+
+  const updatedShipment = await ShippingService.update({
+    data: {
+      id,
+      shipping_status: "booked",
+      awb_number: awb,
+      amazon_shipment_id: shipment_id,
+      shipment_error: null
+    }
+  });
+
+  if (!updatedShipment) {
+    console.error("shipping/create/shiprocket/update", ShippingService.error);
+  }
+
+  const existingUser = await UserService.read({ id: userId });
+
+  const totalDeduct =
+    Number(freight_charge || 0) +
+    Number(cod_price || 0);
+
+  const updatedUser = await UserService.update(
+    { id: userId },
+    {
+      wallet_balance:
+        Number(existingUser.wallet_balance) - totalDeduct
+    }
+  );
+
+  if (!updatedUser) {
+    console.error(
+      "shipping/create/shiprocket/userWalletUpdate",
+      UserService.error
+    );
+  }
+}
       return true;
     } catch (error) {
       this.error = error;
