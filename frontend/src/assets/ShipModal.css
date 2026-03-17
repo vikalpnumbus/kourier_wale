@@ -13,7 +13,7 @@
   --fm:'JetBrains Mono',monospace;
 } */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{
+/* html,body{
   font-family:var(--fb);font-size:13px;-webkit-font-smoothing:antialiased;
   background:var(--ink);min-height:100vh;
   display:flex;align-items:center;justify-content:center;padding:1.5rem
@@ -24,7 +24,7 @@ body::before{
     linear-gradient(rgba(61,107,255,.05) 1px,transparent 1px),
     linear-gradient(90deg,rgba(61,107,255,.05) 1px,transparent 1px);
   background-size:52px 52px;pointer-events:none;z-index:0
-}
+} */
 
 /* ══ OVERLAY ══ */
 .ov{
