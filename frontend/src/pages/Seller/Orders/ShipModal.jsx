@@ -249,8 +249,8 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                 const total =
                   (Number(rate.freight_charge) || 0) +
                   (Number(rate.cod_charge) || 0);
-
-                const isCheap = total === minPrice;
+                  const isCheap = index === 0;
+                  const isFastest = index === 1;
 
                 return (
                   <div
@@ -262,14 +262,20 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                     onClick={() => handleCourierSelect(rate)}
                     style={{ position: "relative" }}
                   >
-
                     {/* ✅ BADGE ADD */}
                     {isCheap && (
                       <div className="cr-badge cb-g">
                         ★ Best Value
                       </div>
                     )}
-
+                    {isFastest && (
+                      <div className="cr-badge cb-o">
+                        <svg width="7" height="7" viewBox="0 0 7 7" fill="none">
+                          <path d="M3.5.5l.8 2.2H7L5.2 3.9l.8 2.4-2.5-1.5-2.5 1.5.8-2.4L0 2.7h2.7z" fill="currentColor"></path>
+                        </svg>
+                        Fastest
+                      </div>
+                    )}
                     <div className="cr-id">
                       <div className="cr-dot">
                         {rate.courier_name?.slice(0, 2)}
