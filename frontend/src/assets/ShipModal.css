@@ -221,7 +221,7 @@ body::before{
 }
 .crow:hover{
     border-color:#C7D5FF !important;
-    background:#2952E3 !important;
+    background:#EEF3FF !important;
     box-shadow:0 3px 12px rgba(61,107,255,.1);
     transform:translateX(2px)
 }
