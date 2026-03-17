@@ -8,7 +8,6 @@ import api from "../../../utils/api";
 import { useAlert } from '../../../middleware/AlertContext';
 import { useSearchParams } from "react-router-dom";
 import "../../../assets/ShipModal.css"
-
 function ShipModal({ orderData, onClose, handleFetchData }) {
   const [shipData, setShipData] = useState({
     order_db_ids: "",
@@ -221,7 +220,13 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                 {ratePrice.length} carriers available
               </div>
             </div>
-
+            <div ClassName="rp-steps">
+              <div ClassName="rs"><div ClassName="rs-dot done"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span ClassName="rs-lbl">Route</span></div>
+              <div ClassName="rs-sep"></div>
+              <div ClassName="rs"><div ClassName="rs-dot act">2</div><span ClassName="rs-lbl act">Carrier</span></div>
+              <div ClassName="rs-sep"></div>
+              <div ClassName="rs"><div ClassName="rs-dot pend">3</div><span ClassName="rs-lbl">Ship</span></div>
+            </div>
             <div className="rp-close" onClick={onClose}>×</div>
           </div>
 
