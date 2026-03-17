@@ -1,4 +1,4 @@
-:root{
+/* :root{
   --bl:#3D6BFF;--bld:#2952E3;--blm:#EEF3FF;--blb:#C7D5FF;
   --ur:#6B7AFF;--ink:#0A0A0F;--ink2:#111118;--ink3:#1A1A26;
   --pp:#F7F6F2;--ppd:#EEECEA;
@@ -11,7 +11,7 @@
   --fh:'Syne',sans-serif;
   --fb:'DM Sans',sans-serif;
   --fm:'JetBrains Mono',monospace;
-}
+} */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{
   font-family:var(--fb);font-size:13px;-webkit-font-smoothing:antialiased;
