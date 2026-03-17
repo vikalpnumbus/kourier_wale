@@ -213,7 +213,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
             </div>
             <div>
               <div className="lw-lbl">Wallet Balance</div>
-              <div className="lw-val">₹ {{sellerwallet}}</div>
+              <div className="lw-val">₹ {sellerwallet}</div>
             </div>
           </div>
         </div>
