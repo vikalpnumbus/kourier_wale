@@ -154,7 +154,16 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
       setLoading(false);
     }
   };
-
+  const minPrice =
+  ratePrice.length > 0
+    ? Math.min(
+        ...ratePrice.map(
+          (r) =>
+            (Number(r.freight_charge) || 0) +
+            (Number(r.cod_charge) || 0)
+        )
+      )
+    : 0;
   return (
     <div
       className="modal fade show"
@@ -220,102 +229,126 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                 {ratePrice.length} carriers available
               </div>
             </div>
-            {/* <div ClassName="rp-steps">
-              <div ClassName="rs">
-                <div ClassName="rs-dot done">
+            <div className="rp-steps">
+              <div className="rs">
+                <div className="rs-dot done">
                   <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
                     <path d="M1.5 4l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 </div>
-                <span ClassName="rs-lbl">Route</span></div>
-              <div ClassName="rs-sep"></div>
-              <div ClassName="rs"><div ClassName="rs-dot act">2</div><span ClassName="rs-lbl act">Carrier</span></div>
-              <div ClassName="rs-sep"></div>
-              <div ClassName="rs"><div ClassName="rs-dot pend">3</div><span ClassName="rs-lbl">Ship</span></div>
-            </div> */}
+                <span className="rs-lbl">Route</span></div>
+              <div className="rs-sep"></div>
+              <div className="rs"><div className="rs-dot act">2</div><span className="rs-lbl act">Carrier</span></div>
+              <div className="rs-sep"></div>
+              <div className="rs"><div className="rs-dot pend">3</div><span className="rs-lbl">Ship</span></div>
+            </div>
             <div className="rp-close" onClick={onClose}>×</div>
           </div>
-
-          {/* ================= CARRIER LIST ================= */}
           <div className="carrier-list">
+  {ratePrice.length > 0 ? (
+    ratePrice.map((rate, index) => {
+      const total =
+        (Number(rate.freight_charge) || 0) +
+        (Number(rate.cod_charge) || 0);
 
-            {ratePrice.length > 0 ? (
-              ratePrice.map((rate, index) => {
-                const total =
-                  (Number(rate.freight_charge) || 0) +
-                  (Number(rate.cod_charge) || 0);
+      const isCheap = total === minPrice;
 
-                return (
-                  <div
-                    key={index}
-                    className={`crow ${selectedIndex === index ? "sel" : ""}`}
-                    onClick={() => handleCourierSelect(rate, index)}
-                  >
-                    {/* Courier Info */}
-                    <div className="cr-id">
-                      <div className="cr-dot">
-                        {rate.courier_name?.slice(0, 2)}
-                      </div>
-                      <div>
-                        <div className="cr-name">
-                          {rate.courier_name}
-                        </div>
-                        <div className="cr-wt">
-                          {orderData?.packageDetails?.weight || "--"} gm
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Zone + ETA */}
-                    <div className="cr-meta">
-                      <div className="cr-zone">
-                        {rate.zone || "N/A"}
-                      </div>
-                      <div className="cr-eta">
-                        <div className="cr-eta-dot"></div>
-                        <div className="cr-eta-txt">2–4 Days</div>
-                      </div>
-                    </div>
-
-                    {/* Charges */}
-                    <div className="cr-charges">
-                      <div className="cr-ch">
-                        <div ClassName="cr-ch-ico cci-m">
-                          <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5h6M4.5 1.5v6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
-                        </div>
-                        <div className="cr-ch-lbl">Freight</div>
-                        <div className="cr-ch-val">
-                          ₹ {rate.freight_charge || 0}
-                        </div>
-                      </div>
-
-                      <div className="cr-ch-sep"></div>
-
-                      <div className="cr-ch">
-                        <div ClassName="cr-ch-ico cci-o">
-                          <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><rect x="1" y="2" width="7" height="5" rx="1" stroke="currentColor" stroke-width="1"/><path d="M1 4h7" stroke="currentColor" stroke-width="1"/></svg>
-                        </div>
-                        <div className="cr-ch-lbl">COD</div>
-                        <div className="cr-ch-val">
-                          ₹ {rate.cod_charge || 0}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Total Price */}
-                    <div className="cr-total">
-                      <div className="cr-rs">₹</div>
-                      <div className="cr-price">{total}</div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <p className="text-center text-muted">
-                No Rate Data Found
-              </p>
-            )}
+      return (
+        <div
+          key={index}
+          className={`crow 
+            ${selectedIndex === index ? "sel" : ""} 
+            ${isCheap ? "cheap" : ""}
+          `}
+          onClick={() => handleCourierSelect(rate, index)}
+        >
+          {/* Courier Info */}
+          <div className="cr-id">
+            <div className="cr-dot">
+              {rate.courier_name?.slice(0, 2)}
+            </div>
+            <div>
+              <div className="cr-name">
+                {rate.courier_name}
+              </div>
+              <div className="cr-wt">
+                {orderData?.packageDetails?.weight || "--"} gm
+              </div>
+            </div>
           </div>
+
+          {/* Zone + ETA */}
+          <div className="cr-meta">
+            <div className="cr-zone">
+              {rate.zone || "N/A"}
+            </div>
+            <div className="cr-eta">
+              <div className="cr-eta-dot"></div>
+              <div className="cr-eta-txt">2–4 Days</div>
+            </div>
+          </div>
+
+          {/* Charges */}
+          <div className="cr-charges">
+            <div className="cr-ch">
+              <div className="cr-ch-ico cci-m">
+                <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                  <path
+                    d="M1.5 4.5h6M4.5 1.5v6"
+                    stroke="currentColor"
+                    strokeWidth="1.1"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              <div className="cr-ch-lbl">Freight</div>
+              <div className="cr-ch-val">
+                ₹ {rate.freight_charge || 0}
+              </div>
+            </div>
+
+            <div className="cr-ch-sep"></div>
+
+            <div className="cr-ch">
+              <div className="cr-ch-ico cci-o">
+                <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                  <rect
+                    x="1"
+                    y="2"
+                    width="7"
+                    height="5"
+                    rx="1"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                  />
+                  <path
+                    d="M1 4h7"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                  />
+                </svg>
+              </div>
+              <div className="cr-ch-lbl">COD</div>
+              <div className="cr-ch-val">
+                ₹ {rate.cod_charge || 0}
+              </div>
+            </div>
+          </div>
+
+          {/* Total Price */}
+          <div className="cr-total">
+            <div className="cr-rs">₹</div>
+            <div className="cr-price">{total}</div>
+          </div>
+        </div>
+      );
+    })
+  ) : (
+    <p className="text-center text-muted">
+      No Rate Data Found
+    </p>
+  )}
+</div>
 
           {/* ================= FOOTER ================= */}
           <div className="rp-foot">
