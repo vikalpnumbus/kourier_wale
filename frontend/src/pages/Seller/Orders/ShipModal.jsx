@@ -34,11 +34,13 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
   };
 
   const [planid, setPlanId] = useState("");
+  const [sellerwallet, setSellerwallet] = useState("0");
   useEffect(() => {
     const fetchplanname = async () => {
       try {
         const response = await api.get(companyDetailsConfig.companyDetails);
         setPlanId(response?.data?.data?.companyDetails.pricingPlanId || "");
+        setSellerwallet(response?.data?.data?.companyDetails.wallet_balance || "0");
       } catch {
         setPlanId("");
       }
@@ -203,6 +205,16 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
             {errors.rto_warehouse_id && (
               <small className="text-danger">{errors.rto_warehouse_id}</small>
             )}
+          </div>
+
+          <div class="lp-wallet">
+            <div class="lw-icon">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M1 5h10" stroke="currentColor" stroke-width="1.1"/><circle cx="8.5" cy="7" r=".8" fill="currentColor"/></svg>
+            </div>
+            <div>
+              <div class="lw-lbl">Wallet Balance</div>
+              <div class="lw-val">₹ {{sellerwallet}}</div>
+            </div>
           </div>
         </div>
         {/* ================= RIGHT PANEL ================= */}
