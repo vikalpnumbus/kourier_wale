@@ -7,28 +7,22 @@ import create_shipment from "../../../config/Shipments/ShipmentsConfig";
 import api from "../../../utils/api";
 import { useAlert } from '../../../middleware/AlertContext';
 import { useSearchParams } from "react-router-dom";
-import "../../../assets/ShipModal.css"
+import "../../../assets/ShipModal.css";
+
 function ShipModal({ orderData, onClose, handleFetchData }) {
-  const [shipData, setShipData] = useState({
-    order_db_ids: "",
-    warehouse_id: "",
-    rto_warehouse_id: "",
-    courier_id: "",
-    freight_charge: "",
-    cod_price: "",
-    zone: "",
-    plan_id: "",
-  });
+
+  const [shipData, setShipData] = useState({});
   const [loading, setLoading] = useState(false);
   const [ratePrice, setRatePrice] = useState([]);
-  const [showForwardReverse, setShowForwardReverse] = useState(false);
   const [form, setForm] = useState({});
   const [errors, setErrors] = useState({});
   const [initialWarehouseData, setInitialWarehouseData] = useState({});
-  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [selectedCourierId, setSelectedCourierId] = useState(null);
+
   const { showError, showSuccess } = useAlert();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // ✅ Warehouse init
   useEffect(() => {
     setInitialWarehouseData({
       warehouse_id: orderData?.warehouse_id || "",
@@ -36,6 +30,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
     });
   }, [orderData]);
 
+  // ✅ Validation
   const validateForm = (form) => {
     const errors = {};
     if (!form.warehouse_id) errors.warehouse_id = "Warehouse Is Required";
@@ -44,60 +39,47 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
     return errors;
   };
 
-  // Fetch Seller Plan Id Because It's Store in User Table
-  const [planid, setPlanId] = useState({});
-  const fetchplanname = async () => {
-    try {
-      const response = await api.get(companyDetailsConfig.companyDetails);
-      setPlanId(response?.data?.data?.companyDetails.pricingPlanId || {});
-    } catch (error) {
-      console.error("Company Details Fetch Error:", error);
-      setPlanId({});
-    }
-  };
+  // ✅ Plan ID
+  const [planid, setPlanId] = useState("");
   useEffect(() => {
+    const fetchplanname = async () => {
+      try {
+        const response = await api.get(companyDetailsConfig.companyDetails);
+        setPlanId(response?.data?.data?.companyDetails.pricingPlanId || "");
+      } catch (error) {
+        setPlanId("");
+      }
+    };
     fetchplanname();
   }, []);
 
+  // ✅ Fetch Rates
   useEffect(() => {
     if (!form.warehouse_id || !orderData) return;
 
-    const {
-      paymentType,
-      packageDetails,
-      shippingDetails,
-      collectableAmount,
-    } = orderData;
+    const { paymentType, packageDetails, shippingDetails, collectableAmount } = orderData;
 
     if (!packageDetails || !shippingDetails) return;
 
-    const { length, height, breadth, weight } = packageDetails;
-    const destination = shippingDetails?.pincode;
-    const origin = form.originpincode || orderData.originpincode; // optional if you store origin in warehouse
-    const amount = collectableAmount;
-
     const formData = {
       paymentType,
-      length,
-      height,
-      breadth,
-      weight,
-      destination,
-      origin,
-      amount,
+      length: packageDetails.length,
+      height: packageDetails.height,
+      breadth: packageDetails.breadth,
+      weight: packageDetails.weight,
+      destination: shippingDetails?.pincode,
+      origin: form.originpincode || orderData.originpincode,
+      amount: collectableAmount,
     };
 
     const fetchRate = async () => {
       try {
         setLoading(true);
-        const url = `${RateConfig.RateCalculator}`;
-        const res = await api.post(url, formData);
+        const res = await api.post(RateConfig.RateCalculator, formData);
         setRatePrice(res?.data?.data?.rows || []);
-        setShowForwardReverse(true);
-        setSelectedIndex(null); // reset selected courier when warehouse changes
+        setSelectedCourierId(null);
       } catch (error) {
-        console.error("API Error:", error);
-        alert("Something went wrong while updating rates");
+        showError("Rate fetch failed");
       } finally {
         setLoading(false);
       }
@@ -106,64 +88,72 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
     fetchRate();
   }, [orderData, form.warehouse_id, form.rto_warehouse_id]);
 
-  const handleCourierSelect = (rate, index) => {
-    setSelectedIndex(index);
+  // ✅ Sorting (CHEAP FIRST)
+  const sortedRates = [...ratePrice].sort((a, b) => {
+    const totalA =
+      (Number(a.freight_charge) || 0) +
+      (Number(a.cod_charge) || 0);
+
+    const totalB =
+      (Number(b.freight_charge) || 0) +
+      (Number(b.cod_charge) || 0);
+
+    return totalA - totalB;
+  });
+
+  // ✅ Min Price
+  const minPrice =
+    sortedRates.length > 0
+      ? (Number(sortedRates[0].freight_charge) || 0) +
+        (Number(sortedRates[0].cod_charge) || 0)
+      : 0;
+
+  // ✅ Select Courier
+  const handleCourierSelect = (rate) => {
+    setSelectedCourierId(rate.courier_id);
+
     setShipData({
       order_db_ids: orderData?.id ? [orderData.id] : [],
-      warehouse_id: form.warehouse_id || orderData?.warehouse_id || "",
-      rto_warehouse_id: form.rto_warehouse_id || orderData?.rto_warehouse_id || "",
-      courier_id: rate.courier_id || "",
+      warehouse_id: form.warehouse_id,
+      rto_warehouse_id: form.rto_warehouse_id,
+      courier_id: rate.courier_id,
       freight_charge: Number(rate.freight_charge) || 0,
       cod_price: Number(rate.cod_charge) || 0,
       zone: rate.zone || "",
-      plan_id: planid || "",
+      plan_id: planid,
     });
   };
 
+  // ✅ Submit
   const handleSubmit = async () => {
     const newErrors = validateForm(form);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
+
     if (!shipData.courier_id) {
-      showError("Please select a courier before shipping.");
+      showError("Please select a courier");
       return;
     }
-    const finalPayload = {
-      ...shipData,
-      warehouse_id: form.warehouse_id,
-      rto_warehouse_id: form.rto_warehouse_id,
-      plan_id: planid,
-    };
+
     try {
       setLoading(true);
-      const url = `${create_shipment.createshipments}`;
-      const res = await api.post(url, finalPayload);
+      const res = await api.post(create_shipment.createshipments, shipData);
+
       if (res?.data?.status === 201) {
-        showSuccess(res?.data?.message || "Shipment Created Successfully")
-        setSearchParams({});
+        showSuccess("Shipment Created");
         onClose();
         handleFetchData();
       } else {
-        showError(res?.data?.message || "Something went wrong while creating shipment")
+        showError("Shipment failed");
       }
-    } catch (error) {
-      showError(error?.response?.data?.message || "Something went wrong while creating shipment")
+    } catch {
+      showError("Shipment error");
     } finally {
       setLoading(false);
     }
   };
-  const minPrice =
-  ratePrice.length > 0
-    ? Math.min(
-        ...ratePrice.map(
-          (r) =>
-            (Number(r.freight_charge) || 0) +
-            (Number(r.cod_charge) || 0)
-        )
-      )
-    : 0;
   return (
     <div
       className="modal fade show"
@@ -252,110 +242,69 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
             <div className="rp-close" onClick={onClose}>×</div>
           </div>
           <div className="carrier-list">
-  {ratePrice.length > 0 ? (
-    ratePrice.map((rate, index) => {
-      const total =
-        (Number(rate.freight_charge) || 0) +
-        (Number(rate.cod_charge) || 0);
 
-      const isCheap = total === minPrice;
+      {sortedRates.length > 0 ? (
+        sortedRates.map((rate) => {
+          const total =
+            (Number(rate.freight_charge) || 0) +
+            (Number(rate.cod_charge) || 0);
 
-      return (
-        <div
-          key={index}
-          className={`crow 
-            ${selectedIndex === index ? "sel" : ""} 
-            ${isCheap ? "cheap" : ""}
-          `}
-          onClick={() => handleCourierSelect(rate, index)}
-        >
-          {/* Courier Info */}
-          <div className="cr-id">
-            <div className="cr-dot">
-              {rate.courier_name?.slice(0, 2)}
-            </div>
-            <div>
-              <div className="cr-name">
-                {rate.courier_name}
+          const isCheap = total === minPrice;
+
+          return (
+            <div
+              key={rate.courier_id}
+              className={`crow 
+                ${selectedCourierId === rate.courier_id ? "sel" : ""} 
+                ${isCheap ? "cheap" : ""}
+              `}
+              onClick={() => handleCourierSelect(rate)}
+              style={{ position: "relative" }}
+            >
+
+              {/* ✅ BEST VALUE BADGE */}
+              {isCheap && (
+                <div className="cr-badge cb-g">
+                  ★ Best Value
+                </div>
+              )}
+
+              <div className="cr-id">
+                <div className="cr-dot">
+                  {rate.courier_name?.slice(0, 2)}
+                </div>
+                <div>
+                  <div className="cr-name">{rate.courier_name}</div>
+                  <div className="cr-wt">
+                    {orderData?.packageDetails?.weight || "--"} gm
+                  </div>
+                </div>
               </div>
-              <div className="cr-wt">
-                {orderData?.packageDetails?.weight || "--"} gm
-              </div>
-            </div>
-          </div>
 
-          {/* Zone + ETA */}
-          <div className="cr-meta">
-            <div className="cr-zone">
-              {rate.zone || "N/A"}
-            </div>
-            <div className="cr-eta">
-              <div className="cr-eta-dot"></div>
-              <div className="cr-eta-txt">2–4 Days</div>
-            </div>
-          </div>
-
-          {/* Charges */}
-          <div className="cr-charges">
-            <div className="cr-ch">
-              <div className="cr-ch-ico cci-m">
-                <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                  <path
-                    d="M1.5 4.5h6M4.5 1.5v6"
-                    stroke="currentColor"
-                    strokeWidth="1.1"
-                    strokeLinecap="round"
-                  />
-                </svg>
+              <div className="cr-meta">
+                <div className="cr-zone">{rate.zone || "N/A"}</div>
+                <div className="cr-eta">2–4 Days</div>
               </div>
-              <div className="cr-ch-lbl">Freight</div>
-              <div className="cr-ch-val">
-                ₹ {rate.freight_charge || 0}
+
+              <div className="cr-total">
+                ₹ {total}
               </div>
+
             </div>
+          );
+        })
+      ) : (
+        <p>No Rate Data</p>
+      )}
 
-            <div className="cr-ch-sep"></div>
+      <button
+        disabled={!selectedCourierId}
+        onClick={handleSubmit}
+      >
+        {loading ? "Processing..." : "Confirm & Ship"}
+      </button>
 
-            <div className="cr-ch">
-              <div className="cr-ch-ico cci-o">
-                <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                  <rect
-                    x="1"
-                    y="2"
-                    width="7"
-                    height="5"
-                    rx="1"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                  />
-                  <path
-                    d="M1 4h7"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                  />
-                </svg>
-              </div>
-              <div className="cr-ch-lbl">COD</div>
-              <div className="cr-ch-val">
-                ₹ {rate.cod_charge || 0}
-              </div>
-            </div>
-          </div>
-
-          {/* Total Price */}
-          <div className="cr-total">
-            <div className="cr-rs">₹</div>
-            <div className="cr-price">{total}</div>
-          </div>
-        </div>
-      );
-    })
-  ) : (
-    <p className="text-center text-muted">
-      No Rate Data Found
-    </p>
-  )}
-</div>
+    </div>
 
           {/* ================= FOOTER ================= */}
           <div className="rp-foot">
