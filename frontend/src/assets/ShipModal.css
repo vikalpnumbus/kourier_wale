@@ -191,7 +191,7 @@ body::before{
 .carrier-list::-webkit-scrollbar-thumb{background:#E8EBF2;border-radius:3px}
 
 /* ── CARRIER ROW — horizontal layout ── */
-/* .crow{
+.crow{
   background:#FFFFFF;border:1.5px solid #E8EBF2;
   border-radius:12px;padding:.75rem 1rem;
   display:flex;align-items:center;gap:.875rem;
@@ -217,10 +217,10 @@ body::before{
 .crow.cheap::before{background:#2D8A4E}
 .crow.cheap:hover{background:#E6F7EE;border-color:#B3E8C8}
 .crow.cheap.sel{background:#E6F7EE;border-color:#2D8A4E}
-.crow.cheap.sel::before{background:#2D8A4E} */
+.crow.cheap.sel::before{background:#2D8A4E}
 
 
-.crow {
+/* .crow {
   background: #FFFFFF;
   border: 1.5px solid #E8EBF2;
   border-radius: 12px;
@@ -233,8 +233,6 @@ body::before{
   position: relative;
   overflow: hidden;
 }
-
-/* LEFT BORDER */
 .crow::before {
   content: '';
   position: absolute;
@@ -245,51 +243,37 @@ body::before{
   background: #E8EBF2;
   transition: all .16s;
 }
-
-/* NORMAL HOVER */
 .crow:hover {
   border-color: #C7D5FF;
-  background: #F4F7FF; /* LIGHT hover instead of dark */
+  background: #F4F7FF;
 }
-
 .crow:hover::before {
   background: #3D6BFF;
 }
-
-/* SELECTED */
 .crow.sel {
   border-color: #3D6BFF;
   background: #EAF0FF;
 }
-
 .crow.sel::before {
   background: #3D6BFF;
 }
-
-/* CHEAP */
 .crow.cheap {
   border-color: #B3E8C8;
 }
-
 .crow.cheap::before {
   background: #2D8A4E;
 }
-
-/* CHEAP HOVER */
 .crow.cheap:hover {
   background: #E6F7EE;
   border-color: #2D8A4E;
 }
-
-/* CHEAP SELECTED */
 .crow.cheap.sel {
   background: #DDF5E8;
   border-color: #2D8A4E;
 }
-
 .crow.cheap.sel::before {
   background: #2D8A4E;
-}
+} */
 
 /* carrier identity */
 .cr-id{display:flex;align-items:center;gap:.5rem;width:155px;flex-shrink:0}
