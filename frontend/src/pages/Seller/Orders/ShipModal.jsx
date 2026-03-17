@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import WarehouseDropdown from "./WarehouseDropdown";
 import ShipModalWarehouse from "./ShipModalWarehouse";
 import companyDetailsConfig from "../../../config/CompanyDetails/CompanyDetailsConfig";
 import RateConfig from "../../../config/RateDetails/RateDetailsConfig";
@@ -8,9 +7,7 @@ import api from "../../../utils/api";
 import { useAlert } from '../../../middleware/AlertContext';
 import { useSearchParams } from "react-router-dom";
 import "../../../assets/ShipModal.css";
-
 function ShipModal({ orderData, onClose, handleFetchData }) {
-
   const [shipData, setShipData] = useState({});
   const [loading, setLoading] = useState(false);
   const [ratePrice, setRatePrice] = useState([]);
@@ -18,11 +15,9 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
   const [errors, setErrors] = useState({});
   const [initialWarehouseData, setInitialWarehouseData] = useState({});
   const [selectedCourierId, setSelectedCourierId] = useState(null);
-
   const { showError, showSuccess } = useAlert();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // ✅ Warehouse init
   useEffect(() => {
     setInitialWarehouseData({
       warehouse_id: orderData?.warehouse_id || "",
@@ -30,7 +25,6 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
     });
   }, [orderData]);
 
-  // ✅ Validation
   const validateForm = (form) => {
     const errors = {};
     if (!form.warehouse_id) errors.warehouse_id = "Warehouse Is Required";
@@ -39,21 +33,19 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
     return errors;
   };
 
-  // ✅ Plan ID
   const [planid, setPlanId] = useState("");
   useEffect(() => {
     const fetchplanname = async () => {
       try {
         const response = await api.get(companyDetailsConfig.companyDetails);
         setPlanId(response?.data?.data?.companyDetails.pricingPlanId || "");
-      } catch (error) {
+      } catch {
         setPlanId("");
       }
     };
     fetchplanname();
   }, []);
 
-  // ✅ Fetch Rates
   useEffect(() => {
     if (!form.warehouse_id || !orderData) return;
 
@@ -78,7 +70,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
         const res = await api.post(RateConfig.RateCalculator, formData);
         setRatePrice(res?.data?.data?.rows || []);
         setSelectedCourierId(null);
-      } catch (error) {
+      } catch {
         showError("Rate fetch failed");
       } finally {
         setLoading(false);
@@ -88,7 +80,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
     fetchRate();
   }, [orderData, form.warehouse_id, form.rto_warehouse_id]);
 
-  // ✅ Sorting (CHEAP FIRST)
+  // ✅ SORT ADD KIYA
   const sortedRates = [...ratePrice].sort((a, b) => {
     const totalA =
       (Number(a.freight_charge) || 0) +
@@ -101,14 +93,13 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
     return totalA - totalB;
   });
 
-  // ✅ Min Price
+  // ✅ MIN PRICE
   const minPrice =
     sortedRates.length > 0
       ? (Number(sortedRates[0].freight_charge) || 0) +
         (Number(sortedRates[0].cod_charge) || 0)
       : 0;
 
-  // ✅ Select Courier
   const handleCourierSelect = (rate) => {
     setSelectedCourierId(rate.courier_id);
 
@@ -124,7 +115,6 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
     });
   };
 
-  // ✅ Submit
   const handleSubmit = async () => {
     const newErrors = validateForm(form);
     if (Object.keys(newErrors).length > 0) {
@@ -142,18 +132,19 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
       const res = await api.post(create_shipment.createshipments, shipData);
 
       if (res?.data?.status === 201) {
-        showSuccess("Shipment Created");
+        showSuccess("Shipment Created Successfully");
         onClose();
         handleFetchData();
       } else {
         showError("Shipment failed");
       }
     } catch {
-      showError("Shipment error");
+      showError("Something went wrong");
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div
       className="modal fade show"
@@ -214,11 +205,8 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
             )}
           </div>
         </div>
-
         {/* ================= RIGHT PANEL ================= */}
         <div className="right">
-
-          {/* Header */}
           <div className="rp-hdr">
             <div>
               <div className="rp-title">Choose a Carrier</div>
@@ -241,70 +229,64 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
             </div>
             <div className="rp-close" onClick={onClose}>×</div>
           </div>
+
           <div className="carrier-list">
 
-      {sortedRates.length > 0 ? (
-        sortedRates.map((rate) => {
-          const total =
-            (Number(rate.freight_charge) || 0) +
-            (Number(rate.cod_charge) || 0);
+            {sortedRates.length > 0 ? (
+              sortedRates.map((rate) => {
+                const total =
+                  (Number(rate.freight_charge) || 0) +
+                  (Number(rate.cod_charge) || 0);
 
-          const isCheap = total === minPrice;
+                const isCheap = total === minPrice;
 
-          return (
-            <div
-              key={rate.courier_id}
-              className={`crow 
-                ${selectedCourierId === rate.courier_id ? "sel" : ""} 
-                ${isCheap ? "cheap" : ""}
-              `}
-              onClick={() => handleCourierSelect(rate)}
-              style={{ position: "relative" }}
-            >
+                return (
+                  <div
+                    key={rate.courier_id}
+                    className={`crow 
+                      ${selectedCourierId === rate.courier_id ? "sel" : ""} 
+                      ${isCheap ? "cheap" : ""}
+                    `}
+                    onClick={() => handleCourierSelect(rate)}
+                    style={{ position: "relative" }}
+                  >
 
-              {/* ✅ BEST VALUE BADGE */}
-              {isCheap && (
-                <div className="cr-badge cb-g">
-                  ★ Best Value
-                </div>
-              )}
+                    {/* ✅ BADGE ADD */}
+                    {isCheap && (
+                      <div className="cr-badge cb-g">
+                        ★ Best Value
+                      </div>
+                    )}
 
-              <div className="cr-id">
-                <div className="cr-dot">
-                  {rate.courier_name?.slice(0, 2)}
-                </div>
-                <div>
-                  <div className="cr-name">{rate.courier_name}</div>
-                  <div className="cr-wt">
-                    {orderData?.packageDetails?.weight || "--"} gm
+                    <div className="cr-id">
+                      <div className="cr-dot">
+                        {rate.courier_name?.slice(0, 2)}
+                      </div>
+                      <div>
+                        <div className="cr-name">{rate.courier_name}</div>
+                        <div className="cr-wt">
+                          {orderData?.packageDetails?.weight || "--"} gm
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="cr-meta">
+                      <div className="cr-zone">{rate.zone || "N/A"}</div>
+                      <div className="cr-eta">2–4 Days</div>
+                    </div>
+
+                    <div className="cr-total">
+                      ₹ {total}
+                    </div>
+
                   </div>
-                </div>
-              </div>
+                );
+              })
+            ) : (
+              <p>No Rate Data</p>
+            )}
 
-              <div className="cr-meta">
-                <div className="cr-zone">{rate.zone || "N/A"}</div>
-                <div className="cr-eta">2–4 Days</div>
-              </div>
-
-              <div className="cr-total">
-                ₹ {total}
-              </div>
-
-            </div>
-          );
-        })
-      ) : (
-        <p>No Rate Data</p>
-      )}
-
-      <button
-        disabled={!selectedCourierId}
-        onClick={handleSubmit}
-      >
-        {loading ? "Processing..." : "Confirm & Ship"}
-      </button>
-
-    </div>
+          </div>
 
           {/* ================= FOOTER ================= */}
           <div className="rp-foot">
@@ -313,13 +295,14 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
             </button>
 
             <button
-              className={`btn-ship ${selectedIndex !== null ? "rdy" : ""}`}
-              disabled={selectedIndex === null || loading}
+              className={`btn-ship ${selectedCourierId ? "rdy" : ""}`}
+              disabled={!selectedCourierId || loading}
               onClick={handleSubmit}
             >
               {loading ? "Processing..." : "Confirm & Ship"}
             </button>
           </div>
+
         </div>
       </div>
     </div>
