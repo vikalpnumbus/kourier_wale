@@ -183,8 +183,15 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
 
         {/* ================= LEFT PANEL ================= */}
         <div className="left">
-
-          {/* Heading */}
+          <div class="lp-brand">
+            <svg class="lp-logo" viewBox="0 0 72 72" fill="none">
+              <circle cx="36" cy="36" r="34" fill="rgba(61,107,255,0.15)"></circle>
+              <path d="M25 18 Q25 10 36 10 Q47 10 47 18" stroke="#fff" stroke-width="2.6" stroke-linecap="round" fill="none" opacity="0.35"></path>
+              <path d="M16 22 L36 54 L56 22" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+              <circle cx="36" cy="54" r="4.5" fill="#3D6BFF"></circle>
+            </svg>
+            <div class="lp-name">vey<span>go</span></div>
+          </div>
           <div className="lp-heading">
             <div className="lp-h">
               SHIP <br /> <span className="acc">NOW</span>
