@@ -153,11 +153,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
       className="modal fade show"
       onClick={onClose}
     >
-      <div
-        className="modal-dialog cmp_modal-lg"
-        role="document"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="modal-dialog cmp_modal-lg" role="document" onClick={(e) => e.stopPropagation()}>
     <div className="ov">
       <div className="dlg">
         <div className="left">
