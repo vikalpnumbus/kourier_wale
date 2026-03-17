@@ -187,9 +187,9 @@ body::before{
 /* coloured left bar */
 .crow::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
   background:#E8EBF2;transition:background .16s;border-radius:6px 0 0 6px}
-.crow:hover{border-color:#C7D5FF;background:#2952E3;box-shadow:0 3px 12px rgba(61,107,255,.1);transform:translateX(2px)}
+.crow:hover{border-color:#C7D5FF !important;background:#2952E3 !important;box-shadow:0 3px 12px rgba(61,107,255,.1);transform:translateX(2px)}
 .crow:hover::before{background:#3D6BFF}
-.crow.sel{border-color:#3D6BFF;background:#2952E3;box-shadow:0 4px 16px rgba(61,107,255,.14)}
+.crow.sel{border-color:#3D6BFF !important;background:#2952E3 !important;box-shadow:0 4px 16px rgba(61,107,255,.14)}
 .crow.sel::before{background:#3D6BFF}
 .crow.cheap{border-color:#B3E8C8}
 .crow.cheap::before{background:#2D8A4E}
