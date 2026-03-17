@@ -170,158 +170,153 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
         role="document"
         onClick={(e) => e.stopPropagation()}
       >
-      <div className="ov" onClick={onClose}>
-        <div className="dlg" onClick={(e) => e.stopPropagation()}>
+    <div className="ov" onClick={onClose}>
+      <div className="dlg" onClick={(e) => e.stopPropagation()}>
 
-          {/* ================= LEFT PANEL ================= */}
-          <div className="left">
+        {/* ================= LEFT PANEL ================= */}
+        <div className="left">
 
-            {/* Heading */}
-            <div className="lp-heading">
-              <div className="lp-h">
-                SHIP <br /> <span className="acc">NOW</span>
-              </div>
-              <div className="lp-sub">Pick carrier · Confirm · Done</div>
+          {/* Heading */}
+          <div className="lp-heading">
+            <div className="lp-h">
+              SHIP <br /> <span className="acc">NOW</span>
             </div>
-
-            {/* Warehouse Selection */}
-            <div className="pkg-meta">
-              <div className="pm-lbl">Select Warehouses</div>
-
-              <ShipModalWarehouse
-                setForm={setForm}
-                setErrors={setErrors}
-                initialWarehouseData={initialWarehouseData.warehouse_id}
-                warehouseType={"normal"}
-              />
-              {errors.warehouse_id && (
-                <small className="text-danger">{errors.warehouse_id}</small>
-              )}
-
-              <ShipModalWarehouse
-                setForm={setForm}
-                setErrors={setErrors}
-                initialWarehouseData={initialWarehouseData.rto_warehouse_id}
-                warehouseType={"rto"}
-              />
-              {errors.rto_warehouse_id && (
-                <small className="text-danger">{errors.rto_warehouse_id}</small>
-              )}
-            </div>
+            <div className="lp-sub">Pick carrier · Confirm · Done</div>
           </div>
 
-          {/* ================= RIGHT PANEL ================= */}
-          <div className="right">
+          {/* Warehouse Selection */}
+          <div className="pkg-meta">
+            <div className="pm-lbl">Select Warehouses</div>
 
-            {/* Header */}
-            <div ClassName="rp-hdr">
-              <div ClassName="rp-hdr-left">
-                <div ClassName="rp-title">Choose a Carrier</div>
-                <div ClassName="rp-count" id="rpCount">{ratePrice.length} carriers available for this route</div>
-              </div>
-              <div ClassName="rp-steps">
-                <div ClassName="rs"><div ClassName="rs-dot done"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span ClassName="rs-lbl">Route</span></div>
-                <div ClassName="rs-sep"></div>
-                <div ClassName="rs"><div ClassName="rs-dot act">2</div><span ClassName="rs-lbl act">Carrier</span></div>
-                <div ClassName="rs-sep"></div>
-                <div ClassName="rs"><div ClassName="rs-dot pend">3</div><span ClassName="rs-lbl">Ship</span></div>
-              </div>
-              <div ClassName="rp-close" onClick={onClose}>
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <ShipModalWarehouse
+              setForm={setForm}
+              setErrors={setErrors}
+              initialWarehouseData={initialWarehouseData.warehouse_id}
+              warehouseType={"normal"}
+            />
+            {errors.warehouse_id && (
+              <small className="text-danger">{errors.warehouse_id}</small>
+            )}
+
+            <ShipModalWarehouse
+              setForm={setForm}
+              setErrors={setErrors}
+              initialWarehouseData={initialWarehouseData.rto_warehouse_id}
+              warehouseType={"rto"}
+            />
+            {errors.rto_warehouse_id && (
+              <small className="text-danger">{errors.rto_warehouse_id}</small>
+            )}
+          </div>
+        </div>
+
+        {/* ================= RIGHT PANEL ================= */}
+        <div className="right">
+
+          {/* Header */}
+          <div className="rp-hdr">
+            <div>
+              <div className="rp-title">Choose a Carrier</div>
+              <div className="rp-count">
+                {ratePrice.length} carriers available
               </div>
             </div>
-            {/* ================= CARRIER LIST ================= */}
-            <div className="carrier-list">
 
-              {ratePrice.length > 0 ? (
-                ratePrice.map((rate, index) => {
-                  const total =
-                    (Number(rate.freight_charge) || 0) +
-                    (Number(rate.cod_charge) || 0);
+            <div className="rp-close" onClick={onClose}>×</div>
+          </div>
 
-                  return (
-                    <div
-                      key={index}
-                      className={`crow ${selectedIndex === index ? "sel" : ""}`}
-                      onClick={() => handleCourierSelect(rate, index)}
-                    >
-                      {/* Courier Info */}
-                      <div className="cr-id">
-                        <div className="cr-dot">
-                          {rate.courier_name?.slice(0, 2)}
-                        </div>
-                        <div>
-                          <div className="cr-name">
-                            {rate.courier_name}
-                          </div>
-                          <div className="cr-wt">
-                            {orderData?.packageDetails?.weight || "--"} gm
-                          </div>
-                        </div>
+          {/* ================= CARRIER LIST ================= */}
+          <div className="carrier-list">
+
+            {ratePrice.length > 0 ? (
+              ratePrice.map((rate, index) => {
+                const total =
+                  (Number(rate.freight_charge) || 0) +
+                  (Number(rate.cod_charge) || 0);
+
+                return (
+                  <div
+                    key={index}
+                    className={`crow ${selectedIndex === index ? "sel" : ""}`}
+                    onClick={() => handleCourierSelect(rate, index)}
+                  >
+                    {/* Courier Info */}
+                    <div className="cr-id">
+                      <div className="cr-dot">
+                        {rate.courier_name?.slice(0, 2)}
                       </div>
-
-                      {/* Zone + ETA */}
-                      <div className="cr-meta">
-                        <div className="cr-zone">
-                          {rate.zone || "N/A"}
+                      <div>
+                        <div className="cr-name">
+                          {rate.courier_name}
                         </div>
-                        <div className="cr-eta">
-                          <div className="cr-eta-dot"></div>
-                          <div className="cr-eta-txt">2–4 Days</div>
+                        <div className="cr-wt">
+                          {orderData?.packageDetails?.weight || "--"} gm
                         </div>
-                      </div>
-
-                      {/* Charges */}
-                      <div className="cr-charges">
-                        <div className="cr-ch">
-                          <div className="cr-ch-lbl">Freight</div>
-                          <div className="cr-ch-val">
-                            ₹ {rate.freight_charge || 0}
-                          </div>
-                        </div>
-
-                        <div className="cr-ch-sep"></div>
-
-                        <div className="cr-ch">
-                          <div className="cr-ch-lbl">COD</div>
-                          <div className="cr-ch-val">
-                            ₹ {rate.cod_charge || 0}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Total Price */}
-                      <div className="cr-total">
-                        <div className="cr-rs">₹</div>
-                        <div className="cr-price">{total}</div>
                       </div>
                     </div>
-                  );
-                })
-              ) : (
-                <p className="text-center text-muted">
-                  No Rate Data Found
-                </p>
-              )}
-            </div>
 
-            {/* ================= FOOTER ================= */}
-            <div className="rp-foot">
-              <button className="btn-cancel" onClick={onClose}>
-                Cancel
-              </button>
+                    {/* Zone + ETA */}
+                    <div className="cr-meta">
+                      <div className="cr-zone">
+                        {rate.zone || "N/A"}
+                      </div>
+                      <div className="cr-eta">
+                        <div className="cr-eta-dot"></div>
+                        <div className="cr-eta-txt">2–4 Days</div>
+                      </div>
+                    </div>
 
-              <button
-                className={`btn-ship ${selectedIndex !== null ? "rdy" : ""}`}
-                disabled={selectedIndex === null || loading}
-                onClick={handleSubmit}
-              >
-                {loading ? "Processing..." : "Confirm & Ship"}
-              </button>
-            </div>
+                    {/* Charges */}
+                    <div className="cr-charges">
+                      <div className="cr-ch">
+                        <div className="cr-ch-lbl">Freight</div>
+                        <div className="cr-ch-val">
+                          ₹ {rate.freight_charge || 0}
+                        </div>
+                      </div>
+
+                      <div className="cr-ch-sep"></div>
+
+                      <div className="cr-ch">
+                        <div className="cr-ch-lbl">COD</div>
+                        <div className="cr-ch-val">
+                          ₹ {rate.cod_charge || 0}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Total Price */}
+                    <div className="cr-total">
+                      <div className="cr-rs">₹</div>
+                      <div className="cr-price">{total}</div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-center text-muted">
+                No Rate Data Found
+              </p>
+            )}
+          </div>
+
+          {/* ================= FOOTER ================= */}
+          <div className="rp-foot">
+            <button className="btn-cancel" onClick={onClose}>
+              Cancel
+            </button>
+
+            <button
+              className={`btn-ship ${selectedIndex !== null ? "rdy" : ""}`}
+              disabled={selectedIndex === null || loading}
+              onClick={handleSubmit}
+            >
+              {loading ? "Processing..." : "Confirm & Ship"}
+            </button>
           </div>
         </div>
       </div>
+    </div>
       </div>
     </div>
   );
