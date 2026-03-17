@@ -71,9 +71,22 @@ body::before{
 .lp-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#fff;letter-spacing:-.04em}
 .lp-name span{color:#3D6BFF}
 
-.lp-heading{position:relative;z-index:1}
-.lp-h{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#fff;line-height:.92;letter-spacing:.02em}
-.lp-h .acc{color:#3D6BFF}
+.lp-heading
+{
+    position:relative !important;
+    z-index:1 !important;
+}
+.lp-h{
+    font-family:'Bebas Neue',sans-serif !important;
+    font-size:2rem !important;
+    color:#fff !important;
+    line-height:.92 !important;
+    letter-spacing:.02em !important;
+}
+.lp-h .acc
+{
+    color:#3D6BFF !important;
+}
 .lp-sub{font-family:'JetBrains Mono',monospace;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;
   color:rgba(255,255,255,.3);margin-top:.35rem}
 
