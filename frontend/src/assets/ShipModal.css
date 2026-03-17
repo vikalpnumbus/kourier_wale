@@ -27,9 +27,9 @@ body::before{
 } */
 
 /* ══ OVERLAY ══ */
-.modal-dialog {
+/* .modal-dialog {
   pointer-events: auto !important;
-}
+} */
 .ov{
     position: relative;
     z-index: 10;
