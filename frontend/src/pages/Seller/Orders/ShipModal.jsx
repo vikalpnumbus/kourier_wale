@@ -227,7 +227,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
               <div className="rs-sep"></div>
               <div className="rs"><div className="rs-dot pend">3</div><span className="rs-lbl">Ship</span></div>
             </div>
-            <div className="rp-close">×</div>
+            <div className="rp-close" onClick={onClose}>×</div>
           </div>
 
           <div className="carrier-list">
@@ -320,7 +320,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
 
           {/* ================= FOOTER ================= */}
           <div className="rp-foot">
-            <button className="btn-cancel">
+            <button className="btn-cancel" onClick={onClose}>
               Cancel
             </button>
 
