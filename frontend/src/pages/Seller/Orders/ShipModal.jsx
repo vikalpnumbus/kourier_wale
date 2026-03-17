@@ -280,7 +280,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                     {/* Charges */}
                     <div className="cr-charges">
                       <div className="cr-ch">
-                        <div class="cr-ch-ico cci-m">
+                        <div ClassName="cr-ch-ico cci-m">
                           <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5h6M4.5 1.5v6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
                         </div>
                         <div className="cr-ch-lbl">Freight</div>
@@ -292,7 +292,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                       <div className="cr-ch-sep"></div>
 
                       <div className="cr-ch">
-                        <div class="cr-ch-ico cci-o">
+                        <div ClassName="cr-ch-ico cci-o">
                           <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><rect x="1" y="2" width="7" height="5" rx="1" stroke="currentColor" stroke-width="1"/><path d="M1 4h7" stroke="currentColor" stroke-width="1"/></svg>
                         </div>
                         <div className="cr-ch-lbl">COD</div>

@@ -185,8 +185,18 @@ body::before{
   cursor:pointer;transition:all .16s;position:relative;overflow:hidden
 }
 /* coloured left bar */
-.crow::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:#E8EBF2;transition:background .16s;border-radius:6px 0 0 6px}
+.crow::before
+{
+    content:'';
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:3px;
+    background:#E8EBF2;
+    transition:all .16s;
+    border-radius:6px 0 0 6px
+}
 .crow:hover{border-color:#C7D5FF !important;background:#2952E3 !important;box-shadow:0 3px 12px rgba(61,107,255,.1);transform:translateX(2px)}
 .crow:hover::before{background:#3D6BFF}
 .crow.sel{border-color:#3D6BFF !important;background:#2952E3 !important;box-shadow:0 4px 16px rgba(61,107,255,.14)}
