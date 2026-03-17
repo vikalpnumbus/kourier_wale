@@ -7,6 +7,7 @@ import create_shipment from "../../../config/Shipments/ShipmentsConfig";
 import api from "../../../utils/api";
 import { useAlert } from '../../../middleware/AlertContext';
 import { useSearchParams } from "react-router-dom";
+import "../../../assets/ShipModal.css"
 
 function ShipModal({ orderData, onClose, handleFetchData }) {
   const [shipData, setShipData] = useState({
@@ -169,115 +170,153 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
         role="document"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="modal-content">
-          <div className="modal-header py-1">
-            <h5 className="modal-title">Ship Your Package Now</h5>
-            <button
-              type="button"
-              className="close"
-              onClick={onClose}
-              aria-label="Close"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
+      <div className="ov" onClick={onClose}>
+        <div className="dlg" onClick={(e) => e.stopPropagation()}>
 
-          <div className="modal-body text-center">
-            <div className="row">
-              <div className="col-md-6">
-                <ShipModalWarehouse
-                  setForm={setForm}
-                  setErrors={setErrors}
-                  initialWarehouseData={initialWarehouseData.warehouse_id}
-                  warehouseType={"normal"}
-                />
-                {errors.warehouse_id && (
-                  <small className="text-danger text-start mb-4">
-                    {errors.warehouse_id}
-                  </small>
-                )}
+          {/* ================= LEFT PANEL ================= */}
+          <div className="left">
+
+            {/* Heading */}
+            <div className="lp-heading">
+              <div className="lp-h">
+                SHIP <br /> <span className="acc">NOW</span>
               </div>
-              <div className="col-md-6">
-                <ShipModalWarehouse
-                  setForm={setForm}
-                  setErrors={setErrors}
-                  initialWarehouseData={initialWarehouseData.rto_warehouse_id}
-                  warehouseType={"rto"}
-                />
-                {errors.rto_warehouse_id && (
-                  <small className="text-danger text-start mb-4">
-                    {errors.rto_warehouse_id}
-                  </small>
-                )}
-              </div>
+              <div className="lp-sub">Pick carrier · Confirm · Done</div>
             </div>
 
-            {/* ✅ Courier Rate Cards */}
-            <div className="row mt-3">
-              <div className="col-md-12 mb-2">
-                {ratePrice.length > 0 ? (
-                  <div className="row">
-                    {ratePrice.map((rate, index) => (
+            {/* Warehouse Selection */}
+            <div className="pkg-meta">
+              <div className="pm-lbl">Select Warehouses</div>
 
-                      <div
-                        key={index}
-                        className="col-md-6 mb-3"
-                        onClick={() => handleCourierSelect(rate, index)}
-                      >
-                        <div
-                          className={`volume_price p-3 rounded ${selectedIndex === index ? "selected-rate" : ""
-                            }`}
-                          style={{
-                            cursor: "pointer",
-                            border:
-                              selectedIndex === index
-                                ? "2px solid #007bff"
-                                : "1px solid #ddd",
-                            backgroundColor:
-                              selectedIndex === index ? "#e7f1ff" : "#fff",
-                            transition: "all 0.3s ease",
-                          }}
-                        >
-                          <div className="d-flex justify-content-between align-items-center">
-                            <span className="courier-title-heading">
-                              {rate.courier_name}
-                            </span>
-                            <div className="courier-box text-center">
-                              <div className="courier-box-rs">
-                                <sup>₹</sup>
-                                <span className="price">{(Number(rate.freight_charge) || 0) + (Number(rate.cod_charge) || 0)}</span>
-                              </div>
-                              <small className="text-muted d-block mt-1">
-                                {rate.zone || "N/A"}
-                              </small>
-                            </div>
+              <ShipModalWarehouse
+                setForm={setForm}
+                setErrors={setErrors}
+                initialWarehouseData={initialWarehouseData.warehouse_id}
+                warehouseType={"normal"}
+              />
+              {errors.warehouse_id && (
+                <small className="text-danger">{errors.warehouse_id}</small>
+              )}
+
+              <ShipModalWarehouse
+                setForm={setForm}
+                setErrors={setErrors}
+                initialWarehouseData={initialWarehouseData.rto_warehouse_id}
+                warehouseType={"rto"}
+              />
+              {errors.rto_warehouse_id && (
+                <small className="text-danger">{errors.rto_warehouse_id}</small>
+              )}
+            </div>
+          </div>
+
+          {/* ================= RIGHT PANEL ================= */}
+          <div className="right">
+
+            {/* Header */}
+            <div className="rp-hdr">
+              <div>
+                <div className="rp-title">Choose a Carrier</div>
+                <div className="rp-count">
+                  {ratePrice.length} carriers available
+                </div>
+              </div>
+
+              <div className="rp-close" onClick={onClose}>×</div>
+            </div>
+
+            {/* ================= CARRIER LIST ================= */}
+            <div className="carrier-list">
+
+              {ratePrice.length > 0 ? (
+                ratePrice.map((rate, index) => {
+                  const total =
+                    (Number(rate.freight_charge) || 0) +
+                    (Number(rate.cod_charge) || 0);
+
+                  return (
+                    <div
+                      key={index}
+                      className={`crow ${selectedIndex === index ? "sel" : ""}`}
+                      onClick={() => handleCourierSelect(rate, index)}
+                    >
+                      {/* Courier Info */}
+                      <div className="cr-id">
+                        <div className="cr-dot">
+                          {rate.courier_name?.slice(0, 2)}
+                        </div>
+                        <div>
+                          <div className="cr-name">
+                            {rate.courier_name}
                           </div>
-                          <div className="form-text mt-2">
-                            <i className="ti ti-info-circle menu-icon"></i>
-                            Freight Charges: ₹ {rate.freight_charge || 0} + COD
-                            Charges: ₹ {rate.cod_charge || 0}
+                          <div className="cr-wt">
+                            {orderData?.packageDetails?.weight || "--"} gm
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-muted">No Rate Data Found</p>
-                )}
-              </div>
+
+                      {/* Zone + ETA */}
+                      <div className="cr-meta">
+                        <div className="cr-zone">
+                          {rate.zone || "N/A"}
+                        </div>
+                        <div className="cr-eta">
+                          <div className="cr-eta-dot"></div>
+                          <div className="cr-eta-txt">2–4 Days</div>
+                        </div>
+                      </div>
+
+                      {/* Charges */}
+                      <div className="cr-charges">
+                        <div className="cr-ch">
+                          <div className="cr-ch-lbl">Freight</div>
+                          <div className="cr-ch-val">
+                            ₹ {rate.freight_charge || 0}
+                          </div>
+                        </div>
+
+                        <div className="cr-ch-sep"></div>
+
+                        <div className="cr-ch">
+                          <div className="cr-ch-lbl">COD</div>
+                          <div className="cr-ch-val">
+                            ₹ {rate.cod_charge || 0}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Total Price */}
+                      <div className="cr-total">
+                        <div className="cr-rs">₹</div>
+                        <div className="cr-price">{total}</div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-center text-muted">
+                  No Rate Data Found
+                </p>
+              )}
             </div>
 
-            <div className="modal-footer py-1">
+            {/* ================= FOOTER ================= */}
+            <div className="rp-foot">
+              <button className="btn-cancel" onClick={onClose}>
+                Cancel
+              </button>
+
               <button
-                type="button"
-                className="btn btn-dark btn-md py-2 px-3"
+                className={`btn-ship ${selectedIndex !== null ? "rdy" : ""}`}
+                disabled={selectedIndex === null || loading}
                 onClick={handleSubmit}
               >
-                Ship
+                {loading ? "Processing..." : "Confirm & Ship"}
               </button>
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
