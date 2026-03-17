@@ -284,8 +284,10 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
 
                     <div className="cr-meta">
                       <div className="cr-zone">{rate.zone || "N/A"}</div>
-                      <div class="cr-eta-dot"></div>
-                      <div className="cr-eta-txt">2–4 Days</div>
+                      <div className="cr-eta">
+                        <div class="cr-eta-dot"></div>
+                        <div className="cr-eta-txt">2–4 Days</div>
+                      </div>
                     </div>
 
                     <div className="cr-charges">
