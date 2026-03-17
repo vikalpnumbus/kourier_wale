@@ -103,6 +103,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
       : 0;
 
   const handleCourierSelect = (rate) => {
+    console.log("CLICKED:", rate.courier_id);
     setSelectedCourierId(rate.courier_id);
 
     setShipData({
@@ -255,10 +256,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                 return (
                   <div
                     key={rate.courier_id}
-                    className={`crow 
-                      ${selectedCourierId === rate.courier_id ? "sel" : ""} 
-                      ${isCheap ? "cheap" : ""}
-                    `}
+                    className={`crow ${selectedCourierId === rate.courier_id ? "sel" : ""} ${isCheap ? "cheap" : ""}`}
                     onClick={() => handleCourierSelect(rate)}
                     style={{ position: "relative" }}
                   >
