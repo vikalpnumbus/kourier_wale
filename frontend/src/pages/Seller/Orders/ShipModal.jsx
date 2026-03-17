@@ -151,6 +151,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
   return (
     <div
       className="modal fade show"
+      style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
       onClick={onClose}
     >
       <div className="modal-dialog cmp_modal-lg" role="document" onClick={(e) => e.stopPropagation()}>
