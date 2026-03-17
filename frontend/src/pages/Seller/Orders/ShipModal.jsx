@@ -231,7 +231,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
               <div className="rs-sep"></div>
               <div className="rs"><div className="rs-dot pend">3</div><span className="rs-lbl">Ship</span></div>
             </div>
-            <div className="rp-close" onClick={onClose}>×</div>
+            <div className="rp-close">×</div>
           </div>
 
           <div className="carrier-list">
@@ -249,7 +249,6 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                     key={rate.courier_id}
                     className={`crow ${selectedCourierId === rate.courier_id ? "sel" : ""} ${isCheap ? "cheap" : ""}`}
                     onClick={(e) => {
-                      e.stopPropagation();
                       handleCourierSelect(rate);
                     }}
                     style={{ position: "relative" }}
@@ -325,7 +324,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
 
           {/* ================= FOOTER ================= */}
           <div className="rp-foot">
-            <button className="btn-cancel" onClick={onClose}>
+            <button className="btn-cancel">
               Cancel
             </button>
 

@@ -23,7 +23,7 @@ body::before{
   background-image:
     linear-gradient(rgba(61,107,255,.05) 1px,transparent 1px),
     linear-gradient(90deg,rgba(61,107,255,.05) 1px,transparent 1px);
-  background-size:52px 52px;pointer-events:none;z-index:0
+  background-size:52px 52px;z-index:0
 } */
 
 /* ══ OVERLAY ══ */
@@ -56,13 +56,11 @@ body::before{
   content:'';position:absolute;top:-60px;left:-40px;
   width:220px;height:220px;
   background:radial-gradient(circle,rgba(61,107,255,.18) 0%,transparent 65%);
-  pointer-events:none
 }
 .left::after{
   content:'';position:absolute;bottom:-40px;right:-40px;
   width:160px;height:160px;
   background:radial-gradient(circle,rgba(245,166,35,.07) 0%,transparent 70%);
-  pointer-events:none
 }
 
 /* Logo + title */
