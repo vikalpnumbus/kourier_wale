@@ -280,6 +280,9 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                     {/* Charges */}
                     <div className="cr-charges">
                       <div className="cr-ch">
+                        <div class="cr-ch-ico cci-m">
+                          <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5h6M4.5 1.5v6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+                        </div>
                         <div className="cr-ch-lbl">Freight</div>
                         <div className="cr-ch-val">
                           ₹ {rate.freight_charge || 0}
