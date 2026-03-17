@@ -221,7 +221,7 @@ body::before{
 .cr-charges{display:flex;align-items:center;gap:.5rem;flex:1}
 .cr-ch{display:flex;flex-direction:column;gap:.1rem;align-items:center}
 .cr-ch-ico{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center}
-.cci-m{background:#2952E3;color:#3D6BFF}
+.cci-m{background:#EEF3FF;color:#3D6BFF}
 .cci-o{background:#FEF3DC;color:#C8830E}
 .cr-ch-lbl{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;color:#8B93B0}
 .cr-ch-val{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;color:#3D3F5C}
