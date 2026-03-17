@@ -38,7 +38,8 @@ body::before{
     backdrop-filter:blur(14px);
     display:flex;
     align-items:center;
-    justify-content:center;padding:1rem
+    justify-content:center;
+    padding:1rem
 }
 
 /* ══ DIALOG — horizontal split ══ */
