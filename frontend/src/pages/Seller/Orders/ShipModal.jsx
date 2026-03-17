@@ -151,10 +151,6 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
   return (
     <div
       className="modal fade show"
-      style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-      tabIndex="-1"
-      role="dialog"
-      aria-modal="true"
       onClick={onClose}
     >
       <div
@@ -162,10 +158,8 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
         role="document"
         onClick={(e) => e.stopPropagation()}
       >
-    <div className="ov" onClick={onClose}>
-      <div className="dlg" onClick={(e) => e.stopPropagation()}>
-
-        {/* ================= LEFT PANEL ================= */}
+    <div className="ov">
+      <div className="dlg">
         <div className="left">
           <div className="lp-brand">
             <svg className="lp-logo" viewBox="0 0 72 72" fill="none">
@@ -257,7 +251,10 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                   <div
                     key={rate.courier_id}
                     className={`crow ${selectedCourierId === rate.courier_id ? "sel" : ""} ${isCheap ? "cheap" : ""}`}
-                    onClick={() => handleCourierSelect(rate)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCourierSelect(rate);
+                    }}
                     style={{ position: "relative" }}
                   >
                     {isCheap && (
