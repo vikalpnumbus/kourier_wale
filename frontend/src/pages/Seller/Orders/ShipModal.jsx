@@ -313,7 +313,8 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                     </div>
 
                     <div className="cr-total">
-                      ₹ {total}
+                      <div className="cr-rs">₹</div>
+                      <div className="cr-price">{total}</div>
                     </div>
 
                   </div>
