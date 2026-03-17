@@ -229,7 +229,7 @@ body::before{
 .crow.sel
 {
     border-color:#3D6BFF !important;
-    background:#2952E3 !important;
+    background:#EEF3FF !important;
     box-shadow:0 4px 16px rgba(61,107,255,.14)
 }
 .crow.sel::before
