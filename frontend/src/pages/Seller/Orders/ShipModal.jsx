@@ -287,6 +287,28 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
                       <div className="cr-eta">2–4 Days</div>
                     </div>
 
+                    <div className="cr-charges">
+                      <div className="cr-ch">
+                        <div className="cr-ch-ico cci-m">
+                          <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                            <path d="M1.5 4.5h6M4.5 1.5v6" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+                          </svg>
+                        </div>
+                        <div className="cr-ch-lbl">Freight</div> 
+                        <div className="cr-ch-val"> ₹ {rate.freight_charge || 0} </div> 
+                      </div>
+                      
+                      <div className="cr-ch-sep"></div> 
+                      <div className="cr-ch"> 
+                        <div className="cr-ch-ico cci-o"> 
+                          <svg width="9" height="9" viewBox="0 0 9 9" fill="none"> <rect x="1" y="2" width="7" height="5" rx="1" stroke="currentColor" strokeWidth="1" /> 
+                          <path d="M1 4h7" stroke="currentColor" strokeWidth="1" /> </svg> 
+                        </div> 
+                        <div className="cr-ch-lbl">COD</div> 
+                        <div className="cr-ch-val"> ₹ {rate.cod_charge || 0} </div> 
+                      </div>
+                    </div>
+
                     <div className="cr-total">
                       ₹ {total}
                     </div>
