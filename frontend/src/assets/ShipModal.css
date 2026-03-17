@@ -27,14 +27,14 @@ body::before{
 } */
 
 /* ══ OVERLAY ══ */
-/* .modal-dialog {
+.modal-dialog {
   pointer-events: auto !important;
-} */
+}
 .ov{
     position: relative;
     z-index: 10;
     inset:0;
-    background:rgba(10,10,15,.75);
+    /*background:rgba(10,10,15,.75);*/
     backdrop-filter:blur(14px);
     display:flex;
     align-items:center;
