@@ -584,6 +584,7 @@ class Service {
         if (!warehouse) {
           throw new Error("Warehouse not found");
         }
+        console.log("warehouse data",warehouse);
         let pickup_location = warehouse.pickup_code;
         console.log("pikcup location:", pickup_location);
         if (!pickup_location) {
