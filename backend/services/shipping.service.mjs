@@ -585,6 +585,7 @@ class Service {
           throw new Error("Warehouse not found");
         }
         let pickup_location = warehouse.pickup_code;
+        console.log("pikcup location:", pickup_location);
         if (!pickup_location) {
         const pickupRes = await ShiprocketProvider.createPickupLocation(warehouse);
         if (!pickupRes) {
