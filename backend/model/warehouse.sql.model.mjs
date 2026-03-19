@@ -76,6 +76,16 @@ const WarehouseModel = sqlDB.sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+     shiprocket_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+    },
+    pickup_code: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null
+    },    
   },
   {
     timestamps: true,
