@@ -38,7 +38,11 @@ class Service {
         ttl: 600,
         fetcher: async () => {
           const [result] = await sqlDB.sequelize.query(query, {
-            replacements: { startDateTime, endDateTime, userId },
+            replacements: { 
+              start_date: startDateTime,
+              end_date: endDateTime,
+              userId 
+            },
           });
           return result;
         },
