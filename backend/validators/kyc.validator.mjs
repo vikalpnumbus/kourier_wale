@@ -168,33 +168,32 @@ class ValidationClass {
   }
 
   gstNumberValidator(field, label) {
-    return this.fieldCheck(field, label)
-      .if((value, { req }) => req.body.kycType !== "sole proprietorship")
-      .exists({ checkFalsy: true })
-      .withMessage(`${label} is required.`)
-      .bail()
-      .isString()
-      .withMessage(`${label} must be a string.`)
-      .bail()
-      .isLength({ max: 150 })
-      .withMessage(`${label} can be maximum 150 characters long.`)
-      .bail()
-      .matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/)
-      .withMessage("Invalid GST number");
-  }
+  return check(field).custom((value, { req }) => {
+    if (req.body.kycType === "sole proprietorship") {
+      return true; // ✅ optional
+    }
+    if (!value) {
+      throw new Error(`${label} is required.`);
+    }
+    const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+    if (!regex.test(value)) {
+      throw new Error("Invalid GST number");
+    }
+    return true;
+  });
+}
 
   gstNameValidator(field, label) {
-    return this.fieldCheck(field, label)
-      .if((value, { req }) => req.body.kycType !== "sole proprietorship")
-      .exists({ checkFalsy: true })
-      .withMessage(`${label} is required.`)
-      .bail()
-      .isString()
-      .withMessage(`${label} must be a string.`)
-      .bail()
-      .isLength({ max: 150 })
-      .withMessage(`${label} can be maximum 150 characters long.`);
-  }
+  return check(field).custom((value, { req }) => {
+    if (req.body.kycType === "sole proprietorship") {
+      return true; // ✅ optional
+    }
+    if (!value) {
+      throw new Error(`${label} is required.`);
+    }
+    return true;
+  });
+}
 }
 
 const KYCValidations = new ValidationClass();
