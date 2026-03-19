@@ -7,6 +7,7 @@ import { useAlert } from "../../../middleware/AlertContext";
 import authConfig from "../../../config/Auth/AuthConfig";
 import { encrypt } from "../../../middleware/Encryption";
 import company_logo from "../../../../public/themes/assets/company_image/veygo-logo.svg";
+import "../../../assets/auth/auth.css"
 
 function Register() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ function Register() {
     fname: "",
     lname: "",
     email: "",
-    phone: "+91",
+    phone: "",
     companyName: "",
     password: "",
     confirmPassword: "",
@@ -218,336 +219,279 @@ function Register() {
     showError("");
   }, [step]);
   return (
-    <>
-      <div className="container-scroller">
-        <div className="container-fluid page-body-wrapper full-page-wrapper">
-          <div className="content-wrapper d-flex align-items-stretch auth auth-img-bg">
-            <div className="row flex-grow">
-              <div className="col-lg-6 d-flex align-items-center justify-content-center">
-                <div
-                  className="auth-form-transparent text-left p-3"
-                  style={{ width: "75%" }}
-                >
-                  <img
-                    className="mb-3"
-                    src={company_logo}
-                    alt="Veygo"
-                    width={180}
-                  />
-                  {step === 1 && (
-                    <>
-                      <form onSubmit={handleNextStep1}>
-                        {" "}
-                        <div className="row">
-                          {" "}
-                          <div className="col-md-6 mb-2">
-                            {" "}
-                            <div className="form-group text-start mb-3">
-                              {" "}
-                              <label>First Name</label>{" "}
-                              <input
-                                type="text"
-                                className="form-control"
-                                name="fname"
-                                value={form.fname}
-                                onChange={handleChange}
-                              />{" "}
-                            </div>{" "}
-                          </div>{" "}
-                          <div className="col-md-6 mb-2">
-                            {" "}
-                            <div className="form-group text-start mb-3">
-                              {" "}
-                              <label>Last Name</label>{" "}
-                              <input
-                                type="text"
-                                className="form-control"
-                                name="lname"
-                                value={form.lname}
-                                onChange={handleChange}
-                              />{" "}
-                            </div>{" "}
-                          </div>{" "}
-                        </div>{" "}
-                        <div className="row">
-                          {" "}
-                          <div className="col-md-6 mb-2">
-                            {" "}
-                            <div className="form-group text-start mb-3">
-                              {" "}
-                              <label>Email</label>{" "}
-                              <input
-                                type="text"
-                                className="form-control"
-                                name="email"
-                                value={form.email}
-                                onChange={handleChange}
-                              />{" "}
-                            </div>{" "}
-                          </div>{" "}
-                          <div className="col-md-6 mb-2">
-                            {" "}
-                            <div className="form-group text-start mb-3">
-                              {" "}
-                              <label>Phone</label>{" "}
-                              <input
-                                type="text"
-                                className="form-control"
-                                name="phone"
-                                value={form.phone}
-                                onChange={handleChange}
-                                maxLength={13}
-                              />{" "}
-                            </div>{" "}
-                          </div>{" "}
-                        </div>{" "}
-                        <div className="row">
-                          {" "}
-                          <div className="col-md-6 mb-2">
-                            {" "}
-                            <div className="form-group text-start mb-3">
-                              {" "}
-                              <label>Company Name</label>{" "}
-                              <input
-                                type="text"
-                                className="form-control"
-                                name="companyName"
-                                value={form.companyName}
-                                onChange={handleChange}
-                              />{" "}
-                            </div>{" "}
-                          </div>{" "}
-                          <div className="col-md-6 mb-2">
-                            {" "}
-                            <div className="form-group text-start mb-3">
-                              {" "}
-                              <label>Shipping Volume</label>{" "}
-                              <select
-                                className="form-control "
-                                name="shippingVolume"
-                                value={form.shippingVolume}
-                                onChange={handleChange}
-                                style={{ lineHeight: "0.6" }}
-                              >
-                                {" "}
-                                <option value="">Select</option>{" "}
-                                {shippingOptions.map((opt) => (
-                                  <option key={opt} value={opt}>
-                                    {" "}
-                                    {opt}{" "}
-                                  </option>
-                                ))}{" "}
-                              </select>{" "}
-                            </div>{" "}
-                          </div>
-                        </div>{" "}
-                        <div className="row">
-                          {" "}
-                          <div className="col-md-6 mb-2">
-                            {" "}
-                            <div className="form-group text-start mb-3">
-                              {" "}
-                              <label>Password</label>{" "}
-                              <div className="input-group">
-                                {" "}
-                                <input
-                                  type={showPassword ? "text" : "password"}
-                                  className="form-control"
-                                  name="password"
-                                  value={form.password}
-                                  onChange={handleChange}
-                                />{" "}
-                                <div className="input-group-prepend bg-transparent">
-                                  <span
-                                    className="input-group-text bg-transparent border-right-0"
-                                    style={{ cursor: "pointer" }}
-                                    onClick={() =>
-                                      setShowPassword((prev) => !prev)
-                                    }
-                                  >
-                                    {showPassword ? (
-                                      <Icon path={mdiEyeOff} size={0.7} />
-                                    ) : (
-                                      <Icon path={mdiEye} size={0.7} />
-                                    )}
-                                  </span>
-                                </div>
-                              </div>{" "}
-                            </div>{" "}
-                          </div>{" "}
-                          <div className="col-md-6 mb-2">
-                            {" "}
-                            <div className="form-group text-start mb-3">
-                              {" "}
-                              <label>Confirm Password</label>{" "}
-                              <div className="input-group">
-                                {" "}
-                                <input
-                                  type={
-                                    showConfirmPassword ? "text" : "password"
-                                  }
-                                  className="form-control"
-                                  name="confirmPassword"
-                                  value={form.confirmPassword}
-                                  onChange={handleChange}
-                                />{" "}
-                                <div className="input-group-prepend bg-transparent">
-                                  <span
-                                    className="input-group-text bg-transparent border-right-0"
-                                    style={{ cursor: "pointer" }}
-                                    onClick={() =>
-                                      setShowConfirmPassword((prev) => !prev)
-                                    }
-                                  >
-                                    {showConfirmPassword ? (
-                                      <Icon path={mdiEyeOff} size={0.7} />
-                                    ) : (
-                                      <Icon path={mdiEye} size={0.7} />
-                                    )}
-                                  </span>
-                                </div>
-                              </div>{" "}
-                            </div>{" "}
-                          </div>{" "}
-                        </div>{" "}
-                        <button
-                          type="submit"
-                          className="btn ripple btn-primary btn-block w-100"
-                          disabled={loading}
-                        >
-                          {" "}
-                          {loading ? "Processing..." : "Next"}{" "}
-                        </button>{" "}
-                      </form>
-                      <div className="mt-3 text-center">
-                        <p className="mb-0">
-                          Already have an account?{" "}
-                          <Link to="/login" className="text-primary">
-                            Sign In
-                          </Link>
-                        </p>
-                      </div>
-                    </>
-                  )}
-                  {step === 2 && (
-                    <>
-                      <form onSubmit={handlePhoneOtpVerify}>
-                        <div className="form-group text-start mb-3">
-                          <div className="row align-items-end my-2">
-                            <p>
-                              Enter the 6 digit OTP sent to mobile number <br />
-                              <span className="text-primary">{form.phone}</span>
-                              <span
-                                className="ms-2 text-primary"
-                                onClick={() => setStep(1)}
-                                style={{ cursor: "pointer" }}
-                              >
-                                <Icon path={mdiPencil} size={0.6} />
-                              </span>
-                            </p>
-                          </div>
-                          <input
-                            type="text"
-                            className="form-control otp-input"
-                            style={{
-                              letterSpacing: "8px",
-                              transition: "all 0.2s ease-in-out",
-                            }}
-                            value={phoneOtp}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(/\D/g, "");
-                              if (value.length <= 6) {
-                                setPhoneOtp(value);
-                              }
-                            }}
-                            maxLength={6}
-                            placeholder="••••••"
-                          />
-
-                          <p
-                            className="text-primary my-2"
-                            onClick={() => handleResendOTP("phone")}
-                            style={{ cursor: "pointer" }}
-                          >
-                            Re-send OTP?
-                          </p>
-                          <button
-                            type="submit"
-                            className="btn w-100 ripple btn-primary btn-block mt-2"
-                            disabled={loading}
-                          >
-                            {loading ? "Verifying..." : "Verify"}
-                          </button>
-                        </div>
-                      </form>
-                    </>
-                  )}
-                  {step === 3 && (
-                    <>
-                      <form onSubmit={handleEmailOtpVerify}>
-                        <div className="form-group text-start mb-3">
-                          <div className="row align-items-end my-2">
-                            <p>
-                              Enter the 6 digit OTP sent to E-mail <br />
-                              <span className="text-primary">{form.email}</span>
-                              <span
-                                className="ms-2 text-primary"
-                                onClick={() => setStep(1)}
-                                style={{ cursor: "pointer" }}
-                              >
-                                <Icon path={mdiPencil} size={0.6} />
-                              </span>
-                            </p>
-                          </div>
-                          <input
-                            type="text"
-                            className="form-control otp-input"
-                            style={{
-                              letterSpacing: "8px",
-                              transition: "all 0.2s ease-in-out",
-                            }}
-                            value={emailOtp}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(/\D/g, "");
-                              if (value.length <= 6) {
-                                setEmailOtp(value);
-                              }
-                            }}
-                            maxLength={6}
-                            placeholder="••••••"
-                          />
-                          <p
-                            className="text-primary my-2"
-                            onClick={() => handleResendOTP("email")}
-                            style={{ cursor: "pointer" }}
-                          >
-                            Re-send OTP?
-                          </p>
-                          <button
-                            type="submit"
-                            className="btn w-100 ripple btn-primary btn-block "
-                            disabled={loading}
-                          >
-                            {loading ? "Verifying..." : "Submit"}
-                          </button>
-                        </div>
-                      </form>
-                    </>
-                  )}
-                </div>
+  <div className="auth-shell">
+      <div className="left-panel">
+        <div className="glow-bl"></div>
+        <div className="glow-tr"></div>
+        <div className="orbit orbit-1"></div>
+        <div className="orbit orbit-2"></div>
+        <div className="starfield" id="starfield"></div>
+        <div className="left-logo">
+          <svg viewBox="0 0 72 72" width="36" height="36" fill="none">
+            <circle cx="36" cy="36" r="34" fill="rgba(61,107,255,0.13)"/>
+            <path d="M25 18 Q25 10 36 10 Q47 10 47 18" stroke="#fff" stroke-width="2.8" stroke-linecap="round" fill="none" opacity="0.4"/>
+            <path d="M16 22 L36 52 L56 22" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M16 22 Q8 30 11 42" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.3"/>
+            <path d="M56 22 Q64 30 61 42" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.3"/>
+            <circle cx="36" cy="52" r="4" fill="#fff"/>
+          </svg>
+          <div className="logo-wordmark">vey<span className="go">go</span></div>
+        </div>
+        <div className="left-centre">
+          <div className="hero-display">
+            BUILT FOR<br/>
+            <span className="blue">SHIPPERS.</span><br/>
+            TRUSTED BY<br/>
+            THOUSANDS.
+          </div>
+          <div className="hero-accent">
+            India's most reliable shipping platform —<br/>
+            so you can focus on growing your business.
+          </div>
+          <div className="stats-row">
+            <div className="stat-item">
+              <div className="stat-val">20<span className="u">+</span></div>
+              <div className="stat-lbl">Courier partners</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-val">5<span className="u">L+</span></div>
+              <div className="stat-lbl">Shipments/month</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-val">98<span className="u">%</span></div>
+              <div className="stat-lbl">Delivery success</div>
+            </div>
+          </div>
+          <div className="trust-promises">
+            <div className="promise-item">
+              <div className="promise-icon mercury-bg">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M7 1L11.5 3.5v4C11.5 10 9.5 12 7 13 4.5 12 2.5 10 2.5 7.5v-4L7 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                  <path d="M4.5 7l2 2 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </div>
-              <div className="col-lg-6 register-half-bg d-flex flex-row">
-                <p className="text-white fw-medium text-center flex-grow align-self-end">
-                  Copyright © 2021 All rights reserved.
-                </p>
+              <div className="promise-text">
+                <div className="promise-title">Your data is fully secured</div>
+                <div className="promise-sub">256-bit encryption. Your business information belongs only to you — always.</div>
+              </div>
+            </div>
+            <div className="promise-item">
+              <div className="promise-icon venus-bg">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M7 1.5v11M4 5h5a2 2 0 010 4H4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div className="promise-text">
+                <div className="promise-title">100% transparent payments</div>
+                <div className="promise-sub">Every rupee tracked. No hidden charges. No surprises on your billing — ever.</div>
+              </div>
+            </div>
+            <div className="promise-item">
+              <div className="promise-icon gold-bg">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M7 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div className="promise-text">
+                <div className="promise-title">We are here 24 × 7 for you</div>
+                <div className="promise-sub">Real support, real people. Reach us anytime — we never close when you need help.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="left-bottom">
+          <div className="testimonial">
+            <div className="testi-stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </div>
+            <div className="testi-quote">
+              "Switched to Veygo six months ago. Shipping costs dropped by 31% and I haven't had a single unresolved issue. Their team genuinely cares."
+            </div>
+            <div className="testi-author">
+              <div className="testi-avatar">AK</div>
+              <div>
+                <div className="testi-name">Aryan Kapoor</div>
+                <div className="testi-co">FOUNDER · THREADMILL INDIA</div>
               </div>
             </div>
           </div>
         </div>
       </div>
-     
-    </>
-  );
+
+    {/* RIGHT PANEL */}
+    <div className="right-panel">
+      <div className="form-wrap">
+
+        {/* REGISTER FORM */}
+        {step === 1 && (
+          <form onSubmit={handleNextStep1} className="form-page active">
+
+            <div className="form-eyebrow">Start for free</div>
+            <div className="form-title">
+              Create your <span className="blue">account</span>
+            </div>
+
+            <div className="field-group">
+
+              {/* NAME */}
+              <div className="field-row">
+                <div className="field">
+                  <label className="field-label">First Name</label>
+                  <div class="input-wrap">
+                    <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <circle cx="7.5" cy="4.5" r="2.8" stroke="currentColor" stroke-width="1.3"/>
+                    <path d="M1.5 13c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    </svg>
+                    <input type="text" name="fname" className="field-input" value={form.fname} onChange={handleChange} placeholder="Rajan" autocomplete="given-name"/>
+                  </div>
+                </div>
+                <div className="field">
+                  <label className="field-label">Last Name</label>
+                  <div class="input-wrap">
+                    <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <circle cx="7.5" cy="4.5" r="2.8" stroke="currentColor" stroke-width="1.3"/>
+                    <path d="M1.5 13c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    </svg>
+                  <input type="text" name="lname" className="field-input" value={form.lname} onChange={handleChange} placeholder="Kumar" autocomplete="family-name"/>
+                  </div>
+                </div>
+              </div>
+
+              {/* COMPANY */}
+              <div className="field">
+                <label className="field-label">Business / Brand Name</label>
+                <div class="input-wrap">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <rect x="2" y="4" width="11" height="9.5" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+                    <path d="M5 4V3a2.5 2.5 0 015 0v1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    <path d="M2 7.5h11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
+                  <input type="text" name="companyName" className="field-input" value={form.companyName} onChange={handleChange} placeholder="Your Brand Pvt. Ltd." autocomplete="organization"/>
+                </div>
+              </div>
+
+              {/* EMAIL */}
+              <div className="field">
+                <label className="field-label">Business Email</label>
+                <div class="input-wrap">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <rect x="1.5" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+                    <path d="M1.5 5l6 4 6-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                <input type="email" name="email" className="field-input" value={form.email} onChange={handleChange} placeholder="you@yourbrand.com" autocomplete="email"/>
+                </div>
+              </div>
+
+              {/* PHONE */}
+              <div className="field">
+                <label className="field-label">Mobile Number</label>
+                <div className="input-wrap">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <rect x="3.5" y="1.5" width="8" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/>
+                    <circle cx="7.5" cy="11.5" r="0.7" fill="currentColor"/>
+                  </svg>
+                  <span class="phone-prefix">+91</span>
+                  <input type="text" name="phone" className="field-input phone" value={form.phone} onChange={handleChange} placeholder="98765 43210" autocomplete="tel"/>
+                </div>
+              </div>
+
+              {/* SHIPPING */}
+              <div className="field">
+                <label className="field-label">Shipping Volume</label>
+                <select
+                  name="shippingVolume"
+                  className="field-input"
+                  value={form.shippingVolume}
+                  onChange={handleChange}
+                >
+                  <option value="">Select</option>
+                  {shippingOptions.map((opt) => (
+                    <option key={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* PASSWORD */}
+              <div className="field">
+                <label className="field-label">Password</label>
+                <div className="input-wrap">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <rect x="3" y="6.5" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+                    <path d="M5 6.5V4.5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    <circle cx="7.5" cy="10" r="1" fill="currentColor"/>
+                  </svg>
+                  <input type={showPassword ? "text" : "password"} name="password" className="field-input" placeholder="Minimum 8 characters"  value={form.password} onChange={handleChange}/>
+                  <div
+                    className="input-suffix"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    <Icon path={showPassword ? mdiEyeOff : mdiEye} size={0.7} />
+                  </div>
+                </div>
+              </div>
+
+              {/* CONFIRM PASSWORD */}
+              <div className="field">
+                <label className="field-label">Confirm Password</label>
+                <div className="input-wrap">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <rect x="3" y="6.5" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+                    <path d="M5 6.5V4.5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    <circle cx="7.5" cy="10" r="1" fill="currentColor"/>
+                  </svg>
+                  <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="Confirm The Password" className="field-input" value={form.confirmPassword} onChange={handleChange}/>
+                  <div
+                    className="input-suffix"
+                    onClick={() =>
+                      setShowConfirmPassword(!showConfirmPassword)
+                    }
+                  >
+                    <Icon path={showConfirmPassword ? mdiEyeOff : mdiEye} size={0.7} />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <button
+              type="submit"
+              className="btn-cta"
+              disabled={loading}
+            >
+              {loading ? "Creating..." : "Create Account"}
+            </button>
+
+            <div className="bottom-toggle">
+              Already have an account? <Link to="/login">Sign in →</Link>
+            </div>
+
+          </form>
+        )}
+
+        {/* EMAIL OTP */}
+        {step === 3 && (
+          <form onSubmit={handleEmailOtpVerify} className="form-page active">
+            <div className="form-title">Verify Email</div>
+
+            <input
+              type="text"
+              className="field-input"
+              value={emailOtp}
+              onChange={(e) => setEmailOtp(e.target.value)}
+              placeholder="Enter OTP"
+            />
+
+            <button className="btn-cta">
+              {loading ? "Verifying..." : "Verify"}
+            </button>
+          </form>
+        )}
+
+      </div>
+    </div>
+  </div>
+);
 }
 
 export default Register;
