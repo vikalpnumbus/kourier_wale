@@ -8,31 +8,37 @@ class Service {
 
   async dashboardStats(params) {
     try {
-      const { start_date = "2025-08-01", end_date = formatDate_YYYY_MM_DD(Date.now()), userId } = params;
+      const { 
+        start_date = "2025-08-01", 
+        end_date = formatDate_YYYY_MM_DD(Date.now()), 
+        userId 
+      } = params;
+      // 👉 FIX: add time range
+      const startDateTime = `${start_date} 00:00:00`;
+      const endDateTime = `${end_date} 23:59:59`;
       const key = `dashboard:${userId}:dashboardStats:${start_date}:${end_date}`;
-
-    const query = `
-    SELECT 
-    SUM(case when (shipping.shipping_status = 'delivered') then 1 else 0 end) as delivered, 
-    SUM(case when (shipping.shipping_status = 'delivered' and orders. paymentType!='reverse') then orders.orderAmount else 0 end) as revenue, 
-    SUM(case when (shipping.shipping_status = 'rto') then 1 else 0 end) as rto, 
-    SUM(case when (shipping.shipping_status in ('in_transit', 'out_for_ delivery', 'delivered', 'exception', 'rto' ,'picked')) then 1 else 0 end) as total_delivered_shipments, 
-    SUM(CASE WHEN shipping.shipping_status IN ('booked','pending_pickup','delivered','rto','in_transit') THEN 1 ELSE 0 END) as total_shipments, 
-    SUM(CASE WHEN shipping.shipping_status IN ('booked','pending_pickup','delivered','rto','in_transit') AND orders.paymentType = 'COD' THEN 1 ELSE 0 END) as cod_shipments, 
-    SUM(CASE WHEN shipping.shipping_status IN ('booked','pending_pickup','delivered','rto','in_transit') AND orders.paymentType = 'Prepaid' THEN 1 ELSE 0 END) as prepaid_shipments, 
-    (SELECT COUNT(*) FROM orders WHERE orders.createdAt >= :start_date AND orders.createdAt <= :end_date AND orders.userId = :userId) AS total_orders 
-    FROM shipping 
-    LEFT JOIN orders ON orders.id = shipping.order_db_id 
-    INNER JOIN courier ON shipping.courier_id = courier.id 
-    WHERE shipping.createdAt >= :start_date AND shipping.shipping_status != 'cancelled' AND shipping.createdAt <= :end_date AND shipping.userId = :userId
-    `;
+      const query = `
+      SELECT 
+      SUM(case when (shipping.shipping_status = 'delivered') then 1 else 0 end) as delivered, 
+      SUM(case when (shipping.shipping_status = 'delivered' and orders. paymentType!='reverse') then orders.orderAmount else 0 end) as revenue, 
+      SUM(case when (shipping.shipping_status = 'rto') then 1 else 0 end) as rto, 
+      SUM(case when (shipping.shipping_status in ('in_transit', 'out_for_ delivery', 'delivered', 'exception', 'rto' ,'picked')) then 1 else 0 end) as total_delivered_shipments, 
+      SUM(CASE WHEN shipping.shipping_status IN ('booked','pending_pickup','delivered','rto','in_transit') THEN 1 ELSE 0 END) as total_shipments, 
+      SUM(CASE WHEN shipping.shipping_status IN ('booked','pending_pickup','delivered','rto','in_transit') AND orders.paymentType = 'COD' THEN 1 ELSE 0 END) as cod_shipments, 
+      SUM(CASE WHEN shipping.shipping_status IN ('booked','pending_pickup','delivered','rto','in_transit') AND orders.paymentType = 'Prepaid' THEN 1 ELSE 0 END) as prepaid_shipments, 
+      (SELECT COUNT(*) FROM orders WHERE orders.createdAt >= :start_date AND orders.createdAt <= :end_date AND orders.userId = :userId) AS total_orders 
+      FROM shipping 
+      LEFT JOIN orders ON orders.id = shipping.order_db_id 
+      INNER JOIN courier ON shipping.courier_id = courier.id 
+      WHERE shipping.createdAt >= :start_date AND shipping.shipping_status != 'cancelled' AND shipping.createdAt <= :end_date AND shipping.userId = :userId
+      `;
 
       const result = await withCache({
         key,
         ttl: 600,
         fetcher: async () => {
           const [result] = await sqlDB.sequelize.query(query, {
-            replacements: { start_date, end_date, userId },
+            replacements: { startDateTime, endDateTime, userId },
           });
           return result;
         },
