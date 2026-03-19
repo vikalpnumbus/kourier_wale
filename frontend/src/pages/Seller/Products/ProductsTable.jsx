@@ -6,12 +6,18 @@ import productsConfig from "../../../config/Products/ProductsConfig";
 import { useAlert } from "../../../middleware/AlertContext";
 import api from "../../../utils/api";
 import Pagination from "../../../Component/Pagination";
+import "../../../assets/product/product.css"; // <-- yaha tum CSS file daalna
+
 function ProductsTable() {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const { showError, showSuccess } = useAlert();
   const [totalCount, setTotalCount] = useState(0);
+
+  // filters state (UI ke liye)
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
 
   const handleFetchData = async () => {
     setLoading(true);
@@ -21,26 +27,20 @@ function ProductsTable() {
       const page = parseInt(searchParams.get("page") || "1", 10);
       const limit = parseInt(searchParams.get("limit") || "10", 10);
 
-      // Build query params
       const params = new URLSearchParams();
       params.append("page", page);
       params.append("limit", limit);
-      if (name) {
-        params.append("name", name);
-      }
-      if (category) {
-        params.append("category", category);
-      }
+      if (name) params.append("name", name);
+      if (category) params.append("category", category);
 
       const url = `${productsConfig.productsApi}?${params.toString()}`;
-
       const { data } = await api.get(url);
 
       setDataList(data?.data?.result || []);
       setTotalCount(data?.data?.total || 0);
     } catch (error) {
-      console.error("Fetch products error:", error);
       setDataList([]);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -49,14 +49,10 @@ function ProductsTable() {
   const deleteProduct = async (id) => {
     try {
       await api.delete(`${productsConfig.productsApi}/${id}`);
-      handleFetchData();
       showSuccess("Product deleted successfully!");
+      handleFetchData();
     } catch (error) {
-      showError(
-        error?.response?.data?.message ||
-        "Something went wrong, Please try again later."
-      );
-      console.error("Delete product error:", error);
+      showError(error?.response?.data?.message || "Error");
     }
   };
 
@@ -64,76 +60,140 @@ function ProductsTable() {
     handleFetchData();
   }, [searchParams]);
 
+  // UI filter (frontend)
+  const filteredData = dataList.filter((item) => {
+    const matchSearch =
+      !search ||
+      item.name?.toLowerCase().includes(search.toLowerCase()) ||
+      item.sku?.toLowerCase().includes(search.toLowerCase());
+
+    const matchCategory =
+      !categoryFilter || item.category === categoryFilter;
+
+    return matchSearch && matchCategory;
+  });
+
   return (
-    <>
-      <div className="table-responsive h-100">
-        <table className="table table-hover">
-          <thead>
-            <tr>
-              <th>Product Name</th>
-              <th>SKU</th>
-              <th>Product Price</th>
-              <th>Category</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+    <div className="products-page">
+
+      {/* HEADER */}
+      <div className="page-header">
+        <div>
+          <div className="page-title">Products</div>
+          <div className="page-subtitle">
+            Manage your product catalogue
+          </div>
+        </div>
+      </div>
+      {/* <div className="filters-bar">
+        <input
+          type="text"
+          placeholder="Search product..."
+          className="search-input"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        <select
+          className="filter-select"
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+        >
+          <option value="">All Categories</option>
+          <option value="sports">Sports</option>
+          <option value="apparel">Apparel</option>
+          <option value="electronics">Electronics</option>
+        </select>
+      </div> */}
+      <div className="table-card">
+        <div className="table-header-row">
+          <div className="table-header-title">
+            Product Catalogue
+            <span className="table-count-badge">
+              {totalCount} items
+            </span>
+          </div>
+        </div>
+
+        <div className="table-wrapper">
+          <table className="product-table">
+            <thead>
               <tr>
-                <td colSpan="5">
-                  <div className="dot-opacity-loader">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                </td>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th style={{ width: "120px" }}>Actions</th>
               </tr>
-            ) : dataList.length > 0 ? (
-              dataList.map((data) => (
-                <tr key={data.id}>
-                  <td className="py-2">
-                    <img
-                      src={`${import.meta.env.VITE_API_URL}${data.productImage[0]
-                        }`}
-                      className="img-fluid rounded me-3"
-                      height={200}
-                      width={200}
-                    />
-                    {data.name || ""}
-                  </td>
-                  <td className="py-2">{data.sku || ""}</td>
-                  <td className="py-2">{data.price || ""}</td>
-                  <td className="py-2">{data.category || ""}</td>
-                  <td className="py-2">
-                    <div className="btn-group">
-                      <Link
-                        to={`edit/${data.id}`}
-                        className="btn btn-outline-primary btn-md py-2 px-3"
-                      >
-                        <Icon path={mdiPencil} size={0.6} />
-                      </Link>
-                      <button
-                        className="btn btn-outline-primary btn-md py-2 px-3"
-                        onClick={() => deleteProduct(data.id)}
-                      >
-                        <Icon path={mdiDelete} size={0.6} />
-                      </button>
-                    </div>
+            </thead>
+
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="text-center">
+                    Loading...
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="text-center">
-                  No records found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ) : filteredData.length > 0 ? (
+                filteredData.map((item) => (
+                  <tr key={item.id}>
+                    <td>
+                      <div class="product-name-cell">
+                        <div class="product-thumb">
+                          <div class="product-thumb-placeholder">
+                            <img src={`${import.meta.env.VITE_API_URL}${item.productImage?.[0]}`} className="product-thumb"/>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="product-name-text">{item.name}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="sku-cell">{item.sku}</td>
+                    <td className="price-cell">
+                      ₹ {item.price}
+                    </td>
+                    <td>
+                      <span className="category-badge">
+                        {item.category}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="actions-cell">
+                        <Link
+                          to={`edit/${item.id}`}
+                          className="action-btn edit"
+                        >
+                          <Icon path={mdiPencil} size={0.6} />
+                        </Link>
+
+                        <button
+                          className="action-btn delete"
+                          onClick={() => deleteProduct(item.id)}
+                        >
+                          <Icon path={mdiDelete} size={0.6} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center">
+                    No records found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* PAGINATION */}
+        <div className="table-footer">
+          <Pagination totalCount={totalCount} />
+        </div>
       </div>
-      <Pagination totalCount={totalCount} />
-    </>
+    </div>
   );
 }
 
