@@ -463,7 +463,7 @@ export default function KYCDetails() {
                           <img
                             height={100}
                             width={100}
-                            src={`http://localhost:3001/api/v1${dataList.panCardImage[0]}`}
+                            src={`http://3.111.42.130:3001/api/v1/${dataList.panCardImage[0]}`}
                             alt=""
                           />
                         ) : (
@@ -517,7 +517,7 @@ export default function KYCDetails() {
                               <img
                                 height={100}
                                 width={100}
-                                src={`http://localhost:3001/api/v1${dataList.documentFrontImage[0]}`}
+                                src={`http://3.111.42.130:3001/api/v1/${dataList.documentFrontImage[0]}`}
                                 alt=""
                               />
                             ) : (
@@ -557,7 +557,7 @@ export default function KYCDetails() {
                             <img
                               height={100}
                               width={100}
-                              src={`http://localhost:3001/api/v1${dataList.partnershipDeedImage[0]}`}
+                              src={`http://3.111.42.130:3001/api/v1/${dataList.partnershipDeedImage[0]}`}
                               alt=""
                             />
                           ) : (
@@ -626,7 +626,7 @@ export default function KYCDetails() {
                               <img
                                 height={100}
                                 width={100}
-                                src={`http://localhost:3001/api/v1${dataList.gstImage[0]}`}
+                                src={`http://3.111.42.130:3001/api/v1/${dataList.gstImage[0]}`}
                                 alt=""
                               />
                             ) : (
@@ -746,7 +746,7 @@ export default function KYCDetails() {
                               <img
                                 height={100}
                                 width={100}
-                                src={`http://localhost:3001/api/v1${dataList.documentFrontImage[0]}`}
+                                src={`http://3.111.42.130:3001/api/v1/${dataList.documentFrontImage[0]}`}
                                 alt=""
                               />
                             ) : (
@@ -782,7 +782,7 @@ export default function KYCDetails() {
                               <img
                                 height={100}
                                 width={100}
-                                src={`http://localhost:3001/api/v1${dataList.documentBackImage[0]}`}
+                                src={`http://3.111.42.130:3001/api/v1/${dataList.documentBackImage[0]}`}
                                 alt=""
                               />
                             ) : (
@@ -823,7 +823,7 @@ export default function KYCDetails() {
                             <img
                               height={100}
                               width={100}
-                              src={`http://localhost:3001/api/v1${dataList.documentBackImage[0]}`}
+                              src={`http://3.111.42.130:3001/api/v1/${dataList.documentBackImage[0]}`}
                               alt=""
                             />
                           ) : (
