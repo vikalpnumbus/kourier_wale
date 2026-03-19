@@ -205,7 +205,7 @@ export default function KYCDetails() {
 
   const handleFetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/api/v1/kyc", {
+      const response = await axios.get("http://3.111.42.130:3001/api/v1/kyc", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
