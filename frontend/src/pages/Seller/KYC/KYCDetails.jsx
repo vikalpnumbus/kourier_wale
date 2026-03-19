@@ -175,7 +175,7 @@ export default function KYCDetails() {
       if (formData.coiNumber) payload.append("coiNumber", formData.coiNumber);
 
       const response = await axios[editSubmit ? "patch" : "post"](
-        "http://localhost:3001/api/v1/kyc",
+        "http://3.111.42.130:3001/api/v1/kyc",
         payload,
         {
           headers: {
