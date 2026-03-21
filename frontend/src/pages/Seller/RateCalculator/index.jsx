@@ -26,6 +26,7 @@ function index() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showForwardReverse, setShowForwardReverse] = useState(false);
+  const [apiMessage, setApiMessage] = useState("");
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -60,7 +61,10 @@ function index() {
         const url = `${RateConfig.RateCalculator}`;
         const res = await api.post(url, formData);
         setShowForwardReverse(true);
-        setRatePrice(res?.data?.data?.rows || []);
+        const rows = res?.data?.data?.rows || [];
+        const message = res?.data?.data?.message || "";
+        setRatePrice(rows);
+        setApiMessage(message);
       } catch (error) {
         console.error("API Error:", error);
         alert("Something went wrong");
@@ -236,30 +240,35 @@ function index() {
                         <hr></hr>
                         {showForwardReverse && (
                             <div className="forward_reverse">
-                                
                                 {ratePrice.length > 0 ? (
                                     ratePrice.map((row, index) => (
-                                <div className="volume_price" key={index}>
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <div>
+                                        <div className="volume_price" key={index}>
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <div>
                                             <span className="courier-title-heading">{row.courier_name}</span>
                                             <div className="courier-box">
                                                 <div className="courier-box-rs">
-                                                    <sup>₹</sup><span className="price">{row.total}</span>
+                                                <sup>₹</sup><span className="price">{row.total}</span>
                                                 </div>
-                                                <span className="delivery_in">/ {row.zone})</span>
+                                                <span className="delivery_in">/ {row.zone}</span>
                                             </div>
+                                            </div>
+                                            <i className="ti ti-truck" style={{ fontSize: "50px" }}></i>
                                         </div>
-                                        <i className="ti ti-truck" style={{fontSize: "50px"}}></i>
-                                    </div>
-                                    <div className="form-text ">
-                                        <i className="ti ti-info-circle menu-icon"></i>Freight Charges : ₹ {row.freight_charge} + COD Charges: ₹ {row.cod_charge ?? "0"}
-                                    </div>
-                                </div>
-                                )))
-                            : ({
 
-                            })}
+                                        <div className="form-text">
+                                            <i className="ti ti-info-circle menu-icon"></i>
+                                            Freight Charges : ₹ {row.freight_charge} + COD Charges: ₹ {row.cod_charge ?? "0"}
+                                        </div>
+                                        </div>
+                                    ))
+                                    ) : (
+                                    <div className="text-center mt-3">
+                                        <div className="alert alert-warning">
+                                        {apiMessage || "No courier available for this pincode"}
+                                        </div>
+                                    </div>
+                                    )}
                             </div>
                         )}
                     </div>
