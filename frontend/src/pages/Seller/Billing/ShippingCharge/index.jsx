@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import "../../../../assets/Shipments/shippingcharges.css";
+import "../../../../assets/Billing/shippingcharges.css";
 function ShippingCharge() {
   return (
     <div className="shipping-page">
