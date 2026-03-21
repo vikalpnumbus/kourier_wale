@@ -1,30 +1,29 @@
-import React from 'react'
-import { Outlet } from 'react-router-dom'
-
+import React from "react";
+import { Outlet } from "react-router-dom";
+import "../../../../assets/Shipments/shippingcharges.css";
 function ShippingCharge() {
-    return (
-        <div className="row">
-            <div className="col-md-12 grid-margin stretch-card d-md-flex">
-                <div className="card">
-                    <div className="card-body">
-                        <div className="row">
-                            <div className="col-md-4">
-                                <h4 className="card-title">
-                                    Shipping Charges
-                                </h4>
-                            </div>
-                        </div>
-
-                        <div className="row mt-3">
-                            <div className="col-12">
-                                <Outlet />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="shipping-page">
+      <div className="page-header">
+        <div className="page-header-left">
+          <div className="page-eyebrow">
+            Billing · Transaction Ledger
+          </div>
+          <h1 className="page-title">Shipping Charges</h1>
+          <p className="page-subtitle">
+            All debit and credit entries across your shipping transactions
+          </p>
         </div>
-    )
+        <div className="page-header-right">
+          <button className="btn btn-ghost">Export CSV</button>
+          <button className="btn btn-ghost">Date Range</button>
+        </div>
+      </div>
+      <div className="mt-3">
+        <Outlet />
+      </div>
+    </div>
+  );
 }
 
-export default ShippingCharge
+export default ShippingCharge;
