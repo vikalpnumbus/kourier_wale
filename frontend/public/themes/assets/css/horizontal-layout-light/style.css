@@ -23458,11 +23458,6 @@ code {
     height: auto !important;
   }
 }
-
-svg {
-  width: 100%;
-}
-
 .google-chart-container {
   overflow: hidden;
 }
