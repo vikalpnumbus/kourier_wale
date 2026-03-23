@@ -20,7 +20,7 @@ function Escalation() {
             !location.pathname.includes("/support/view") && (
               <button
                 onClick={() => navigate("add")}
-                className="btn btn-primary?"
+                className="btn btn-primary"
               >
                 <Icon path={mdiPlus} size={0.7} />
                 <span>Create Escalation</span>
