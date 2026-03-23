@@ -6,6 +6,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
+import "../../../assets/channel/channel.css";
 function Channel() {
     const navigate = useNavigate();
   const location = useLocation();
@@ -16,34 +17,36 @@ function Channel() {
       <div className="col-md-12 grid-margin stretch-card d-md-flex">
         <div className="card">
           <div className="card-body">
-            <div className="row">
-              <div className="col-md-4">
-                <h4 className="card-title">Channel</h4>
+            <div className="page-header">
+              <div>
+                <div className="page-eyebrow">Settings · Integrations</div>
+                <h1 className="page-title">Channel Integrations</h1>
+                <p className="page-subtitle">
+                  Connect your storefronts and sync orders automatically into Veygo
+                </p>
               </div>
-              <div className="col-md-8 col-sm-12 d-flex justify-content-end gap-2">
-                
 
-            
-                {!location.pathname.includes("/channel/edit") &&
-                  !location.pathname.includes("/channel/add") && (
-                    <button
-                      onClick={() => navigate("add")}
-                      type="button"
-                      className="btn btn-dark btn-md py-2 px-4"
-                    >
-                      <Icon path={mdiPlus} size={0.7} /> Add Channel
-                    </button>
-                  )}
-              </div>
+              {!location.pathname.includes("/channel/edit") &&
+                !location.pathname.includes("/channel/add") && (
+                  <button
+                    onClick={() => navigate("add")}
+                    className="btn btn-primary"
+                  >
+                    <Icon path={mdiPlus} size={0.7} /> Add Channel
+                  </button>
+                )}
             </div>
 
-            <div className="row mt-3">
-              <div className="col-12">
-                <div className="tab-content tab-content-vertical">
-                  <div className="tab-pane fade show active" role="tabpanel">
-                    <Outlet />
-                  </div>
+            <div className="table-card mt-3">
+              <div className="table-header">
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span className="table-title">Connected Channels</span>
+                  <span className="table-count">List</span>
                 </div>
+              </div>
+
+              <div className="p-3">
+                <Outlet />
               </div>
             </div>
           </div>

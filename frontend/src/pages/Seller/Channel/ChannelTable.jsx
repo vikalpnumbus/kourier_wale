@@ -68,14 +68,14 @@ function ChannelTable() {
   return (
     <>
       <div className="table-responsive h-100">
-        <table className="table table-hover">
+        <table className="data-table">
           <thead>
             <tr>
               <th>Channel</th>
               <th>Channel Name</th>
               <th>Channel Host</th>
-              <th>Date</th>
-              <th>Actions</th>
+              <th>Connected On</th>
+              <th className="center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -92,29 +92,48 @@ function ChannelTable() {
             ) : dataList.length > 0 ? (
               dataList.map((data) => (
                 <tr key={data.id}>
-                  <td className="py-2">{data.channel || ""}</td>
-                  <td className="py-2">{data.channel_name || ""}</td>
-                  <td className="py-2">{data.channel_host || ""}</td>
-                  <td className="py-2">
-                    {data?.createdAt ? formatDateTime(data?.createdAt) : ""}
+                  <td>
+                    <div className="channel-name-cell">
+                      <div className="channel-mini-logo logo-custom">
+                        {data.channel?.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="channel-name-text">
+                          {data.channel || ""}
+                        </div>
+                        <div className="channel-name-id">
+                          CHANNEL
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span className="ch-name-badge">
+                      {data.channel_name || ""}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="host-cell">
+                      <span className="host-url">
+                        {data.channel_host || ""}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="date-cell">
+                    <div className="date-part">
+                      {data?.createdAt ? formatDateTime(data.createdAt) : ""}
+                    </div>
                   </td>
 
-                  <td className="py-2">
-                    <div className="btn-group">
+                  <td className="center">
+                    <div className="action-group" style={{ justifyContent: "center" }}>
                       <Link
-                        to={`edit${
-                          data.channel == "shopify" ? "/shopify" : ""
-                        }/${data.id}`}
-                        className="btn btn-outline-primary btn-md py-2 px-3"
+                        to={`edit${data.channel == "shopify" ? "/shopify" : ""}/${data.id}`}
+                        className="act-btn edit"
                       >
                         <Icon path={mdiPencil} size={0.6} />
                       </Link>
-                      <button
-                        className="btn btn-outline-primary btn-md py-2 px-3"
-                        onClick={() => deleteProduct(data.id)}
-                      >
-                        <Icon path={mdiDelete} size={0.6} />
-                      </button>
+                      <button className="act-btn delete" onClick={() => deleteProduct(data.id)}><Icon path={mdiDelete} size={0.6} /></button>
                     </div>
                   </td>
                 </tr>
