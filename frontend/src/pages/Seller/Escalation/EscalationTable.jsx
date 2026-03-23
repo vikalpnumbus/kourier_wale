@@ -18,20 +18,15 @@ function EscalationTable() {
     try {
       const page = parseInt(searchParams.get("page") || "1", 10);
       const limit = parseInt(searchParams.get("limit") || "10", 10);
-
-      // Build query params
       const params = new URLSearchParams();
       params.append("page", page);
       params.append("limit", limit);
-
       const url = `${escalationConfig.escalationApi}?${params.toString()}`;
-
       const { data } = await api.get(url);
-
       setDataList(data?.data?.result || []);
       setTotalCount(data?.data?.total || 0);
     } catch (error) {
-      console.error("Fetch channel error:", error);
+      console.error("Fetch escalation error:", error);
       setDataList([]);
     } finally {
       setLoading(false);
@@ -41,73 +36,150 @@ function EscalationTable() {
   useEffect(() => {
     handleFetchData();
   }, [searchParams]);
+
+  // 🎯 Status class mapping
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "open":
+        return "status-open";
+      case "in_progress":
+        return "status-inprogress";
+      case "resolved":
+        return "status-resolved";
+      case "closed":
+        return "status-closed";
+      default:
+        return "status-pending";
+    }
+  };
+
+  // 🎯 Type class mapping
+  const getTypeClass = (type) => {
+    switch (type) {
+      case "tech":
+        return "type-tech";
+      case "billing":
+        return "type-billing";
+      case "shipment":
+        return "type-shipment";
+      case "cod":
+        return "type-cod";
+      default:
+        return "type-other";
+    }
+  };
+
+  console.log("db data",dataList);
   return (
-    <div>
-      <>
-        <div className="table-responsive h-100">
-          <table className="table table-hover">
-            <thead>
+    <div className="table-card">
+
+      {/* HEADER */}
+      <div className="table-header">
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <span className="table-title">Escalation Tickets</span>
+          <span className="table-count">{totalCount} tickets</span>
+        </div>
+      </div>
+
+      {/* TABLE */}
+      <div className="table-responsive">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Type</th>
+              <th>Details</th>
+              <th>Created</th>
+              <th>Updated</th>
+              <th>Status</th>
+              <th className="center">Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {loading ? (
               <tr>
-                <th>#</th>
-                <th>Escalation Type</th>
-                <th>Details</th>
-                <th>Ticket Created</th>
-                <th>Last Update</th>
-                <th>Status</th>
-                <th>Action</th>
+                <td colSpan="7" className="text-center">
+                  Loading...
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="7">
-                    <div className="dot-opacity-loader">
-                      <span></span>
-                      <span></span>
-                      <span></span>
+            ) : dataList.length > 0 ? (
+              dataList.map((item, index) => (
+                <tr key={item.id}>
+
+                  {/* Ticket ID */}
+                  <td>
+                    <span className="ticket-num">#{item.id}</span>
+                  </td>
+
+                  {/* TYPE */}
+                  <td>
+                    <span className={`type-badge ${getTypeClass(item.type)}`}>
+                      {item.type || "Other"}
+                    </span>
+                  </td>
+
+                  {/* DETAILS */}
+                  <td className="details-cell">
+                    <div className="details-title">
+                      {item.subject || "No title"}
+                    </div>
+                    <div className="details-sub">
+                      {item.query || "No description"}
                     </div>
                   </td>
-                </tr>
-              ) : dataList.length > 0 ? (
-                dataList.map((data) => (
-                  <tr key={data.id}>
-                    <td className="py-2">{data.id || ""}</td>
-                    <td className="py-2">{data.type || ""}</td>
-                    <td className="py-2">deatils</td>
-                    <td className="py-2">
-                      {data?.createdAt ? formatDateTime(data?.createdAt) : ""}
-                    </td>
-                    <td className="py-2">
-                      {data?.updatedAt ? formatDateTime(data?.updatedAt) : ""}
-                    </td>
-                    <td className="py-2">status</td>
 
-                    <td className="py-2">
-                      <div className="btn-group">
-                        <Link
-                          to={`view/${data.id}`}
-                          className="btn btn-outline-primary btn-md py-2 px-3"
-                        >
-                          <Icon path={mdiEye} size={0.6} /> View Escalation
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="text-center">
-                    No records found
+                  {/* CREATED */}
+                  <td className="date-cell">
+                    {item.createdAt ? formatDateTime(item.createdAt) : ""}
+                  </td>
+
+                  {/* UPDATED */}
+                  <td>
+                    {item.updatedAt ? formatDateTime(item.updatedAt) : ""}
+                  </td>
+
+                  {/* STATUS */}
+                  <td className="center">
+                    <span
+                      className={`status-pill ${getStatusClass(item.status)}`}
+                    >
+                      {item.status || "pending"}
+                    </span>
+                  </td>
+
+                  {/* ACTION */}
+                  <td class="center">
+                    <Link
+                      to={`view/${item.id}`}
+                      className="view-btn"
+                    >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    View
+                    </Link>
                   </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        {dataList.length > 0 && !loading && (
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" className="text-center">
+                  No records found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* PAGINATION */}
+      {dataList.length > 0 && !loading && (
+        <div className="table-footer">
+          <span className="pagination-info">
+            Total {totalCount} entries
+          </span>
           <Pagination totalCount={totalCount} />
-        )}
-      </>
+        </div>
+      )}
     </div>
   );
 }
