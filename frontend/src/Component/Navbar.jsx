@@ -144,7 +144,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
               onClick={()=>setShowRechargeModal(true)}
             >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M6 1.5v9M1.5 6h9" stroke="white" stroke-width="1.6" stroke-linecap="round"></path>
+              <path d="M6 1.5v9M1.5 6h9" stroke="white" strokeWidth="1.6" strokeLinecap="round"></path>
             </svg>
               Recharge
             </div>

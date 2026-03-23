@@ -157,8 +157,8 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
           <div className="lp-brand">
             <svg className="lp-logo" viewBox="0 0 72 72" fill="none">
               <circle cx="36" cy="36" r="34" fill="rgba(61,107,255,0.15)"></circle>
-              <path d="M25 18 Q25 10 36 10 Q47 10 47 18" stroke="#fff" stroke-width="2.6" stroke-linecap="round" fill="none" opacity="0.35"></path>
-              <path d="M16 22 L36 54 L56 22" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+              <path d="M25 18 Q25 10 36 10 Q47 10 47 18" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" fill="none" opacity="0.35"></path>
+              <path d="M16 22 L36 54 L56 22" stroke="#fff" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round" fill="none"></path>
               <circle cx="36" cy="54" r="4.5" fill="#3D6BFF"></circle>
             </svg>
             <div className="lp-name">vey<span>go</span></div>
@@ -197,7 +197,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
 
           <div className="lp-wallet">
             <div className="lw-icon">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M1 5h10" stroke="currentColor" stroke-width="1.1"/><circle cx="8.5" cy="7" r=".8" fill="currentColor"/></svg>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.1"/><path d="M1 5h10" stroke="currentColor" strokeWidth="1.1"/><circle cx="8.5" cy="7" r=".8" fill="currentColor"/></svg>
             </div>
             <div>
               <div className="lw-lbl">Wallet Balance</div>
@@ -218,7 +218,7 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
               <div className="rs">
                 <div className="rs-dot done">
                   <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                    <path d="M1.5 4l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M1.5 4l2 2 3-3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
                 <span className="rs-lbl">Route</span></div>

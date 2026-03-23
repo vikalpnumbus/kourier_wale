@@ -229,10 +229,10 @@ function Register() {
         <div className="left-logo">
           <svg viewBox="0 0 72 72" width="36" height="36" fill="none">
             <circle cx="36" cy="36" r="34" fill="rgba(61,107,255,0.13)"/>
-            <path d="M25 18 Q25 10 36 10 Q47 10 47 18" stroke="#fff" stroke-width="2.8" stroke-linecap="round" fill="none" opacity="0.4"/>
-            <path d="M16 22 L36 52 L56 22" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path d="M16 22 Q8 30 11 42" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.3"/>
-            <path d="M56 22 Q64 30 61 42" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.3"/>
+            <path d="M25 18 Q25 10 36 10 Q47 10 47 18" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" fill="none" opacity="0.4"/>
+            <path d="M16 22 L36 52 L56 22" stroke="#fff" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            <path d="M16 22 Q8 30 11 42" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" fill="none" opacity="0.3"/>
+            <path d="M56 22 Q64 30 61 42" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" fill="none" opacity="0.3"/>
             <circle cx="36" cy="52" r="4" fill="#fff"/>
           </svg>
           <div className="logo-wordmark">vey<span className="go">go</span></div>
@@ -266,8 +266,8 @@ function Register() {
             <div className="promise-item">
               <div className="promise-icon mercury-bg">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M7 1L11.5 3.5v4C11.5 10 9.5 12 7 13 4.5 12 2.5 10 2.5 7.5v-4L7 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
-                  <path d="M4.5 7l2 2 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M7 1L11.5 3.5v4C11.5 10 9.5 12 7 13 4.5 12 2.5 10 2.5 7.5v-4L7 1z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+                  <path d="M4.5 7l2 2 3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
               <div className="promise-text">
@@ -278,7 +278,7 @@ function Register() {
             <div className="promise-item">
               <div className="promise-icon venus-bg">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M7 1.5v11M4 5h5a2 2 0 010 4H4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M7 1.5v11M4 5h5a2 2 0 010 4H4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
               <div className="promise-text">
@@ -289,8 +289,8 @@ function Register() {
             <div className="promise-item">
               <div className="promise-icon gold-bg">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/>
-                  <path d="M7 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                  <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3"/>
+                  <path d="M7 4v3.5l2 1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                 </svg>
               </div>
               <div className="promise-text">
@@ -340,8 +340,8 @@ function Register() {
                   <label className="field-label">First Name</label>
                   <div class="input-wrap">
                     <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <circle cx="7.5" cy="4.5" r="2.8" stroke="currentColor" stroke-width="1.3"/>
-                    <path d="M1.5 13c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    <circle cx="7.5" cy="4.5" r="2.8" stroke="currentColor" strokeWidth="1.3"/>
+                    <path d="M1.5 13c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                     </svg>
                     <input type="text" name="fname" className="field-input" value={form.fname} onChange={handleChange} placeholder="Rajan" autocomplete="given-name"/>
                   </div>
@@ -350,8 +350,8 @@ function Register() {
                   <label className="field-label">Last Name</label>
                   <div class="input-wrap">
                     <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <circle cx="7.5" cy="4.5" r="2.8" stroke="currentColor" stroke-width="1.3"/>
-                    <path d="M1.5 13c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    <circle cx="7.5" cy="4.5" r="2.8" stroke="currentColor" strokeWidth="1.3"/>
+                    <path d="M1.5 13c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                     </svg>
                   <input type="text" name="lname" className="field-input" value={form.lname} onChange={handleChange} placeholder="Kumar" autocomplete="family-name"/>
                   </div>
@@ -363,9 +363,9 @@ function Register() {
                 <label className="field-label">Business / Brand Name</label>
                 <div class="input-wrap">
                   <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <rect x="2" y="4" width="11" height="9.5" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-                    <path d="M5 4V3a2.5 2.5 0 015 0v1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                    <path d="M2 7.5h11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    <rect x="2" y="4" width="11" height="9.5" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
+                    <path d="M5 4V3a2.5 2.5 0 015 0v1" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                    <path d="M2 7.5h11" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                   </svg>
                   <input type="text" name="companyName" className="field-input" value={form.companyName} onChange={handleChange} placeholder="Your Brand Pvt. Ltd." autocomplete="organization"/>
                 </div>
@@ -376,8 +376,8 @@ function Register() {
                 <label className="field-label">Business Email</label>
                 <div class="input-wrap">
                   <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <rect x="1.5" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-                    <path d="M1.5 5l6 4 6-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="1.5" y="3" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
+                    <path d="M1.5 5l6 4 6-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 <input type="email" name="email" className="field-input" value={form.email} onChange={handleChange} placeholder="you@yourbrand.com" autocomplete="email"/>
                 </div>
@@ -388,7 +388,7 @@ function Register() {
                 <label className="field-label">Mobile Number</label>
                 <div className="input-wrap">
                   <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <rect x="3.5" y="1.5" width="8" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/>
+                    <rect x="3.5" y="1.5" width="8" height="12" rx="2" stroke="currentColor" strokeWidth="1.3"/>
                     <circle cx="7.5" cy="11.5" r="0.7" fill="currentColor"/>
                   </svg>
                   <span class="phone-prefix">+91</span>
@@ -417,8 +417,8 @@ function Register() {
                 <label className="field-label">Password</label>
                 <div className="input-wrap">
                   <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <rect x="3" y="6.5" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-                    <path d="M5 6.5V4.5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    <rect x="3" y="6.5" width="9" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
+                    <path d="M5 6.5V4.5a2.5 2.5 0 015 0v2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                     <circle cx="7.5" cy="10" r="1" fill="currentColor"/>
                   </svg>
                   <input type={showPassword ? "text" : "password"} name="password" className="field-input" placeholder="Minimum 8 characters"  value={form.password} onChange={handleChange}/>
@@ -436,8 +436,8 @@ function Register() {
                 <label className="field-label">Confirm Password</label>
                 <div className="input-wrap">
                   <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <rect x="3" y="6.5" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-                    <path d="M5 6.5V4.5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                    <rect x="3" y="6.5" width="9" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
+                    <path d="M5 6.5V4.5a2.5 2.5 0 015 0v2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                     <circle cx="7.5" cy="10" r="1" fill="currentColor"/>
                   </svg>
                   <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="Confirm The Password" className="field-input" value={form.confirmPassword} onChange={handleChange}/>

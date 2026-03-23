@@ -6,6 +6,7 @@ import RateConfig from "../../../config/RateDetails/RateDetailsConfig";
 import companyDetailsConfig from "../../../config/CompanyDetails/CompanyDetailsConfig";
 import api from "../../../utils/api";
 import '../../../../public/themes/assets/css/custom/custom.css';
+import "../../../assets/ratecalculator/ratecalculator.css";
 function index() {
     const [formData, setFormData] = useState({
     origin: "",
@@ -85,6 +86,7 @@ function index() {
     }
   };
 
+  console.log("plandata", planData);
   const [planChartData, setPlanChartData] = useState([]);
   const fetchplanchart = async () => {
     try {
@@ -111,278 +113,314 @@ function index() {
     }, []);
 
   return (
-    <div className='row'>
-        <div className="col-6">
-            <div className="card">
-                <div className="card-body">
-                    <h4 className="card-title">Rate Calculator</h4>
-                    <p className="card-description">Check Your Price As Per Your Conditions</p>
-                    <hr></hr>
-                    <form className="forms-sample" onSubmit={handleSubmit} noValidate>
-                        <div className="row">
-                            <div className="form-group col-md-4">
-                            <label className="cmp_required">Origin</label>
-                            <input
-                                type="text"
-                                name="origin"
-                                maxLength={6}
-                                pattern="\d*"
-                                className="form-control"
-                                placeholder="Origin"
-                                value={formData.origin}
-                                onChange={handleChange}
-                            />
-                            {errors.origin && <small className="cmp-text-danger">{errors.origin}</small>}
-                            </div>
-                            <div className="form-group col-md-4">
-                            <label className="cmp_required">Destination</label>
-                            <input
-                                type="text"
-                                name="destination"
-                                maxLength={6}
-                                pattern="\d*"
-                                className="form-control"
-                                placeholder="Destination"
-                                value={formData.destination}
-                                onChange={handleChange}
-                            />
-                            {errors.destination && <small className="cmp-text-danger">{errors.destination}</small>}
-                            </div>
-                            <div className="form-group col-md-4">
-                            <label className="cmp_required">Weight</label>
-                            <div className="input-group">
-                                    <div className="input-group-prepend">
-                                        <span className="input-group-text cmp_input_gm">GM</span>
-                                    </div>
-                                    <input
-                                        type="text"
-                                        name="weight"
-                                        className="form-control"
-                                        placeholder="Weight"
-                                        value={formData.weight}
-                                        onChange={handleChange}
-                                    />
-                            </div>
-                            {errors.weight && <small className="cmp-text-danger">{errors.weight}</small>}
-                            </div>
-                        </div>
-                        <div className="row">
-                            {["length", "breadth", "height"].map((field) => (
-                            <div key={field} className="form-group col-md-4">
-                                <label className="cmp_required">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
-                                <div className="input-group">
-                                    <div className="input-group-prepend">
-                                        <span className="input-group-text cmp_input_lbh">CM</span>
-                                    </div>
-                                    <input type="text" name={field} className="form-control" placeholder={field} value={formData[field]} onChange={handleChange}/>
-                                </div>
-                                {errors[field] && <small className="cmp-text-danger">{errors[field]}</small>}
-                            </div>
-                            ))}
-                        </div>
-                        <div className="row">
-                            <div className="form-group col-md-6">
-                            <label>Payment Method</label>
-                            <select
-                                name="paymentType"
-                                className="form-select"
-                                value={formData.paymentType}
-                                onChange={handleChange}
-                            >
-                                <option value="">Payment Method</option>
-                                <option value="cod">COD</option>
-                                <option value="prepaid">PREPAID</option>
-                            </select>
-                            </div>
-
-                            <div className="form-group col-md-6">
-                            <label>Amount</label>
-                            <input
-                                type="text"
-                                name="amount"
-                                className="form-control"
-                                placeholder="Total Amount"
-                                value={formData.amount}
-                                onChange={handleChange}
-                            />
-                            </div>
-                        </div>
-                        <button type="submit" className="btn btn-primary me-2" disabled={loading}>
-                            {loading ? "Calculating..." : "Calculate Price"}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-light"
-                            onClick={() => {
-                            setFormData({
-                                origin: "",
-                                destination: "",
-                                weight: "",
-                                length: "",
-                                breadth: "",
-                                height: "",
-                                paymentType: "",
-                                amount: ""
-                            });
-                            setErrors({});
-                            }}
-                        >
-                            Clear
-                        </button>
-                    </form>
+    <div className="layout">
+        <main>
+            <div className="page-header">
+                <div>
+                    <div className="page-eyebrow">Tools · Pricing Engine</div>
+                    <h1 className="page-title">Rate Calculator</h1>
+                    <p className="page-subtitle">
+                    Compare live carrier rates instantly across all zones & weight slabs
+                    </p>
+                </div>
+                <div className="plan-badge">
+                    {planNames[planData?.pricingPlanId]}
                 </div>
             </div>
-            <div className="col-md-12 mt-5">
-                <div className="h-100">
-                    <div className="card border p-3">
-                        <h4 className="card-title">Rate Price</h4>
-                        <p className="card-description">Check Your Price As Per Your Conditions</p>
-                        <hr></hr>
-                        {showForwardReverse && (
-                            <div className="forward_reverse">
-                                {ratePrice.length > 0 ? (
-                                    ratePrice.map((row, index) => (
-                                        <div className="volume_price" key={index}>
-                                        <div className="d-flex justify-content-between align-items-center">
-                                            <div>
-                                            <span className="courier-title-heading">{row.courier_name}</span>
-                                            <div className="courier-box">
-                                                <div className="courier-box-rs">
-                                                <sup>₹</sup><span className="price">{row.total}</span>
+            <div className="row">
+                <div className="col-6">
+                    <div className="calc-card">
+                        <div className="calc-card-header">
+                            <div>
+                            <div className="calc-header-title">Shipment Details</div>
+                            <div className="calc-header-sub">
+                                Fill in dimensions & route to compare rates
+                            </div>
+                            </div>
+                        </div>
+                        <div className="calc-body">
+                            <form className="forms-sample" onSubmit={handleSubmit} noValidate>
+                                <div>
+                                    <div className="field-group-label">Route</div>
+                                    <div className="field-row cols-2">
+                                        <div className="form-field">
+                                            <label className="form-label">
+                                                Origin Pincode <span className="required-dot">*</span>
+                                            </label>
+                                            <div className="input-wrap">
+                                                <div className="input-prefix">
+                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                                                    <circle cx="12" cy="10" r="3"/>
+                                                </svg>
                                                 </div>
-                                                <span className="delivery_in">/ {row.zone}</span>
+                                                <input className="form-input" type="text" placeholder="e.g. 400001" name="origin" maxLength={6} pattern="\d*" value={formData.origin} onChange={handleChange}/>
                                             </div>
+                                            {errors.origin && <small className="cmp-text-danger">{errors.origin}</small>}
+                                        </div>
+                                        <div className="form-field">
+                                            <label className="form-label">
+                                                Destination Pincode <span className="required-dot">*</span>
+                                            </label>
+                                            <div className="input-wrap">
+                                                <div className="input-prefix">
+                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                                                    <circle cx="12" cy="10" r="3"/>
+                                                </svg>
+                                                </div>
+                                                <input className="form-input" type="text" placeholder="e.g. 110001" name="destination" maxLength={6} pattern="\d*" value={formData.destination} onChange={handleChange}/>
                                             </div>
-                                            <i className="ti ti-truck" style={{ fontSize: "50px" }}></i>
+                                            {errors.destination && <small className="cmp-text-danger">{errors.destination}</small>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="field-group-label">Weight</div>
+                                    <div className="col-md-12">
+                                        <div className="form-field">
+                                        <label className="form-label">
+                                            Actual Weight <span className="required-dot">*</span>
+                                        </label>
+                                        <div className="input-wrap">
+                                            <div className="input-prefix">GM</div>
+                                            <input className="form-input" type="number" placeholder="e.g. 500" name="weight" value={formData.weight} onChange={handleChange} />
+                                        </div>
+                                        {errors.weight && <small className="cmp-text-danger">{errors.weight}</small>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="field-group-label">Package Dimensions (for volumetric weight)</div>
+                                    <div className="field-row cols-3">
+                                        {["length", "breadth", "height"].map((field) => (
+                                            <div className="form-field">
+                                                <label className="form-label">{field.charAt(0).toUpperCase() + field.slice(1)} <span className="required-dot">*</span></label>
+                                                <div className="input-wrap">
+                                                    <div className="input-prefix">CM</div>
+                                                    <input className="form-input" type="number" name={field} placeholder={field} value={formData[field]} onChange={handleChange} />
+                                                </div>
+                                                {errors[field] && <small className="cmp-text-danger">{errors[field]}</small>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="dim-hint">Vol. weight = L × B × H ÷ 5000 · Chargeable = max(actual, volumetric)</div>
+                                </div>
+                                <div>
+                                    <div className="field-group-label">Payment &amp; Order Value</div>
+                                    <div className="field-row cols-2">
+                                        <div className="form-field">
+                                        <label className="form-label">Payment Method <span className="required-dot">*</span></label>
+                                        <select name="paymentType" className="form-select" value={formData.paymentType} onChange={handleChange}>
+                                            <option value="">Payment Method</option>
+                                            <option value="cod">COD</option>
+                                            <option value="prepaid">PREPAID</option>
+                                        </select>
+                                        </div>
+                                        <div className="form-field">
+                                        <label className="form-label">Order Value (₹)</label>
+                                        <div className="input-wrap">
+                                            <div className="input-prefix">₹</div>
+                                            <input className="form-input" type="number" placeholder="e.g. 1500" name="amount" value={formData.amount}onChange={handleChange} />
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="calc-actions mt-3">
+                                    <button type="submit" className="btn-calc btn-calc-primary" disabled={loading}>
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                                        {loading ? "Calculating..." : "Calculate Rates"} 
+                                    </button>
+                                    <button type="button" className="btn-calc btn-calc-ghost" onClick={() => {setFormData({origin: "",destination: "",weight: "",length: "",breadth: "",height: "",paymentType: "",amount: ""});setErrors({});}}>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <polyline points="1 4 1 10 7 10"/>
+                                            <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+                                        </svg>
+                                        Clear
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-6">
+                    <div className="card border p-3">
+                        <div className="results-header">
+                            <div>
+                            <div className="results-title">Rate Comparison</div>
+                            <div className="results-sub">
+                                Live courier pricing
+                            </div>
+                            </div>
+                        </div>
+                        {showForwardReverse && (
+                            <div className="results-card">
+                                <div className="results-body">
+                                    {ratePrice.length > 0 ? (
+                                    ratePrice.map((row, index) => (
+                                        <div
+                                        key={index}
+                                        className={`result-row ${index === 0 ? "best" : ""}`}
+                                        >
+                                        {index === 0 && <div className="best-tag">Best Rate</div>}
+
+                                        <div className="carrier-logo" style={{background:"linear-gradient(135deg,#3D6BFF,#6B7AFF)"}}>
+                                            {row.courier_name?.slice(0, 2)}
                                         </div>
 
-                                        <div className="form-text">
-                                            <i className="ti ti-info-circle menu-icon"></i>
-                                            Freight Charges : ₹ {row.freight_charge} + COD Charges: ₹ {row.cod_charge ?? "0"}
+                                        <div className="carrier-info">
+                                            <div className="carrier-name">
+                                            {row.courier_name}
+                                            </div>
+
+                                            <div className="carrier-meta">
+                                            {row.zone}
+                                            </div>
+                                        </div>
+
+                                        <div className="carrier-price">
+                                            <div className="price-val">
+                                            ₹{row.total}
+                                            </div>
+
+                                            <div className="price-breakdown">
+                                            Freight ₹{row.freight_charge} + COD ₹{row.cod_charge || 0}
+                                            </div>
                                         </div>
                                         </div>
                                     ))
                                     ) : (
-                                    <div className="text-center mt-3">
-                                        <div className="alert alert-warning">
-                                        {apiMessage || "No courier available for this pincode"}
+                                    <div className="empty-results">
+                                        <div className="empty-title">
+                                        {apiMessage || "No courier available"}
                                         </div>
                                     </div>
                                     )}
+                                </div>
                             </div>
                         )}
                     </div>
-                </div>    
-            </div>
-        </div>
-        <div className="col-6">
-            <div className="card">
-                <div className="card-body">
-                    <h4 className="card-title">Rate Card</h4>
-                    <form className="form-sample">
-                    <p className="card-description">
-                        {{
-                        1: "Bronze",
-                        2: "Silver",
-                        3: "Gold",
-                        4: "Platinum"
-                    }[planData?.pricingPlanId] || "Custom Plan"}
-                    </p>
-                    </form>
-                    <div className="table-responsive">
-                    <table className="table table-hover">
-                        <thead className="bg-gray-200">
-                        <tr>
-                            <th>Courier</th>
-                            <th>Z 1</th>
-                            <th>Z 2</th>
-                            <th>Z 3</th>
-                            <th>Z 4</th>
-                            <th>Z 5</th>
-                            <th>COD / %</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            {planChartData.length > 0 ? (
-                                planChartData.map((row, i) => (
-                                <tr key={i}>
-                                <td className="text-left font-medium">
-                                    {row.courier} / {row.type}
-                                </td>
-                                <td>
-                                    <div>FWD: {row.data.forward?.zone1 || "-"}</div>
-                                    <div>WT: {row.data.weight?.zone1 || "-"}</div>
-                                    <div>RTO: {row.data.rto?.zone1 || "-"}</div>
-                                </td>
-                                <td>
-                                    <div>FWD: {row.data.forward?.zone2 || "-"}</div>
-                                    <div>WT: {row.data.weight?.zone2 || "-"}</div>
-                                    <div>RTO: {row.data.rto?.zone2 || "-"}</div>
-                                </td>
-                                <td>
-                                    <div>FWD: {row.data.forward?.zone3 || "-"}</div>
-                                    <div>WT: {row.data.weight?.zone3 || "-"}</div>
-                                    <div>RTO: {row.data.rto?.zone3 || "-"}</div>
-                                </td>
-                                <td>
-                                    <div>FWD: {row.data.forward?.zone4 || "-"}</div>
-                                    <div>WT: {row.data.weight?.zone4 || "-"}</div>
-                                    <div>RTO: {row.data.rto?.zone4 || "-"}</div>
-                                </td>
-                                <td>
-                                    <div>FWD: {row.data.forward?.zone5 || "-"}</div>
-                                    <div>WT: {row.data.weight?.zone5 || "-"}</div>
-                                    <div>RTO: {row.data.rto?.zone5 || "-"}</div>
-                                </td>
-                                <td>
-                                    {row.data.forward?.cod || 0} / {row.data.forward?.cod_percentage || 0}%
-                                </td>
+                    <div className="rate-card mt-3">
+                        <div className="rate-card-header">
+                            <div>
+                            <div className="rate-card-title">Rate Card</div>
+                            <div className="rate-card-sub">
+                                All zones & weight slabs · GST inclusive
+                            </div>
+                            </div>
+                            <div className="platinum-badge">
+                            {planNames[planData?.pricingPlanId]}
+                            </div>
+                        </div>
+                        <div className="rate-table-wrap">
+                            <table className="rate-table">
+                            <thead>
+                                <tr>
+                                <th style={{ minWidth: "160px" }}>Courier</th>
+                                <th className="zone-th">Zone 1</th>
+                                <th className="zone-th">Zone 2</th>
+                                <th className="zone-th">Zone 3</th>
+                                <th className="zone-th">Zone 4</th>
+                                <th className="zone-th">Zone 5</th>
                                 </tr>
-                            ))
-                            ) : (
-                            <tr>
-                                <td colSpan="9" className="text-center text-gray-500">
-                                No Data Found
-                                </td>
-                            </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {planChartData.length > 0 ? (
+                                planChartData.map((row, i) => {
+                                    const data = row.data || {};
+                                    return (
+                                    <tr key={i}>
+                                        <td>
+                                        <div className="carrier-cell">
+                                            <span className="carrier-dot"></span>
+                                            <div>
+                                            <div className="carrier-cell-name">
+                                                {row.courier}
+                                            </div>
+                                            <div className="carrier-cell-sub">
+                                                {row.type || "STANDARD"} · FWD & RTO
+                                            </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td className="zone-cell">
+                                        <div className="fwd">₹{data.forward?.zone1 || "-"}</div>
+                                        <div className="wt">WT: {data.weight?.zone1 || "-"}</div>
+                                        <div className="rto">RTO: {data.rto?.zone1 || "-"}</div>
+                                        </td>
+                                        <td className="zone-cell">
+                                        <div className="fwd">₹{data.forward?.zone2 || "-"}</div>
+                                        <div className="wt">WT: {data.weight?.zone2 || "-"}</div>
+                                        <div className="rto">RTO: {data.rto?.zone2 || "-"}</div>
+                                        </td>
+                                        <td className="zone-cell">
+                                        <div className="fwd">₹{data.forward?.zone3 || "-"}</div>
+                                        <div className="wt">WT: {data.weight?.zone3 || "-"}</div>
+                                        <div className="rto">RTO: {data.rto?.zone3 || "-"}</div>
+                                        </td>
+                                        <td className="zone-cell">
+                                        <div className="fwd">₹{data.forward?.zone4 || "-"}</div>
+                                        <div className="wt">WT: {data.weight?.zone4 || "-"}</div>
+                                        <div className="rto">RTO: {data.rto?.zone4 || "-"}</div>
+                                        </td>
+                                        <td className="zone-cell">
+                                        <div className="fwd">₹{data.forward?.zone5 || "-"}</div>
+                                        <div className="wt">WT: {data.weight?.zone5 || "-"}</div>
+                                        <div className="rto">RTO: {data.rto?.zone5 || "-"}</div>
+                                        </td>
+                                    </tr>
+                                    );
+                                })
+                                ) : (
+                                <tr>
+                                    <td colSpan="6" className="empty-state">
+                                    No Data Found
+                                    </td>
+                                </tr>
+                                )}
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-12 mt-3">
+                    <div className="terms-card">
+                        <div className="terms-header">
+                            <div className="terms-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            </div>
+                            <div className="terms-title">Terms &amp; Conditions</div>
+                        </div>
+                        <div className="terms-grid">
+                            <div className="term-item">
+                            <div className="term-bullet">1</div>
+                            <div className="term-text"><strong>GST Inclusive</strong> — All displayed prices include applicable GST. No additional tax is charged at booking.</div>
+                            </div>
+                            <div className="term-item">
+                            <div className="term-bullet">2</div>
+                            <div className="term-text"><strong>Chargeable Weight</strong> — Billed on whichever is higher: physical dead weight or volumetric weight (L×B×H ÷ 5000).</div>
+                            </div>
+                            <div className="term-item">
+                            <div className="term-bullet">3</div>
+                            <div className="term-text"><strong>COD Charges</strong> — Applied as a fixed COD charge or a % of order value, whichever is higher per carrier policy.</div>
+                            </div>
+                            <div className="term-item">
+                            <div className="term-bullet">4</div>
+                            <div className="term-text"><strong>Volumetric Formula</strong> — L (cm) × B (cm) × H (cm) ÷ 5000 = Volumetric weight in kg per IATA standard.</div>
+                            </div>
+                            <div className="term-item">
+                            <div className="term-bullet">5</div>
+                            <div className="term-text"><strong>Zone Detection</strong> — Zones are auto-detected based on origin and destination pincodes. Rates vary by zone.</div>
+                            </div>
+                            <div className="term-item">
+                            <div className="term-bullet">6</div>
+                            <div className="term-text"><strong>Fuel Surcharge</strong> — Prices may include fuel surcharge as per carrier policy. Surcharges are subject to periodic revision.</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div className="card mt-4">
-                <div className="card-body">
-                    <h5 className="card-title mb-3">Terms &amp; Conditions</h5>
-                    <ul className="list-unstyled rate-terms">
-                    <li>• The above prices are inclusive of GST.</li>
-                    <li>• Chargeable Weight will be Physical / Dead Weight or Volumetric Weight, whichever is Higher.</li>
-                    <li>• COD Charges will be fixed COD charge or a COD % of the order value, whichever is Higher.</li>
-                    <li>
-                        • Volumetric Weight (Kilogram) calculation as per IATA – Length (cm) × Breadth (cm) × Height (cm) / 5000
-                    </li>
-                    <li>
-                        • Other Charges like Octroi charges, state entry tax and fees, and address correction charges if applicable,
-                        shall be charged extra.
-                    </li>
-                    <li>
-                        • RTO (return to origin) shipment will be charged separately from the forward delivery rate, which will be
-                        the same as the forward rates.
-                    </li>
-                    <li>• For any queries, a ticket has to be raised on the panel.</li>
-                    <li>
-                        • The maximum liability, if any, is limited to Rs. 2000/- in the event of a claim by the Merchant, provided
-                        such claim is raised within one (1) month from the date of damage, loss, or theft.
-                    </li>
-                    <li>
-                        • The Merchant shall not book or handover any Product which is banned, restricted, illegal, prohibited,
-                        hazardous, liquid, stolen, or in breach of any law in force in India.
-                    </li>
-                    <li>• Other terms and conditions will be applicable as defined in the agreement.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        </main>
     </div>
   )
 }

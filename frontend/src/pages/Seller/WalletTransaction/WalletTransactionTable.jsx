@@ -38,53 +38,103 @@ function WalletTransactionTable() {
     return (
         <div className="tab-content tab-content-vertical">
             <div className="tab-pane fade show active">
-                <div className="table-responsive h-100">
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Transaction ID</th>
-                                <th>Credit(₹)</th>
-                                <th>Debit(₹)</th>
-                                <th>Closing Balance(₹)</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {loading ? (
+                <div className="table-card">
+                    <div style={{ overflowX: "auto" }}>
+                        <table className="txn-table">
+                            <thead>
                                 <tr>
-                                    <td colSpan="8">
-                                        <div className="dot-opacity-loader">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                    </td>
+                                    <th className="th-first">Date & Time</th>
+                                    <th>TXN ID</th>
+                                    <th>Type</th>
+                                    <th className="th-r">Credit (₹)</th>
+                                    <th className="th-r">Debit (₹)</th>
+                                    <th className="th-r">Closing Balance (₹)</th>
+                                    <th className="th-last">Description</th>
                                 </tr>
-                            ) : dataList.length > 0 ? (
-                                dataList.map((data) => (
-                                    <tr key={data.id}>
-                                        <td>
-                                            {data?.createdAt ? formatDateTime(data?.createdAt) : '-'}
-                                        </td>
-                                        <td>{data?.id || '-'}</td>
-                                        <td>{data?.payment_type === "CREDIT" ? data?.amount : '-'}</td>
-                                        <td>{data?.payment_type === "DEBIT" ? data?.amount : '-'}</td>
-                                        <td>{data?.closing_balance || '-'}</td>
-                                        <td>{`${data?.payment_type === "CREDIT" ? "Credit" : data?.payment_type === "DEBIT" ? "Debit" : "Payment"} Applied For Razorpay Recharge.`}</td>
+                            </thead>
+                            <tbody>
+                                {loading ? (
+                                    <tr>
+                                    <td colSpan="7">Loading...</td>
                                     </tr>
+                                ) : dataList.length > 0 ? (
+                                    dataList.map((data) => {
+                                    const isCredit = data?.payment_type === "CREDIT";
 
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="8" className="text-center">
+                                    return (
+                                        <tr key={data.id}>
+                                        {/* DATE */}
+                                        <td className="td-first">
+                                            <div className="date-cell">
+                                            <div className="dc-date">
+                                                {data?.createdAt ? formatDateTime(data.createdAt).split(",")[0] : "-"}
+                                            </div>
+                                            <div className="dc-time">
+                                                {data?.createdAt ? formatDateTime(data.createdAt).split(",")[1] : ""}
+                                            </div>
+                                            </div>
+                                        </td>
+
+                                        {/* TXN ID */}
+                                        <td>
+                                            <div className="txnid-cell">#{data?.id}</div>
+                                        </td>
+
+                                        {/* TYPE BADGE */}
+                                        <td>
+                                            <div className={`type-badge ${isCredit ? "tbt-credit" : "tbt-debit"}`}>
+                                            <span className="tb-dot"></span>
+                                            {isCredit ? "CREDIT" : "DEBIT"}
+                                            </div>
+                                        </td>
+
+                                        {/* CREDIT */}
+                                        <td className="td-r">
+                                            {isCredit ? (
+                                            <span className="amt-credit">₹ {data.amount}</span>
+                                            ) : (
+                                            <span className="amt-dash">—</span>
+                                            )}
+                                        </td>
+
+                                        {/* DEBIT */}
+                                        <td className="td-r">
+                                            {!isCredit ? (
+                                            <span className="amt-debit">₹ {data.amount}</span>
+                                            ) : (
+                                            <span className="amt-dash">—</span>
+                                            )}
+                                        </td>
+
+                                        {/* BALANCE */}
+                                        <td className="td-r">
+                                            <span className="balance-cell">
+                                            ₹ {data?.closing_balance || 0}
+                                            </span>
+                                        </td>
+
+                                        {/* DESCRIPTION */}
+                                        <td className="td-last">
+                                            <div className="desc-cell">
+                                            {isCredit ? "Wallet Recharge" : "Shipment Deduction"}
+                                            <div className="desc-ref">
+                                                {data?.payment_type} Applied
+                                            </div>
+                                            </div>
+                                        </td>
+                                        </tr>
+                                    );
+                                    })
+                                ) : (
+                                    <tr>
+                                    <td colSpan="7" className="text-center">
                                         No records found
                                     </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 {dataList.length > 0 && !loading && (
