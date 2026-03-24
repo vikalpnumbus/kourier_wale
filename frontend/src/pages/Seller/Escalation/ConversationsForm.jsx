@@ -56,42 +56,29 @@ function ConversationsForm({
   return (
     <div className="card bg-light card-rounded mt-3">
       <div className="card-body px-3 py-3">
-        <h4 className="card-title card-title-dash mb-2">Add new remark</h4>
+        <div className="rb-label">Add New Remark</div>
 
         <form onSubmit={handleSubmit}>
-          <div className="row">
-            <div className="col-md-12 mb-2">
-              <div className="form-group text-start mb-3">
-                <textarea
-                  className="form-control form-textarea"
-                  rows={3}
-                  placeholder="Add new message"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                />
-              </div>
-            </div>
+          <textarea
+            className="rb-ta"
+            placeholder="Type your message..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
 
-            <div className="col-md-12 mb-2">
-              <div className="form-group text-start mb-3">
-                <label>Attachments (If any)</label>
-                <input
-                  type="file"
-                  className="form-control"
-                  onChange={(e) => setFile(e.target.files[0])}
-                />
-              </div>
-            </div>
+          <div className="rb-bottom">
 
-            <div className="col-md-12">
-              <button
-                type="submit"
-                className="btn btn-primary w-100"
-                disabled={loading}
-              >
-                {loading ? "Sending..." : "Submit"}
-              </button>
-            </div>
+            <label className="rb-attach-btn">
+              Attach
+              <input
+                type="file"
+                onChange={(e) => setFile(e.target.files[0])}
+              />
+            </label>
+
+            <button className="rb-submit" disabled={loading}>
+              {loading ? "Sending..." : "Submit"}
+            </button>
           </div>
         </form>
       </div>
