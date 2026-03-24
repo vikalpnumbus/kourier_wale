@@ -59,16 +59,23 @@ app.use((req, res, next) => {
   next();
 });
 
+// app.use("/api/v1", globalRouter);
+
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// // Serve static files from React build
+// app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+// // All other requests should return React's index.html
+// app.get(/^(?!\/api).*/, (req, res) => {
+//   res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+// });
+
 app.use("/api/v1", globalRouter);
-
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// Serve static files from React build
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-// All other requests should return React's index.html
-app.get(/^(?!\/api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
 });
 
 app.use((error, req, res, next) => {
