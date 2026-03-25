@@ -55,7 +55,6 @@ function AppRoutes() {
           </Route>
 
           <Route path="/warehouse" element={<Warehouse />}>
-            <Route index element={<WarehouseTable />} />
             <Route path="add" element={<WarehouseForm />} />
             <Route path="edit/:id" element={<WarehouseForm />} />
           </Route>
