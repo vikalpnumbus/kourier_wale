@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { data, Link } from "react-router-dom";
-
+const BASE_URL = "http://3.111.42.130:3001";
 const FormFieldError = ({ text }) => {
   return text != "" && <span className="text-danger form-text">{text}</span>;
 };
@@ -13,20 +13,16 @@ export default function KYCDetails() {
   const [loading, setLoading] = useState({ save: false, dataList: false });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [editSubmit, setEditSubmit] = useState(false);
-
   const [dataList, setDataList] = useState([]);
-
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   };
-
   const validateErrors = () => {
     const newErrors = {};
     const alphanumericRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     const gstRegex =
       /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
-
     if (!formData.panCardNumber || formData.panCardNumber.trim().length === 0) {
       newErrors.panCardNumber = "Pan card number is required.";
     } else if (formData.panCardNumber.trim().length !== 10) {
@@ -36,19 +32,15 @@ export default function KYCDetails() {
       newErrors.panCardNumberAlphanumeric =
         "Pan card number must be alphanumeric. Example: ABCDE1234F";
     }
-
     if (!formData.nameOnPanCard || formData.nameOnPanCard.trim().length === 0) {
       newErrors.nameOnPanCard = "Name on Pan card is required.";
     }
-
     if (!formData.panCardImage) {
       newErrors.panCardImage = "Pan card image is required.";
     }
-
     if (!formData.documentType) {
       newErrors.documentType = "Document type is required.";
     }
-
     if (!formData.documentId || formData.documentId.trim().length === 0) {
       newErrors.documentId = "Document ID is required.";
     } else if (formData.documentType == "Aadhar") {
@@ -81,14 +73,12 @@ export default function KYCDetails() {
         ? ""
         : "Invalid number. Must be 5–13 digits.";
     }
-
     if (
       !formData.nameOnDocument ||
       formData.nameOnDocument.trim().length === 0
     ) {
       newErrors.nameOnDocument = "Document name is required.";
     }
-
     if (!formData.documentFrontImage) {
       if (
         formData.kycType === "private limited company" ||
@@ -99,7 +89,6 @@ export default function KYCDetails() {
         newErrors.documentFrontImage = "Front Image is required.";
       }
     }
-
     if (
       formData.kycType !== "private limited company" &&
       formData.kycType !== "public limited company" &&
@@ -107,7 +96,6 @@ export default function KYCDetails() {
     ) {
       newErrors.documentBackImage = "Back Image is required.";
     }
-
     if (
       formData.kycType === "partnership" ||
       formData.kycType === "limited liability partnership" ||
@@ -116,7 +104,6 @@ export default function KYCDetails() {
       if (!formData.partnershipDeedImage)
         newErrors.partnershipDeedImage = "Partnership Deed is required.";
     }
-
     if (
       formData.kycType === "public limited company" ||
       formData.kycType === "private limited company"
@@ -135,7 +122,6 @@ export default function KYCDetails() {
         newErrors.gstName = "GST name is required.";
       }
     }
-
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
       return true;
@@ -143,13 +129,11 @@ export default function KYCDetails() {
       return Object.values(newErrors).every((val) => val === "");
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateErrors()) return;
     try {
       const payload = new FormData();
-
       if (formData.kycType) payload.append("kycType", formData.kycType);
       if (formData.panCardNumber)
         payload.append("panCardNumber", formData.panCardNumber);
@@ -231,17 +215,6 @@ export default function KYCDetails() {
       data.documentType = dataList?.documentType;
       data.documentId = dataList?.documentId;
       data.nameOnDocument = dataList?.nameOnDocument;
-      // data.panCardImage = Array.isArray(dataList?.panCardImage)
-      //   ? dataList.panCardImage[0]
-      //   : dataList?.panCardImage || null;
-
-      // data.documentFrontImage = Array.isArray(dataList?.documentFrontImage)
-      //   ? dataList.documentFrontImage[0]
-      //   : dataList?.documentFrontImage || null;
-
-      // data.documentBackImage = Array.isArray(dataList?.documentBackImage)
-      //   ? dataList.documentBackImage[0]
-      //   : dataList?.documentBackImage || null;
     }
     if (formData.kycType?.toLowerCase() == "partnership") {
       data.panCardNumber = dataList?.panCardNumber;
@@ -251,25 +224,6 @@ export default function KYCDetails() {
       data.nameOnDocument = dataList?.nameOnDocument;
       data.gstName = dataList?.gstName;
       data.gstNumber = dataList?.gstNumber;
-      // data.panCardImage = Array.isArray(dataList?.panCardImage)
-      //   ? dataList.panCardImage[0]
-      //   : dataList?.panCardImage || null;
-
-      // data.documentFrontImage = Array.isArray(dataList?.documentFrontImage)
-      //   ? dataList.documentFrontImage[0]
-      //   : dataList?.documentFrontImage || null;
-
-      // data.documentBackImage = Array.isArray(dataList?.documentBackImage)
-      //   ? dataList.documentBackImage[0]
-      //   : dataList?.documentBackImage || null;
-
-      // data.partnershipDeedImage = Array.isArray(dataList?.partnershipDeedImage)
-      //   ? dataList.partnershipDeedImage[0]
-      //   : dataList?.partnershipDeedImage || null;
-
-      // data.gstImage = Array.isArray(dataList?.gstImage)
-      //   ? dataList.gstImage[0]
-      //   : dataList?.gstImage || null;
     }
     if (formData.kycType?.toLowerCase() == "limited liability partnership") {
       data.panCardNumber = dataList?.panCardNumber;
@@ -279,25 +233,6 @@ export default function KYCDetails() {
       data.nameOnDocument = dataList?.nameOnDocument;
       data.gstName = dataList?.gstName;
       data.gstNumber = dataList?.gstNumber;
-      // data.panCardImage = Array.isArray(dataList?.panCardImage)
-      //   ? dataList.panCardImage[0]
-      //   : dataList?.panCardImage || null;
-
-      // data.documentFrontImage = Array.isArray(dataList?.documentFrontImage)
-      //   ? dataList.documentFrontImage[0]
-      //   : dataList?.documentFrontImage || null;
-
-      // data.documentBackImage = Array.isArray(dataList?.documentBackImage)
-      //   ? dataList.documentBackImage[0]
-      //   : dataList?.documentBackImage || null;
-
-      // data.partnershipDeedImage = Array.isArray(dataList?.partnershipDeedImage)
-      //   ? dataList.partnershipDeedImage[0]
-      //   : dataList?.partnershipDeedImage || null;
-
-      // data.gstImage = Array.isArray(dataList?.gstImage)
-      //   ? dataList.gstImage[0]
-      //   : dataList?.gstImage || null;
     }
     if (
       formData.kycType?.toLowerCase() == "public limited company" ||
@@ -309,7 +244,6 @@ export default function KYCDetails() {
       data.documentId = dataList?.documentId;
       data.nameOnDocument = dataList?.nameOnDocument;
     }
-
     const documentType = dataList?.documentType;
     if (
       formData.kycType?.toLowerCase() == "public limited company" ||
@@ -336,7 +270,6 @@ export default function KYCDetails() {
   useEffect(() => {
     handleFetchData();
   }, []);
-
   return (
     <>
       <div
@@ -463,8 +396,11 @@ export default function KYCDetails() {
                           <img
                             height={100}
                             width={100}
-                            src={`http://3.111.42.130:3001${dataList.panCardImage[0]}`}
-                            alt=""
+                            src={`${BASE_URL}${dataList?.panCardImage?.[0]}`}
+                            alt="pan"
+                            onError={(e) => {
+                              e.target.src = "https://via.placeholder.com/100?text=No+Image";
+                            }}
                           />
                         ) : (
                           <input
