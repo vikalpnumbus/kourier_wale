@@ -105,6 +105,7 @@ export default function ProductsForm() {
       formData.append(key, value);
     });
 
+    console.log("CReate Product REquest", formData);
     const response = await api[method](url, formData);
 
     if (response.status === 201 || response?.data?.status === 201) {
