@@ -15,7 +15,7 @@ const defaultForm = {
   sku: "",
   price: "",
   category: "",
-  productImage: null,
+  productImage: "",
 };
 
 export default function ProductsForm() {
@@ -101,13 +101,11 @@ export default function ProductsForm() {
 
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
-      if (key === "productImage" && !value) return; // skip empty file
+      if (key === "productImage" && !value) return;
       formData.append(key, value);
     });
 
-    const response = await api[method](url, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const response = await api[method](url, formData);
 
     if (response.status === 201 || response?.data?.status === 201) {
       showSuccess(

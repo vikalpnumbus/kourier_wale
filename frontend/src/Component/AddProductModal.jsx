@@ -10,7 +10,7 @@ function AddProductModal({ onClose, onProductAdded }) {
         sku: "",
         price: "",
         category: "",
-        productImage: null,
+        productImage: "",
     };
 
     const [form, setForm] = useState(defaultForm);

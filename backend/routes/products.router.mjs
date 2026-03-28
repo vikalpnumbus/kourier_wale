@@ -17,7 +17,7 @@ const ProductsRouter = express.Router();
 ProductsRouter.post(
   "/",
   TokenHandler.authenticateToken,
-  upload.any(),
+  upload.single("productImage"),
   ImageValidator.validate,
   validate(ProductsValidations.create()),
   create
