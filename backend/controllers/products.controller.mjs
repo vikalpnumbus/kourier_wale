@@ -2,6 +2,7 @@ import ProductsService from "../services/products.service.mjs";
 import { readCsvAsArray } from "../utils/basic.utils.mjs";
 
 export const create = async (req, res, next) => {
+  console.log("Porduct Body", req.body);
   try {
     const { name, price, category } = req.body;
     const errors = [];
