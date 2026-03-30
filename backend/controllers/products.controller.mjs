@@ -34,14 +34,14 @@ export const create = async (req, res, next) => {
     const missingFiles = requiredFiles.filter(
       (required) => !uploadedFileNames.includes(required)
     );
-    if (missingFiles.length > 0) {
-      missingFiles.forEach((file) => {
-        errors.push({
-          field: file,
-          message: "Product Image is required.",
-        });
-      });
-    }
+    // if (missingFiles.length > 0) {
+    //   missingFiles.forEach((file) => {
+    //     errors.push({
+    //       field: file,
+    //       message: "Product Image is required.",
+    //     });
+    //   });
+    // }
     if (errors.length > 0) {
       return next({
         status: 400,
