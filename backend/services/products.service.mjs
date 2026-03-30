@@ -30,20 +30,19 @@ class Service {
         channel_product_id:channel_product_id||null,
       };
       const result = await this.repository.save(payload);
-      if (files && files.length > 0) {
-          ProductsProducer.publish({
-            files: files.map((f) => ({
-              buffer: f.buffer,
-              fieldname: f.fieldname,        // ✅ REQUIRED
-              originalname: f.originalname,  // ✅ REQUIRED
-              mimetype: f.mimetype,
-              dir: "products",
-            })),
-            metadata: {
-              id: result.id,
-            },
-          });
-        }
+
+      if (files) {
+        ProductsProducer.publish({
+          files: files.map((e) => ({
+            imageName: data.userId,
+            image: e,
+            dir: "products",
+          })),
+          metadata: {
+            id: result.id,
+          },
+        });
+      }
       return {
         status: 201,
         data: {
