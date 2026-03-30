@@ -157,7 +157,7 @@ main { flex: 1; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.
 ══════════════════════════ */
 .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(10,10,15,0.55); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
 .modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal { background: var(--surface); border-radius: var(--r-xl); box-shadow: 0 24px 60px rgba(10,10,15,0.25); width: 100%; max-width: 600px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; transform: translateY(20px) scale(0.97); transition: transform 0.22s ease; }
+/* .modal { background: var(--surface); border-radius: var(--r-xl); box-shadow: 0 24px 60px rgba(10,10,15,0.25); width: 100%; max-width: 600px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; transform: translateY(20px) scale(0.97); transition: transform 0.22s ease; } */
 .modal-overlay.open .modal { transform: translateY(0) scale(1); }
 .modal-hdr { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-soft); flex-shrink: 0; }
 .modal-title { font-family: var(--font-heading); font-weight: 700; font-size: 1rem; color: var(--text-primary); letter-spacing: -0.01em; }
