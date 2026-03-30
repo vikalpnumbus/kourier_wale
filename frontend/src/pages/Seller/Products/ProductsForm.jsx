@@ -64,7 +64,7 @@ export default function ProductsForm() {
     // Only require image on CREATE, not on EDIT
     const isEdit = location.pathname.includes("/products/edit");
 
-  if (!isEdit) {
+    if (!isEdit) {
       if (!form.productImage) {
         newErrors.productImage = "Product image is required";
       } else if (!form.productImage.type?.startsWith("image/")) {
@@ -100,12 +100,13 @@ export default function ProductsForm() {
 
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
-      if (key === "productImage" && !value) return;
+      if (key === "productImage" && !value) return; // skip empty file
       formData.append(key, value);
     });
 
-    console.log("CReate Product REquest", formData);
-    const response = await api[method](url, formData);
+    const response = await api[method](url, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
     if (response.status === 201 || response?.data?.status === 201) {
       showSuccess(
