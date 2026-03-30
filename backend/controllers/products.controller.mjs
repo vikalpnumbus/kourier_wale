@@ -39,7 +39,7 @@ export const create = async (req, res, next) => {
       missingFiles.forEach((file) => {
         errors.push({
           field: file,
-          message: "Product Image is required Vikalp",
+          message: "Product Image is required.",
         });
       });
     }

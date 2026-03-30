@@ -15,7 +15,7 @@ const defaultForm = {
   sku: "",
   price: "",
   category: "",
-  productImage: "",
+  productImage: null,
 };
 
 export default function ProductsForm() {
@@ -65,17 +65,16 @@ export default function ProductsForm() {
     const isEdit = location.pathname.includes("/products/edit");
 
   if (!isEdit) {
-    if (!form.productImage) {
-      newErrors.productImage = "Product image is required";
-    } else if (!form.productImage.type?.startsWith("image/")) {
-      newErrors.productImage = "File must be an image";
-    } else if (form.productImage.size > 2 * 1024 * 1024) {
-      newErrors.productImage = "Image size must be ≤ 2 MB";
-    }
-    } else {
-      if (!form.productImage && !preview) {
+      if (!form.productImage) {
         newErrors.productImage = "Product image is required";
-      } else if (form.productImage) {
+      } else if (!form.productImage.type?.startsWith("image/")) {
+        newErrors.productImage = "File must be an image";
+      } else if (form.productImage.size > 2 * 1024 * 1024) {
+        newErrors.productImage = "Image size must be ≤ 2 MB";
+      }
+    } else {
+      // If editing and user uploads a new image, still validate type/size
+      if (form.productImage) {
         if (!form.productImage.type?.startsWith("image/")) {
           newErrors.productImage = "File must be an image";
         } else if (form.productImage.size > 2 * 1024 * 1024) {
@@ -245,7 +244,6 @@ export default function ProductsForm() {
                       onChange={handleFileChange}
                       accept="image/*"
                       ref={fileInputRef}
-                      name="productImage"
                     />
                     {errors.productImage && (
                       <small className="text-danger">
