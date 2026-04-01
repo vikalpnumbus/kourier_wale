@@ -86,7 +86,6 @@
 /* Input wrapper with prefix */
 .input-wrap {
   display: flex; 
-  align-items: stretch !important;
   border: 1.5px solid #E4E7EF; border-radius: 10px;
   background: #F7F8FB; overflow: hidden;
   transition: border-color 0.14s, box-shadow 0.14s;
