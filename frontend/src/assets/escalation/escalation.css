@@ -178,7 +178,7 @@
     box-shadow: 0 0 0 3px rgba(61,107,255,0.08);
 }
 .table-footer {
-  display: flex; align-items: center; justify-content: space-between;
+  display: block; align-items: center; justify-content: space-between;
   padding: 0.875rem 1.375rem; border-top: 1px solid #ECEEF5; background: #F7F8FB;
 }
 .pagination-info { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: #8B93B0; letter-spacing: 0.06em; }
@@ -542,7 +542,7 @@
 .pb-h{background:#FEF3DC;border-color:#F5D59A;color:#C8830E}
 .pb-c{background:#FDF0E8;border-color:rgba(232,99,10,.25);color:#E8630A}
 .pb-dot{width:5px;height:5px;border-radius:50%}
-.action-btn{display:flex;align-items:center;gap:.375rem;padding:.4rem .875rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid;transition:all .14s}
+.action-btn{display:flex;align-items:center;gap:.375rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid;transition:all .14s}
 .ab-outline{background:#FFFFFF;border-color:#E4E7EF;color:#4B5270}
 .ab-outline:hover{border-color:#C7D5FF;color:#3D6BFF;background:#EEF3FF}
 .ab-danger{background:#FFFFFF;border-color:rgba(232,99,10,.25);color:#E8630A}

@@ -307,7 +307,7 @@ main { flex: 1; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.
 /* Product name cell */
 .product-name-cell { display: flex; align-items: center; gap: 0.75rem; }
 .product-thumb {
-  width: 38px; height: 38px; border-radius: var(--r-sm);
+  width: 38px; height: 38px; border-radius: 6px;
   background: var(--surface-2); border: 1px solid var(--border-soft);
   overflow: hidden; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
@@ -367,7 +367,7 @@ main { flex: 1; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.
 /* Actions cell */
 .actions-cell { display: flex; align-items: center; gap: 0.4rem; }
 .action-btn {
-  width: 30px; height: 30px; border-radius: var(--r-sm);
+  width: 30px; height: 30px; border-radius: 6px;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; border: none; transition: all 0.13s;
 }
@@ -386,7 +386,7 @@ main { flex: 1; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.
 
 /* ── Table footer / pagination ── */
 .table-footer {
-  display: flex; align-items: center; justify-content: space-between;
+  display: block; align-items: center; justify-content: space-between;
   padding: 0.875rem 1.5rem; border-top: 1px solid var(--border-soft);
   background: var(--surface-2);
 }
@@ -396,7 +396,7 @@ main { flex: 1; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.
 }
 .pagination { display: flex; gap: 0.3rem; align-items: center; }
 .page-btn {
-  width: 30px; height: 30px; border-radius: var(--r-sm);
+  width: 30px; height: 30px; border-radius: 6px;
   display: flex; align-items: center; justify-content: center;
   border: 1px solid var(--border); background: var(--surface);
   font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-secondary);
@@ -436,7 +436,7 @@ main { flex: 1; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.
 }
 .modal-subtitle { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
 .modal-close {
-  width: 30px; height: 30px; border-radius: var(--r-sm);
+  width: 30px; height: 30px; border-radius: 6px;
   background: var(--surface-2); border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; color: var(--text-muted);

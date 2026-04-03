@@ -283,7 +283,7 @@
 
 /* TABLE FOOTER */
 .table-footer {
-  display: flex; align-items: center; justify-content: space-between;
+  display: block; align-items: center; justify-content: space-between;
   padding: 0.875rem 1.375rem; border-top: 1px solid #ECEEF5;
   background: #F7F8FB;
 }

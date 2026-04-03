@@ -160,18 +160,11 @@ function ProductsTable() {
                     </td>
                     <td>
                       <div className="actions-cell">
-                        <Link
-                          to={`edit/${item.id}`}
-                          className="action-btn edit"
-                        >
-                          <Icon path={mdiPencil} size={0.6} />
+                        <Link to={`edit/${item.id}`} className="action-btn edit">
+                          <Icon path={mdiPencil} size={0.7} />
                         </Link>
-
-                        <button
-                          className="action-btn delete"
-                          onClick={() => deleteProduct(item.id)}
-                        >
-                          <Icon path={mdiDelete} size={0.6} />
+                        <button className="action-btn delete" onClick={() => deleteProduct(item.id)}>
+                          <Icon path={mdiDelete} size={0.7} />
                         </button>
                       </div>
                     </td>
