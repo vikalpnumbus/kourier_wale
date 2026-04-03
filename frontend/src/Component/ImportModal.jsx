@@ -115,8 +115,15 @@ const currentSample = sampleFiles[title] || {};
                 <small className="text-muted">
                   Please download the sample CSV file and follow the same format while uploading.
                 </small>
-                <a href="/imports_files/ordersBulkImport.csv" download="ordersBulkImportSample.csv" className="btn btn-sm btn-outline-primary mt-2">
-                ⬇ Download CSV </a>
+                {currentSample?.url && (
+                  <a
+                    href={currentSample.url}
+                    download={currentSample.name}
+                    className="btn btn-sm btn-outline-primary mt-2"
+                  >
+                    ⬇ Download CSV
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -172,7 +179,7 @@ const currentSample = sampleFiles[title] || {};
               Cancel
             </button>
             <button type="submit" className="btn btn-primary">
-              Import Orders
+              {title}
             </button>
           </div>
         </form>

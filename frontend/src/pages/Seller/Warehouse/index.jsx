@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import {useLocation,useNavigate,useSearchParams} from "react-router-dom";
 import ImportModal from "../../../Component/ImportModal";
+import Icon from "@mdi/react";
+import { mdiCloudDownloadOutline } from "@mdi/js";
 import warehouseConfig from "../../../config/Warehouse/WarehouseConfig";
 import WarehouseTable from "./WarehouseTable";
 import "../../../assets/warehouse/warehouse.css"
@@ -32,15 +34,31 @@ const [statusFilter, setStatusFilter] = useState("");
     <div className="layout">
       <main>
         <div className="page-header">
-          <div>
+          <div className="col-md-8">
             <div className="page-eyebrow">Logistics Network</div>
             <div className="page-title">Warehouses</div>
             <div className="page-subtitle">
               Manage pickup locations and shipping origins.
             </div>
           </div>
-          <Link to="add" className="btn btn-primary"> + Add Warehouse</Link>
-          {/* <button className="btn btn-primary" onClick={() => navigate("add")}>+ Add Warehouse</button> */}
+          <div className="row">
+            <div className="col-md-12 d-flex gap-2">
+              {!location.pathname.includes("/warehouse/edit") && 
+              !location.pathname.includes("/warehouse/add") && (
+                <button
+                  onClick={() => { setShowImportModal(true); }}
+                  type="button"
+                  className="btn btn-dark btn-md py-2 px-4"
+                >
+                  <Icon path={mdiCloudDownloadOutline} size={0.7} />{" "}
+                  Import
+                </button>
+              )}
+              <Link to="add" className="btn btn-primary btn-md py-2 px-4">
+                + Add Warehouse
+              </Link>
+            </div>
+          </div>
         </div>
         <div className="filters-bar">
           <div className="search-wrap">
