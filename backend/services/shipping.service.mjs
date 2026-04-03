@@ -59,6 +59,7 @@ class Service {
         throw error;
       }
 
+      console.log("Seller account details:", user);
       const warehouses = warehouseRes?.data?.result || [];
       const user_wallet_balance = user?.wallet_balance || 0;
 
