@@ -57,26 +57,22 @@ function Register() {
   };
 
   const handleChange = (e) => {
-    let { name, value } = e.target;
-    if (name === "phone") {
-      value = value.replace(/\D/g, "");
-      if (!value.startsWith("91")) {
-        value = "91" + value;
-      }
-      value = "+".concat(value);
+  let { name, value } = e.target;
+  if (name === "phone") {
+    value = value.replace(/\D/g, "");
+    if (value.length > 10) {
+      value = value.slice(0, 10);
     }
-    setForm((prev) => ({ ...prev, [name]: value }));
+  }
+  setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleNextStep1 = async (e) => {
     e.preventDefault();
     showError("");
 
-    for (const [key, value] of Object.entries(form)) {
-      if (key === "phone") {
-        if (value.length < 13)
-          return showError("Please enter a valid phone number.");
-      }
+    if (!/^[6-9]\d{9}$/.test(form.phone)) {
+      return showError("Please enter a valid 10-digit mobile number.");
     }
 
     const emailError = validateEmail(form.email);
@@ -101,9 +97,10 @@ function Register() {
 
     try {
       setLoading(true);
-
-      await axios.post(authConfig.registerStep1Api, form);
-      // setStep(2);
+      await axios.post(authConfig.registerStep1Api, {
+        ...form,
+        phone: `+91${form.phone}`,
+      });
       setStep(3);
     } catch (err) {
       showError(
@@ -399,17 +396,19 @@ function Register() {
               {/* SHIPPING */}
               <div className="field">
                 <label className="field-label">Shipping Volume</label>
-                <select
-                  name="shippingVolume"
-                  className="field-input"
-                  value={form.shippingVolume}
-                  onChange={handleChange}
-                >
-                  <option value="">Select</option>
-                  {shippingOptions.map((opt) => (
-                    <option key={opt}>{opt}</option>
-                  ))}
-                </select>
+                <div className="input-wrap">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                    <path d="M2 5.5L7.5 2.5L13 5.5L7.5 8.5L2 5.5Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+                    <path d="M2 5.5V10L7.5 13L13 10V5.5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+                    <path d="M7.5 8.5V13" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                  </svg>
+                  <select name="shippingVolume" className="field-input" value={form.shippingVolume} onChange={handleChange}>
+                    <option value="">Select</option>
+                    {shippingOptions.map((opt) => (
+                      <option key={opt}>{opt}</option>
+                    ))}
+                  </select>
+                  </div>
               </div>
 
               {/* PASSWORD */}
