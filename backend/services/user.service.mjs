@@ -89,7 +89,7 @@ class Service {
     try {
       const { type, to, otp } = data;
       let query = {};
-      if (type == "phone") query = { phone: to };
+      if (type == "phone") query = { phone: to, phone_otp: otp };
       if (type == "email") query = { email: to, email_otp: otp };
 
       let otpInstance = await this.otpRepository.findOne(query);

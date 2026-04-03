@@ -26,8 +26,13 @@ export class BaseRepositoryClass {
   }
 
   async findOne(condition, include = []) {
-    if (condition.hasOwnProperty("where")) return await this.model.findOne(condition);
-    else return (await this.model.findOne({ where: condition, include }))?.dataValues;
+  let result;
+  if (condition.hasOwnProperty("where")) {
+    result = await this.model.findOne(condition);
+  } else {
+    result = await this.model.findOne({ where: condition, include });
+  }
+  return result ? result.get({ plain: true }) : null;
   }
 
   async findOneAndDelete(condition) {
