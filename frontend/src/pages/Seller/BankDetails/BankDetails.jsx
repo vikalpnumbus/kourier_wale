@@ -43,8 +43,8 @@ function BankDetails() {
   return (
     <>
       <div className="row">
-        <div className="col-md-6"></div>
-        <div className="col-md-6 text-end">
+        <div className="col-md-10"></div>
+        <div className="col-md-2 text-end">
           <button
             onClick={() => navigate("add")}
             type="button"
