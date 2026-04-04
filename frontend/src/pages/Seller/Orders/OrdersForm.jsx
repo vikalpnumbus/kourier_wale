@@ -822,7 +822,13 @@ const InputField = React.forwardRef(
         />
         <label htmlFor={name}>
           {label}
-          {name !== "shippingDetails.alternatePhone" && name !== "charges.shipping" && name !== "charges.discount" && (
+          {![
+            "shippingDetails.alternatePhone",
+            "charges.shipping",
+            "charges.tax_amount",
+            "charges.cod",
+            "charges.discount"
+          ].includes(name) && (
             <span className="text-danger">*</span>
           )}
         </label>
