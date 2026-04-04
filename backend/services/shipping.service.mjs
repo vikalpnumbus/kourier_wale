@@ -58,37 +58,23 @@ class Service {
         error.status = 400;
         throw error;
       }
-
       console.log("Seller account details:", user);
       const warehouses = warehouseRes?.data?.result || [];
       const user_wallet_balance = user?.wallet_balance || 0;
-
       let productIDs = order.products.map((product) => product.id + "");
       const foundProducts = await ProductsService.read({ id: productIDs });
       const checkProductExistence = new Set(foundProducts?.data?.result?.map((e) => e.id + ""));
       const missingIds = productIDs.filter((id) => !checkProductExistence.has(id));
-
-      const total_price =
-        Number(freight_charge) +
-        Number(cod_price) +
-        Number(order.charges?.cod) +
-        Number(order.charges?.shipping) +
-        Number(order.charges?.tax_amount) -
-        Number(order.charges?.discount) +
-        order.products.reduce((acc, e) => acc + Number(e.qty) * Number(e.price), 0);
-
+      const total_price = Number(freight_charge) + Number(cod_price);
       const errors = [];
-
       if (missingIds.length > 0) {
         errors.push(`Product with IDs ${missingIds.join(", ")} does not exist.`);
       }
-
       if (warehouse_id == rto_warehouse_id && warehouses.length !== 1) {
         errors.push("Pickup Warehouse or RTO warehouse with given IDs not found.");
       } else if (warehouse_id != rto_warehouse_id && warehouses.length !== 2) {
         errors.push("Pickup Warehouse or RTO warehouse with given IDs not found.");
       }
-
       const isCourierExist = await CourierService.read({ id: courier_id });
       if (!isCourierExist) {
         errors.push("Courier does not exist.");
@@ -99,13 +85,11 @@ class Service {
       if (user_wallet_balance < total_price) {
         errors.push("Wallet Balance is low");
       }
-
       if (total_price > 2_00_000 && order.paymentType == "cod") {
         const error = new Error("COD is not available for more than 200000 collectable amount");
         error.status = 400;
         throw error;
       }
-
       if (errors.length > 0) {
         payload.shipment_error = errors.join("|");
       }
