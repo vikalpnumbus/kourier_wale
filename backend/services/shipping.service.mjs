@@ -93,7 +93,9 @@ class Service {
       if (!isCourierExist) {
         errors.push("Courier does not exist.");
       }
-
+      console.log("Wallet Balance:", user_wallet_balance);
+      console.log("Total Cost:", total_price);
+      console.log("User ID:", userId);
       if (user_wallet_balance < total_price) {
         errors.push("Wallet Balance is low");
       }
