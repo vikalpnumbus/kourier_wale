@@ -142,6 +142,14 @@ const OrdersModel = sqlDB.sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    is_valid: {
+      type: DataTypes.TINYINT, // 0 / 1
+      defaultValue: 1,
+    },
+    error_message: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
   {
     timestamps: true,
