@@ -386,46 +386,60 @@ function OrdersTable({ setExportHandler }) {
                       </div>
                     </td>
                     <td className="py-2">
-                      <div className="btn-group">
-                        <button
-                          className={`btn btn-md py-2 px-3 ${data.shipping_status === "new"
-                            ? "btn-primary"
-                            : data.shipping_status === "cancel"
-                              ? "btn-danger kw_button_cancel"
-                              : data.shipping_status === "booked"
+                      <div className="d-flex align-items-center gap-2">
+                        <div className="btn-group">
+                          <button
+                            className={`btn btn-md py-2 px-3 ${
+                              data.shipping_status === "new"
+                                ? "btn-primary"
+                                : data.shipping_status === "cancel"
+                                ? "btn-danger kw_button_cancel"
+                                : data.shipping_status === "booked"
                                 ? "btn-success kw_button_booked"
                                 : "btn-secondary kw_button_booked"
                             }`}
-                          onClick={() => {
-                            const warehouse = warehouseList.find(
-                              (w) => w.id == data.warehouse_id
-                            );
-                            setShipOrderDetails({
-                              id: data.id,
-                              warehouse_id: data.warehouse_id,
-                              rto_warehouse_id: data.rto_warehouse_id,
-                              collectableAmount: data.collectableAmount,
-                              paymentType: data.paymentType,
-                              packageDetails: data.packageDetails,
-                              shippingDetails: data.shippingDetails,
-                              originpincode: warehouse?.pincode,
-                            });
-                            setShowShipModal(true);
-                          }}
-                          disabled={!orderCanShip(data)}
-                        >
-                          {data.shipping_status === "new" ? "ship" : data.shipping_status}
-                        </button>
-                      </div>{" "}
-                      &nbsp;
-                      {data.shipping_status === "new" && (
-                        <div className="btn-group">
-                          <Link
-                            to={`edit/${data.id}`}
-                            className="btn btn-outline-primary btn-md py-2 px-3"
+                            onClick={() => {
+                              const warehouse = warehouseList.find(
+                                (w) => w.id == data.warehouse_id
+                              );
+                              setShipOrderDetails({
+                                id: data.id,
+                                warehouse_id: data.warehouse_id,
+                                rto_warehouse_id: data.rto_warehouse_id,
+                                collectableAmount: data.collectableAmount,
+                                paymentType: data.paymentType,
+                                packageDetails: data.packageDetails,
+                                shippingDetails: data.shippingDetails,
+                                originpincode: warehouse?.pincode,
+                              });
+                              setShowShipModal(true);
+                            }}
+                            disabled={!orderCanShip(data)}
                           >
-                            <Icon path={mdiPencil} size={0.6} />
-                          </Link>
+                            {data.shipping_status === "new"
+                              ? "ship"
+                              : data.shipping_status}
+                          </button>
+                        </div>
+
+                        {data.shipping_status === "new" && (
+                          <div className="btn-group">
+                            <Link
+                              to={`edit/${data.id}`}
+                              className="btn btn-outline-primary btn-md py-2 px-3"
+                            >
+                              <Icon path={mdiPencil} size={0.6} />
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                      {data.is_valid === 0 && data.error_message && (
+                        <div className="text-danger mt-2 response_error">
+                          {data.error_message.split("|").map((err, i) => (
+                            <div key={i}>
+                            {err}
+                            </div>
+                          ))}
                         </div>
                       )}
                     </td>
