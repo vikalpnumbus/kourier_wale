@@ -112,6 +112,18 @@ class Service {
         throw new Error(shipmentRes?.error || "Shipment failed");
       }
 
+
+      // ================= ✅ WALLET SUCCESS =================
+      const existingUser = await UserService.read({ id: userId });
+      await UserService.update(
+        { id: userId },
+        {
+          wallet_balance:
+            Number(existingUser.wallet_balance) -
+            Number(total_price),
+        }
+      );
+
       // ================= ✅ SUCCESS =================
 
       // ✅ Create shipment now
