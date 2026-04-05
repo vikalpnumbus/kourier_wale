@@ -26,7 +26,6 @@ class Service {
   }
   async create({ data }) {
     try {
-      let payload = {};
       let {
         order_id,
         warehouse_id,
@@ -38,50 +37,31 @@ class Service {
         plan_id,
         userId,
       } = data;
+
       let [orderRes, warehouseRes, user] = await Promise.all([
         OrdersService.read({ id: order_id, userId }),
         WarehouseService.read({ id: [warehouse_id, rto_warehouse_id] }),
         UserService.read({ id: userId }),
       ]);
+
       let order = orderRes?.data?.result?.[0];
-      if (!order) {
-        const error = new Error("Order not found.");
-        error.status = 404;
-        throw error;
-      }
-      if (order.shipping_status == "cancelled") {
-        const error = new Error("Cancelled order cannot be shipped.");
-        error.status = 400;
-        throw error;
-      }
+      if (!order) throw new Error("Order not found.");
+      if (order.shipping_status == "cancelled")
+        throw new Error("Cancelled order cannot be shipped.");
+
       const warehouses = warehouseRes?.data?.result || [];
       const user_wallet_balance = user?.wallet_balance || 0;
-      let productIDs = order.products.map((p) => p.id + "");
-      const foundProducts = await ProductsService.read({ id: productIDs });
-      const foundIds = new Set(
-        foundProducts?.data?.result?.map((e) => e.id + "")
-      );
-      const missingIds = productIDs.filter((id) => !foundIds.has(id));
+
       const total_price = Number(freight_charge) + Number(cod_price);
+
       const errors = [];
-      if (missingIds.length > 0) {
-        errors.push(
-          `Product with IDs ${missingIds.join(", ")} does not exist.`
-        );
-      }
-      if ((warehouse_id == rto_warehouse_id && warehouses.length !== 1) || (warehouse_id != rto_warehouse_id && warehouses.length !== 2)) {
-        errors.push("Pickup/RTO warehouse not found.");
-      }
-      const courierRes = await CourierService.read({ id: courier_id });
-      if (!courierRes) {
-        errors.push("Courier does not exist.");
-      }
-      if (user_wallet_balance < total_price) {
+
+      if (user_wallet_balance < total_price)
         errors.push("Wallet Balance is low");
-      }
-      if (total_price > 200000 && order.paymentType == "cod") {
-        errors.push("COD not allowed above 200000");
-      }
+
+      const courierRes = await CourierService.read({ id: courier_id });
+      if (!courierRes) errors.push("Courier does not exist.");
+
       if (errors.length > 0) {
         await OrdersService.update({
           data: {
@@ -90,33 +70,58 @@ class Service {
             error_message: errors.join("|"),
           },
         });
-        const error = new Error(errors.join(", "));
-        error.status = 400;
-        throw error;
+        throw new Error(errors.join(", "));
       }
+
+      // ✅ Prepare payload (NO DB SAVE)
       delete order.id;
       delete order.createdAt;
       delete order.updatedAt;
-      payload = {
+
+      const payload = {
         order_db_id: order_id,
         ...order,
         warehouse_id,
         rto_warehouse_id,
-        shipping_status: "new",
         courier_id,
         freight_charge,
         cod_price,
         total_price,
         zone,
         plan_id,
-        courierPackageDetails: {
-          courier_billed_weight: 0,
-          courier_billed_length: 0,
-          courier_billed_height: 0,
-          courier_billed_breadth: 0,
-        },
       };
-      const result = await this.repository.save(payload);
+
+      // ================= 🔥 STEP: FIRST CREATE AWB =================
+      const shipmentRes = await this.handleCreateSingleShipment({
+        ...payload,
+        courier: courierRes,
+        warehouses,
+        userId,
+      });
+
+      // ❌ FAIL → NO shipment + NO booking
+      if (!shipmentRes?.success) {
+        await OrdersService.update({
+          data: {
+            id: order_id,
+            is_valid: 0,
+            error_message: shipmentRes?.error || "Shipment failed",
+          },
+        });
+
+        throw new Error(shipmentRes?.error || "Shipment failed");
+      }
+
+      // ================= ✅ SUCCESS =================
+
+      // ✅ Create shipment now
+      const result = await this.repository.save({
+        ...payload,
+        awb_number: shipmentRes.awb_number,
+        shipping_status: "booked",
+      });
+
+      // ✅ Update order
       await OrdersService.update({
         data: {
           id: order_id,
@@ -127,15 +132,7 @@ class Service {
           error_message: null,
         },
       });
-      const createShipment = await this.handleCreateSingleShipment({
-        ...payload,
-        courier: courierRes,
-        warehouses,
-        id: result.id,
-      });
-      if (!createShipment) {
-        throw new Error("Shipment creation failed");
-      }
+
       return {
         status: 201,
         data: {
@@ -370,288 +367,120 @@ class Service {
   }
 
   async handleCreateSingleShipment(data) {
-  try {
-    const { id, userId, courier, total_price, freight_charge, cod_price, order_db_id } = data;
+    try {
+      const { courier } = data;
+      const { code } = courier?.data?.result?.[0];
 
-    const updateOrderError = async (message) => {
-      await OrdersService.update({
-        data: {
-          id: order_db_id,
-          is_valid: 0,
-          error_message: message,
-        },
-      });
-    };
+      // ================= XpressBees =================
+      if (code.includes("xpressbees")) {
+        const res = await XpressBeesProvider.createShipment(data);
 
-    const { code } = courier?.data?.result?.[0];
-
-    // ================= XpressBees =================
-    if (code.includes("xpressbees")) {
-      const shipmentRes = await XpressBeesProvider.createShipment({ ...data, shipmentId: id });
-
-      if (!shipmentRes) {
-        const errMsg = XpressBeesProvider.error.message;
-
-        await ShippingService.update({
-          data: { id, shipment_error: errMsg },
-        });
-
-        await updateOrderError(errMsg); // ✅ IMPORTANT
-        return false;
-      }
-
-      await ShippingService.update({
-        data: {
-          id,
-          shipping_status: "booked",
-          awb_number: shipmentRes.AWBNo,
-          shipment_error: null,
-        },
-      });
-
-      await CourierAWBListService.update({
-        data: {
-          id: shipmentRes?.courierAWBListData?.id,
-          used: 1,
-        },
-      });
-
-      const existingUser = await UserService.read({ id: userId });
-      await UserService.update(
-        { id: userId },
-        {
-          wallet_balance:
-            existingUser.wallet_balance -
-            ((freight_charge || 0) + (cod_price || 0)),
+        if (!res) {
+          return {
+            success: false,
+            error: XpressBeesProvider.error.message,
+          };
         }
-      );
-    }
 
-    // ================= Shadowfax =================
-    if (code.includes("Shadow_Fax")) {
-      const shipmentRes = await ShadowfaxProvider.createShipment(data);
-
-      if (!shipmentRes) {
-        const errMsg = ShadowfaxProvider.error.message;
-
-        await ShippingService.update({
-          data: { id, shipment_error: errMsg },
-        });
-
-        await updateOrderError(errMsg);
-        return false;
+        return {
+          success: true,
+          awb_number: res.AWBNo,
+        };
       }
 
-      await ShippingService.update({
-        data: {
-          id,
-          shipping_status: "booked",
-          awb_number: shipmentRes.AWBNo,
-          shipment_error: null,
-        },
-      });
+      // ================= Shadowfax =================
+      if (code.includes("Shadow_Fax")) {
+        const res = await ShadowfaxProvider.createShipment(data);
 
-      const existingUser = await UserService.read({ id: userId });
-      await UserService.update(
-        { id: userId },
-        { wallet_balance: existingUser.wallet_balance - total_price }
-      );
-    }
+        if (!res) {
+          return {
+            success: false,
+            error: ShadowfaxProvider.error.message,
+          };
+        }
 
-    // ================= Amazon =================
-    if (code.includes("Amazon_500_Gram")) {
-      const shipmentRes = await ATSProvider.createShipment({
-        ...data,
-        shipmentId: id,
-      });
-
-      if (!shipmentRes) {
-        const errMsg =
-          ATSProvider.error?.message || "Amazon booking failed";
-
-        await ShippingService.update({
-          data: { id, shipment_error: errMsg },
-        });
-
-        await updateOrderError(errMsg);
-        return false;
+        return {
+          success: true,
+          awb_number: res.AWBNo,
+        };
       }
 
-      const payload = shipmentRes.payload;
+      // ================= Amazon =================
+      if (code.includes("Amazon_500_Gram")) {
+        const res = await ATSProvider.createShipment(data);
 
-      await ShippingService.update({
-        data: {
-          id,
-          shipping_status: "booked",
+        if (!res) {
+          return {
+            success: false,
+            error: ATSProvider.error?.message || "Amazon failed",
+          };
+        }
+
+        return {
+          success: true,
           awb_number:
-            payload?.packageDocumentDetails?.[0]?.trackingId || null,
-          amazon_shipment_id: payload?.shipmentId || null,
-          shipment_error: null,
-        },
-      });
+            res.payload?.packageDocumentDetails?.[0]?.trackingId,
+        };
+      }
 
-      const existingUser = await UserService.read({ id: userId });
-      await UserService.update(
-        { id: userId },
-        {
-          wallet_balance:
-            existingUser.wallet_balance -
-            ((freight_charge || 0) + (cod_price || 0)),
+      // ================= Bluedart =================
+      if (code.includes("Bluedart_500_Gram")) {
+        const res = await BluedartProvider.createShipment(data);
+
+        if (!res) {
+          return {
+            success: false,
+            error:
+              BluedartProvider.error?.message || "Bluedart failed",
+          };
         }
-      );
-    }
 
-    // ================= Bluedart =================
-    if (code.includes("Bluedart_500_Gram")) {
-      const shipmentRes = await BluedartProvider.createShipment({
-        ...data,
-        shipmentId: id,
-      });
+        return {
+          success: true,
+          awb_number: res.GenerateWayBillResult?.AWBNo,
+        };
+      }
 
-      if (!shipmentRes) {
-        const errMsg =
-          BluedartProvider.error?.message ||
-          "BlueDart Booking Failed";
+      // ================= Shiprocket =================
+      if (code.includes("Shiprocket")) {
+        const orderRes = await ShiprocketProvider.createOrder(data);
 
-        await ShippingService.update({
-          data: { id, shipment_error: errMsg },
+        if (!orderRes) {
+          return {
+            success: false,
+            error: "Shiprocket order failed",
+          };
+        }
+
+        const awbRes = await ShiprocketProvider.assignAWB({
+          shipment_id: orderRes.shipment_id,
+          courier_id: "753",
         });
 
-        await updateOrderError(errMsg);
-        return false;
-      }
-
-      const result = shipmentRes.GenerateWayBillResult;
-
-      await ShippingService.update({
-        data: {
-          id,
-          shipping_status: "booked",
-          awb_number: result?.AWBNo || null,
-          shipment_error: null,
-        },
-      });
-
-      const existingUser = await UserService.read({ id: userId });
-
-      await UserService.update(
-        { id: userId },
-        {
-          wallet_balance:
-            Number(existingUser.wallet_balance) -
-            (Number(freight_charge || 0) + Number(cod_price || 0)),
-        }
-      );
-    }
-
-    // ================= Shiprocket =================
-    if (code.includes("Delhivery_DS_500gm_Shiprocket")) {
-      const warehouse = data.warehouses.find(
-        (w) => w.id == data.warehouse_id
-      );
-
-      if (!warehouse) {
-        await updateOrderError("Warehouse not found");
-        throw new Error("Warehouse not found");
-      }
-
-      let pickup_location = warehouse.pickup_code;
-
-      if (!pickup_location) {
-        const pickupRes =
-          await ShiprocketProvider.createPickupLocation(warehouse);
-
-        if (!pickupRes) {
-          const errMsg =
-            ShiprocketProvider.error?.message ||
-            "Pickup failed";
-
-          await ShippingService.update({
-            data: { id, shipment_error: errMsg },
-          });
-
-          await updateOrderError(errMsg);
-          return false;
+        if (!awbRes) {
+          return {
+            success: false,
+            error: "Shiprocket AWB failed",
+          };
         }
 
-        pickup_location = pickupRes.address.pickup_code;
+        return {
+          success: true,
+          awb_number: awbRes.response.data.awb_code,
+        };
       }
 
-      const orderRes = await ShiprocketProvider.createOrder({
-        ...data,
-        pickup_location,
-      });
-
-      if (!orderRes) {
-        const errMsg =
-          ShiprocketProvider.error?.message ||
-          "Order failed";
-
-        await ShippingService.update({
-          data: { id, shipment_error: errMsg },
-        });
-
-        await updateOrderError(errMsg);
-        return false;
-      }
-
-      const awbRes = await ShiprocketProvider.assignAWB({
-        shipment_id: orderRes.shipment_id,
-        courier_id: "753",
-      });
-
-      if (!awbRes) {
-        const errMsg =
-          ShiprocketProvider.error?.message ||
-          "AWB failed";
-
-        await ShippingService.update({
-          data: { id, shipment_error: errMsg },
-        });
-
-        await updateOrderError(errMsg);
-        return false;
-      }
-
-      await ShippingService.update({
-        data: {
-          id,
-          shipping_status: "booked",
-          awb_number: awbRes?.response?.data?.awb_code,
-          shipment_error: null,
-        },
-      });
-
-      const existingUser = await UserService.read({ id: userId });
-
-      await UserService.update(
-        { id: userId },
-        {
-          wallet_balance:
-            Number(existingUser.wallet_balance) -
-            (Number(freight_charge || 0) + Number(cod_price || 0)),
-        }
-      );
+      return {
+        success: false,
+        error: "Unsupported courier",
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
     }
-
-    return true;
-  } catch (error) {
-    this.error = error;
-
-    // ✅ FINAL CATCH (VERY IMPORTANT)
-    if (data?.order_db_id) {
-      await OrdersService.update({
-        data: {
-          id: data.order_db_id,
-          is_valid: 0,
-          error_message: error.message,
-        },
-      });
-    }
-
-    return false;
   }
-}
 
   async handleCancelSingleShipment({ data }) {
     try {
