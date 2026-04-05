@@ -468,11 +468,10 @@ class Service {
           shipment_id: orderRes.shipment_id,
           courier_id: "753",
         });
-
         if (!awbRes) {
           return {
             success: false,
-            error: "Shiprocket AWB failed",
+            error: "AWB Generation failed",
           };
         }
 
@@ -567,6 +566,18 @@ class Service {
           console.log("✅ Shiprocket shipment cancelled");
         }
       }
+      if (existingShipmentData.shipping_status === "booked" && existingShipmentData.awb_number)
+      {
+        const refundAmount = Number(existingShipmentData.freight_charge || 0) + Number(existingShipmentData.cod_price || 0);
+        const existingUser = await UserService.read({ id: userId });
+        await UserService.update(
+          { id: userId },
+          {
+            wallet_balance:
+              Number(existingUser.wallet_balance) + refundAmount,
+          }
+        );
+      }
       await Promise.all([
         OrdersService.update({
           data: {
@@ -581,7 +592,6 @@ class Service {
           },
         }),
       ]);
-
       return { data: { message: "Cancelled successfully." } };
     } catch (error) {
       this.error = error;
