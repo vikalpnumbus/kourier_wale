@@ -43,15 +43,12 @@ class Class {
         this.import_queue,
         async (msg) => {
           console.time("bulk-import-orders");
-
           const { files = null, metadata = null } = msg;
-
           if (!files) throw new Error("No files provided.");
           if (!metadata || !metadata.id)
             throw new Error(
               "metadata.id (user's document id) is not provided."
             );
-
           async function validateRow(row) {
             const req = { body: row };
             await Promise.all(
@@ -60,13 +57,10 @@ class Class {
             const errors = validationResult(req);
             return errors.isEmpty() ? null : errors.array();
           }
-
           const fileBuffer = files[0]?.file?.buffer;
           if (!fileBuffer) throw new Error("File buffer missing.");
-
           let rows = await readCsvAsArray(Buffer.from(fileBuffer));
           const productRegex = /^Product (\d+) (ID|Qty)$/;
-
           rows = rows.map((e, index) => {
             const payload = {
               userId: metadata.id,
@@ -85,7 +79,7 @@ class Class {
                 address: e["shippingDetails.address"],
                 city: e["shippingDetails.city"],
                 state: e["shippingDetails.state"],
-                country: e["shippingDetails.country"],
+                country: "India",
                 pincode: e["shippingDetails.pincode"],
               },
               packageDetails: {
@@ -108,9 +102,7 @@ class Class {
               warehouse_id: e["warehouse_id"],
               rto_warehouse_id: e["rto_warehouse_id"],
             };
-
             const productMap = [];
-
             for (const key in e) {
               const match = key.match(productRegex);
               if (!match) continue;

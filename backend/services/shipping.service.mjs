@@ -24,82 +24,80 @@ class Service {
     this.error = null;
     this.repository = FactoryRepository.getRepository("shipping");
   }
-
   async create({ data }) {
     try {
       let payload = {};
-      let { order_id, warehouse_id, rto_warehouse_id, courier_id, freight_charge, cod_price, zone, plan_id, userId } = data;
-
+      let {
+        order_id,
+        warehouse_id,
+        rto_warehouse_id,
+        courier_id,
+        freight_charge,
+        cod_price,
+        zone,
+        plan_id,
+        userId,
+      } = data;
       let [orderRes, warehouseRes, user] = await Promise.all([
         OrdersService.read({ id: order_id, userId }),
         WarehouseService.read({ id: [warehouse_id, rto_warehouse_id] }),
         UserService.read({ id: userId }),
       ]);
-
       let order = orderRes?.data?.result?.[0];
-
       if (!order) {
-        if (["No record found."].includes(OrdersService?.error?.message)) {
-          const error = new Error("Order not found.");
-          error.status = 404;
-          throw error;
-        }
-        throw OrdersService.error;
+        const error = new Error("Order not found.");
+        error.status = 404;
+        throw error;
       }
-
-      // if (order.shipping_status == "booked") {
-      //   const error = new Error("Order is already booked.");
-      //   error.status = 400;
-      //   throw error;
-      // }
-
       if (order.shipping_status == "cancelled") {
         const error = new Error("Cancelled order cannot be shipped.");
         error.status = 400;
         throw error;
       }
-      console.log("Seller account details:", user);
       const warehouses = warehouseRes?.data?.result || [];
       const user_wallet_balance = user?.wallet_balance || 0;
-      let productIDs = order.products.map((product) => product.id + "");
+      let productIDs = order.products.map((p) => p.id + "");
       const foundProducts = await ProductsService.read({ id: productIDs });
-      const checkProductExistence = new Set(foundProducts?.data?.result?.map((e) => e.id + ""));
-      const missingIds = productIDs.filter((id) => !checkProductExistence.has(id));
+      const foundIds = new Set(
+        foundProducts?.data?.result?.map((e) => e.id + "")
+      );
+      const missingIds = productIDs.filter((id) => !foundIds.has(id));
       const total_price = Number(freight_charge) + Number(cod_price);
       const errors = [];
       if (missingIds.length > 0) {
-        errors.push(`Product with IDs ${missingIds.join(", ")} does not exist.`);
+        errors.push(
+          `Product with IDs ${missingIds.join(", ")} does not exist.`
+        );
       }
-      if (warehouse_id == rto_warehouse_id && warehouses.length !== 1) {
-        errors.push("Pickup Warehouse or RTO warehouse with given IDs not found.");
-      } else if (warehouse_id != rto_warehouse_id && warehouses.length !== 2) {
-        errors.push("Pickup Warehouse or RTO warehouse with given IDs not found.");
+      if ((warehouse_id == rto_warehouse_id && warehouses.length !== 1) || (warehouse_id != rto_warehouse_id && warehouses.length !== 2)) {
+        errors.push("Pickup/RTO warehouse not found.");
       }
-      const isCourierExist = await CourierService.read({ id: courier_id });
-      if (!isCourierExist) {
+      const courierRes = await CourierService.read({ id: courier_id });
+      if (!courierRes) {
         errors.push("Courier does not exist.");
       }
-      console.log("Wallet Balance:", user_wallet_balance);
-      console.log("Total Cost:", total_price);
-      console.log("User ID:", userId);
       if (user_wallet_balance < total_price) {
         errors.push("Wallet Balance is low");
       }
-      if (total_price > 2_00_000 && order.paymentType == "cod") {
-        const error = new Error("COD is not available for more than 200000 collectable amount");
+      if (total_price > 200000 && order.paymentType == "cod") {
+        errors.push("COD not allowed above 200000");
+      }
+      if (errors.length > 0) {
+        await OrdersService.update({
+          data: {
+            id: order_id,
+            is_valid: 0,
+            error_message: errors.join("|"),
+          },
+        });
+        const error = new Error(errors.join(", "));
         error.status = 400;
         throw error;
       }
-      if (errors.length > 0) {
-        payload.shipment_error = errors.join("|");
-      }
-
       delete order.id;
       delete order.createdAt;
       delete order.updatedAt;
-
       payload = {
-        ...payload,
         order_db_id: order_id,
         ...order,
         warehouse_id,
@@ -118,35 +116,30 @@ class Service {
           courier_billed_breadth: 0,
         },
       };
-
       const result = await this.repository.save(payload);
-
-      const orderUpdate = await OrdersService.update({
+      await OrdersService.update({
         data: {
           id: order_id,
           warehouse_id,
           rto_warehouse_id,
           shipping_status: "booked",
+          is_valid: 1,
+          error_message: null,
         },
       });
-      if (!orderUpdate) console.error("shipping/create/orderUpdate", OrdersService.error);
-
-      // console.error("err: ", errors);
-      if (errors.length == 0) {
-        const createSingleShipment = await this.handleCreateSingleShipment({
-          ...payload,
-          courier: isCourierExist,
-          warehouses,
-          id: result.id,
-        });
-
-        if (!createSingleShipment) throw ShippingService.error;
-      } else throw new Error(errors.join(", "));
-
+      const createShipment = await this.handleCreateSingleShipment({
+        ...payload,
+        courier: courierRes,
+        warehouses,
+        id: result.id,
+      });
+      if (!createShipment) {
+        throw new Error("Shipment creation failed");
+      }
       return {
         status: 201,
         data: {
-          message: "Shipment has been created successfully.",
+          message: "Shipment created successfully",
           id: result.id,
         },
       };
