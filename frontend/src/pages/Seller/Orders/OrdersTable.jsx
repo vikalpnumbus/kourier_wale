@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Icon from "@mdi/react";
 import { mdiCubeSend, mdiPencil } from "@mdi/js";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useOutletContext } from "react-router-dom";
 import Pagination from "../../../Component/Pagination";
 import ordersConfig from "../../../config/Orders/OrdersConfig";
 import ShipModal from "../Orders/ShipModal";
@@ -16,6 +16,7 @@ function OrdersTable({ setExportHandler }) {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
+  const { refreshKey } = useOutletContext();
   // const { showError, showSuccess } = useAlert();
   const [totalCount, setTotalCount] = useState(0);
   const [defaultStart, defaultEnd] = useMemo(() => getLastNDaysRange(7), []);
@@ -186,7 +187,7 @@ function OrdersTable({ setExportHandler }) {
   useEffect(() => {
   handleFetchData();
   setSelectedOrders([]);
-}, [searchParams, activeTab]);
+}, [searchParams, activeTab, refreshKey]);
 
   useEffect(() => {
   setExportHandler?.(() => handleExportOrders());

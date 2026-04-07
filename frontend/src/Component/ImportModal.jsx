@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useAlert } from "../middleware/AlertContext";
 import api from "../utils/api";
-function ImportModal({ onClose, title, apiURL }) {
+function ImportModal({ onClose, title, apiURL, onSuccess }) {
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
@@ -54,6 +54,7 @@ function ImportModal({ onClose, title, apiURL }) {
           response.data?.data?.message || "Imported successfully!"
         );
         handleClear();
+        onSuccess();
         onClose();
       }else {
         showError(

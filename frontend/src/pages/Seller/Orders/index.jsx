@@ -25,6 +25,7 @@ function Orders() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [searchParams] = useSearchParams();
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // 🔥 export handler ref
   const exportHandlerRef = useRef(null);
@@ -92,6 +93,7 @@ function Orders() {
                   context={{
                     setExportHandler: (fn) =>
                       (exportHandlerRef.current = fn),
+                    refreshKey   // ✅ DIRECT PASS
                   }}
                 />
               </div>
@@ -105,6 +107,7 @@ function Orders() {
           title="Import Orders"
           onClose={() => setShowImportModal(false)}
           apiURL={ordersConfig.ordersBulkImportApi}
+          onSuccess={() => setRefreshKey(prev => prev + 1)}  // ✅ KEY
         />
       )}
     </div>
