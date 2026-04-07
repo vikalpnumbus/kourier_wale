@@ -105,7 +105,6 @@ function Orders() {
           title="Import Orders"
           onClose={() => setShowImportModal(false)}
           apiURL={ordersConfig.ordersBulkImportApi}
-          onSuccess={() => exportHandlerRef.current?.refreshFn?.()}
         />
       )}
     </div>

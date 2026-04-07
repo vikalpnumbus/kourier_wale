@@ -184,12 +184,8 @@ function OrdersTable({ setExportHandler }) {
   };
 
   useEffect(() => {
-  if (setExportHandler) {
-    setExportHandler({
-      exportFn: handleExportOrders,
-      refreshFn: handleFetchData,   // ✅ ADD THIS
-    });
-  }
+  handleFetchData();
+  setSelectedOrders([]);
 }, [searchParams, activeTab]);
 
   useEffect(() => {

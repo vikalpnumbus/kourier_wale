@@ -50,11 +50,10 @@ function ImportModal({ onClose, title, apiURL }) {
         }
       );
       if (response?.data?.status === 200) {
-        showSuccess("Imported successfully!");
+        showSuccess(
+          response.data?.data?.message || "Imported successfully!"
+        );
         handleClear();
-        if (onSuccess) {
-          onSuccess();   // ✅ TABLE REFRESH
-        }
         onClose();
       }else {
         showError(
@@ -180,8 +179,8 @@ const currentSample = sampleFiles[title] || {};
               Cancel
             </button>
             <button type="submit" className="btn btn-primary">
-              {title}
-            </button>
+            {title}
+          </button>
           </div>
         </form>
         </div>
