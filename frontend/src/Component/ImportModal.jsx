@@ -50,10 +50,11 @@ function ImportModal({ onClose, title, apiURL }) {
         }
       );
       if (response?.data?.status === 200) {
-        showSuccess(
-          response.data?.data?.message || "Imported successfully!"
-        );
+        showSuccess("Imported successfully!");
         handleClear();
+        if (onSuccess) {
+          onSuccess();   // ✅ TABLE REFRESH
+        }
         onClose();
       }else {
         showError(

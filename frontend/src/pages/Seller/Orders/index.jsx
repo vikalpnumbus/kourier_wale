@@ -59,7 +59,7 @@ function Orders() {
                     <Link className="btninfoorder" to="/channel/add"><i className="mdi mdi-webhook menu-icon"></i>
                       <span className="menu-title">Channel Integration</span>
                     </Link>
-                    <button className="btninfoorder py-2 px-4" onClick={() => exportHandlerRef.current?.()}>
+                    <button className="btninfoorder py-2 px-4" onClick={() => exportHandlerRef.current?.exportFn?.()}>
                       <Icon path={mdiCloudDownload} size={0.7} /> Export
                     </button>
                     <button className="btninfoorder py-2 px-4" onClick={() => setShowImportModal(true)}>
@@ -105,6 +105,7 @@ function Orders() {
           title="Import Orders"
           onClose={() => setShowImportModal(false)}
           apiURL={ordersConfig.ordersBulkImportApi}
+          onSuccess={() => exportHandlerRef.current?.refreshFn?.()}
         />
       )}
     </div>
