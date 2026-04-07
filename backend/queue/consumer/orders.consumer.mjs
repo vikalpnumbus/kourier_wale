@@ -94,10 +94,10 @@ class Class {
                   5,
               },
               charges: {
-                shipping: Number(e["charges.shipping"] || 0),
-                tax_amount: Number(e["charges.tax_amount"] || 0),
-                cod: Number(e["charges.cod"] || 0),
-                discount: Number(e["charges.discount"] || 0),
+                shipping: Number(e["charges.shipping"] || "0"),
+                tax_amount: Number(e["charges.tax_amount"] || "0"),
+                cod: Number(e["charges.cod"] || "0"),
+                discount: Number(e["charges.discount"] || "0")
               },
               warehouse_id: e["warehouse_id"],
               rto_warehouse_id: e["rto_warehouse_id"],
