@@ -17,6 +17,7 @@ function OrdersTable({ setExportHandler }) {
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const { refreshKey } = useOutletContext();
+  const { triggerRefresh } = useOutletContext();   // ✅ ADD THIS
   // const { showError, showSuccess } = useAlert();
   const [totalCount, setTotalCount] = useState(0);
   const [defaultStart, defaultEnd] = useMemo(() => getLastNDaysRange(7), []);
@@ -464,6 +465,7 @@ function OrdersTable({ setExportHandler }) {
             onClose={() => setShowShipModal(false)}
             orderData={shipOrderDetails}
             handleFetchData={handleFetchData}
+            onSuccess={triggerRefresh}
           />
         )}
         {showbulkShipModal && shipOrderDetails && (

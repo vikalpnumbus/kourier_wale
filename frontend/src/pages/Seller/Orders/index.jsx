@@ -93,7 +93,8 @@ function Orders() {
                   context={{
                     setExportHandler: (fn) =>
                       (exportHandlerRef.current = fn),
-                    refreshKey   // ✅ DIRECT PASS
+                    refreshKey,
+                    triggerRefresh: () => setRefreshKey(prev => prev + 1),
                   }}
                 />
               </div>

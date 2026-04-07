@@ -7,7 +7,7 @@ import api from "../../../utils/api";
 import { useAlert } from '../../../middleware/AlertContext';
 import { useSearchParams } from "react-router-dom";
 import "../../../assets/ShipModal.css";
-function ShipModal({ orderData, onClose, handleFetchData }) {
+function ShipModal({ orderData, onClose, handleFetchData, onSuccess }) {
   const [shipData, setShipData] = useState({});
   const [loading, setLoading] = useState(false);
   const [ratePrice, setRatePrice] = useState([]);
@@ -137,6 +137,9 @@ function ShipModal({ orderData, onClose, handleFetchData }) {
       if (res?.data?.status === 201) {
         showSuccess("Shipment Created Successfully");
         onClose();
+        if (onSuccess) {
+          onSuccess();
+        }
         handleFetchData();
       } else {
         showError("Shipment failed");
