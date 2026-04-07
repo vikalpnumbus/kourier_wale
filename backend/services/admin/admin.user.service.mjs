@@ -41,13 +41,21 @@ class Service {
         );
       }
 
-      if (start_date) {
-        whereClause[Op.and].push({ "$User.createdAt$": { [Op.gte]: new Date(start_date) } });
-        // whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.gte]: start_date }));
-      }
-      if (end_date) {
-        whereClause[Op.and].push({ "$User.createdAt$": { [Op.lte]: new Date(end_date) } });
-        // whereClause[Op.and].push(where(fn("DATE", col("createdAt")), { [Op.lte]: end_date }));
+      if (start_date || end_date) {
+        const dateFilter = {};
+        if (start_date) {
+          const start = new Date(start_date);
+          start.setHours(0, 0, 0, 0);
+          dateFilter[Op.gte] = start;
+        }
+        if (end_date) {
+          const end = new Date(end_date);
+          end.setHours(23, 59, 59, 999);
+          dateFilter[Op.lte] = end;
+        }
+        whereClause[Op.and].push({
+          createdAt: dateFilter,
+        });
       }
 
       if (!whereClause[Op.and].length) delete whereClause[Op.and];
