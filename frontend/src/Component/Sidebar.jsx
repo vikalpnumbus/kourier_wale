@@ -1,245 +1,111 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import "../assets/sidebar/sidebar.css";
 
-function Sidebar({ setSideNavActive, sideNavActive }) {
+function Sidebar() {
   const location = useLocation();
-  const [hoveredItem, setHoveredItem] = useState(null); // track which li is hovered
+  const [collapsed, setCollapsed] = useState(false);
 
-  useEffect(() => {
-    setSideNavActive(false);
-  }, [location.pathname]);
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <nav
-      className={`sidebar sidebar-offcanvas ${sideNavActive ? "active" : ""}`}
-      id="sidebar"
-    >
-      <ul className="nav">
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/dashboard") || location.pathname === "/" ? "active" : ""}
-            ${hoveredItem === "dashboard" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("dashboard")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/dashboard">
-            <i className="mdi mdi-grid-large menu-icon"></i>
-            <span className="menu-title">Dashboard</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/orders") ? "active" : ""}
-            ${hoveredItem === "orders" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("orders")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/orders">
-            <i className="mdi mdi-cube-outline menu-icon"></i>
-            <span className="menu-title">Orders</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/shipments") ? "active" : ""}
-            ${hoveredItem === "shipments" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("shipments")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/shipments">
-            <i className="mdi mdi-truck-outline menu-icon"></i>
-            <span className="menu-title">Shipments</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/products") ? "active" : ""}
-            ${hoveredItem === "products" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("products")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/products">
-            <i className="mdi mdi-package menu-icon"></i>
-            <span className="menu-title">Products</span>
-          </Link>
-        </li>
-        
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/warehouse") ? "active" : ""}
-            ${hoveredItem === "warehouse" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("warehouse")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/warehouse">
-            <i className="mdi mdi-warehouse menu-icon"></i>
-            <span className="menu-title">Warehouse</span>
-          </Link>
-        </li>
-        <li className="nav-item nav-category">Billing</li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/shippingcharges") ? "active" : ""}
-            ${hoveredItem === "shippingcharges" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("shippingcharges")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/shippingcharges">
-            <i className="mdi mdi-book-open-page-variant menu-icon"></i>
-            <span className="menu-title">Shipping Charges</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/cod_remittance") ? "active" : ""}
-            ${hoveredItem === "cod_remittance" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("cod_remittance")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/cod_remittance">
-            <i className="mdi mdi-currency-inr menu-icon"></i>
-            <span className="menu-title">COD Remittance</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/wallet_history") ? "active" : ""}
-            ${hoveredItem === "wallet_history" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("wallet_history")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/wallet_history">
-            <i className="mdi mdi-wallet menu-icon"></i>
-            <span className="menu-title">Wallet History</span>
-          </Link>
-        </li>
-        <li className="nav-item nav-category">Tools</li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/after_ship") ? "active" : ""}
-            ${hoveredItem === "after_ship" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("after_ship")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/after_ship">
-            <i className="mdi mdi-wallet menu-icon"></i>
-            <span className="menu-title">After Ship</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/rate_calculator") ? "active" : ""}
-            ${hoveredItem === "rate_calculator" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("rate_calculator")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/rate_calculator">
-            <i className="mdi mdi-calculator menu-icon"></i>
-            <span className="menu-title">Rate Calculator</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/order_allocation") ? "active" : ""}
-            ${hoveredItem === "order_allocation" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("order_allocation")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/order_allocation">
-            <i className="mdi mdi-wallet menu-icon"></i>
-            <span className="menu-title">Order Alloc. Eng.</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/pickup") ? "active" : ""}
-            ${hoveredItem === "pickup" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("pickup")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/pickup">
-            <i className="mdi mdi-wallet menu-icon"></i>
-            <span className="menu-title">Pickup Request</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/channel") ? "active" : ""}
-            ${hoveredItem === "channel_integration" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("channel_integration")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/channel">
-            <i className="mdi mdi-webhook menu-icon"></i>
-            <span className="menu-title">Channel Integration</span>
-          </Link>
-        </li>
-        <li className="nav-item nav-category">Others</li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/support") ? "active" : ""}
-            ${hoveredItem === "support" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("support")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/support">
-            <i className="mdi mdi-ticket-account menu-icon"></i>
-            <span className="menu-title">Support</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/staff") ? "active" : ""}
-            ${hoveredItem === "staff" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("staff")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/staff">
-            <i className="mdi mdi-account-multiple-plus menu-icon"></i>
-            <span className="menu-title">Staff Managment</span>
-          </Link>
-        </li>
-        <li className="nav-item nav-category">Setting</li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/profile") ? "active" : ""}
-            ${hoveredItem === "profile" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("profile")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/profile">
-            <i className="mdi mdi-account-settings menu-icon"></i>
-            <span className="menu-title">Profile</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/label_setting") ? "active" : ""}
-            ${hoveredItem === "label_setting" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("label_setting")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/label_setting">
-            <i className="mdi mdi-label menu-icon"></i>
-            <span className="menu-title">Label Setting</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item 
-            ${location.pathname.includes("/notification") ? "active" : ""}
-            ${hoveredItem === "notification" ? "hover-open" : ""}`}
-          onMouseEnter={() => setHoveredItem("notification")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link className="nav-link" to="/notification">
-            <i className="mdi mdi-bell-ring menu-icon"></i>
-            <span className="menu-title">Notification</span>
-          </Link>
-        </li>
-        
-      </ul>
+    <nav className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+      <div className="sidebar-nav">
+        <Link to="/dashboard" data-label="Dashboard" className={`nav-item ${isActive("/dashboard") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+          </svg>
+          Dashboard
+        </Link>
+        <Link to="/orders" data-label="Orders" className={`nav-item ${isActive("/orders") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg> Orders
+          <span className="nav-badge">4</span>
+        </Link>
+        <Link to="/shipments" data-label="Shipments" className={`nav-item ${isActive("/shipments") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <rect x="1" y="5" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M5 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg> Shipments
+        </Link>
+        <Link to="/products" data-label="Products" className={`nav-item ${isActive("/products") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1L10.5 6H15L11 9.5L12.5 14.5L8 11.5L3.5 14.5L5 9.5L1 6H5.5L8 1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          </svg> Products
+        </Link>
+        <Link to="/warehouse" data-label="Warehouse" className={`nav-item ${isActive("/warehouse") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M2 13V6l6-4 6 4v7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="6" y="9" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.3"/>
+          </svg> Warehouse
+        </Link>
+        <div className="nav-section-label">Billing</div>
+        <Link to="/shippingcharges" data-label="Shipping Charges" className={`nav-item ${isActive("/shippingcharges") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M8 5v1.5M8 9.5V11M6.5 7.5h2a1 1 0 010 2h-1a1 1 0 000 2H9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg> Shipping Charges
+        </Link>
+        <Link to="/cod_remittance" data-label="COD Remittance" className={`nav-item ${isActive("/cod_remittance") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <rect x="1.5" y="3" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M1.5 6.5h13" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M5 10h2M10 10h1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg> COD Remittance
+        </Link>
+        <Link to="/wallet_history" data-label="Wallet History" className={`nav-item ${isActive("/wallet_history") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M2 4h12v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1" stroke="currentColor" stroke-width="1.4"/>
+          </svg> Wallet History
+        </Link>
+        <div className="nav-section-label">Tools</div>
+        <Link to="/after_ship" data-label="After Ship" className={`nav-item ${isActive("/after_ship") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1l1.5 3.5L13 5l-2.5 2.5.5 3.5L8 9.5 5 11l.5-3.5L3 5l3.5-.5L8 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          </svg> After Ship
+        </Link>
+        <Link to="/rate_calculator" data-label="Rate Calculator" className={`nav-item ${isActive("/rate_calculator") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+            <rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+            <rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M9 11.5h5M11.5 9v5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg> Rate Calculator
+        </Link>
+        <Link to="/order_allocation" data-label="Order Allocation" className={`nav-item ${isActive("/order_allocation") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M2 14c0-3 2.5-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg> Order Alloc. Eng.
+        </Link>
+        <Link to="/pickup" data-label="Pickup Request" className={`nav-item ${isActive("/pickup") ? "active" : ""}`}>
+              <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M3 4h6M3 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg> Pickup Request
+        </Link>
+        <Link to="/channel" data-label="Channel" className={`nav-item ${isActive("/channel") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M3 4h6M3 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg> Channel
+        </Link>
+      </div>
+      <div className="sidebar-footer">
+        <div className="user-row">
+          <div className="user-avatar">VM</div>
+          {!collapsed && (
+            <div style={{ flex: 1 }}>
+              <div className="user-name">Veygo Admin</div>
+              <div className="user-role">Super Admin</div>
+            </div>
+          )}
+        </div>
+      </div>
     </nav>
   );
 }
-
 export default Sidebar;
