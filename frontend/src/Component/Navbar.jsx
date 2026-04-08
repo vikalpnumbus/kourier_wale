@@ -6,6 +6,7 @@ import api from "../utils/api";
 import RechargeModal from "./RechargeModal";
 import Icon from "@mdi/react";
 import { mdiCurrencyInr, mdiClock } from "@mdi/js";
+import { useWallet } from "../context/WalletContext";
 function Navbar({ setSideNavActive, sideNavActive }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,9 +21,8 @@ function Navbar({ setSideNavActive, sideNavActive }) {
     return "Good Evening";
   };
   const [showRechargeModal, setShowRechargeModal] = useState(false);
-
+  const { wallet } = useWallet();
   const [searchAWb, setSearchAWB] = useState("");
-
   const handleSearchAwb = (e) => {
     e.preventDefault();
     if (searchAWb.trim()) {
@@ -158,7 +158,7 @@ function Navbar({ setSideNavActive, sideNavActive }) {
               aria-expanded="false"
             >
               <Icon path={mdiCurrencyInr} size={0.7} />
-              {companyData?.wallet_balance}
+              {wallet}
             </div>
           </li>
           <li className="nav-item">

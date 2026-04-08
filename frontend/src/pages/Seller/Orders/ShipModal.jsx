@@ -7,10 +7,12 @@ import api from "../../../utils/api";
 import { useAlert } from '../../../middleware/AlertContext';
 import { useSearchParams } from "react-router-dom";
 import "../../../assets/ShipModal.css";
+import { useWallet } from "../../../context/WalletContext";
 function ShipModal({ orderData, onClose, handleFetchData, onSuccess }) {
   const [shipData, setShipData] = useState({});
   const [loading, setLoading] = useState(false);
   const [ratePrice, setRatePrice] = useState([]);
+  const { setWallet } = useWallet();
   const [form, setForm] = useState({});
   const [errors, setErrors] = useState({});
   const [initialWarehouseData, setInitialWarehouseData] = useState({});
@@ -34,13 +36,11 @@ function ShipModal({ orderData, onClose, handleFetchData, onSuccess }) {
   };
 
   const [planid, setPlanId] = useState("");
-  const [sellerwallet, setSellerwallet] = useState("0");
   useEffect(() => {
     const fetchplanname = async () => {
       try {
         const response = await api.get(companyDetailsConfig.companyDetails);
         setPlanId(response?.data?.data?.companyDetails.pricingPlanId || "");
-        setSellerwallet(response?.data?.data?.companyDetails.wallet_balance || "0");
       } catch {
         setPlanId("");
       }
@@ -204,7 +204,7 @@ function ShipModal({ orderData, onClose, handleFetchData, onSuccess }) {
             </div>
             <div>
               <div className="lw-lbl">Wallet Balance</div>
-              <div className="lw-val">₹ {sellerwallet}</div>
+              <div className="lw-val">₹ {setWallet}</div>
             </div>
           </div>
         </div>
