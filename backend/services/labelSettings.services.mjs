@@ -366,8 +366,10 @@ class Service {
             throw new Error("Amazon label download failed");
           }
           const pdfBuffer = await convertPngToPdf(amazonLabelRes.buffer);
+          console.log("PDF TYPE:", typeof pdfBuffer);
+          console.log("IS BUFFER:", Buffer.isBuffer(pdfBuffer));
           return {
-            pdfBuffer: Buffer.from(pdfBuffer), // ✅ force buffer,
+            pdfBuffer: pdfBuffer, // ✅ force buffer,
             fileName: "amazon_label",
             contentType: "application/pdf",
           };
@@ -419,8 +421,10 @@ class Service {
           height: "6in",
         });
         const buffer = await pdf.generate({ returnBuffer: true });
+        console.log("PDF TYPE:", typeof buffer);
+        console.log("IS BUFFER:", Buffer.isBuffer(buffer));
         return {
-          pdfBuffer: Buffer.from(buffer), // ✅ force buffer
+          pdfBuffer: buffer, // ✅ force buffer
           fileName: "shipment_labels",
           contentType: "application/pdf",
         };
