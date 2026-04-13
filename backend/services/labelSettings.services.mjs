@@ -210,8 +210,7 @@ class Service {
       if (labelSettings.paper_size !== "standard") {
         pdfOptions.paperSize = "A4";
       } else {
-        pdfOptions.width = "4in";
-        pdfOptions.height = "6in";
+        pdfOptions.paperSize = "A4";
       }
       const pdf = new PdfGenerator(pdfOptions);
       const pdfGenRes = await pdf.generate({ returnBuffer: true });
