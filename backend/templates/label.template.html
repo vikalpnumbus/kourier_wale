@@ -461,9 +461,9 @@
     </div>
     <div class="from-block">
       <div class="role-tag outline">Return To</div>
-      <div class="to-name sm">Rajan Kumar Enterprises</div>
+      <!-- <div class="to-name sm">Rajan Kumar Enterprises</div> -->
       <div class="to-addr">{{pickupWarehouse_full_address}}</div>
-      <div class="to-phone" style="font-size:7.5px">+91 98765 43210 &nbsp;|&nbsp; VG-SEL-008271</div>
+      <div class="to-phone" style="font-size:7.5px">{{rtoWarehouse_contactPhone}}</div>
     </div>
     <div class="meta-row">
       <div class="mc">
@@ -475,8 +475,8 @@
         <div class="mc-val">{{order_date}}</div>
       </div>
       <div class="mc">
-        <div class="mc-lbl">Invoice No.</div>
-        <div class="mc-val">{{invoice_no}}</div>
+        <div class="mc-lbl">Total Amt.</div>
+        <div class="mc-val">{{total_price}}</div>
       </div>
       <div class="mc">
         <div class="mc-lbl">Payment</div>
@@ -512,11 +512,12 @@
     <div class="rto-strip">
       <div class="rto-info">
         <div class="rto-lbl">If undelivered, return to sender:</div>
-        <div class="rto-val">Rajan Kumar Enterprises · Gurgaon HR 122 002</div>
+        <div class="rto-val">{{pickupWarehouse_full_address}}</div>
+        <div style="font-size:7.5px">{{rtoWarehouse_contactPhone}}</div>
       </div>
       <div class="rto-box">RTO</div>
     </div>
-    <div class="order-info">
+    <div style="font-size:10px; padding: 5px;">
         This is computer generated document, hence does not required
         signature.<br />
         <b>Note:</b> All disputes are subject to Delhi jurisdiction. Goods once
@@ -528,101 +529,4 @@
       <div class="lbl-footer-brand">vey<u>go</u></div>
     </div>
   </div>
-
-  <!-- <body>
-    <div class="header">
-      <div>{{invoice_generated_date}}</div>
-      <div>{{sellercompname}}</div>
-    </div>
-    <div class="invoice">
-      <div class="to-section">
-        <b>To:</b><br />
-        <br />
-        <br />
-        <b>Primary Phone: </b><br />
-        <b>Alternate Phone: </b><br />
-      </div>
-
-      <div class="order-info d-flex justify-content-between">
-        <div>
-          Order Date:<b> </b><br />
-          Invoice No: <b></b>
-        </div>
-        <div class="barcode">
-          
-        </div>
-      </div>
-
-      <div class="details">
-        <div>
-          <b></b><br />
-          ₹{{total_price}}<br />
-          WEIGHT: {{packageDetails_weight}}KG
-        </div>
-        <div>
-          {{courier_name}}<br />
-          {{awb_number}}<br />
-          Dimensions (cm): {{packageDetails_length}} X
-          {{packageDetails_breadth}} X {{packageDetails_height}}
-        </div>
-      </div>
-
-      <table>
-        {{#if products}}
-        <tr>
-          <th>Item Name</th>
-          <th>Item SKU</th>
-          <th>Qty.</th>
-          <th>Amount</th>
-        </tr>
-        {{#each products}}
-        <tr>
-          <td>{{this.name}}</td>
-          <td>{{this.sku}}</td>
-          <td>{{this.qty}}</td>
-          <td>{{this.price}}</td>
-        </tr>
-        {{/each}} {{/if}}
-      </table>
-
-      {{#ifEqual pickupWarehouse_full_address rtoWarehouse_full_address}}
-      <div class="order-info">
-        <b>Pickup & RTO Address:</b><br />
-        {{pickupWarehouse_full_address}}<br />
-        Mobile No. {{pickupWarehouse_contactPhone}}<br />
-      </div>
-      {{else}}
-      <div class="order-info">
-        <b>Pickup Address:</b><br />
-        {{pickupWarehouse_full_address}}<br />
-        Mobile No. {{pickupWarehouse_contactPhone}}<br />
-      </div>
-
-      <div class="order-info">
-        <b>RTO Address:</b><br />
-        {{rtoWarehouse_full_address}}<br />
-        Mobile No. {{rtoWarehouse_contactPhone}}<br />
-      </div>
-      <div class="order-info">
-      {{/ifEqual}}
-      {{#if seller_gst_number}}
-      <b>GST:</b> {{seller_gst_number}}
-      {{/if}}
-      </div>
-      <div class="order-info">
-        <b>For any query please contact:</b><br />
-        Phone: <b>{{support_phone}}</b>, Email:<b> {{support_email}}</b>
-      </div>
-
-      <div class="order-info">
-        This is computer generated document, hence does not required
-        signature.<br />
-        <b>Note:</b> All disputes are subject to Delhi jurisdiction. Goods once
-        sold will only be taken back or exchanged as per the store's
-        exchange/return policy
-      </div>
-
-      <div class="powered">Powered By Veygo</div>
-    </div>
-  </body> -->
 </html>
