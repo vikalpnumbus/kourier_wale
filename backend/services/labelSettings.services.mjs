@@ -366,10 +366,13 @@ class Service {
             throw new Error("Amazon label download failed");
           }
           const pdfBuffer = await convertPngToPdf(amazonLabelRes.buffer);
-          console.log("PDF TYPE:", typeof pdfBuffer);
-          console.log("IS BUFFER:", Buffer.isBuffer(pdfBuffer));
+          const finalBuffer = pdfBuffer?.buffer || pdfBuffer;
+          if (!Buffer.isBuffer(finalBuffer)) {
+            throw new Error("Amazon PDF invalid");
+          }
+
           return {
-            pdfBuffer: pdfBuffer, // ✅ force buffer,
+            pdfBuffer: finalBuffer,
             fileName: "amazon_label",
             contentType: "application/pdf",
           };
@@ -420,7 +423,12 @@ class Service {
           width: "4in",
           height: "6in",
         });
-        const buffer = await pdf.generate({ returnBuffer: true });
+        const pdfRes = await pdf.generate({ returnBuffer: true });
+        console.log("PDF RES:", pdfRes); // 👈 ye dekhna IMPORTANT
+        const buffer = pdfRes?.buffer || pdfRes?.data || pdfRes;
+        if (!Buffer.isBuffer(buffer)) {
+          throw new Error("PDF generation failed: Not a valid buffer");
+        }
         console.log("PDF TYPE:", typeof buffer);
         console.log("IS BUFFER:", Buffer.isBuffer(buffer));
         return {
