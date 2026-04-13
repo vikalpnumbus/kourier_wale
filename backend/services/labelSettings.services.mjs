@@ -125,7 +125,6 @@ class Service {
                 phone,
                 alternatePhone,
               } = e.shippingDetails || {};
-              console.log('alternate_phone: ', alternatePhone);
               return {
                 sellercompname: user.companyName || "",
                 shippingDetails_fname: fname || "",
@@ -147,6 +146,7 @@ class Service {
             order_date: e.updatedAt ? formatDate_YYYY_MM_DD(e.updatedAt) : "",
             invoice_no: e.orderId || "",
             awb_number: e.awb_number || "",
+            zone: e.zone || "",
             paymentType: capitialiseFirstLetter(e.paymentType) || "",
             total_price: e.orderAmount || "",
             ...(() => {
