@@ -131,6 +131,7 @@ class Service {
         ...payload,
         awb_number: shipmentRes.awb_number,
         shipping_status: "booked",
+        shiprocket_shipment_id: shipmentRes.shipment_id,
       });
 
       // ✅ Update order
