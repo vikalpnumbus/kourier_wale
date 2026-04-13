@@ -518,19 +518,21 @@
                     <th style="width:10%" class="center">Qty</th>
                     <th style="width:24%" class="right">Amount</th>
                   </tr>
-                  {{#each products}}
+                  {{/if}}
                 </thead>
                 <tbody>
+                  {{#each products}}
                   <tr>
                     <td>
                       <div class="td-name">{{this.name}}</div>
-                      <!-- <div class="td-sku">Black / 40hr Battery</div> -->
                     </td>
-                    <td style="font-family:'JetBrains Mono',monospace;font-size:6.5pt;vertical-align:middle">{{this.sku}}</td>
+                    <td style="font-family:'JetBrains Mono',monospace;font-size:6.5pt;">
+                      {{this.sku}}
+                    </td>
                     <td class="td-qty">{{this.qty}}</td>
                     <td class="td-amt">₹ {{this.price}}</td>
                   </tr>
-                  {{/each}} {{/if}}
+                  {{/each}}
                 </tbody>
               </table>
             </div>
@@ -554,7 +556,7 @@
               <div class="lbl-footer-brand">vey<u>go</u></div>
             </div>
           </div>
-          </div>
+        </div>
       {{/each}}
     </div>
   </body>
