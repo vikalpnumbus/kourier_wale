@@ -29,8 +29,7 @@ export const generate = async (req, res, next) => {
       "Content-Type": result.contentType || "application/pdf",
       "Content-Disposition": `attachment; filename="${result.fileName}.pdf"`,
     });
-    console.log("PDF Buffer check:", result?.pdfBuffer?.length);
-    res.send(result.pdfBuffer);
+    res.send(result.buffer);
   } catch (error) {
     next(error);
   }

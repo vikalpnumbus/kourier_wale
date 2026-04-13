@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Veygo Label</title>
     <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
       .page {
-        width: 210mm;
-        height: 297mm;
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
         gap: 10px;
-        padding: 10px;
-        box-sizing: border-box;
       }
-      .label {
+      .label {      
         width: 100%;
-        height: 100%;
+        height: 140mm; /* half page */
+        box-sizing: border-box;
+        padding: 10px;
         transform: scale(0.95); /* optional fit adjust */
         transform-origin: top left;
         background: #FFF;
@@ -419,7 +420,7 @@
   </head>
   <body>
     <div class="page">
-    {{#each this}}
+    {{#each data}}
       <div class="label">
         <div class="brand-bar">
           <div class="brand-left">
