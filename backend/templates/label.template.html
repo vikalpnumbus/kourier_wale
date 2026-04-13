@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Veygo Label</title>
     <style>
-      .page {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
       .label {      
         width:  384px;
         height: 576px;
@@ -413,8 +408,6 @@
     </style>
   </head>
   <body>
-    <div class="page">
-    {{#each data}}
       <div class="label">
         <div class="brand-bar">
           <div class="brand-left">
@@ -541,7 +534,5 @@
           <div class="lbl-footer-brand">vey<u>go</u></div>
         </div>
       </div>
-    {{/each}}
-    </div>
   </body>
 </html>
