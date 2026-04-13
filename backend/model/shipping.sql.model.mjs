@@ -216,6 +216,10 @@ const ShippingModel = sqlDB.sequelize.define(
       allowNull: true,
       references: { model: "remittance_batch", key: "id" },
     },
+    shiprocket_shipment_id: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
   },
   {
     timestamps: true,
