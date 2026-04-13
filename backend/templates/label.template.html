@@ -5,9 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Courier Wale Invoice</title>
     <style>
+      @page {
+        size: A4;
+        margin: 10mm;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .page {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .label-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
       .label {
-        width:  370px;
-        height: 576px;
+       width: 100%;
+        height: auto;
+        transform: scale(0.95); /* adjust if needed */
+        transform-origin: top left;
         background: #FFF;
         border: 1px solid #000;
         box-shadow: 0 6px 28px rgba(0,0,0,.3);
@@ -405,128 +426,136 @@
       }
     </style>
   </head>
-  <div class="label">
-    <div class="brand-bar">
-      <div class="brand-left">
-        <svg class="brand-logo" viewBox="0 0 72 72" fill="none">
-          <circle cx="36" cy="36" r="33" stroke="#FFF" stroke-width="3" opacity="0.22"/>
-          <path d="M24 19 Q24 10 36 10 Q48 10 48 19" stroke="#FFF" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.28"/>
-          <path d="M15 23 L36 56 L57 23" stroke="#FFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="36" cy="56" r="5" fill="#FFF"/>
-        </svg>
-        <div class="brand-name">vey<u>go</u></div>
-      </div>
-      <div class="brand-right">
-        <div class="brand-type">Shipping Label · Domestic</div>
-        <div class="carrier-tag">{{courier_name}}</div>
-      </div>
+  <body>
+    <div class="page">
+      {{#each shipments}}
+        <div class="label-wrapper">
+          <div class="label">
+            <div class="brand-bar">
+              <div class="brand-left">
+                <svg class="brand-logo" viewBox="0 0 72 72" fill="none">
+                  <circle cx="36" cy="36" r="33" stroke="#FFF" stroke-width="3" opacity="0.22"/>
+                  <path d="M24 19 Q24 10 36 10 Q48 10 48 19" stroke="#FFF" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.28"/>
+                  <path d="M15 23 L36 56 L57 23" stroke="#FFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="36" cy="56" r="5" fill="#FFF"/>
+                </svg>
+                <div class="brand-name">vey<u>go</u></div>
+              </div>
+              <div class="brand-right">
+                <div class="brand-type">Shipping Label · Domestic</div>
+                <div class="carrier-tag">{{courier_name}}</div>
+              </div>
+            </div>
+            <div class="svc-row">
+              <div class="svc-cell">
+                <div class="sc-lbl">Service</div>
+                <div class="sc-val">Ecom</div>
+              </div>
+              <div class="svc-cell">
+                <div class="sc-lbl">Chg. Weight</div>
+                <div class="sc-val">{{packageDetails_weight}} KG</div>
+              </div>
+              <div class="svc-cell">
+                <div class="sc-lbl">Dimensions</div>
+                <div class="sc-val">{{packageDetails_length}} X {{packageDetails_breadth}} X {{packageDetails_height}} cm</div>
+              </div>
+              <div class="svc-cell">
+                <div class="sc-lbl">Pickup Date</div>
+                <div class="sc-val">18 Mar 2026</div>
+              </div>
+              <div class="zone-cell">
+                <div class="zone-num">1</div>
+                <div class="zone-lbl">Zone</div>
+              </div>
+            </div>
+            <div class="awb-wrap">
+              <div class="awb-lbl">AWB / Tracking Number</div>
+              <img src="https://api-bwipjs.metafloor.com/?bcid=code128&text={{awb_number}}&scale=2&includetext" alt="Barcode"/>
+              <div class="awb-num">{{awb_number}}</div>
+            </div>
+            <div class="to-block">
+              <div class="role-tag">Deliver To</div>
+              <div class="to-name">{{shippingDetails_fname}} {{shippingDetails_lname}}</div>
+              <div class="to-addr">
+                {{shippingDetails_address}}, {{shippingDetails_city}},
+                {{shippingDetails_state}}, {{shippingDetails_country}}<br />
+              </div>
+              <div class="to-pin">{{shippingDetails_pincode}}</div>
+              <div class="to-phone">Mob: {{shippingDetails_phone}}</div>
+              <div class="to-phone">Alt Mob: {{shippingDetails_alternate_phone}}</div>
+            </div>
+            <div class="from-block">
+              <div class="role-tag outline">Return To</div>
+              <!-- <div class="to-name sm">Rajan Kumar Enterprises</div> -->
+              <div class="to-addr">{{pickupWarehouse_full_address}}</div>
+              <div class="to-phone" style="font-size:7.5px">{{rtoWarehouse_contactPhone}}</div>
+            </div>
+            <div class="meta-row">
+              <div class="mc">
+                <div class="mc-lbl">Order ID</div>
+                <div class="mc-val">{{invoice_no}}</div>
+              </div>
+              <div class="mc">
+                <div class="mc-lbl">Order Date</div>
+                <div class="mc-val">{{order_date}}</div>
+              </div>
+              <div class="mc">
+                <div class="mc-lbl">Total Amt.</div>
+                <div class="mc-val">{{total_price}}</div>
+              </div>
+              <div class="mc">
+                <div class="mc-lbl">Payment</div>
+                <div class="pay-tag">{{paymentType}}</div>
+              </div>
+            </div>
+            <div class="item-section">
+              <table class="item-table">
+                <thead>
+                  {{#if products}}
+                  <tr>
+                    <th style="width:44%">Item Name</th>
+                    <th style="width:22%">SKU</th>
+                    <th style="width:10%" class="center">Qty</th>
+                    <th style="width:24%" class="right">Amount</th>
+                  </tr>
+                  {{#each products}}
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="td-name">{{this.name}}</div>
+                      <!-- <div class="td-sku">Black / 40hr Battery</div> -->
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace;font-size:6.5pt;vertical-align:middle">{{this.sku}}</td>
+                    <td class="td-qty">{{this.qty}}</td>
+                    <td class="td-amt">₹ {{this.price}}</td>
+                  </tr>
+                  {{/each}} {{/if}}
+                </tbody>
+              </table>
+            </div>
+            <div class="rto-strip">
+              <div class="rto-info">
+                <div class="rto-lbl">If undelivered, return to sender:</div>
+                <div class="rto-val">{{pickupWarehouse_full_address}}</div>
+                <div style="font-size:7.5px">{{rtoWarehouse_contactPhone}}</div>
+              </div>
+              <div class="rto-box">RTO</div>
+            </div>
+            <div style="font-size:10px; padding: 5px;">
+                This is computer generated document, hence does not required
+                signature.<br />
+                <b>Note:</b> All disputes are subject to Delhi jurisdiction. Goods once
+                sold will only be taken back or exchanged as per the store's
+                exchange/return policy
+            </div>
+            <div class="lbl-footer">
+              <div class="lbl-footer-txt">Powered By Veygo · veygo.in</div>
+              <div class="lbl-footer-brand">vey<u>go</u></div>
+            </div>
+          </div>
+          </div>
+      {{/each}}
     </div>
-    <div class="svc-row">
-      <div class="svc-cell">
-        <div class="sc-lbl">Service</div>
-        <div class="sc-val">Ecom</div>
-      </div>
-      <div class="svc-cell">
-        <div class="sc-lbl">Chg. Weight</div>
-        <div class="sc-val">{{packageDetails_weight}} KG</div>
-      </div>
-      <div class="svc-cell">
-        <div class="sc-lbl">Dimensions</div>
-        <div class="sc-val">{{packageDetails_length}} X {{packageDetails_breadth}} X {{packageDetails_height}} cm</div>
-      </div>
-      <div class="svc-cell">
-        <div class="sc-lbl">Pickup Date</div>
-        <div class="sc-val">18 Mar 2026</div>
-      </div>
-      <div class="zone-cell">
-        <div class="zone-num">1</div>
-        <div class="zone-lbl">Zone</div>
-      </div>
-    </div>
-    <div class="awb-wrap">
-      <div class="awb-lbl">AWB / Tracking Number</div>
-      <img src="https://api-bwipjs.metafloor.com/?bcid=code128&text={{awb_number}}&scale=2&includetext" alt="Barcode"/>
-      <div class="awb-num">{{awb_number}}</div>
-    </div>
-    <div class="to-block">
-      <div class="role-tag">Deliver To</div>
-      <div class="to-name">{{shippingDetails_fname}} {{shippingDetails_lname}}</div>
-      <div class="to-addr">
-        {{shippingDetails_address}}, {{shippingDetails_city}},
-        {{shippingDetails_state}}, {{shippingDetails_country}}<br />
-      </div>
-      <div class="to-pin">{{shippingDetails_pincode}}</div>
-      <div class="to-phone">Mob: {{shippingDetails_phone}}</div>
-      <div class="to-phone">Alt Mob: {{shippingDetails_alternate_phone}}</div>
-    </div>
-    <div class="from-block">
-      <div class="role-tag outline">Return To</div>
-      <!-- <div class="to-name sm">Rajan Kumar Enterprises</div> -->
-      <div class="to-addr">{{pickupWarehouse_full_address}}</div>
-      <div class="to-phone" style="font-size:7.5px">{{rtoWarehouse_contactPhone}}</div>
-    </div>
-    <div class="meta-row">
-      <div class="mc">
-        <div class="mc-lbl">Order ID</div>
-        <div class="mc-val">{{invoice_no}}</div>
-      </div>
-      <div class="mc">
-        <div class="mc-lbl">Order Date</div>
-        <div class="mc-val">{{order_date}}</div>
-      </div>
-      <div class="mc">
-        <div class="mc-lbl">Total Amt.</div>
-        <div class="mc-val">{{total_price}}</div>
-      </div>
-      <div class="mc">
-        <div class="mc-lbl">Payment</div>
-        <div class="pay-tag">{{paymentType}}</div>
-      </div>
-    </div>
-    <div class="item-section">
-      <table class="item-table">
-        <thead>
-          {{#if products}}
-          <tr>
-            <th style="width:44%">Item Name</th>
-            <th style="width:22%">SKU</th>
-            <th style="width:10%" class="center">Qty</th>
-            <th style="width:24%" class="right">Amount</th>
-          </tr>
-          {{#each products}}
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <div class="td-name">{{this.name}}</div>
-              <!-- <div class="td-sku">Black / 40hr Battery</div> -->
-            </td>
-            <td style="font-family:'JetBrains Mono',monospace;font-size:6.5pt;vertical-align:middle">{{this.sku}}</td>
-            <td class="td-qty">{{this.qty}}</td>
-            <td class="td-amt">₹ {{this.price}}</td>
-          </tr>
-          {{/each}} {{/if}}
-        </tbody>
-      </table>
-    </div>
-    <div class="rto-strip">
-      <div class="rto-info">
-        <div class="rto-lbl">If undelivered, return to sender:</div>
-        <div class="rto-val">{{pickupWarehouse_full_address}}</div>
-        <div style="font-size:7.5px">{{rtoWarehouse_contactPhone}}</div>
-      </div>
-      <div class="rto-box">RTO</div>
-    </div>
-    <div style="font-size:10px; padding: 5px;">
-        This is computer generated document, hence does not required
-        signature.<br />
-        <b>Note:</b> All disputes are subject to Delhi jurisdiction. Goods once
-        sold will only be taken back or exchanged as per the store's
-        exchange/return policy
-    </div>
-    <div class="lbl-footer">
-      <div class="lbl-footer-txt">Powered By Veygo · veygo.in</div>
-      <div class="lbl-footer-brand">vey<u>go</u></div>
-    </div>
-  </div>
+  </body>
 </html>
