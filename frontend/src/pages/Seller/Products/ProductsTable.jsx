@@ -77,14 +77,14 @@ function ProductsTable() {
     <div className="products-page">
 
       {/* HEADER */}
-      <div className="page-header">
+      {/* <div className="page-header">
         <div>
           <div className="page-title">Products</div>
           <div className="page-subtitle">
             Manage your product catalogue
           </div>
         </div>
-      </div>
+      </div> */}
       {/* <div className="filters-bar">
         <input
           type="text"

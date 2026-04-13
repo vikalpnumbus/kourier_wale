@@ -366,7 +366,11 @@ class Service {
             throw new Error("Amazon label download failed");
           }
           const pdfBuffer = await convertPngToPdf(amazonLabelRes.buffer);
-          return pdfBuffer;
+          return {
+            pdfBuffer: Buffer.from(pdfBuffer), // ✅ force buffer,
+            fileName: "amazon_label",
+            contentType: "application/pdf",
+          };
         }
         const label = {
           paper_size: "standard",
@@ -416,15 +420,15 @@ class Service {
         });
         const buffer = await pdf.generate({ returnBuffer: true });
         return {
-          buffer,
-          fileName: "shipment_labels.pdf",
+          pdfBuffer: Buffer.from(buffer), // ✅ force buffer
+          fileName: "shipment_labels",
           contentType: "application/pdf",
         };
       } catch (error) {
         this.error = error;
         return false;
       }
-  }
+    }
 }
 
 const LabelSettingsService = new Service();

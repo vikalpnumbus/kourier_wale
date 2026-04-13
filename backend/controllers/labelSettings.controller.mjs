@@ -24,13 +24,12 @@ export const generate = async (req, res, next) => {
         shipping_db_ids,
       },
     });
-
     if (!result) throw LabelSettingsService.error;
-
     res.set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${result.fileName}.pdf"`,
+      "Content-Type": result.contentType || "application/pdf",
+      "Content-Disposition": `attachment; filename="${result.fileName}.pdf"`,
     });
+    console.log("PDF Buffer check:", result?.pdfBuffer?.length);
     res.send(result.pdfBuffer);
   } catch (error) {
     next(error);

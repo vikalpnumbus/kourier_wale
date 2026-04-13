@@ -187,7 +187,13 @@ function ShipmentsTable() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "shipment-labels.pdf";
+      const contentDisposition = response.headers["content-disposition"];
+      let fileName = "shipment-labels.pdf";
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+)"/);
+        if (match) fileName = match[1];
+      }
+      a.download = fileName;
       document.body.appendChild(a);
       a.click();
       a.remove();
