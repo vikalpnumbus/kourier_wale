@@ -41,186 +41,186 @@ class Service {
 
 
 
-  // async generate({ data }) {
-  //   try {
-  //     const { userId, shipping_db_ids } = data;
-  //     const [user, shippingRes] = await Promise.all([
-  //       UserService.read({ id: userId }),
-  //       ShippingService.read({ userId, id: shipping_db_ids }),
-  //     ]);
-  //     if (!user) throw UserService.error;
-  //     let labelSettings = user.label_settings;
-  //     if (!labelSettings) throw new Error("Label Settings Not Found.");
-  //     const shipping = await Promise.all(
-  //       shippingRes?.data?.result?.map(async (e) => {
-  //         const [courierRes, warehouseRes] = await Promise.all([
-  //           await CourierService.read({ id: e.courier_id }),
-  //           await WarehouseService.read({
-  //             id: [...new Set([e.warehouse_id, e.rto_warehouse_id])],
-  //           }),
-  //         ]);
-  //         const courier = courierRes?.data?.result?.[0];
-  //         const pickupWarehouse = warehouseRes?.data?.result?.filter(
-  //           (warehouse) => warehouse.id == e.warehouse_id
-  //         )?.[0];
-  //         const rtoWarehouse = warehouseRes?.data?.result?.filter(
-  //           (warehouse) => warehouse.id == e.rto_warehouse_id
-  //         )?.[0];
-  //         if (!pickupWarehouse) {
-  //           const error = new Error("No pickup warehouse found.");
-  //           error.status = 400;
-  //           throw error;
-  //         }
-  //         if (!rtoWarehouse) {
-  //           const error = new Error("No rto warehouse found.");
-  //           error.status = 400;
-  //           throw error;
-  //         }
-  //         const {
-  //           support_email,
-  //           support_phone,
-  //           hide_product_details,
-  //           hide_warehouse_address,
-  //           hide_warehouse_mobile_number,
-  //           hide_end_customer_contact_number,
-  //         } = pickupWarehouse?.labelDetails || {};
-  //         const pickupWarehouse_full_address = (() => {
-  //           const name = !hide_warehouse_address ? pickupWarehouse.name : null;
-  //           const address = !hide_warehouse_address
-  //             ? pickupWarehouse.address
-  //             : null;
-  //           const city = !hide_warehouse_address ? pickupWarehouse.city : null;
-  //           const state = !hide_warehouse_address
-  //             ? pickupWarehouse.state
-  //             : null;
-  //           const country = !hide_warehouse_address ? "India" : null;
-  //           const pincode = !hide_warehouse_address
-  //             ? pickupWarehouse.pincode
-  //             : null;
-  //           return [name, address, city, state, country, pincode].join(", ");
-  //         })();
-  //         const rtoWarehouse_full_address = (() => {
-  //           const name = !hide_warehouse_address ? rtoWarehouse.name : null;
-  //           const address = !hide_warehouse_address
-  //             ? rtoWarehouse.address
-  //             : null;
-  //           const city = !hide_warehouse_address ? rtoWarehouse.city : null;
-  //           const state = !hide_warehouse_address ? rtoWarehouse.state : null;
-  //           const country = !hide_warehouse_address ? "India" : null;
-  //           const pincode = !hide_warehouse_address
-  //             ? rtoWarehouse.pincode
-  //             : null;
-  //           return [name, address, city, state, country, pincode].join(", ");
-  //         })();
-  //         const payload = {
-  //           invoice_generated_date: formatDate_DD_MM_YYYY_HH_MM(Date.now()),
-  //           ...(() => {
-  //             const {
-  //               fname,
-  //               lname,
-  //               address,
-  //               city,
-  //               state,
-  //               pincode,
-  //               phone,
-  //               alternatePhone,
-  //             } = e.shippingDetails || {};
-  //             console.log('alternate_phone: ', alternatePhone);
-  //             return {
-  //               sellercompname: user.companyName || "",
-  //               shippingDetails_fname: fname || "",
-  //               shippingDetails_lname: lname || "",
-  //               shippingDetails_address: address || "",
-  //               shippingDetails_city: city || "",
-  //               shippingDetails_state: state || "",
-  //               shippingDetails_country: "India",
-  //               shippingDetails_pincode: pincode || "",
-  //               shippingDetails_phone: hide_end_customer_contact_number
-  //                 ? null
-  //                 : phone || "",
-  //               shippingDetails_alternate_phone:
-  //                 hide_end_customer_contact_number
-  //                   ? null
-  //                   : alternatePhone || "",
-  //             };
-  //           })(),
-  //           order_date: e.updatedAt ? formatDate_YYYY_MM_DD(e.updatedAt) : "",
-  //           invoice_no: e.orderId || "",
-  //           awb_number: e.awb_number || "",
-  //           paymentType: capitialiseFirstLetter(e.paymentType) || "",
-  //           total_price: e.orderAmount || "",
-  //           ...(() => {
-  //             const { weight, volumetricWeight, height, length, breadth } =
-  //               e.packageDetails || {};
-  //             return {
-  //               packageDetails_weight:
-  //                 CustomMath.roundOff(
-  //                   Math.max(weight || 0, volumetricWeight || 0) / 100
-  //                 ) || "",
-  //               packageDetails_length: length || "",
-  //               packageDetails_breadth: breadth || "",
-  //               packageDetails_height: height || "",
-  //             };
-  //           })(),
-  //           courier_name: courier?.name || "",
-  //           products: !hide_product_details
-  //             ? e.products.map((product) => ({
-  //                 name: product.name,
-  //                 sku: product.sku,
-  //                 qty: product.qty,
-  //                 price: product.price,
-  //               }))
-  //             : null,
-  //           pickupWarehouse_contactPhone: !hide_warehouse_mobile_number
-  //             ? pickupWarehouse.contactPhone
-  //             : null,
-  //           rtoWarehouse_contactPhone:
-  //             hide_warehouse_mobile_number ||
-  //             pickupWarehouse_full_address === rtoWarehouse_full_address
-  //               ? null
-  //               : rtoWarehouse.contactPhone,
-  //           pickupWarehouse_full_address,
-  //           rtoWarehouse_full_address,
-  //           support_email,
-  //           support_phone,
-  //         };
-  //         return payload;
-  //       })
-  //     );
-  //     if (!shipping) {
-  //       const error = new Error("No shipment found.");
-  //       error.status = 400;
-  //       throw error;
-  //     }
-  //     const shipmentsCannotBeShipped = shipping.filter(
-  //       (e) => !e.awb_number || e.shipping_status == "cancelled"
-  //     );
-  //     const shipmentsCanBeShipped = shipping.filter(
-  //       (e) => e.awb_number && e.shipping_status != "cancelled"
-  //     );
-  //     const templateHtml = fs.readFileSync(
-  //       "templates/label.template.html",
-  //       "utf-8"
-  //     );
-  //     const pdfOptions = {
-  //       fileName: "invoice2",
-  //       templateHtml,
-  //       data: shipmentsCanBeShipped,
-  //     };
-  //     if (labelSettings.paper_size !== "standard") {
-  //       pdfOptions.paperSize = "A4";
-  //     } else {
-  //       pdfOptions.width = "4in";
-  //       pdfOptions.height = "6in";
-  //     }
-  //     const pdf = new PdfGenerator(pdfOptions);
-  //     const pdfGenRes = await pdf.generate({ returnBuffer: true });
-  //     return { ...pdfGenRes };
-  //   } catch (error) {
-  //     this.error = error;
-  //     return false;
-  //   }
-  // }
+  async generate({ data }) {
+    try {
+      const { userId, shipping_db_ids } = data;
+      const [user, shippingRes] = await Promise.all([
+        UserService.read({ id: userId }),
+        ShippingService.read({ userId, id: shipping_db_ids }),
+      ]);
+      if (!user) throw UserService.error;
+      let labelSettings = user.label_settings;
+      if (!labelSettings) throw new Error("Label Settings Not Found.");
+      const shipping = await Promise.all(
+        shippingRes?.data?.result?.map(async (e) => {
+          const [courierRes, warehouseRes] = await Promise.all([
+            await CourierService.read({ id: e.courier_id }),
+            await WarehouseService.read({
+              id: [...new Set([e.warehouse_id, e.rto_warehouse_id])],
+            }),
+          ]);
+          const courier = courierRes?.data?.result?.[0];
+          const pickupWarehouse = warehouseRes?.data?.result?.filter(
+            (warehouse) => warehouse.id == e.warehouse_id
+          )?.[0];
+          const rtoWarehouse = warehouseRes?.data?.result?.filter(
+            (warehouse) => warehouse.id == e.rto_warehouse_id
+          )?.[0];
+          if (!pickupWarehouse) {
+            const error = new Error("No pickup warehouse found.");
+            error.status = 400;
+            throw error;
+          }
+          if (!rtoWarehouse) {
+            const error = new Error("No rto warehouse found.");
+            error.status = 400;
+            throw error;
+          }
+          const {
+            support_email,
+            support_phone,
+            hide_product_details,
+            hide_warehouse_address,
+            hide_warehouse_mobile_number,
+            hide_end_customer_contact_number,
+          } = pickupWarehouse?.labelDetails || {};
+          const pickupWarehouse_full_address = (() => {
+            const name = !hide_warehouse_address ? pickupWarehouse.name : null;
+            const address = !hide_warehouse_address
+              ? pickupWarehouse.address
+              : null;
+            const city = !hide_warehouse_address ? pickupWarehouse.city : null;
+            const state = !hide_warehouse_address
+              ? pickupWarehouse.state
+              : null;
+            const country = !hide_warehouse_address ? "India" : null;
+            const pincode = !hide_warehouse_address
+              ? pickupWarehouse.pincode
+              : null;
+            return [name, address, city, state, country, pincode].join(", ");
+          })();
+          const rtoWarehouse_full_address = (() => {
+            const name = !hide_warehouse_address ? rtoWarehouse.name : null;
+            const address = !hide_warehouse_address
+              ? rtoWarehouse.address
+              : null;
+            const city = !hide_warehouse_address ? rtoWarehouse.city : null;
+            const state = !hide_warehouse_address ? rtoWarehouse.state : null;
+            const country = !hide_warehouse_address ? "India" : null;
+            const pincode = !hide_warehouse_address
+              ? rtoWarehouse.pincode
+              : null;
+            return [name, address, city, state, country, pincode].join(", ");
+          })();
+          const payload = {
+            invoice_generated_date: formatDate_DD_MM_YYYY_HH_MM(Date.now()),
+            ...(() => {
+              const {
+                fname,
+                lname,
+                address,
+                city,
+                state,
+                pincode,
+                phone,
+                alternatePhone,
+              } = e.shippingDetails || {};
+              console.log('alternate_phone: ', alternatePhone);
+              return {
+                sellercompname: user.companyName || "",
+                shippingDetails_fname: fname || "",
+                shippingDetails_lname: lname || "",
+                shippingDetails_address: address || "",
+                shippingDetails_city: city || "",
+                shippingDetails_state: state || "",
+                shippingDetails_country: "India",
+                shippingDetails_pincode: pincode || "",
+                shippingDetails_phone: hide_end_customer_contact_number
+                  ? null
+                  : phone || "",
+                shippingDetails_alternate_phone:
+                  hide_end_customer_contact_number
+                    ? null
+                    : alternatePhone || "",
+              };
+            })(),
+            order_date: e.updatedAt ? formatDate_YYYY_MM_DD(e.updatedAt) : "",
+            invoice_no: e.orderId || "",
+            awb_number: e.awb_number || "",
+            paymentType: capitialiseFirstLetter(e.paymentType) || "",
+            total_price: e.orderAmount || "",
+            ...(() => {
+              const { weight, volumetricWeight, height, length, breadth } =
+                e.packageDetails || {};
+              return {
+                packageDetails_weight:
+                  CustomMath.roundOff(
+                    Math.max(weight || 0, volumetricWeight || 0) / 100
+                  ) || "",
+                packageDetails_length: length || "",
+                packageDetails_breadth: breadth || "",
+                packageDetails_height: height || "",
+              };
+            })(),
+            courier_name: courier?.name || "",
+            products: !hide_product_details
+              ? e.products.map((product) => ({
+                  name: product.name,
+                  sku: product.sku,
+                  qty: product.qty,
+                  price: product.price,
+                }))
+              : null,
+            pickupWarehouse_contactPhone: !hide_warehouse_mobile_number
+              ? pickupWarehouse.contactPhone
+              : null,
+            rtoWarehouse_contactPhone:
+              hide_warehouse_mobile_number ||
+              pickupWarehouse_full_address === rtoWarehouse_full_address
+                ? null
+                : rtoWarehouse.contactPhone,
+            pickupWarehouse_full_address,
+            rtoWarehouse_full_address,
+            support_email,
+            support_phone,
+          };
+          return payload;
+        })
+      );
+      if (!shipping) {
+        const error = new Error("No shipment found.");
+        error.status = 400;
+        throw error;
+      }
+      const shipmentsCannotBeShipped = shipping.filter(
+        (e) => !e.awb_number || e.shipping_status == "cancelled"
+      );
+      const shipmentsCanBeShipped = shipping.filter(
+        (e) => e.awb_number && e.shipping_status != "cancelled"
+      );
+      const templateHtml = fs.readFileSync(
+        "templates/label.template.html",
+        "utf-8"
+      );
+      const pdfOptions = {
+        fileName: "invoice2",
+        templateHtml,
+        data: shipmentsCanBeShipped,
+      };
+      if (labelSettings.paper_size !== "standard") {
+        pdfOptions.paperSize = "A4";
+      } else {
+        pdfOptions.width = "4in";
+        pdfOptions.height = "6in";
+      }
+      const pdf = new PdfGenerator(pdfOptions);
+      const pdfGenRes = await pdf.generate({ returnBuffer: true });
+      return { ...pdfGenRes };
+    } catch (error) {
+      this.error = error;
+      return false;
+    }
+  }
 
   // async generate({ data }) {
   //     try 
@@ -345,102 +345,102 @@ class Service {
   //     }
   // }
 
-    async generate({ data }) {
-      try {
-        const { userId, shipping_db_ids } = data;
-        const [user, shippingRes] = await Promise.all([
-          UserService.read({ id: userId }),
-          ShippingService.read({ userId, id: shipping_db_ids }),
-        ]);
-        if (!user) throw new Error("User not found");
-        if (!shippingRes?.data?.result?.length)
-          throw new Error("No shipments found");
-        const amazonShipment = shippingRes.data.result.find(
-          (s) => s.amazon_shipment_id
-        );
-        if (amazonShipment) {
-          const amazonLabelRes = await ATSProvider.downloadShipmentLabel({
-            amazon_shipment_id: amazonShipment.amazon_shipment_id,
-          });
-          if (!amazonLabelRes?.buffer) {
-            throw new Error("Amazon label download failed");
-          }
-          const pdfBuffer = await convertPngToPdf(amazonLabelRes.buffer);
-          const finalBuffer = pdfBuffer?.buffer || pdfBuffer;
-          if (!Buffer.isBuffer(finalBuffer)) {
-            throw new Error("Amazon PDF invalid");
-          }
+    // async generate({ data }) {
+    //   try {
+    //     const { userId, shipping_db_ids } = data;
+    //     const [user, shippingRes] = await Promise.all([
+    //       UserService.read({ id: userId }),
+    //       ShippingService.read({ userId, id: shipping_db_ids }),
+    //     ]);
+    //     if (!user) throw new Error("User not found");
+    //     if (!shippingRes?.data?.result?.length)
+    //       throw new Error("No shipments found");
+    //     const amazonShipment = shippingRes.data.result.find(
+    //       (s) => s.amazon_shipment_id
+    //     );
+    //     if (amazonShipment) {
+    //       const amazonLabelRes = await ATSProvider.downloadShipmentLabel({
+    //         amazon_shipment_id: amazonShipment.amazon_shipment_id,
+    //       });
+    //       if (!amazonLabelRes?.buffer) {
+    //         throw new Error("Amazon label download failed");
+    //       }
+    //       const pdfBuffer = await convertPngToPdf(amazonLabelRes.buffer);
+    //       const finalBuffer = pdfBuffer?.buffer || pdfBuffer;
+    //       if (!Buffer.isBuffer(finalBuffer)) {
+    //         throw new Error("Amazon PDF invalid");
+    //       }
 
-          return {
-            pdfBuffer: finalBuffer,
-            fileName: "amazon_label",
-            contentType: "application/pdf",
-          };
-        }
-        const label = {
-          paper_size: "standard",
-          hide_product_details: false,
-          hide_seller_gst_number: false,
-          hide_warehouse_address: false,
-          hide_warehouse_mobile_number: false,
-          hide_end_customer_contact_number: false,
-          ...user.label_settings,
-        };
-        const shipments = await Promise.all(
-          shippingRes.data.result.map(async (e) => {
-            const [courierRes, warehouseRes] = await Promise.all([
-              CourierService.read({ id: e.courier_id }),
-              WarehouseService.read({
-                id: [...new Set([e.warehouse_id, e.rto_warehouse_id])],
-              }),
-            ]);
-            const courier = courierRes?.data?.result?.[0];
-            const pickupWarehouse = warehouseRes.data.result.find(
-              (w) => w.id == e.warehouse_id
-            );
-            const rtoWarehouse = warehouseRes.data.result.find(
-              (w) => w.id == e.rto_warehouse_id
-            );
-            return {
-              invoice_no: e.orderId,
-              awb_number: e.awb_number,
-              courier_name: courier?.name || "",
-              total_price: e.orderAmount,
-              paymentType: capitialiseFirstLetter(e.paymentType),
-              products: label.hide_product_details ? null : e.products,
-              pickupWarehouse_full_address: pickupWarehouse.address,
-              rtoWarehouse_full_address: rtoWarehouse.address,
-            };
-          })
-        );
-        const templateHtml = fs.readFileSync(
-          "templates/label.template.html",
-          "utf-8"
-        );
-        const pdf = new PdfGenerator({
-          templateHtml,
-          data: shipments,
-          width: "4in",
-          height: "6in",
-        });
-        const pdfRes = await pdf.generate({ returnBuffer: true });
-        console.log("PDF RES:", pdfRes); // 👈 ye dekhna IMPORTANT
-        const buffer = pdfRes?.buffer || pdfRes?.data || pdfRes;
-        if (!Buffer.isBuffer(buffer)) {
-          throw new Error("PDF generation failed: Not a valid buffer");
-        }
-        console.log("PDF TYPE:", typeof buffer);
-        console.log("IS BUFFER:", Buffer.isBuffer(buffer));
-        return {
-          pdfBuffer: buffer, // ✅ force buffer
-          fileName: "shipment_labels",
-          contentType: "application/pdf",
-        };
-      } catch (error) {
-        this.error = error;
-        return false;
-      }
-    }
+    //       return {
+    //         pdfBuffer: finalBuffer,
+    //         fileName: "amazon_label",
+    //         contentType: "application/pdf",
+    //       };
+    //     }
+    //     const label = {
+    //       paper_size: "standard",
+    //       hide_product_details: false,
+    //       hide_seller_gst_number: false,
+    //       hide_warehouse_address: false,
+    //       hide_warehouse_mobile_number: false,
+    //       hide_end_customer_contact_number: false,
+    //       ...user.label_settings,
+    //     };
+    //     const shipments = await Promise.all(
+    //       shippingRes.data.result.map(async (e) => {
+    //         const [courierRes, warehouseRes] = await Promise.all([
+    //           CourierService.read({ id: e.courier_id }),
+    //           WarehouseService.read({
+    //             id: [...new Set([e.warehouse_id, e.rto_warehouse_id])],
+    //           }),
+    //         ]);
+    //         const courier = courierRes?.data?.result?.[0];
+    //         const pickupWarehouse = warehouseRes.data.result.find(
+    //           (w) => w.id == e.warehouse_id
+    //         );
+    //         const rtoWarehouse = warehouseRes.data.result.find(
+    //           (w) => w.id == e.rto_warehouse_id
+    //         );
+    //         return {
+    //           invoice_no: e.orderId,
+    //           awb_number: e.awb_number,
+    //           courier_name: courier?.name || "",
+    //           total_price: e.orderAmount,
+    //           paymentType: capitialiseFirstLetter(e.paymentType),
+    //           products: label.hide_product_details ? null : e.products,
+    //           pickupWarehouse_full_address: pickupWarehouse.address,
+    //           rtoWarehouse_full_address: rtoWarehouse.address,
+    //         };
+    //       })
+    //     );
+    //     const templateHtml = fs.readFileSync(
+    //       "templates/label.template.html",
+    //       "utf-8"
+    //     );
+    //     const pdf = new PdfGenerator({
+    //       templateHtml,
+    //       data: shipments,
+    //       width: "4in",
+    //       height: "6in",
+    //     });
+    //     const pdfRes = await pdf.generate({ returnBuffer: true });
+    //     console.log("PDF RES:", pdfRes); // 👈 ye dekhna IMPORTANT
+    //     const buffer = pdfRes?.buffer || pdfRes?.data || pdfRes;
+    //     if (!Buffer.isBuffer(buffer)) {
+    //       throw new Error("PDF generation failed: Not a valid buffer");
+    //     }
+    //     console.log("PDF TYPE:", typeof buffer);
+    //     console.log("IS BUFFER:", Buffer.isBuffer(buffer));
+    //     return {
+    //       pdfBuffer: buffer, // ✅ force buffer
+    //       fileName: "shipment_labels",
+    //       contentType: "application/pdf",
+    //     };
+    //   } catch (error) {
+    //     this.error = error;
+    //     return false;
+    //   }
+    // }
 }
 
 const LabelSettingsService = new Service();
