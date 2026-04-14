@@ -101,14 +101,6 @@ function Sidebar() {
             <path d="M12 20a4 4 0 004-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg> Support
         </Link>
-        <Link to="/warehouse" data-label="Warehouse" className={`nav-item ${isActive("/warehouse") ? "active" : ""}`}>
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
-            <path d="M3 10L12 4L21 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
-            <rect x="10" y="14" width="4" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M7 13h2M7 16h2M15 13h2M15 16h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg> Warehouse
-        </Link>
         <Link to="/label_setting" data-label="Support" className={`nav-item ${isActive("/label_setting") ? "active" : ""}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
             <path d="M3 12L12 3H18V9L9 18L3 12Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
