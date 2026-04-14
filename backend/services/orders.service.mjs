@@ -476,6 +476,38 @@ class Service {
       return false;
     }
   }
+
+
+  async bulkCancel({ order_ids, userId }) {
+    const t = await sequelize.transaction();
+    try {
+      const [updatedCount] = await this.repository.update(
+        {
+          shipping_status: "cancelled",
+          updatedAt: new Date(),
+        },
+        {
+          where: {
+            id: order_ids,
+            userId,
+            shipping_status: "new",
+          },
+          transaction: t,
+        }
+      );
+      if (!updatedCount) {
+        throw new Error("No orders were cancelled");
+      }
+      await t.commit();
+      return {
+        cancelled_count: updatedCount,
+      };
+    } catch (error) {
+      await t.rollback();
+      this.error = error;
+      return false;
+    }
+  }
 }
 
 const OrdersService = new Service();

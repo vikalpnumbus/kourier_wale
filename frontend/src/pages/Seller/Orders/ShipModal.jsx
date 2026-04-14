@@ -138,6 +138,8 @@ function ShipModal({ orderData, onClose, handleFetchData, onSuccess }) {
         handleFetchData();
       } else {
         showError(res?.data?.message || "Shipment failed");
+        onClose();
+        handleFetchData();
       }
     } catch (error) {
       const message =
@@ -148,6 +150,8 @@ function ShipModal({ orderData, onClose, handleFetchData, onSuccess }) {
       showError(message);
     } finally {
       setLoading(false);
+      onClose();
+      handleFetchData();
     }
   };
 

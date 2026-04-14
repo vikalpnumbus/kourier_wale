@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Icon from "@mdi/react";
-import { mdiCubeSend, mdiPencil } from "@mdi/js";
+import { mdiCubeSend, mdiPencil, mdiDelete } from "@mdi/js";
 import { Link, useSearchParams, useOutletContext } from "react-router-dom";
 import Pagination from "../../../Component/Pagination";
 import ordersConfig from "../../../config/Orders/OrdersConfig";
@@ -194,6 +194,31 @@ function OrdersTable({ setExportHandler }) {
   setExportHandler?.(() => handleExportOrders());
 }, [searchParams]);
 
+
+  const handleBulkCancel = async () => {
+    try {
+      if (!selectedOrders.length) {
+        showError("Please select at least one order");
+        return;
+      }
+      if (!window.confirm(`Cancel ${selectedOrders.length} selected orders?`)) return;
+      setLoading(true);
+      const res = await api.post(ordersConfig.bulkCancelApi, {
+        order_ids: selectedOrders,
+      });
+      if (res?.data) {
+        showSuccess("Selected orders cancelled successfully");
+      }
+      setSelectedOrders([]);
+      triggerRefresh();
+    } catch (err) {
+      console.error(err);
+      showError("Failed to cancel selected orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="tab-content tab-content-vertical">
       <div className="tab-pane fade show active" role="tabpanel">
@@ -236,6 +261,9 @@ function OrdersTable({ setExportHandler }) {
                   }}
                   >
                   <Icon path={mdiCubeSend} size={0.7} /> Bulk Ship
+                </div>
+                <div className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content", cursor: "pointer" }} onClick={handleBulkCancel}>
+                  <Icon path={mdiDelete} size={0.7} /> Bulk Cancel Order
                 </div>
 
               </div>

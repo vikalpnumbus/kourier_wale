@@ -10,6 +10,7 @@ import {
   bulkImport,
   bulkExport,
   cancelOrder,
+  cancelBulkOrders
 } from "../controllers/orders.controller.mjs";
 import upload from "../middlewares/multer.mjs";
 import FileValidator from "../validators/file.validator.mjs";
@@ -33,15 +34,8 @@ OrdersRouter.patch(
 OrdersRouter.get("/", TokenHandler.authenticateToken, read);
 OrdersRouter.get("/:id", TokenHandler.authenticateToken, read);
 OrdersRouter.delete("/:id", TokenHandler.authenticateToken, remove);
-
-OrdersRouter.post(
-  "/bulk-import",
-  TokenHandler.authenticateToken,
-  upload.any(),
-  FileValidator.validate,
-  bulkImport
-);
-
+OrdersRouter.post("/bulk-import",TokenHandler.authenticateToken,upload.any(),FileValidator.validate,bulkImport);
+OrdersRouter.post("/bulk-cancel",TokenHandler.authenticateToken,cancelBulkOrders);
 OrdersRouter.post("/cancel/:id", TokenHandler.authenticateToken, cancelOrder);
 
 export default OrdersRouter;

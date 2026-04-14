@@ -292,3 +292,29 @@ export const cancelOrder = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const cancelBulkOrders = async (req, res, next) => {
+  try {
+    const { order_ids } = req.body;
+    if (!order_ids || !Array.isArray(order_ids) || !order_ids.length) {
+      return res.status(400).json({
+        success: false,
+        message: "order_ids array is required",
+      });
+    }
+    const result = await OrdersService.bulkCancel({
+      order_ids,
+      userId: req.user.id,
+    });
+    if (!result) {
+      throw OrdersService.error;
+    }
+    res.success({
+      message: "Orders cancelled successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
