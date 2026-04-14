@@ -32,6 +32,11 @@ function Sidebar() {
             <path d="M5 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
           </svg> Shipments
         </Link>
+        <Link to="/pickup" data-label="Pickup Request" className={`nav-item ${isActive("/pickup") ? "active" : ""}`}>
+              <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M3 4h6M3 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg> Pickup Request
+        </Link>
         <Link to="/products" data-label="Products" className={`nav-item ${isActive("/products") ? "active" : ""}`}>
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
             <path d="M8 1L10.5 6H15L11 9.5L12.5 14.5L8 11.5L3.5 14.5L5 9.5L1 6H5.5L8 1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
@@ -64,11 +69,11 @@ function Sidebar() {
           </svg> Wallet History
         </Link>
         <div className="nav-section-label">Tools</div>
-        <Link to="/after_ship" data-label="After Ship" className={`nav-item ${isActive("/after_ship") ? "active" : ""}`}>
+        {/* <Link to="/after_ship" data-label="After Ship" className={`nav-item ${isActive("/after_ship") ? "active" : ""}`}>
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
             <path d="M8 1l1.5 3.5L13 5l-2.5 2.5.5 3.5L8 9.5 5 11l.5-3.5L3 5l3.5-.5L8 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
           </svg> After Ship
-        </Link>
+        </Link> */}
         <Link to="/rate_calculator" data-label="Rate Calculator" className={`nav-item ${isActive("/rate_calculator") ? "active" : ""}`}>
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
             <rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
@@ -77,33 +82,42 @@ function Sidebar() {
             <path d="M9 11.5h5M11.5 9v5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
           </svg> Rate Calculator
         </Link>
-        <Link to="/order_allocation" data-label="Order Allocation" className={`nav-item ${isActive("/order_allocation") ? "active" : ""}`}>
+        {/* <Link to="/order_allocation" data-label="Order Allocation" className={`nav-item ${isActive("/order_allocation") ? "active" : ""}`}>
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
             <circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.4"/>
             <path d="M2 14c0-3 2.5-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
           </svg> Order Alloc. Eng.
-        </Link>
-        <Link to="/pickup" data-label="Pickup Request" className={`nav-item ${isActive("/pickup") ? "active" : ""}`}>
-              <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M3 4h6M3 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg> Pickup Request
-        </Link>
+        </Link> */}
         <Link to="/channel" data-label="Channel" className={`nav-item ${isActive("/channel") ? "active" : ""}`}>
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
                 <path d="M3 8h10M3 4h6M3 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
               </svg> Channel
         </Link>
-      </div>
-      <div className="sidebar-footer">
-        <div className="user-row">
-          <div className="user-avatar">VM</div>
-          {!collapsed && (
-            <div style={{ flex: 1 }}>
-              <div className="user-name">Veygo Admin</div>
-              <div className="user-role">Super Admin</div>
-            </div>
-          )}
-        </div>
+        <Link to="/support" data-label="Support" className={`nav-item ${isActive("/support") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M4 12a8 8 0 0116 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <rect x="3" y="12" width="3" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="18" y="12" width="3" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M12 20a4 4 0 004-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg> Support
+        </Link>
+        <Link to="/warehouse" data-label="Warehouse" className={`nav-item ${isActive("/warehouse") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M3 10L12 4L21 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="10" y="14" width="4" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M7 13h2M7 16h2M15 13h2M15 16h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg> Warehouse
+        </Link>
+        <Link to="/label_setting" data-label="Support" className={`nav-item ${isActive("/label_setting") ? "active" : ""}`}>
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12L12 3H18V9L9 18L3 12Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="16" cy="7" r="1" fill="currentColor"/>
+            <path d="M19.4 15a1.65 1.65 0 000-3l-.3-.1a6 6 0 00-.5-1.2l.2-.3a1.65 1.65 0 10-2.3-2.3l-.3.2a6 6 0 00-1.2-.5l-.1-.3a1.65 1.65 0 00-3 0l-.1.3a6 6 0 00-1.2.5l-.3-.2a1.65 1.65 0 10-2.3 2.3l.2.3a6 6 0 00-.5 1.2l-.3.1a1.65 1.65 0 000 3l.3.1a6 6 0 00.5 1.2l-.2.3a1.65 1.65 0 102.3 2.3l.3-.2a6 6 0 001.2.5l.1.3a1.65 1.65 0 003 0l.1-.3a6 6 0 001.2-.5l.3.2a1.65 1.65 0 102.3-2.3l-.2-.3a6 6 0 00.5-1.2l.3-.1Z"
+                  stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="15" r="2" stroke="currentColor" stroke-width="1.2"/>
+          </svg> Label Setting
+        </Link>
       </div>
     </nav>
   );

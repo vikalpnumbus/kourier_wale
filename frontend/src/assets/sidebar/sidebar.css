@@ -4,7 +4,7 @@
 }
 .sidebar {
   width: 228px;
-  height: 100vh;
+  /* height: 100vh; */
   background: #FFFFFF;
   border-right: 1px solid #ECEEF5;
   display: flex;

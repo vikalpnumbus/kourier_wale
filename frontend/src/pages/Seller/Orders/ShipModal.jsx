@@ -124,28 +124,28 @@ function ShipModal({ orderData, onClose, handleFetchData, onSuccess }) {
       setErrors(newErrors);
       return;
     }
-
     if (!shipData.courier_id) {
       showError("Please select a courier");
       return;
     }
-
     try {
       setLoading(true);
       const res = await api.post(create_shipment.createshipments, shipData);
-
       if (res?.data?.status === 201) {
-        showSuccess("Shipment Created Successfully");
+        showSuccess("Shipment created successfully");
         onClose();
-        if (onSuccess) {
-          onSuccess();
-        }
+        if (onSuccess) onSuccess();
         handleFetchData();
       } else {
-        showError("Shipment failed");
+        showError(res?.data?.message || "Shipment failed");
       }
-    } catch {
-      showError("Something went wrong");
+    } catch (error) {
+      const message =
+        error?.response?.data?.message ||   // backend message
+        error?.response?.data?.error ||     // sometimes APIs send "error"
+        error?.message ||                  // fallback
+        "Something went wrong";
+      showError(message);
     } finally {
       setLoading(false);
     }

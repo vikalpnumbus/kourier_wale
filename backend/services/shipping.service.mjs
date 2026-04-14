@@ -383,7 +383,6 @@ class Service {
     try {
       const { courier } = data;
       const { code } = courier?.data?.result?.[0];
-
       // ================= XpressBees =================
       if (code.includes("xpressbees")) {
         const res = await XpressBeesProvider.createShipment(data);
@@ -394,52 +393,49 @@ class Service {
             error: XpressBeesProvider.error.message,
           };
         }
-
         return {
           success: true,
           awb_number: res.AWBNo,
         };
       }
-
       // ================= Shadowfax =================
       if (code.includes("Shadow_Fax")) {
         const res = await ShadowfaxProvider.createShipment(data);
-
         if (!res) {
           return {
             success: false,
             error: ShadowfaxProvider.error.message,
           };
         }
-
         return {
           success: true,
           awb_number: res.AWBNo,
         };
       }
-
       // ================= Amazon =================
       if (code.includes("Amazon_500_Gram")) {
         const res = await ATSProvider.createShipment(data);
-
         if (!res) {
+          const err = ATSProvider.error;
+          const message =
+            err?.errors?.[0]?.details ||
+            err?.errors?.[0]?.message ||
+            err?.message ||
+            "Amazon failed";
           return {
             success: false,
-            error: ATSProvider.error?.message || "Amazon failed",
+            error: message,
           };
         }
-
         return {
           success: true,
           awb_number:
             res.payload?.packageDocumentDetails?.[0]?.trackingId,
         };
       }
-
       // ================= Bluedart =================
       if (code.includes("Bluedart_500_Gram")) {
         const res = await BluedartProvider.createShipment(data);
-
         if (!res) {
           return {
             success: false,
@@ -447,24 +443,20 @@ class Service {
               BluedartProvider.error?.message || "Bluedart failed",
           };
         }
-
         return {
           success: true,
           awb_number: res.GenerateWayBillResult?.AWBNo,
         };
       }
-
       // ================= Shiprocket =================
       if (code.includes("Shiprocket")) {
         const orderRes = await ShiprocketProvider.createOrder(data);
-
         if (!orderRes) {
           return {
             success: false,
             error: "Shiprocket order failed",
           };
         }
-
         const awbRes = await ShiprocketProvider.assignAWB({
           shipment_id: orderRes.shipment_id,
           courier_id: "753",
@@ -475,13 +467,11 @@ class Service {
             error: "AWB Generation failed",
           };
         }
-
         return {
           success: true,
           awb_number: awbRes.response.data.awb_code,
         };
       }
-
       return {
         success: false,
         error: "Unsupported courier",
