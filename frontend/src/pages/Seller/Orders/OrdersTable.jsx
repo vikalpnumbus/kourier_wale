@@ -30,7 +30,7 @@ function OrdersTable({ setExportHandler }) {
   const [statusCounts, setStatusCounts] = useState({
     all: 0,
     new: 0,
-    cancel: 0,
+    cancelled: 0,
   });
   const orderCanShip = (order) => {
     return (
@@ -81,7 +81,7 @@ function OrdersTable({ setExportHandler }) {
       if (activeTab !== "all") {
         const statusMap = {
           not_shipped: "new",
-          cancelled: "cancel",
+          cancelled: "cancelled",
         };
         params.shipping_status = statusMap[activeTab];
       }
@@ -106,7 +106,7 @@ function OrdersTable({ setExportHandler }) {
       setStatusCounts(data?.data?.counts || {
         all: 0,
         new: 0,
-        cancel: 0,
+        cancelled: 0,
       });
     } catch (error) {
       console.error("Fetch orders error:", error);
@@ -275,7 +275,7 @@ function OrdersTable({ setExportHandler }) {
           {[
             { key: "all", label: "All Orders", count: statusCounts?.all || 0 },
             { key: "not_shipped", label: "Not Shipped", count: statusCounts?.new || 0 },
-            { key: "cancelled", label: "Cancelled", count: statusCounts?.cancel || 0 },
+            { key: "cancelled", label: "Cancelled", count: statusCounts?.cancelled || 0 },
           ].map((tab, index, arr) => (
             <div
               key={tab.key}

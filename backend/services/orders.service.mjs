@@ -252,7 +252,7 @@ class Service {
           { include: [includeChannel] }
         );
         cancelCount = await this.repository.countDocuments(
-          { ...baseWhereClause, shipping_status: "cancel" },
+          { ...baseWhereClause, shipping_status: "cancelled" },
           { include: [includeChannel] }
         );
       }
