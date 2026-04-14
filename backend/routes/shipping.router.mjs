@@ -9,6 +9,7 @@ import {
   remove,
   handleCancelShipment,
   shippingChargesRead,
+  generatePickup,
 } from "../controllers/shipping.controller.mjs";
 const ShippingRouter = express.Router();
 
@@ -41,5 +42,10 @@ ShippingRouter.post(
   validate(ShippingValidations.cancel()),
   handleCancelShipment
 );
-
+ShippingRouter.post(
+  "/generate-pickup",
+  TokenHandler.authenticateToken,
+  validate(ShippingValidations.generatePickup()), // optional but recommended
+  generatePickup
+);
 export default ShippingRouter;

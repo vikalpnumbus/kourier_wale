@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { mdiDelete, mdiPencil, mdiPrinter} from "@mdi/js";
+import { mdiDelete, mdiPencil, mdiPrinter, mdiTruck, mdiForward} from "@mdi/js";
 import Icon from "@mdi/react";
 import { Link, useSearchParams } from "react-router-dom";
 import api from "../../../utils/api";
@@ -159,6 +159,22 @@ function ShipmentsTable() {
       }
   };
 
+  const bulkpickupShipments = async (shipmentIds) => {
+      try {
+        const url = ShipmentsConfig.bulkpickup;
+        const res = await api.post(url, {
+          shipment_ids: shipmentIds,
+        });
+        return res.data;
+        } catch (error) {
+        console.error(
+          "Cancel failed:",
+          error.response?.data || error.message
+        );
+        throw error;
+      }
+  };
+
   const formatStatus = (status) => {
     if (!status) return "";
     return status
@@ -248,6 +264,9 @@ function ShipmentsTable() {
                 </div>
                 <div onClick = {downloadLabels} disabled={!selectedShipments.length} className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }}>
                   <Icon path={mdiPrinter} size={0.7} /> Bulk Label
+                </div>
+                <div onClick = {bulkpickupShipments} className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }}>
+                  <Icon path={mdiForward} size={0.7} /> Bulk Pickup
                 </div>
                 <div className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }} onClick={handleBulkCancel}>
                   <Icon path={mdiDelete} size={0.7} /> Bulk Cancel

@@ -179,6 +179,17 @@ class Validations {
       return true;
     });
   }
+  
+  generatePickup() {
+    return [
+      this.fieldCheck("shipment_ids", "shipment_ids").custom((value) => {
+        if (!Array.isArray(value) || value.length === 0) {
+          throw new Error("shipment_ids must be a non-empty array");
+        }
+        return true;
+      }),
+    ];
+  }
 }
 
 const ShippingValidations = new Validations();

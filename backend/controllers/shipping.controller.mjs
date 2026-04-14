@@ -1,5 +1,9 @@
 import ShippingProducer from "../queue/producers/shipping.producer.mjs";
 import ShippingService from "../services/shipping.service.mjs";
+import sequelize from "../configurations/sql.config.mjs";
+import ShippingModel from "../model/shipping.sql.model.mjs";
+import OrderStatusLog from "../model/orderStatusLog.model.mjs";
+
 
 export const create = async (req, res, next) => {
   try {
@@ -207,6 +211,58 @@ export const handleCancelShipment = async (req, res, next) => {
       res.success({ data: "Cancelling Shipments." });
     }
   } catch (error) {
+    next(error);
+  }
+};
+
+export const generatePickup = async (req, res, next) => {
+  const t = await sequelize.transaction();
+  try {
+    const { shipment_ids } = req.body;
+    const userId = req.user.id;
+    const shipments = await ShippingModel.findAll({
+      where: { id: shipment_ids, userId },
+      transaction: t,
+    });
+    if (!shipments.length) {
+      await t.rollback();
+      return res.status(404).json({
+        success: false,
+        message: "No valid shipments found",
+      });
+    }
+    const validShipments = shipments.filter(
+      (s) => s.shipping_status === "booked"
+    );
+    await ShippingModel.update(
+      { shipping_status: "pending-pickup" },
+      {
+        where: {
+          id: shipment_ids,
+          userId,
+          shipping_status: "booked",
+        },
+        transaction: t,
+      }
+    );
+    const logs = validShipments.map((s) => ({
+      user_id: userId,
+      order_id: s.order_id,
+      awb_number: s.awb_number,
+      courier_name: s.courier_name,
+      status: "pending-pickup",
+      raw_payload: null,
+    }));
+    if (logs.length) {
+      await OrderStatusLog.bulkCreate(logs, { transaction: t });
+    }
+    await t.commit();
+    return res.success({
+      message: "Pickup generated successfully",
+    });
+  } catch (error) {
+    await t.rollback();
+    console.error("Generate Pickup Error:", error);
     next(error);
   }
 };
