@@ -245,12 +245,12 @@ export const generatePickup = async (req, res, next) => {
         transaction: t,
       }
     );
-    const logs = validShipments.map((s) => ({
+    const logs = shipments.map((s) => ({
+      shipment_id: s.id,
       user_id: userId,
-      order_id: s.order_id,
       awb_number: s.awb_number,
       courier_name: s.courier_name,
-      status: "pending-pickup",
+      ship_status: "pending-pickup",
       raw_payload: null,
     }));
     if (logs.length) {
