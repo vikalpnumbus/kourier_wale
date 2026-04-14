@@ -7,6 +7,7 @@ import { formatDateTime, getLastNDaysRange } from "../../../middleware/CommonFun
 import Pagination from "../../../Component/Pagination";
 import ShipmentsConfig from "../../../config/Shipments/ShipmentsConfig";
 import warehouseConfig from "../../../config/Warehouse/WarehouseConfig";
+import { useAlert } from '../../../middleware/AlertContext';
 function ShipmentsTable() {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -17,6 +18,7 @@ function ShipmentsTable() {
   const [warehouseList, setWarehouseList] = useState([]);
   const [statusCounts, setStatusCounts] = useState({});
   const [activeTab, setActiveTab] = useState("All");
+  const { showError, showSuccess } = useAlert();
   
   const shipmentTabs = [
     "All",
@@ -127,20 +129,18 @@ function ShipmentsTable() {
 
   const handleBulkCancel = async () =>
   {
-    alert(selectedShipments);
-      if (!selectedShipments.length) {
-        alert("No shipments selected");
-        return;
-      }
-
-      try {
-        await cancelShipments(selectedShipments);
-        alert("Shipments cancelled successfully");
-        setselectedShipments([]);
-        handleFetchData();
-      } catch (err) {
-        alert("Failed to cancel shipments");
-      }
+    if (!selectedShipments.length) {
+      showError("No shipments selected");
+      return;
+    }
+    try {
+      await cancelShipments(selectedShipments);
+      showSuccess("Shipments Cancelled Successfully");
+      setselectedShipments([]);
+      handleFetchData();
+    } catch (err) {
+      showError("Failed to Cancel Shipments");
+    }
   };
 
   const cancelShipments = async (shipmentIds) => {
@@ -150,7 +150,7 @@ function ShipmentsTable() {
           shipment_ids: shipmentIds,
         });
         return res.data;
-        } catch (error) {
+      } catch (error) {
         console.error(
           "Cancel failed:",
           error.response?.data || error.message
@@ -158,6 +158,24 @@ function ShipmentsTable() {
         throw error;
       }
   };
+
+
+  const handleBulkpickup = async () =>
+  {
+    if (!selectedShipments.length) {
+      showError("No Shipments Selected For Change Booked to Pending Pickup");
+      return;
+    }
+    try {
+      await bulkpickupShipments(selectedShipments);
+      showSuccess("Shipments Status Changed and Manifest Successfully");
+      setselectedShipments([]);
+      handleFetchData();
+    } catch (err) {
+      showError("Failed to Changed The Shipments");
+    }
+  };
+
 
   const bulkpickupShipments = async (shipmentIds) => {
       try {
@@ -265,7 +283,7 @@ function ShipmentsTable() {
                 <div onClick = {downloadLabels} disabled={!selectedShipments.length} className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }}>
                   <Icon path={mdiPrinter} size={0.7} /> Bulk Label
                 </div>
-                <div onClick = {bulkpickupShipments} className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }}>
+                <div onClick = {handleBulkpickup} className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }}>
                   <Icon path={mdiForward} size={0.7} /> Bulk Pickup
                 </div>
                 <div className="btn btn-dark btn-md py-2 px-3" style={{ width: "fit-content" }} onClick={handleBulkCancel}>
