@@ -53,6 +53,7 @@ class ATSProvider {
       return false;
     }
   }
+  
   async createShipment(data)
   {
     try 
@@ -164,7 +165,8 @@ class ATSProvider {
     }
     catch (err)
     {
-      console.error("[AMAZON CREATE SHIPMENT ERROR]",err?.response?.data || err.message);
+      this.error = err?.response?.data || err; // ✅ store error
+      console.error("[AMAZON CREATE SHIPMENT ERROR]",this.error);
       return false;
     }
   }
