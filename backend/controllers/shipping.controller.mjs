@@ -235,7 +235,7 @@ export const generatePickup = async (req, res, next) => {
       (s) => s.shipping_status === "booked"
     );
     await ShippingModel.update(
-      { shipping_status: "pending-pickup" },
+      { shipping_status: "pending_pickup" },
       {
         where: {
           id: shipment_ids,
@@ -250,7 +250,7 @@ export const generatePickup = async (req, res, next) => {
       user_id: userId,
       awb_number: s.awb_number,
       courier_name: s.courier_name,
-      ship_status: "pending-pickup",
+      ship_status: "pending_pickup",
       raw_payload: null,
     }));
     if (logs.length) {
