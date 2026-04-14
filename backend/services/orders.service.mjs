@@ -481,7 +481,7 @@ class Service {
   async bulkCancel({ order_ids, userId }) {
     const t = await sqlDB.sequelize.transaction();
     try {
-      const [updatedCount] = await this.repository.update(
+      const [updatedCount] = await this.repository.model.update(
         {
           shipping_status: "cancelled",
           updatedAt: new Date(),
