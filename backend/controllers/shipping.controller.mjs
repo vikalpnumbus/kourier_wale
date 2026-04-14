@@ -1,6 +1,6 @@
 import ShippingProducer from "../queue/producers/shipping.producer.mjs";
 import ShippingService from "../services/shipping.service.mjs";
-import sequelize from "../configurations/sql.config.mjs";
+import sqlDB from "../configurations/sql.config.mjs";
 import ShippingModel from "../model/shipping.sql.model.mjs";
 import OrderStatusLog from "../model/orderStatusLog.model.mjs";
 
@@ -216,7 +216,7 @@ export const handleCancelShipment = async (req, res, next) => {
 };
 
 export const generatePickup = async (req, res, next) => {
-  const t = await sequelize.transaction();
+  const t = await sqlDB.sequelize.transaction();
   try {
     const { shipment_ids } = req.body;
     const userId = req.user.id;
