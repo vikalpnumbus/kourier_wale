@@ -141,7 +141,18 @@ function ProductsTable() {
                       <div class="product-name-cell">
                         <div class="product-thumb">
                           <div class="product-thumb-placeholder">
-                            <img src={`${import.meta.env.VITE_API_URL}${item.productImage?.[0]}`} className="product-thumb"/>
+                            <img
+                              src={
+                                item.productImage?.[0]
+                                  ? `${import.meta.env.VITE_API_URL}${item.productImage[0]}`
+                                  : "/themes/assets/images/product_image.png"
+                              }
+                              className="product-thumb"
+                              onError={(e) => {
+                                e.target.onerror = null; // infinite loop avoid
+                                e.target.src = "/themes/assets/images/product_image.png";
+                              }}
+                            />
                           </div>
                         </div>
                         <div>

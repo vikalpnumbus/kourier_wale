@@ -171,13 +171,8 @@ function ProductSection({ setForm, setProductsPrice, setErrors, initialProductDa
                 // }}
                 className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center"
               >
-                <img
-                  src={`${import.meta.env.VITE_API_URL}${item.productImage[0]}`}
-                  className="img-fluid mb-2 mb-md-0 me-md-3"
-                  height={100}
-                  width={60}
-                />
-
+                  <img src={item.productImage?.[0] ? `${import.meta.env.VITE_API_URL}${item.productImage[0]}` : "/themes/assets/images/product_image.png"}
+                  className="img-fluid mb-2 mb-md-0 me-md-3" height={100} width={60}/>
                 <div className="text-start d-flex flex-column gap-2 flex-md-row w-100 justify-content-between mb-2 mb-md-0 me-1">
                   <div className="mb-1 mb-md-0" style={{ flex: 4 }}>
                     {item.name}
