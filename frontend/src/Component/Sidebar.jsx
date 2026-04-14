@@ -24,7 +24,7 @@ function Sidebar() {
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
             <path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg> Orders
-          <span className="nav-badge">4</span>
+          {/* <span className="nav-badge">4</span> */}
         </Link>
         <Link to="/shipments" data-label="Shipments" className={`nav-item ${isActive("/shipments") ? "active" : ""}`}>
           <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
