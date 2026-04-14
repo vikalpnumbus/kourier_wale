@@ -5,7 +5,7 @@ import ProductsService from "./products.service.mjs";
 import WarehouseService from "./warehouse.service.mjs";
 import ChannelService from "./channel.service.mjs";
 import ShopifyProvider from "../providers/couriers/shopify.provider.mjs";
-
+import sqlDB from "../configurations/sql.config.mjs";
 class Service {
   constructor() {
     this.error = null;
@@ -479,7 +479,7 @@ class Service {
 
 
   async bulkCancel({ order_ids, userId }) {
-    const t = await sequelize.transaction();
+    const t = await sqlDB.sequelize.transaction();
     try {
       const [updatedCount] = await this.repository.update(
         {

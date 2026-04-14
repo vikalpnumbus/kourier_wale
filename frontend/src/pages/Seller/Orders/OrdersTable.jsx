@@ -7,6 +7,7 @@ import ordersConfig from "../../../config/Orders/OrdersConfig";
 import ShipModal from "../Orders/ShipModal";
 import BulkShipModal from "../Orders/BulkShipModal";
 import api from "../../../utils/api";
+import { useAlert } from '../../../middleware/AlertContext';
 import {
   formatDateTime,
   getLastNDaysRange,
@@ -18,7 +19,7 @@ function OrdersTable({ setExportHandler }) {
   const [searchParams] = useSearchParams();
   const { refreshKey } = useOutletContext();
   const { triggerRefresh } = useOutletContext();   // ✅ ADD THIS
-  // const { showError, showSuccess } = useAlert();
+  const { showError, showSuccess } = useAlert();
   const [totalCount, setTotalCount] = useState(0);
   const [defaultStart, defaultEnd] = useMemo(() => getLastNDaysRange(7), []);
   const [showShipModal, setShowShipModal] = useState(false);
