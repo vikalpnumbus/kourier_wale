@@ -162,6 +162,7 @@ function ShipmentsTable() {
 
   const handleBulkpickup = async () =>
   {
+    alert(selectedShipments);
     if (!selectedShipments.length) {
       showError("No Shipments Selected For Change Booked to Pending Pickup");
       return;
