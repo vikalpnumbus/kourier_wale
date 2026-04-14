@@ -291,7 +291,7 @@ class Service {
             all: allCount,
             new: newCount,
             booked: bookedCount,
-            cancel: cancelCount,
+            cancelled: cancelCount,
           },
         },
       };
