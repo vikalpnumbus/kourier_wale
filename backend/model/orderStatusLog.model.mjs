@@ -30,7 +30,7 @@ const OrderStatusLog = sqlDB.sequelize.define(
       allowNull: true,
     },
 
-    status: {
+    ship_status: {
       type: DataTypes.STRING,
       allowNull: false,
     },
