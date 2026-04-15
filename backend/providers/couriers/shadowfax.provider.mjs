@@ -79,7 +79,7 @@ class ShadowfaxService {
       });
     }
 
-    const url = `${this.url}/v1/clients/orders/`;
+    const url = `${this.url}/v3/clients/orders/`;
 
     const response = await axios.post(url, jsonData, {
       headers: {

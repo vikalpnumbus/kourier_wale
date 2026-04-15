@@ -157,192 +157,192 @@ function ShipModal({ orderData, onClose, handleFetchData, onSuccess }) {
 
   return (
    <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }} onClick={onClose}>
-  <div className="modal-dialog cmp_modal-lg" role="document" onClick={(e) => e.stopPropagation()}>
-    <div className="ov" onClick={(e) => e.stopPropagation()}>
-      <div className="dlg">
-        <div className="left">
-          <div className="lp-brand">
-            <svg className="lp-logo" viewBox="0 0 72 72" fill="none">
-              <circle cx="36" cy="36" r="34" fill="rgba(61,107,255,0.15)"></circle>
-              <path d="M25 18 Q25 10 36 10 Q47 10 47 18" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" fill="none" opacity="0.35"></path>
-              <path d="M16 22 L36 54 L56 22" stroke="#fff" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round" fill="none"></path>
-              <circle cx="36" cy="54" r="4.5" fill="#3D6BFF"></circle>
-            </svg>
-            <div className="lp-name">vey<span>go</span></div>
-          </div>
-          <div className="lp-heading">
-            <div className="lp-h">
-              SHIP <br /> <span className="acc">NOW</span>
-            </div>
-            <div className="lp-sub">Pick carrier · Confirm · Done</div>
-          </div>
+      <div className="modal-dialog cmp_modal-lg" role="document" onClick={(e) => e.stopPropagation()}>
+        <div className="ov" onClick={(e) => e.stopPropagation()}>
+          <div className="dlg">
+            <div className="left">
+              <div className="lp-brand">
+                <svg className="lp-logo" viewBox="0 0 72 72" fill="none">
+                  <circle cx="36" cy="36" r="34" fill="rgba(61,107,255,0.15)"></circle>
+                  <path d="M25 18 Q25 10 36 10 Q47 10 47 18" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" fill="none" opacity="0.35"></path>
+                  <path d="M16 22 L36 54 L56 22" stroke="#fff" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round" fill="none"></path>
+                  <circle cx="36" cy="54" r="4.5" fill="#3D6BFF"></circle>
+                </svg>
+                <div className="lp-name">vey<span>go</span></div>
+              </div>
+              <div className="lp-heading">
+                <div className="lp-h">
+                  SHIP <br /> <span className="acc">NOW</span>
+                </div>
+                <div className="lp-sub">Pick carrier · Confirm · Done</div>
+              </div>
 
-          {/* Warehouse Selection */}
-          <div className="pkg-meta">
-            <div className="pm-lbl">Select Warehouses</div>
+              {/* Warehouse Selection */}
+              <div className="pkg-meta">
+                <div className="pm-lbl">Select Warehouses</div>
 
-            <ShipModalWarehouse
-              setForm={setForm}
-              setErrors={setErrors}
-              initialWarehouseData={initialWarehouseData.warehouse_id}
-              warehouseType={"normal"}
-            />
-            {errors.warehouse_id && (
-              <small className="text-danger">{errors.warehouse_id}</small>
-            )}
+                <ShipModalWarehouse
+                  setForm={setForm}
+                  setErrors={setErrors}
+                  initialWarehouseData={initialWarehouseData.warehouse_id}
+                  warehouseType={"normal"}
+                />
+                {errors.warehouse_id && (
+                  <small className="text-danger">{errors.warehouse_id}</small>
+                )}
 
-            <ShipModalWarehouse
-              setForm={setForm}
-              setErrors={setErrors}
-              initialWarehouseData={initialWarehouseData.rto_warehouse_id}
-              warehouseType={"rto"}
-            />
-            {errors.rto_warehouse_id && (
-              <small className="text-danger">{errors.rto_warehouse_id}</small>
-            )}
-          </div>
+                <ShipModalWarehouse
+                  setForm={setForm}
+                  setErrors={setErrors}
+                  initialWarehouseData={initialWarehouseData.rto_warehouse_id}
+                  warehouseType={"rto"}
+                />
+                {errors.rto_warehouse_id && (
+                  <small className="text-danger">{errors.rto_warehouse_id}</small>
+                )}
+              </div>
 
-          <div className="lp-wallet">
-            <div className="lw-icon">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.1"/><path d="M1 5h10" stroke="currentColor" strokeWidth="1.1"/><circle cx="8.5" cy="7" r=".8" fill="currentColor"/></svg>
-            </div>
-            <div>
-              <div className="lw-lbl">Wallet Balance</div>
-              <div className="lw-val">₹ {setWallet}</div>
-            </div>
-          </div>
-        </div>
-        {/* ================= RIGHT PANEL ================= */}
-        <div className="right">
-          <div className="rp-hdr">
-            <div>
-              <div className="rp-title">Choose a Carrier</div>
-              <div className="rp-count">
-                {ratePrice.length} carriers available
+              <div className="lp-wallet">
+                <div className="lw-icon">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.1"/><path d="M1 5h10" stroke="currentColor" strokeWidth="1.1"/><circle cx="8.5" cy="7" r=".8" fill="currentColor"/></svg>
+                </div>
+                <div>
+                  <div className="lw-lbl">Wallet Balance</div>
+                  <div className="lw-val">₹ {setWallet}</div>
+                </div>
               </div>
             </div>
-            <div className="rp-steps">
-              <div className="rs">
-                <div className="rs-dot done">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                    <path d="M1.5 4l2 2 3-3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <span className="rs-lbl">Route</span></div>
-              <div className="rs-sep"></div>
-              <div className="rs"><div className="rs-dot act">2</div><span className="rs-lbl act">Carrier</span></div>
-              <div className="rs-sep"></div>
-              <div className="rs"><div className="rs-dot pend">3</div><span className="rs-lbl">Ship</span></div>
-            </div>
-            <div className="rp-close" onClick={onClose}>×</div>
-          </div>
-
-          <div className="carrier-list">
-
-            {sortedRates.length > 0 ? (
-              sortedRates.map((rate, index) => {
-                const total =
-                (Number(rate.freight_charge) || 0) +
-                (Number(rate.cod_charge) || 0);
-                const isCheap = index === 0;
-                const isFastest = index === 1;
-
-                return (
-                  <div
-                    key={rate.courier_id}
-                    className={`crow ${selectedCourierId === rate.courier_id ? "sel" : ""} ${isCheap ? "cheap" : ""}`}
-                    onClick={(e) => {
-                      handleCourierSelect(rate);
-                    }}
-                    style={{ position: "relative" }}
-                  >
-                    {isCheap && (
-                      <div className="cr-badge cb-g">
-                        ★ Best Value
-                      </div>
-                    )}
-                    {isFastest && (
-                      <div className="cr-badge cb-o">
-                        <svg width="7" height="7" viewBox="0 0 7 7">
-                          <path d="M3.5.5l.8 2.2H7L5.2 3.9l.8 2.4-2.5-1.5-2.5 1.5.8-2.4L0 2.7h2.7z" fill="currentColor"></path>
-                        </svg>
-                        Fastest
-                      </div>
-                    )}
-                    <div className="cr-id">
-                      <div className="cr-dot">
-                        {rate.courier_name?.slice(0, 2)}
-                      </div>
-                      <div>
-                        <div className="cr-name">{rate.courier_name}</div>
-                        <div className="cr-wt">
-                          {orderData?.packageDetails?.weight || "--"} gm
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="cr-meta">
-                      <div className="cr-zone">{rate.zone || "N/A"}</div>
-                      <div className="cr-eta">
-                        <div class="cr-eta-dot"></div>
-                        <div className="cr-eta-txt">2–4 Days</div>
-                      </div>
-                    </div>
-
-                    <div className="cr-charges">
-                      <div className="cr-ch">
-                        <div className="cr-ch-ico cci-m">
-                          <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                            <path d="M1.5 4.5h6M4.5 1.5v6" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
-                          </svg>
-                        </div>
-                        <div className="cr-ch-lbl">Freight</div> 
-                        <div className="cr-ch-val"> ₹ {rate.freight_charge || 0} </div> 
-                      </div>
-                      
-                      <div className="cr-ch-sep"></div> 
-                      <div className="cr-ch"> 
-                        <div className="cr-ch-ico cci-o"> 
-                          <svg width="9" height="9" viewBox="0 0 9 9" fill="none"> <rect x="1" y="2" width="7" height="5" rx="1" stroke="currentColor" strokeWidth="1" /> 
-                          <path d="M1 4h7" stroke="currentColor" strokeWidth="1" /> </svg> 
-                        </div> 
-                        <div className="cr-ch-lbl">COD</div> 
-                        <div className="cr-ch-val"> ₹ {rate.cod_charge || 0} </div> 
-                      </div>
-                    </div>
-
-                    <div className="cr-total">
-                      <div className="cr-rs">₹</div>
-                      <div className="cr-price">{total}</div>
-                    </div>
-
+            {/* ================= RIGHT PANEL ================= */}
+            <div className="right">
+              <div className="rp-hdr">
+                <div>
+                  <div className="rp-title">Choose a Carrier</div>
+                  <div className="rp-count">
+                    {ratePrice.length} carriers available
                   </div>
-                );
-              })
-            ) : (
-              <p>No Rate Data</p>
-            )}
+                </div>
+                <div className="rp-steps">
+                  <div className="rs">
+                    <div className="rs-dot done">
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                        <path d="M1.5 4l2 2 3-3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <span className="rs-lbl">Route</span></div>
+                  <div className="rs-sep"></div>
+                  <div className="rs"><div className="rs-dot act">2</div><span className="rs-lbl act">Carrier</span></div>
+                  <div className="rs-sep"></div>
+                  <div className="rs"><div className="rs-dot pend">3</div><span className="rs-lbl">Ship</span></div>
+                </div>
+                <div className="rp-close" onClick={onClose}>×</div>
+              </div>
 
+              <div className="carrier-list">
+
+                {sortedRates.length > 0 ? (
+                  sortedRates.map((rate, index) => {
+                    const total =
+                    (Number(rate.freight_charge) || 0) +
+                    (Number(rate.cod_charge) || 0);
+                    const isCheap = index === 0;
+                    const isFastest = index === 1;
+
+                    return (
+                      <div
+                        key={rate.courier_id}
+                        className={`crow ${selectedCourierId === rate.courier_id ? "sel" : ""} ${isCheap ? "cheap" : ""}`}
+                        onClick={(e) => {
+                          handleCourierSelect(rate);
+                        }}
+                        style={{ position: "relative" }}
+                      >
+                        {isCheap && (
+                          <div className="cr-badge cb-g">
+                            ★ Best Value
+                          </div>
+                        )}
+                        {isFastest && (
+                          <div className="cr-badge cb-o">
+                            <svg width="7" height="7" viewBox="0 0 7 7">
+                              <path d="M3.5.5l.8 2.2H7L5.2 3.9l.8 2.4-2.5-1.5-2.5 1.5.8-2.4L0 2.7h2.7z" fill="currentColor"></path>
+                            </svg>
+                            Fastest
+                          </div>
+                        )}
+                        <div className="cr-id">
+                          <div className="cr-dot">
+                            {rate.courier_name?.slice(0, 2)}
+                          </div>
+                          <div>
+                            <div className="cr-name">{rate.courier_name}</div>
+                            <div className="cr-wt">
+                              {orderData?.packageDetails?.weight || "--"} gm
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="cr-meta">
+                          <div className="cr-zone">{rate.zone || "N/A"}</div>
+                          <div className="cr-eta">
+                            <div class="cr-eta-dot"></div>
+                            <div className="cr-eta-txt">2–4 Days</div>
+                          </div>
+                        </div>
+
+                        <div className="cr-charges">
+                          <div className="cr-ch">
+                            <div className="cr-ch-ico cci-m">
+                              <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                                <path d="M1.5 4.5h6M4.5 1.5v6" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+                              </svg>
+                            </div>
+                            <div className="cr-ch-lbl">Freight</div> 
+                            <div className="cr-ch-val"> ₹ {rate.freight_charge || 0} </div> 
+                          </div>
+                          
+                          <div className="cr-ch-sep"></div> 
+                          <div className="cr-ch"> 
+                            <div className="cr-ch-ico cci-o"> 
+                              <svg width="9" height="9" viewBox="0 0 9 9" fill="none"> <rect x="1" y="2" width="7" height="5" rx="1" stroke="currentColor" strokeWidth="1" /> 
+                              <path d="M1 4h7" stroke="currentColor" strokeWidth="1" /> </svg> 
+                            </div> 
+                            <div className="cr-ch-lbl">COD</div> 
+                            <div className="cr-ch-val"> ₹ {rate.cod_charge || 0} </div> 
+                          </div>
+                        </div>
+
+                        <div className="cr-total">
+                          <div className="cr-rs">₹</div>
+                          <div className="cr-price">{total}</div>
+                        </div>
+
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p>No Rate Data</p>
+                )}
+
+              </div>
+
+              {/* ================= FOOTER ================= */}
+              <div className="rp-foot">
+                <button className="btn-cancel" onClick={onClose}>
+                  Cancel
+                </button>
+
+                <button
+                  className={`btn-ship ${selectedCourierId ? "rdy" : ""}`}
+                  disabled={!selectedCourierId || loading}
+                  onClick={handleSubmit}
+                >
+                  {loading ? "Processing..." : "Confirm & Ship"}
+                </button>
+              </div>
+
+            </div>
           </div>
-
-          {/* ================= FOOTER ================= */}
-          <div className="rp-foot">
-            <button className="btn-cancel" onClick={onClose}>
-              Cancel
-            </button>
-
-            <button
-              className={`btn-ship ${selectedCourierId ? "rdy" : ""}`}
-              disabled={!selectedCourierId || loading}
-              onClick={handleSubmit}
-            >
-              {loading ? "Processing..." : "Confirm & Ship"}
-            </button>
-          </div>
-
         </div>
-      </div>
-    </div>
       </div>
     </div>
   );

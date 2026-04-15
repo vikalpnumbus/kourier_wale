@@ -35,7 +35,7 @@ body::before{
     z-index: 10;
     inset:0;
     /*background:rgba(10,10,15,.75);*/
-    backdrop-filter:blur(14px);
+    /* backdrop-filter:blur(14px); */
     display:flex;
     align-items:center;
     justify-content:center;
@@ -44,11 +44,12 @@ body::before{
 
 /* ══ DIALOG — horizontal split ══ */
 .dlg{
-  width:100%;max-width:800px;
+  width:100%;
+  max-width:800px;
   border-radius:20px;
   overflow:hidden;
   display:flex;
-  box-shadow:0 32px 80px rgba(0,0,0,.5),0 0 0 1px rgba(61,107,255,.12);
+  /* box-shadow:0 32px 80px rgba(0,0,0,.5),0 0 0 1px rgba(61,107,255,.12); */
   animation:rise .3s cubic-bezier(.34,1.4,.64,1) forwards
 }
 @keyframes rise{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
@@ -414,3 +415,99 @@ body::before{
 .btn-ship:hover{background:#2952E3;transform:translateY(-1px);box-shadow:0 8px 24px rgba(61,107,255,.38)}
 .btn-ship:disabled{background:#C8CDD8;box-shadow:none;cursor:not-allowed;transform:none}
 .btn-ship.rdy{background:linear-gradient(135deg,#3D6BFF,#6B7AFF)}
+
+
+
+
+/*----Bulk Model CSS Desgn Code----*/
+
+
+.crow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.crow:hover {
+  border-color: #3D6BFF;
+  transform: translateY(-1px);
+}
+
+.crow.sel {
+  border: 2px solid #3D6BFF;
+  background: #f4f7ff;
+}
+
+.cr-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cr-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #3D6BFF;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.cr-name {
+  font-weight: 600;
+}
+
+.cr-sub {
+  font-size: 12px;
+  color: #888;
+}
+
+.cr-meta {
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+}
+
+.cr-action {
+  display: flex;
+  align-items: center;
+}
+
+.radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #bbb;
+}
+
+.radio.active {
+  border-color: #3D6BFF;
+  background: #3D6BFF;
+}
+
+.cb-g {
+  background: #28a745;
+}
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}
+
+.cr-note {
+  display: block;
+  margin-top: 10px;
+  font-size: 11px;
+  color: #999;
+}

@@ -7,7 +7,8 @@ import create_shipment from "../../../config/Shipments/ShipmentsConfig";
 import api from "../../../utils/api";
 import { useAlert } from '../../../middleware/AlertContext';
 import { useSearchParams } from "react-router-dom";
-
+import "../../../assets/ShipModal.css";
+import { useWallet } from "../../../context/WalletContext";
 function BulkShipModal({ orderData, onClose, handleFetchData }) {
   const [shipData, setShipData] = useState({
     order_db_ids: "",
@@ -22,7 +23,9 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const { showError, showSuccess } = useAlert();
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const { Wallet } = useWallet();
+  const [ratePrice, setRatePrice] = useState([]);
+  const [selectedCourierId, setSelectedCourierId] = useState(null);
   useEffect(() => {
     setInitialWarehouseData({
       warehouse_id: orderData?.warehouse_id || "",
@@ -63,6 +66,8 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
         setLoading(true);
         const res = await api.get(RateConfig.Plan_chart);
         const rows = res?.data?.data?.result || [];
+        setRatePrice(res?.data?.data?.rows || []);
+        setSelectedCourierId(null);
         const uniqueCouriers = [
             ...new Map(
             rows.map(item => [
@@ -148,35 +153,32 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
 
 
   return (
-    <div
-      className="modal fade show"
-      style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-      tabIndex="-1"
-      role="dialog"
-      aria-modal="true"
-      onClick={onClose}
-    >
-      <div
-        className="modal-dialog cmp_modal-lg"
-        role="document"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-content">
-          <div className="modal-header py-1">
-            <h5 className="modal-title">Bulk Ship Your Package Now</h5>
-            <button
-              type="button"
-              className="close"
-              onClick={onClose}
-              aria-label="Close"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
+    <>
+    <div className="modal fade show"  style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }} tabIndex="-1" role="dialog" aria-modal="true" onClick={onClose}>
+      <div className="modal-dialog cmp_modal-lg" role="document" onClick={(e) => e.stopPropagation()}>
+        <div className="ov" onClick={(e) => e.stopPropagation()}>
+          <div className="dlg">
+            <div className="left">
+              <div className="lp-brand">
+                <svg className="lp-logo" viewBox="0 0 72 72" fill="none">
+                  <circle cx="36" cy="36" r="34" fill="rgba(61,107,255,0.15)"></circle>
+                  <path d="M25 18 Q25 10 36 10 Q47 10 47 18" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" fill="none" opacity="0.35"></path>
+                  <path d="M16 22 L36 54 L56 22" stroke="#fff" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round" fill="none"></path>
+                  <circle cx="36" cy="54" r="4.5" fill="#3D6BFF"></circle>
+                </svg>
+                <div className="lp-name">vey<span>go</span></div>
+              </div>
+              <div className="lp-heading">
+                <div className="lp-h">
+                  SHIP <br /> <span className="acc">NOW</span>
+                </div>
+                <div className="lp-sub">Pick carrier · Confirm · Done</div>
+              </div>
 
-          <div className="modal-body text-center">
-            <div className="row">
-              <div className="col-md-6">
+              {/* Warehouse Selection */}
+              <div className="pkg-meta">
+                <div className="pm-lbl">Select Warehouses</div>
+
                 <ShipModalWarehouse
                   setForm={setForm}
                   setErrors={setErrors}
@@ -184,12 +186,9 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
                   warehouseType={"normal"}
                 />
                 {errors.warehouse_id && (
-                  <small className="text-danger text-start mb-4">
-                    {errors.warehouse_id}
-                  </small>
+                  <small className="text-danger">{errors.warehouse_id}</small>
                 )}
-              </div>
-              <div className="col-md-6">
+
                 <ShipModalWarehouse
                   setForm={setForm}
                   setErrors={setErrors}
@@ -197,67 +196,117 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
                   warehouseType={"rto"}
                 />
                 {errors.rto_warehouse_id && (
-                  <small className="text-danger text-start mb-4">
-                    {errors.rto_warehouse_id}
-                  </small>
+                  <small className="text-danger">{errors.rto_warehouse_id}</small>
                 )}
               </div>
+
+              <div className="lp-wallet">
+                <div className="lw-icon">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.1"/><path d="M1 5h10" stroke="currentColor" strokeWidth="1.1"/><circle cx="8.5" cy="7" r=".8" fill="currentColor"/></svg>
+                </div>
+                <div>
+                  <div className="lw-lbl">Wallet Balance</div>
+                  <div className="lw-val">₹ {Wallet}</div>
+                </div>
+              </div>
             </div>
+            {/* ================= RIGHT PANEL ================= */}
+            <div className="right">
+              <div className="rp-hdr">
+                <div>
+                  <div className="rp-title">Choose a Carrier</div>
+                  <div className="rp-count">
+                    {ratePrice.length} carriers available
+                  </div>
+                </div>
+                <div className="rp-steps">
+                  <div className="rs">
+                    <div className="rs-dot done">
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                        <path d="M1.5 4l2 2 3-3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <span className="rs-lbl">Route</span></div>
+                  <div className="rs-sep"></div>
+                  <div className="rs"><div className="rs-dot act">2</div><span className="rs-lbl act">Carrier</span></div>
+                  <div className="rs-sep"></div>
+                  <div className="rs"><div className="rs-dot pend">3</div><span className="rs-lbl">Ship</span></div>
+                </div>
+                <div className="rp-close" onClick={onClose}>×</div>
+              </div>
 
-            {/* ✅ Courier Rate Cards */}
-            <div className="row mt-3">
-              <div className="col-md-12 mb-2">
+              <div className="carrier-list">
                 {CourierList.length > 0 ? (
-                  <div className="row">
-                    {CourierList.map((rate, index) => (
+                  CourierList.map((rate, index) => {
 
+                    const isCheap = index === 0;
+                    const isFastest = index === 1;
+
+                    return (
                       <div
-                        key={index}
-                        className="col-md-6 mb-3"
+                        key={rate.courier_id}
+                        className={`crow ${selectedIndex === index ? "sel" : ""}`}
                         onClick={() => handleCourierSelect(rate, index)}
                       >
-                        <div
-                          className={`volume_price p-3 rounded ${selectedIndex === index ? "selected-rate" : ""
-                            }`}
-                          style={{
-                            cursor: "pointer",
-                            border:
-                              selectedIndex === index
-                                ? "2px solid #007bff"
-                                : "1px solid #ddd",
-                            backgroundColor:
-                              selectedIndex === index ? "#e7f1ff" : "#fff",
-                            transition: "all 0.3s ease",
-                          }}
-                        >
-                            <div className="d-flex justify-content-between align-items-center">
-                                <span className="courier-title-heading">
-                                {rate.courier_name}
-                                </span>
-                            </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-muted">No Rate Data Found</p>
-                )}
-              </div>
-            </div>
 
-            <div className="modal-footer py-1">
-              <button
-                type="button"
-                className="btn btn-dark btn-md py-2 px-3"
-                onClick={handleSubmit}
-              >
-                Ship
-              </button>
+                        {/* BADGES */}
+                        {isCheap && <div className="cr-badge cb-g">★ Best Value</div>}
+                        {isFastest && <div className="cr-badge cb-o">Fastest</div>}
+
+                        {/* LEFT */}
+                        <div className="cr-id">
+                          <div className="cr-dot">
+                            {rate.courier_name?.slice(0, 2)}
+                          </div>
+                          <div>
+                            <div className="cr-name">{rate.courier_name}</div>
+                          </div>
+                        </div>
+
+                        {/* MIDDLE */}
+                        <div className="cr-meta">
+                          <div>Estimated</div>
+                          <div className="fw-bold">2–4 Days</div>
+                        </div>
+
+                        {/* RIGHT */}
+                        <div className="cr-action">
+                          <div className={`radio ${selectedIndex === index ? "active" : ""}`} />
+                        </div>
+
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="no-data">
+                    <p>No Couriers Available</p>
+                  </div>
+                )}
+
+                <small className="cr-note">
+                  *Courier selection is based on your plan configuration
+                </small>
+
+              </div>
+              {/* ================= FOOTER ================= */}
+              <div className="rp-foot">
+                <button className="btn-cancel" onClick={onClose}>
+                  Cancel
+                </button>
+                <button
+                  className={`btn-ship ${selectedCourierId ? "rdy" : ""}`}
+                  disabled={!selectedCourierId || loading}
+                  onClick={handleSubmit}
+                >
+                  {loading ? "Processing..." : "Confirm & Ship"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    </>
   );
 }
 
