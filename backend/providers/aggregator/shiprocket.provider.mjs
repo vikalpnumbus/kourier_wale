@@ -116,7 +116,7 @@ class ShiprocketProvider {
         billing_pincode: data.shippingDetails.pincode,
         billing_state: data.shippingDetails.state,
         billing_country: "India",
-        billing_email: "support@kourierwale.com",
+        billing_email: "",
         billing_phone: data.shippingDetails.phone,
         shipping_is_billing: true,
         order_items: data.products.map(p => ({
