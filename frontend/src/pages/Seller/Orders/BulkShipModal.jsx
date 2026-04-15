@@ -294,8 +294,8 @@ function BulkShipModal({ orderData, onClose, handleFetchData }) {
                   Cancel
                 </button>
                 <button
-                  className={`btn-ship ${selectedCourierId ? "rdy" : ""}`}
-                  disabled={!selectedCourierId || loading}
+                  className={`btn-ship ${shipData.courier_id ? "rdy" : ""}`}
+                  disabled={!shipData.courier_id || loading}
                   onClick={handleSubmit}
                 >
                   {loading ? "Processing..." : "Confirm & Ship"}
