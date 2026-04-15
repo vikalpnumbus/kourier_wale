@@ -23,7 +23,6 @@ class ShadowfaxService {
     const jsonData = {
       order_details: {
         client_order_id: data.orderId,
-        awb_number: "AWB" + Math.floor(Math.random() * 9000 + 1000),
         actual_weight: packageDetails.weight,
         volumetric_weight: packageDetails.volumetricWeight,
         product_value: data.total_price,
