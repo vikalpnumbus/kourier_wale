@@ -14,7 +14,7 @@ import Xpressbeespanel from "../providers/couriers/xpressbees.panel.provider.mjs
 import ATSProvider from "../providers/couriers/ats.provider.mjs";
 import BluedartProvider from "../providers/couriers/bluedart.provider.mjs";
 import ShiprocketProvider from "../providers/aggregator/shiprocket.provider.mjs";
-import ShiprocketProviderats from "../providers/aggregator/shiprocket.provider.mjs";
+import ShiprocketProviderats from "../providers/aggregator/shiprocket.provider.ats.mjs";
 const num = (v, fallback = 1) => {
   const n = Number(v);
   if (!Number.isFinite(n) || n <= 0) return fallback;
