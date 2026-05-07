@@ -6,24 +6,20 @@ import {
   SHIPROCKET_PASSWORD_ATS,
 } from "../../configurations/base.config.mjs";
 
-class ShiprocketProvider {
+class ShiprocketProviderats {
 
   constructor() {
     this.agent = new https.Agent({
       rejectUnauthorized: false
     });
-
     this.token = null;
     this.tokenExpiry = 0;
     this.error = null;
   }
-
   async getToken() {
-
     if (this.token && Date.now() < this.tokenExpiry) {
       return this.token;
     }
-
     try {
       const response = await axios.post(
         SHIPROCKET_LOGIN_URL,
@@ -59,7 +55,6 @@ class ShiprocketProvider {
   }
 
   async createPickupLocation(warehouse) {
-  
     try {
       const token = await this.getToken();
       if (!token) throw new Error("Token failed");
@@ -222,4 +217,4 @@ class ShiprocketProvider {
       }
     }
 }
-export default new ShiprocketProvider();
+export default new ShiprocketProviderats();
