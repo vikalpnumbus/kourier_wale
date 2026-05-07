@@ -10,6 +10,7 @@ import CourierAWBListService from "./courierAWBList.service.mjs";
 import ChannelService from "./channel.service.mjs";
 import ShadowfaxProvider from "../providers/couriers/shadowfax.provider.mjs";
 import XpressBeesProvider from "../providers/couriers/xpressbees.provider.mjs";
+import Xpressbeespanel from "../providers/couriers/xpressbees.panel.provider.mjs"
 import ATSProvider from "../providers/couriers/ats.provider.mjs";
 import BluedartProvider from "../providers/couriers/bluedart.provider.mjs";
 import ShiprocketProvider from "../providers/aggregator/shiprocket.provider.mjs";
@@ -472,6 +473,38 @@ class Service {
           awb_number: awbRes.response.data.awb_code,
         };
       }
+
+      if (code.includes("xb_panel")) {
+      const courierMap = {
+        "Air Xpressbees 0.5 K.G": "6",
+        "Surface Xpressbees 0.5 K.G": "1",
+        "Xpressbees 1 K.G": "12298",
+        "Xpressbees 2 K.G": "2",
+        "Xpressbees 5 K.G": "3",
+        "Xpressbees 10 K.G": "4",
+      };
+      const courierid = courierMap[code.name];
+      if (!courierid) {
+        return {
+          success: false,
+          error: "Invalid Xpressbees courier selected",
+        };
+      }
+      const res = await Xpressbeespanel.createShipment(data, courierid);
+      if (!res) {
+        return {
+          success: false,
+          error:
+            Xpressbeespanel.error?.message ||
+            "Xpressbees Failed To Create Shipment.",
+        };
+      }
+      return {
+        success: true,
+        awb_number:
+          res?.GenerateWayBillResult?.AWBNo || res?.awb_number || null,
+      };
+    }
       return {
         success: false,
         error: "Unsupported courier",
