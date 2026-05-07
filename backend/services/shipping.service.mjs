@@ -475,7 +475,7 @@ class Service {
         };
       }
 
-      if (code.includes("Shiprocket_ats")) {
+      if (code.includes("shiprocket_ats")) {
         const orderRes = await ShiprocketProviderats.createOrder(data);
         if (!orderRes) {
           return {
@@ -499,8 +499,7 @@ class Service {
         };
       }
 
-      if (code.includes("Shiprocket_ats500")) {
-        697, 195
+      if (code.includes("shiprocket_ats500")) {
         const orderRes = await ShiprocketProviderats.createOrder(data);
         if (!orderRes) {
           return {
