@@ -319,7 +319,7 @@ body::before{
 .cr-id{display:flex;align-items:center;gap:.5rem;width:155px;flex-shrink:0}
 .cr-dot{background: linear-gradient(135deg,#3D6BFF,#6B7AFF); width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:#fff;letter-spacing:.01em}
 .cr-info{min-width:0}
-.cr-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:#0A0A0F;letter-spacing:-.02em;line-height:1.2}
+.cr-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:#0A0A0F;letter-spacing:-.02em;line-height:1.2;text-align:left;}
 .crow.sel .cr-name{color:#3D6BFF}
 .crow.cheap.sel .cr-name{color:#2D8A4E}
 .cr-wt{font-family:'JetBrains Mono',monospace;font-size:.54rem;color:#8B93B0;margin-top:.1rem}
