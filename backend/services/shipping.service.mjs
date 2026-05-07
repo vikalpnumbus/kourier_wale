@@ -475,53 +475,53 @@ class Service {
         };
       }
 
-      if (code.includes("shiprocket_ats")) {
-        const orderRes = await ShiprocketProviderats.createOrder(data);
-        if (!orderRes) {
-          return {
-            success: false,
-            error: "Shiprocket order failed",
-          };
-        }
-        const awbRes = await ShiprocketProviderats.assignAWB({
-          shipment_id: orderRes.shipment_id,
-          courier_id: "697",
-        });
-        if (!awbRes) {
-          return {
-            success: false,
-            error: "AWB Generation failed",
-          };
-        }
-        return {
-          success: true,
-          awb_number: awbRes.response.data.awb_code,
-        };
-      }
+      // if (code.includes("shiprocket_ats")) {
+      //   const orderRes = await ShiprocketProviderats.createOrder(data);
+      //   if (!orderRes) {
+      //     return {
+      //       success: false,
+      //       error: "Shiprocket order failed",
+      //     };
+      //   }
+      //   const awbRes = await ShiprocketProviderats.assignAWB({
+      //     shipment_id: orderRes.shipment_id,
+      //     courier_id: "697",
+      //   });
+      //   if (!awbRes) {
+      //     return {
+      //       success: false,
+      //       error: "AWB Generation failed",
+      //     };
+      //   }
+      //   return {
+      //     success: true,
+      //     awb_number: awbRes.response.data.awb_code,
+      //   };
+      // }
 
-      if (code.includes("shiprocket_ats500")) {
-        const orderRes = await ShiprocketProviderats.createOrder(data);
-        if (!orderRes) {
-          return {
-            success: false,
-            error: "Shiprocket order failed",
-          };
-        }
-        const awbRes = await ShiprocketProviderats.assignAWB({
-          shipment_id: orderRes.shipment_id,
-          courier_id: "195",
-        });
-        if (!awbRes) {
-          return {
-            success: false,
-            error: "AWB Generation failed",
-          };
-        }
-        return {
-          success: true,
-          awb_number: awbRes.response.data.awb_code,
-        };
-      }
+      // if (code.includes("shiprocket_ats500")) {
+      //   const orderRes = await ShiprocketProviderats.createOrder(data);
+      //   if (!orderRes) {
+      //     return {
+      //       success: false,
+      //       error: "Shiprocket order failed",
+      //     };
+      //   }
+      //   const awbRes = await ShiprocketProviderats.assignAWB({
+      //     shipment_id: orderRes.shipment_id,
+      //     courier_id: "195",
+      //   });
+      //   if (!awbRes) {
+      //     return {
+      //       success: false,
+      //       error: "AWB Generation failed",
+      //     };
+      //   }
+      //   return {
+      //     success: true,
+      //     awb_number: awbRes.response.data.awb_code,
+      //   };
+      // }
 
       if (code.includes("xb_panel")) {
       const courierMap = {
