@@ -14,6 +14,7 @@ import Xpressbeespanel from "../providers/couriers/xpressbees.panel.provider.mjs
 import ATSProvider from "../providers/couriers/ats.provider.mjs";
 import BluedartProvider from "../providers/couriers/bluedart.provider.mjs";
 import ShiprocketProvider from "../providers/aggregator/shiprocket.provider.mjs";
+import ShiprocketProviderats from "../providers/aggregator/shiprocket.provider.mjs";
 const num = (v, fallback = 1) => {
   const n = Number(v);
   if (!Number.isFinite(n) || n <= 0) return fallback;
@@ -450,7 +451,7 @@ class Service {
         };
       }
       // ================= Shiprocket =================
-      if (code.includes("Shiprocket")) {
+      if (code.includes("Shiprocket_dl")) {
         const orderRes = await ShiprocketProvider.createOrder(data);
         if (!orderRes) {
           return {
@@ -461,6 +462,55 @@ class Service {
         const awbRes = await ShiprocketProvider.assignAWB({
           shipment_id: orderRes.shipment_id,
           courier_id: "753",
+        });
+        if (!awbRes) {
+          return {
+            success: false,
+            error: "AWB Generation failed",
+          };
+        }
+        return {
+          success: true,
+          awb_number: awbRes.response.data.awb_code,
+        };
+      }
+
+      if (code.includes("Shiprocket_ats")) {
+        const orderRes = await ShiprocketProviderats.createOrder(data);
+        if (!orderRes) {
+          return {
+            success: false,
+            error: "Shiprocket order failed",
+          };
+        }
+        const awbRes = await ShiprocketProviderats.assignAWB({
+          shipment_id: orderRes.shipment_id,
+          courier_id: "697",
+        });
+        if (!awbRes) {
+          return {
+            success: false,
+            error: "AWB Generation failed",
+          };
+        }
+        return {
+          success: true,
+          awb_number: awbRes.response.data.awb_code,
+        };
+      }
+
+      if (code.includes("Shiprocket_ats500")) {
+        697, 195
+        const orderRes = await ShiprocketProviderats.createOrder(data);
+        if (!orderRes) {
+          return {
+            success: false,
+            error: "Shiprocket order failed",
+          };
+        }
+        const awbRes = await ShiprocketProviderats.assignAWB({
+          shipment_id: orderRes.shipment_id,
+          courier_id: "195",
         });
         if (!awbRes) {
           return {
@@ -585,6 +635,19 @@ class Service {
 
           if (!shipmentRes) {
             throw ShiprocketProvider.error;
+          }
+
+          console.log("✅ Shiprocket shipment cancelled");
+        }
+      }
+      if (existingShipmentData.shipment_error == null) {
+        if (existingShipmentData.courier_id == "11" || existingShipmentData.courier_id == "12") {
+          const shipmentRes = await ShiprocketProviderats.cancelShipment({
+            awb_number: existingShipmentData.awb_number
+          });
+
+          if (!shipmentRes) {
+            throw ShiprocketProviderats.error;
           }
 
           console.log("✅ Shiprocket shipment cancelled");
