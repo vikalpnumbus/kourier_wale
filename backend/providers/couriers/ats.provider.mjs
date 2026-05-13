@@ -56,7 +56,8 @@ class ATSProvider {
   }
   
   async createShipment(data) {
-    console.log("payloads:",data);
+  console.log("payloads:", data);
+
   try {
     const token = await this.generateATSToken();
     if (!token) throw new Error("Token failed");
@@ -65,15 +66,44 @@ class ATSProvider {
       orderId,
       items,
       packageDetails,
-      shipTo,
-      shipFrom
+      shippingDetails,
+      warehouses
     } = data;
-    
+
+    // ✅ items fix
     const itemsList = Array.isArray(items)
       ? items
       : (data.products || []);
+
+    // ✅ shipTo mapping
+    const shipTo = {
+      name: `${shippingDetails?.fname || ""} ${shippingDetails?.lname || ""}`,
+      address1: shippingDetails?.address,
+      address2: "",
+      city: shippingDetails?.city,
+      state: shippingDetails?.state,
+      pincode: shippingDetails?.pincode,
+      phone: shippingDetails?.phone,
+      email: "test@gmail.com"
+    };
+
+    // ✅ shipFrom mapping
+    const wh = warehouses?.[0]?.dataValues || {};
+
+    const shipFrom = {
+      name: wh?.name || "Warehouse",
+      address1: wh?.address || "Default Address",
+      city: wh?.city,
+      state: wh?.state,
+      pincode: wh?.pincode,
+      phone: wh?.phone,
+      email: wh?.email || "warehouse@test.com"
+    };
+
+    // ✅ FINAL PAYLOAD
     const payload = {
       channelDetails: { channelType: "EXTERNAL" },
+
       labelSpecifications: {
         dpi: 300,
         format: "PDF",
@@ -85,41 +115,51 @@ class ATSProvider {
           unit: "INCH"
         }
       },
+
       packages: [
         {
           dimensions: {
             length: num(packageDetails?.length, 10),
-            width: num(packageDetails?.width, 10),
+            width: num(packageDetails?.breadth, 10), // ✅ FIXED
             height: num(packageDetails?.height, 10),
             unit: "CENTIMETER"
           },
+
           weight: {
             unit: "GRAM",
             value: num(packageDetails?.weight, 500)
           },
+
           insuredValue: {
             value: num(packageDetails?.price, 1),
             unit: "INR"
           },
+
           items: itemsList.map((item, i) => ({
             description: item.name || "Item",
             itemIdentifier: item.sku || item.id || `SKU_${i}`,
             quantity: num(item.qty || item.quantity, 1),
+
             itemValue: {
               value: num(item.price, 1),
               unit: "INR"
             },
+
             weight: {
               unit: "GRAM",
               value: num(item.weight, 200)
             }
           })),
+
           packageClientReferenceId: orderId
         }
       ],
+
       serviceSelection: {
         serviceId: ["SWA-IN-OA"]
       },
+
+      // ✅ CORRECT placement
       shipTo: {
         name: shipTo.name,
         addressLine1: shipTo.address1,
@@ -131,6 +171,7 @@ class ATSProvider {
         phoneNumber: shipTo.phone,
         email: shipTo.email
       },
+
       shipFrom: {
         name: shipFrom.name,
         addressLine1: shipFrom.address1,
@@ -161,7 +202,7 @@ class ATSProvider {
     console.error("[CREATE SHIPMENT ERROR]", err?.response?.data || err);
     return false;
   }
-}
+  }
 
   async cancelShipment({ amazon_shipment_id }) {
     try {
