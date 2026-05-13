@@ -56,6 +56,7 @@ class ATSProvider {
   }
   
   async createShipment(data) {
+    console.log("payloads:",data);
   try {
     const token = await this.generateATSToken();
     if (!token) throw new Error("Token failed");
@@ -67,6 +68,7 @@ class ATSProvider {
       shipTo,
       shipFrom
     } = data;
+    
     const itemsList = Array.isArray(items)
       ? items
       : (data.products || []);
