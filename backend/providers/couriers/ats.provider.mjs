@@ -59,6 +59,7 @@ class ATSProvider {
   try {
     const token = await this.generateATSToken();
     if (!token) throw new Error("Token failed");
+
     const {
       orderId,
       items,
@@ -66,6 +67,9 @@ class ATSProvider {
       shipTo,
       shipFrom
     } = data;
+    const itemsList = Array.isArray(items)
+      ? items
+      : (data.products || []);
     const payload = {
       channelDetails: { channelType: "EXTERNAL" },
       labelSpecifications: {
@@ -79,7 +83,6 @@ class ATSProvider {
           unit: "INCH"
         }
       },
-
       packages: [
         {
           dimensions: {
@@ -88,21 +91,18 @@ class ATSProvider {
             height: num(packageDetails?.height, 10),
             unit: "CENTIMETER"
           },
-
           weight: {
             unit: "GRAM",
             value: num(packageDetails?.weight, 500)
           },
-
           insuredValue: {
             value: num(packageDetails?.price, 1),
             unit: "INR"
           },
-
-          items: items.map((item, i) => ({
+          items: itemsList.map((item, i) => ({
             description: item.name || "Item",
-            itemIdentifier: item.sku || `SKU_${i}`,
-            quantity: num(item.qty, 1),
+            itemIdentifier: item.sku || item.id || `SKU_${i}`,
+            quantity: num(item.qty || item.quantity, 1),
             itemValue: {
               value: num(item.price, 1),
               unit: "INR"
@@ -112,15 +112,12 @@ class ATSProvider {
               value: num(item.weight, 200)
             }
           })),
-
           packageClientReferenceId: orderId
         }
       ],
-
       serviceSelection: {
         serviceId: ["SWA-IN-OA"]
       },
-
       shipTo: {
         name: shipTo.name,
         addressLine1: shipTo.address1,
@@ -132,7 +129,6 @@ class ATSProvider {
         phoneNumber: shipTo.phone,
         email: shipTo.email
       },
-
       shipFrom: {
         name: shipFrom.name,
         addressLine1: shipFrom.address1,
@@ -163,7 +159,7 @@ class ATSProvider {
     console.error("[CREATE SHIPMENT ERROR]", err?.response?.data || err);
     return false;
   }
-  }
+}
 
   async cancelShipment({ amazon_shipment_id }) {
     try {
