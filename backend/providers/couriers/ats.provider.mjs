@@ -57,11 +57,9 @@ class ATSProvider {
   
   async createShipment(data) {
     console.log("payloads:", data);
-
     try {
       const token = await this.generateATSToken();
       if (!token) throw new Error("Token failed");
-
       const {
         orderId,
         items,
@@ -69,13 +67,9 @@ class ATSProvider {
         shippingDetails,
         warehouses
       } = data;
-
-      // ✅ items fix
       const itemsList = Array.isArray(items)
         ? items
         : (data.products || []);
-
-      // ✅ shipTo mapping
       const shipTo = {
         name: `${shippingDetails?.fname || ""} ${shippingDetails?.lname || ""}`,
         address1: shippingDetails?.address,
@@ -86,10 +80,7 @@ class ATSProvider {
         phone: shippingDetails?.phone,
         email: "test@gmail.com"
       };
-
-      // ✅ shipFrom mapping
       const wh = warehouses?.[0]?.dataValues || {};
-
       const shipFrom = {
         name: wh?.name || "Warehouse",
         address1: wh?.address || "Default Address",
@@ -99,8 +90,6 @@ class ATSProvider {
         phone: wh?.phone,
         email: wh?.email || "warehouse@test.com"
       };
-
-      // ✅ FINAL PAYLOAD
       const payload = {
         channelDetails: { channelType: "EXTERNAL" },
         labelSpecifications: {
@@ -150,7 +139,6 @@ class ATSProvider {
         serviceSelection: {
           serviceId: ["SWA-IN-OA"]
         },
-        // ✅ CORRECT placement
         shipTo: {
           name: shipTo.name,
           addressLine1: shipTo.address1,
@@ -186,6 +174,7 @@ class ATSProvider {
       );
       return response.data;
     } catch (err) {
+      console.log("full error:",err);
       console.error("[CREATE SHIPMENT ERROR]", err?.response?.data || err);
       return false;
     }
