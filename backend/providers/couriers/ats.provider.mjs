@@ -25,6 +25,8 @@ class ATSProvider {
     if (!ATS_REFRESH_TOKEN) throw new Error("ATS_REFRESH_TOKEN missing");
     if (!ATS_CLIENT_IDENTIFIER) throw new Error("ATS_CLIENT_IDENTIFIER missing");
     if (!ATS_CLIENT_SECRET) throw new Error("ATS_CLIENT_SECRET missing");
+    this.accessToken = null;
+    this.tokenExpiry = null;
   }
 
   /**
@@ -32,216 +34,186 @@ class ATSProvider {
    */
   async generateATSToken() {
     try {
+      if (this.accessToken && Date.now() < this.tokenExpiry) {
+        return this.accessToken;
+      }
       const payload = qs.stringify({
         grant_type: "refresh_token",
         refresh_token: ATS_REFRESH_TOKEN,
         client_id: ATS_CLIENT_IDENTIFIER,
         client_secret: ATS_CLIENT_SECRET,
       });
-
       const res = await axios.post(ATS_GENERATE_TOKEN_URL, payload, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        timeout: 15000,
       });
-
-      return res.data; // { access_token }
+      this.accessToken = res.data.access_token;
+      this.tokenExpiry = Date.now() + (55 * 60 * 1000);
+      return this.accessToken;
     } catch (err) {
-      console.error(
-        "[ATS TOKEN ERROR]",
-        err?.response?.data || err.message
-      );
-      return false;
+      console.error("[ATS TOKEN ERROR]", err?.response?.data || err.message);
+      return null;
     }
   }
   
-  async createShipment(data)
-  {
-    try 
-    {
-      const { orderId, itemIdentifier, packageDetails, shipTo, shipFrom } = data;
-      const tokenRes = await this.generateATSToken();
-      if (!tokenRes?.access_token) {
-        throw new Error("Amazon token generate failed");
-      }
-      const payload = {
-        "channelDetails": {
-          "channelType": "EXTERNAL"
-        },
-        "labelSpecifications": {
-          "dpi": 300,
-          "format": "PNG",
-          "needFileJoining": false,
-          "pageLayout": "DEFAULT",
-          "requestedDocumentTypes": ["LABEL"],
-          "size": {
-            "length": 6,
-            "width": 4,
-            "unit": "INCH"
-          }
-        },
-
-        "packages": [
-          {
-            "dimensions": {
-              "length": 15,
-              "width": 10,
-              "height": 10,
-              "unit": "CENTIMETER"
-            },
-
-            "weight": {
-              "unit": "GRAM",
-              "value": 190
-            },
-
-            "insuredValue": {
-              "value": 1,
-              "unit": "INR"
-            },
-
-            "items": [
-              {
-                "description": "Item",
-                "itemIdentifier": "STATIC_ITEM_001",
-                "quantity": 1,
-                "itemValue": {
-                  "value": 1,
-                  "unit": "INR"
-                },
-                "weight": {
-                  "unit": "GRAM",
-                  "value": 190
-                }
-              }
-            ],
-
-            "packageClientReferenceId": "STATIC_ORDER_001"
-          }
-        ],
-
-        "serviceSelection": {
-          "serviceId": ["SWA-IN-OA"]
-        },
-
-        "shipTo": {
-          "name": "Test Customer",
-          "addressLine1": "Test Address Line 1",
-          "addressLine2": "Test Area",
-          "city": "Chennai",
-          "stateOrRegion": "Tamil Nadu",
-          "postalCode": "600028",
-          "countryCode": "IN",
-          "phoneNumber": "9999999999",
-          "email": "customer@test.com"
-        },
-
-        "shipFrom": {
-          "name": "Test Warehouse",
-          "addressLine1": "Warehouse Address Line 1",
-          "city": "Chennai",
-          "stateOrRegion": "Tamil Nadu",
-          "postalCode": "600002",
-          "countryCode": "IN",
-          "phoneNumber": "9999999999",
-          "email": "warehouse@test.com"
+  async createShipment(data) {
+  try {
+    const token = await this.generateATSToken();
+    if (!token) throw new Error("Token failed");
+    const {
+      orderId,
+      items,
+      packageDetails,
+      shipTo,
+      shipFrom
+    } = data;
+    const payload = {
+      channelDetails: { channelType: "EXTERNAL" },
+      labelSpecifications: {
+        dpi: 300,
+        format: "PDF",
+        pageLayout: "DEFAULT",
+        requestedDocumentTypes: ["LABEL"],
+        size: {
+          length: 6,
+          width: 4,
+          unit: "INCH"
         }
-      }
-      console.log("Final Payload of shipments", payload);
-      console.log("create shipment url", "https://sandbox.sellingpartnerapi-eu.amazon.com/shipping/v2/oneClickShipment");
-      const response = await axios.post(
-        "https://sandbox.sellingpartnerapi-eu.amazon.com/shipping/v2/oneClickShipment",
-        payload,
+      },
+
+      packages: [
         {
-          headers: {
-            "Content-Type": "application/json",
-            "x-amz-access-token": "Atza|IwEBIFU3C4sxFbFOFAWcieSrF2roV2CePDf4MfbmYE64qb_kVe11QqYmhYz1HB4lzv_NyT_50GbVdRw1Yiug1h7AQ9PejAubj8Zr9jdQ-_tUDt6i9O6UF6fEPndIjOjd-peE1sOJ4_LWqhZWQ56XZS6w20qVRJ28YCBjl9u2CYIaFawYAmy0a_QReCKTAt6wsxhrN56sn_utERb5wpW8dOmW1hEYOm1DkSNSseH7jWlc8TMxobHgoDwOmC6VMz6rOnsp2I36kP8HVpAPkAxr531WDCKufnhTHssMEq70oeOMBTNzAZ2UcppxX2tJlqmK27DZD-FyXa5K5VD6eE8csjrBczgH",
-            "Authorization": `Bearer Atzr|IwEBIBm3jY2qR73uSTWGXVyiP4KsQwNH84phOaIkAUDsUXBWIHz4O7O9HThrj9CENk_CwEaxRhIjFkhxnx7O9q0fl6c4XKXQkZ_zRJyORjWMJdd9rp8DqNlNST-gyNVqdhLdaLFxRobcdAuvApZ-Q3xPM7xt0ENSwxhKPUxjBm77k7cUce4AqZvvNwpPWCHDXR-OslJCPrZs7lZX-JcjXUWVsO2XB3B-HQHtVMOGtiFiO2lxeejZIvkMt_qxt-w1Cg6mVDjJiy4foE5D0e9U2IdtnBoFScQ03LnpybmIsQt5zGhq1YkJvduJ6v09SSnGwG0qduU`,
-            "x-amzn-shipping-business-id": "AmazonShipping_IN",
+          dimensions: {
+            length: num(packageDetails?.length, 10),
+            width: num(packageDetails?.width, 10),
+            height: num(packageDetails?.height, 10),
+            unit: "CENTIMETER"
           },
-          timeout: 20000,
-        }
-      );
-      return response.data;
-    }
-    catch (err)
-    {
-      this.error = err?.response?.data || err; // ✅ store error
-      console.error("[AMAZON CREATE SHIPMENT ERROR]",this.error);
-      return false;
-    }
-  }
 
-  async cancelShipment(data)
-  {
-    try {
-      if (!data?.amazon_shipment_id) {
-        throw new Error("amazon_shipment_id is required for cancel");
-      }
-      const tokenRes = await this.generateATSToken();
-      if (!tokenRes?.access_token) {
-        throw new Error("Amazon token generate failed");
-      }
-      const cancelUrl = `${ATS_CANCEL_SHIPMENT_FORWARD}/${data.amazon_shipment_id}/cancel`;
-      const response = await axios.put(
-        cancelUrl,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-amz-access-token": "Atza|IwEBIFU3C4sxFbFOFAWcieSrF2roV2CePDf4MfbmYE64qb_kVe11QqYmhYz1HB4lzv_NyT_50GbVdRw1Yiug1h7AQ9PejAubj8Zr9jdQ-_tUDt6i9O6UF6fEPndIjOjd-peE1sOJ4_LWqhZWQ56XZS6w20qVRJ28YCBjl9u2CYIaFawYAmy0a_QReCKTAt6wsxhrN56sn_utERb5wpW8dOmW1hEYOm1DkSNSseH7jWlc8TMxobHgoDwOmC6VMz6rOnsp2I36kP8HVpAPkAxr531WDCKufnhTHssMEq70oeOMBTNzAZ2UcppxX2tJlqmK27DZD-FyXa5K5VD6eE8csjrBczgH",
-            "x-amzn-shipping-business-id": "AmazonShipping_IN",
+          weight: {
+            unit: "GRAM",
+            value: num(packageDetails?.weight, 500)
           },
-          timeout: 20000,
-        }
-      );
-      console.log("[AMAZON CANCEL SHIPMENT RESPONSE]", response.data);
-      return response.data;
-    } catch (err) {
-      console.error(
-        "[AMAZON CANCEL SHIPMENT ERROR]",
-        err?.response?.data || err.message
-      );
-      return false;
-    }
-  }
 
-  async downloadShipmentLabel(data) {
-    try {
-      if (!data?.amazon_shipment_id) {
-        throw new Error("amazon_shipment_id is required");
+          insuredValue: {
+            value: num(packageDetails?.price, 1),
+            unit: "INR"
+          },
+
+          items: items.map((item, i) => ({
+            description: item.name || "Item",
+            itemIdentifier: item.sku || `SKU_${i}`,
+            quantity: num(item.qty, 1),
+            itemValue: {
+              value: num(item.price, 1),
+              unit: "INR"
+            },
+            weight: {
+              unit: "GRAM",
+              value: num(item.weight, 200)
+            }
+          })),
+
+          packageClientReferenceId: orderId
+        }
+      ],
+
+      serviceSelection: {
+        serviceId: ["SWA-IN-OA"]
+      },
+
+      shipTo: {
+        name: shipTo.name,
+        addressLine1: shipTo.address1,
+        addressLine2: shipTo.address2,
+        city: shipTo.city,
+        stateOrRegion: shipTo.state,
+        postalCode: shipTo.pincode,
+        countryCode: "IN",
+        phoneNumber: shipTo.phone,
+        email: shipTo.email
+      },
+
+      shipFrom: {
+        name: shipFrom.name,
+        addressLine1: shipFrom.address1,
+        city: shipFrom.city,
+        stateOrRegion: shipFrom.state,
+        postalCode: shipFrom.pincode,
+        countryCode: "IN",
+        phoneNumber: shipFrom.phone,
+        email: shipFrom.email
       }
-      const tokenRes = await this.generateATSToken();
-      if (!tokenRes?.access_token) {
-        throw new Error("Amazon token generate failed");
-      }
-      const labelUrl = `${ATS_LABEL_DOWNLOAD_FORWARD}/${data.amazon_shipment_id}/documents`;
-      const response = await axios.get(labelUrl, {
+    };
+
+    const response = await axios.post(
+      ATS_CREATE_SHIPMENT_FORWARD,
+      payload,
+      {
         headers: {
-          "x-amz-access-token": "Atza|IwEBIFU3C4sxFbFOFAWcieSrF2roV2CePDf4MfbmYE64qb_kVe11QqYmhYz1HB4lzv_NyT_50GbVdRw1Yiug1h7AQ9PejAubj8Zr9jdQ-_tUDt6i9O6UF6fEPndIjOjd-peE1sOJ4_LWqhZWQ56XZS6w20qVRJ28YCBjl9u2CYIaFawYAmy0a_QReCKTAt6wsxhrN56sn_utERb5wpW8dOmW1hEYOm1DkSNSseH7jWlc8TMxobHgoDwOmC6VMz6rOnsp2I36kP8HVpAPkAxr531WDCKufnhTHssMEq70oeOMBTNzAZ2UcppxX2tJlqmK27DZD-FyXa5K5VD6eE8csjrBczgH",
-          "x-amzn-shipping-business-id": "AmazonShipping_IN",
-          "format": "PNG",
-          "Content-Type": "application/json"
-        },
-        timeout: 20000,
-      });
-      const document = response?.data?.payload?.packageDocumentDetail?.packageDocuments ?.find(d => d.type === "LABEL");
-      if (!document?.contents) {
-        throw new Error("Amazon label document not found");
+          "Content-Type": "application/json",
+          "x-amz-access-token": token,
+          "x-amzn-shipping-business-id": "AmazonShipping_IN"
+        }
       }
-      const pngBuffer = Buffer.from(document.contents, "base64");
-      return {
-        buffer: pngBuffer,
-        format: document.format, // PNG
-        fileName: `amazon_label_${data.amazon_shipment_id}.png`,
-      };
+    );
+
+    return response.data;
+
+  } catch (err) {
+    console.error("[CREATE SHIPMENT ERROR]", err?.response?.data || err);
+    return false;
+  }
+  }
+
+  async cancelShipment({ amazon_shipment_id }) {
+    try {
+      const token = await this.generateATSToken();
+      if (!token) throw new Error("Token failed");
+      const url = `${ATS_CANCEL_SHIPMENT_FORWARD}/${amazon_shipment_id}/cancel`;
+      const res = await axios.put(url, {}, {
+        headers: {
+          "x-amz-access-token": token,
+          "Content-Type": "application/json",
+          "x-amzn-shipping-business-id": "AmazonShipping_IN"
+        }
+      });
+      return res.data;
     } catch (err) {
-      console.error(
-        "[AMAZON LABEL DOWNLOAD ERROR]",
-        err?.response?.data || err.message
-      );
+      console.error("[CANCEL ERROR]", err?.response?.data || err);
       return false;
     }
   }
+
+  async downloadShipmentLabel({ amazon_shipment_id }) {
+  try {
+    const token = await this.generateATSToken();
+    if (!token) throw new Error("Token failed");
+
+    const url = `${ATS_LABEL_DOWNLOAD_FORWARD}/${amazon_shipment_id}/documents`;
+
+    const res = await axios.get(url, {
+      headers: {
+        "x-amz-access-token": token,
+        "x-amzn-shipping-business-id": "AmazonShipping_IN"
+      }
+    });
+
+    const doc = res.data?.payload?.packageDocumentDetail?.packageDocuments
+      ?.find(d => d.type === "LABEL");
+
+    if (!doc) throw new Error("Label not found");
+
+    return {
+      buffer: Buffer.from(doc.contents, "base64"),
+      format: doc.format,
+      fileName: `amazon_${amazon_shipment_id}.${doc.format.toLowerCase()}`
+    };
+
+  } catch (err) {
+    console.error("[LABEL ERROR]", err?.response?.data || err);
+    return false;
+  }
+}
 }
 
 export default new ATSProvider();
