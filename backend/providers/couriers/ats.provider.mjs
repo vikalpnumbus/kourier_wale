@@ -108,6 +108,7 @@ class ATSProvider {
         dpi: 300,
         format: "PDF",
         pageLayout: "DEFAULT",
+        needFileJoining: false, // ✅ FIX
         requestedDocumentTypes: ["LABEL"],
         size: {
           length: 6,
