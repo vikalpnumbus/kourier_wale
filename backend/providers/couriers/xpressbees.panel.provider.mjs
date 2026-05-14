@@ -55,7 +55,7 @@ class Provider {
   payment_type: data.paymentType,
   order_amount: data.orderAmount,
 
-  package_weight: data.packageDetails.weight / 1000,
+  package_weight: Number(data.packageDetails.weight), 
   package_length: data.packageDetails.length,
   package_breadth: data.packageDetails.breadth,
   package_height: data.packageDetails.height,
