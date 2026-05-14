@@ -526,12 +526,12 @@ class Service {
 
       if (code.includes("xb_panel")) {
         const courierMap = {
-          "Air Xpressbees 0.5 K.G": "6",
-          "Surface Xpressbees 0.5 K.G": "1",
-          "Xpressbees 1 K.G": "12298",
-          "Xpressbees 2 K.G": "2",
-          "Xpressbees 5 K.G": "3",
-          "Xpressbees 10 K.G": "4",
+          "Air Xpressbees 0.5 K.G (Panel)": "6",
+          "Surface Xpressbees 0.5 K.G (Panel)": "1",
+          "Xpressbees 1 K.G (Panel)": "12298",
+          "Xpressbees 2 K.G (Panel)": "2",
+          "Xpressbees 5 K.G (Panel)": "3",
+          "Xpressbees 10 K.G (Panel)": "4",
         };
         console.log("name =>", name);
         const courierid = courierMap[name];
