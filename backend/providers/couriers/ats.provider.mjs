@@ -189,7 +189,7 @@ class ATSProvider {
           }
         ],
         serviceSelection: {
-          serviceId: ["SWA-IN-OA"]
+          serviceId: ["ATS_STANDARD"]
         },
         taxDetails: {
           gstId: "ANBP1234"
