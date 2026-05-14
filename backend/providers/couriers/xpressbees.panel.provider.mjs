@@ -51,34 +51,48 @@ class Provider {
     const warehouse = data.warehouses[0].dataValues;
 
     const payload = {
-      order_number: data.orderId,
-      payment_type: data.paymentType === "cod" ? "cod" : "prepaid",
-      order_amount: data.orderAmount,
+  order_number: data.orderId,
+  payment_type: data.paymentType,
+  order_amount: data.orderAmount,
 
-      consignee_name: `${data.shippingDetails.fname} ${data.shippingDetails.lname}`,
-      consignee_address: data.shippingDetails.address,
-      consignee_city: data.shippingDetails.city,
-      consignee_state: data.shippingDetails.state,
-      consignee_pincode: data.shippingDetails.pincode,
-      consignee_phone: data.shippingDetails.phone,
+  package_weight: data.packageDetails.weight / 1000,
+  package_length: data.packageDetails.length,
+  package_breadth: data.packageDetails.breadth,
+  package_height: data.packageDetails.height,
 
-      product_name: data.products[0]?.name,
-      quantity: data.products[0]?.qty,
+  consignee: {
+    name: `${data.shippingDetails.fname} ${data.shippingDetails.lname}`,
+    address: data.shippingDetails.address,
+    city: data.shippingDetails.city,
+    state: data.shippingDetails.state,
+    pincode: data.shippingDetails.pincode,
+    phone: data.shippingDetails.phone,
+  },
 
-      weight: data.packageDetails.weight / 1000,
-      length: data.packageDetails.length,
-      breadth: data.packageDetails.breadth,
-      height: data.packageDetails.height,
+  pickup: {
+    warehouse_name: "default", // ⚠️ REQUIRED
+    name: data.warehouses[0].dataValues.name,
+    address: data.warehouses[0].dataValues.address,
+    city: data.warehouses[0].dataValues.city,
+    state: data.warehouses[0].dataValues.state,
+    pincode: data.warehouses[0].dataValues.pincode,
+    phone: data.warehouses[0].dataValues.phone || "9999999999", // ⚠️ FIX
+  },
 
-      pickup_name: warehouse.name,
-      pickup_address: warehouse.address,
-      pickup_city: warehouse.city,
-      pickup_state: warehouse.state,
-      pickup_pincode: warehouse.pincode,
-      pickup_phone: warehouse.phone,
+  order_items: [
+    {
+      name: data.products[0]?.name,
+      qty: Number(data.products[0]?.qty),
+      price: String(data.products[0]?.price),
+      sku: data.products[0]?.sku || "sku001",
+    },
+  ],
 
-      courier_id: courierid,
-    };
+  collectable_amount:
+    data.paymentType === "cod" ? data.collectableAmount : 0,
+
+  courier_id: Number(data.courier_id),
+};
 
     console.log("XB FINAL PAYLOAD =>", payload);
 
