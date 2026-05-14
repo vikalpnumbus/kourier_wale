@@ -1,83 +1,128 @@
 <html>
   <head>
-    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia" /> -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
     <style>
-      /* @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;1,400&display=swap"); */
-
-      body {
-        padding: 18px;
-        /* margin-top: -230px; */
-        font-family: "Poppins", sans-serif;
-        font-size: 4px;
-        background-color: #eee;
-        /* width: 210mm;
-        height: 297mm; */
-        margin: auto;
-        /* transform: scale(2); */
-        /* transform-origin: top left; */
-        overflow: hidden;
+        .top-band{
+        background:#0A0A0F;padding:18px 28px 16px;
+        display:flex;align-items:center;justify-content:space-between;
+        position:relative;overflow:hidden
       }
-
-      p {
-        margin: 0pt;
-        /* line-height: 1.9; */
+      .top-band::after{
+        content:'';position:absolute;top:-40px;right:60px;
+        width:180px;height:180px;border-radius:50%;
+        background:radial-gradient(circle,rgba(61,107,255,.18) 0%,transparent 70%);
+        pointer-events:none
       }
-
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        margin-block: 0;
+      .brand{display:flex;align-items:center;gap:8px}
+      .brand-logo{width:30px;height:30px}
+      .brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#fff;letter-spacing:-.04em}
+      .brand-name span{color:#3D6BFF}
+      .doc-type-wrap{text-align:right;position:relative;z-index:1}
+      .doc-type{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#fff;letter-spacing:-.02em;line-height:1}
+      .doc-sub{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:3px}
+      .accent-line{height:3px;background:linear-gradient(90deg,#3D6BFF 0%,#6B7AFF 40%,#F5A623 80%,transparent 100%)}
+      .meta-row{
+        display:flex;justify-content:space-between;align-items:flex-start;
+        padding:16px 28px 14px;border-bottom:1px solid #E8EBF2;background:#F7F6F2
       }
-
-      table {
-        border-spacing: 0;
+      .meta-block{display:flex;flex-direction:column;gap:2px}
+      .meta-lbl{font-family:'JetBrains Mono',monospace;font-size:.48rem;letter-spacing:.16em;text-transform:uppercase;color:#8B93B0}
+      .meta-val{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:500;color:#0A0A0F;margin-top:2px}
+      .meta-val.big{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:#3D6BFF}
+      .status-badge{
+        background:#E6F7EE;border:1px solid #B3E8C8;border-radius:100px;
+        padding:4px 12px;font-family:'JetBrains Mono',monospace;font-size:.52rem;font-weight:600;
+        letter-spacing:.1em;text-transform:uppercase;color:#2D8A4E;
+        display:flex;align-items:center;gap:5px
       }
-
-      table.items {
-        border: 0.1mm solid #e7e7e7;
+      .status-dot{width:5px;height:5px;border-radius:50%;background:#2D8A4E}
+      .addr-section{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #E8EBF2}
+      .addr-block{padding:16px 28px}
+      .addr-block:first-child{border-right:1px solid #E8EBF2}
+      .addr-title{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.16em;text-transform:uppercase;
+        color:#3D6BFF;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+      .addr-title::after{content:'';flex:1;height:1px;background:#C7D5FF}
+      .addr-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:#0A0A0F;margin-bottom:3px}
+      .addr-line{font-size:.75rem;color:#3D3F5C;line-height:1.55}
+      .addr-highlight{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#3D3F5C;margin-top:5px}
+      .order-pills{
+        display:flex;gap:6px;padding:10px 28px;
+        background:#EEF3FF;border-bottom:1px solid #C7D5FF;flex-wrap:wrap
       }
-
-      .items td {
-        border-left: 0.1mm solid #e7e7e7;
-        border-right: 0.1mm solid #e7e7e7;
-        word-wrap: break-word;
-        /* word-break: break-word; */
+      .pill{display:flex;align-items:center;gap:4px;background:#FFFFFF;
+        border:1px solid #C7D5FF;border-radius:100px;
+        padding:3px 10px;font-family:'JetBrains Mono',monospace;font-size:.52rem;color:#3D3F5C}
+      .pill-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+      .pill.gold{background:#FEF3DC;border-color:#F5D59A;color:#C8830E}
+      .pill.green{background:#E6F7EE;border-color:#B3E8C8;color:#2D8A4E}
+      .pill.blue{background:#EEF3FF;border-color:#C7D5FF;color:#3D6BFF}
+      .items-section{padding:16px 28px}
+      .sec-title{font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;
+        color:#8B93B0;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+      .sec-title::after{content:'';flex:1;height:1px;background:#E8EBF2}
+      table{width:100%;border-collapse:collapse}
+      thead tr{background:#0A0A0F}
+      thead th{
+        padding:7px 10px;text-align:left;
+        font-family:'JetBrains Mono',monospace;font-size:.48rem;letter-spacing:.14em;
+        text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:400
       }
-
-      table thead td {
-        text-align: center;
-        border: 0.1mm solid #e7e7e7;
+      thead th:first-child{padding-left:12px;border-radius:6px 0 0 6px}
+      thead th:last-child{text-align:right;padding-right:12px;border-radius:0 6px 6px 0}
+      tbody tr{border-bottom:1px solid #E8EBF2}
+      tbody tr:last-child{border-bottom:none}
+      tbody tr:nth-child(even){background:#F7F6F2}
+      tbody td{padding:8px 10px;font-size:.76rem;color:#3D3F5C;vertical-align:middle}
+      tbody td:first-child{padding-left:12px;font-weight:500;color:#0A0A0F}
+      tbody td:last-child{text-align:right;padding-right:12px;font-family:'JetBrains Mono',monospace;font-weight:500;color:#0A0A0F}
+      .td-sku{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#8B93B0;margin-top:2px}
+      .td-hsn{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#8B93B0}
+      .td-qty{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;color:#0A0A0F;text-align:center}
+      .td-tax{font-size:.68rem;color:#8B93B0}
+      .totals-section{
+        display:flex;justify-content:flex-end;padding:12px 28px;
+        border-top:1px solid #E8EBF2
       }
-
-      .abc {
-        border: 1px solid #eee;
-        height: 99%;
-        background-color: #fff;
-        border-radius: 8px;
-        padding: 8px;
-        box-sizing: border-box;
+      .totals-box{width:240px}
+      .tot-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+      .tot-lbl{font-size:.75rem;color:#3D3F5C}
+      .tot-val{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#0A0A0F;font-weight:500}
+      .tot-sep{height:1px;background:#E8EBF2;margin:6px 0}
+      .tot-row.grand .tot-lbl{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:#0A0A0F}
+      .tot-row.grand .tot-val{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:#3D6BFF}
+      .tot-row.tax .tot-lbl{color:#8B93B0;font-size:.68rem}
+      .tot-row.tax .tot-val{color:#8B93B0;font-size:.68rem}
+      .amt-words{
+        margin:0 28px 14px;background:#EEF3FF;border:1px solid #C7D5FF;
+        border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px
       }
-
-      .tableHeader {
-        background-color: #cec6c6;
-        font-size: 10px;
-        font-weight: bolder;
-        text-align: center;
-        vertical-align: middle;
-        padding: 6px 4px;
-        word-break: break-word;
-        white-space: normal;
+      .aw-lbl{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:#8B93B0;flex-shrink:0}
+      .aw-val{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;color:#3D6BFF}
+      .bank-section{
+        display:grid;grid-template-columns:1fr 1fr;gap:0;
+        border-top:1px solid #E8EBF2;border-bottom:1px solid #E8EBF2
       }
-
-      .meta-row p {
-        margin: 0;
-        font-size: 14px;
-        line-height: 1.5;
+      .bank-block{padding:14px 28px}
+      .bank-block:first-child{border-right:1px solid #E8EBF2}
+      .bank-row{display:flex;justify-content:space-between;padding:2px 0;font-size:.72rem}
+      .bank-key{color:#8B93B0}
+      .bank-kval{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:500;color:#0A0A0F}
+      .note-text{font-size:.72rem;color:#3D3F5C;line-height:1.6}
+      .doc-footer{
+        padding:12px 28px;display:flex;align-items:center;justify-content:space-between;
+        background:#0A0A0F
       }
+      .df-left{display:flex;flex-direction:column;gap:3px}
+      .df-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:.75rem;color:#fff;letter-spacing:-.03em}
+      .df-brand span{color:#3D6BFF}
+      .df-tagline{font-family:'JetBrains Mono',monospace;font-size:.45rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+      .df-right{text-align:right;font-family:'JetBrains Mono',monospace;font-size:.5rem;color:rgba(255,255,255,.28);letter-spacing:.06em}
+      .watermark{
+        position:absolute;right:-30px;top:50%;transform:translateY(-50%) rotate(90deg);
+        font-family:'Syne',sans-serif;font-weight:800;font-size:7rem;
+        color:rgba(61,107,255,.04);letter-spacing:.1em;pointer-events:none;white-space:nowrap;z-index:0
+      }
+      .sig-line{width:120px;height:1px;background:#0A0A0F;margin-bottom:3px}
     </style>
   </head>
 
@@ -206,7 +251,7 @@
         </tbody>
       </table>
 
-      <table width="100%" style="`font-size: " 12px;margin-top: {{padding_top}}`>
+      <table width="100%">
         <tr>
           <td>
             <table width="30%" align="left" style="font-size: 12px">

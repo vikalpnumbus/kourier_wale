@@ -25,7 +25,7 @@ import WalletHistoryModel from "../model/wallet_history.sql.model.mjs";
 import WarehouseModel from "../model/warehouse.sql.model.mjs";
 import WeightRecoModel from "../model/weightReco.sql.model.mjs";
 import { BaseRepositoryClass } from "./base.sql.repository.mjs";
-
+import ShipmentTrackingModel from "../model/shipmentTracking.sql.model.mjs";
 class Class {
   getRepository(model) {
     const repositories = {
@@ -46,6 +46,7 @@ class Class {
       serviceablePincodes: new BaseRepositoryClass(ServiceablePincodeModel),
 
       shipping: new BaseRepositoryClass(ShippingModel),
+      shipment_tracking: new BaseRepositoryClass(ShipmentTrackingModel),
       courierAWBList: new BaseRepositoryClass(CourierAWBListModel),
       channel: new BaseRepositoryClass(ChannelModel),
       walletHistory: new BaseRepositoryClass(WalletHistoryModel),

@@ -702,6 +702,97 @@ class Service {
       return false;
     }
   }
+
+  async runTrackingCron() {
+    try {
+      console.log("🚀 Tracking Cron Started");
+      const shipments = await ShippingModel.findAll({
+        where: {
+          shipping_status: {
+            [Op.notIn]: ["delivered", "cancelled","rto"],
+          },
+        },
+      });
+      for (const shipment of shipments) {
+          await this.syncTracking(shipment);
+      }
+      console.log("✅ Tracking Cron Completed");
+    } catch (error) {
+      console.error("❌ Cron Error:", error.message);
+    }
+  }
+
+  async syncTracking(shipment) {
+    console.log(`🔄 Syncing tracking for AWB: ${shipment.awb_number}`);
+    try {
+      if (!shipment?.awb_number) return;
+      const trackingData = await Xpressbeespanel.getTracking(shipment.awb_number);
+      console.log("Shipclues tracking data:", trackingData);
+      if (!trackingData) return;
+      const history = trackingData.tracking_history || [];
+      history.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+      const records = [];
+      let lastStatus = null;
+      for (const item of history) {
+        if (!item?.datetime) continue;
+        let status = null;
+        if (item.status) {
+          status = item.status.toLowerCase();
+          lastStatus = status;
+        } else if (item.description) {
+          status = item.description.toLowerCase();
+          lastStatus = status;
+        } else {
+          status = lastStatus;
+        }
+        if (!status) continue;
+        records.push({
+          awb_number: item.awb_number,
+          status,
+          datetime: new Date(item.datetime),
+          shipment_id: shipment.id,
+          description: item.description || "",
+          location: item.location || "",
+        });
+      }
+      if (records.length) {
+        const uniqueMap = new Map();
+
+        for (const r of records) {
+          const key = `${r.awb_number}-${r.status}-${r.datetime}`;
+          if (!uniqueMap.has(key)) {
+            uniqueMap.set(key, r);
+          }
+        }
+        const uniqueRecords = Array.from(uniqueMap.values());
+        await this.trackingRepo.model.bulkCreate(uniqueRecords, {
+          ignoreDuplicates: true, // 👈 important
+        });
+      }
+      console.log(`trackingData:`, trackingData);
+      console.log("Checking for status update...", trackingData);
+      if (trackingData.status) {
+        const newStatus = mapTrackingStatus("shipclues", trackingData.status);
+        if (shipment.shipping_status !== newStatus) {
+          await this.update({
+            data: {
+              id: shipment.id,
+              shipping_status: newStatus,
+              pickup_date: !shipment.pickup_date && trackingData.pickup_date ? trackingData.pickup_date : shipment.pickup_date,
+              estimated_delivery_date: trackingData.estimated_delivery_date ? trackingData.estimated_delivery_date : shipment.estimated_delivery_date,
+              delivered_date: newStatus === "delivered" && trackingData.delivered_date ? trackingData.delivered_date : shipment.delivered_date,
+            },
+          });
+        }
+      }
+      console.log(`✅ Tracking synced: ${shipment.awb_number}`);
+    } catch (error) {
+      console.error(
+        "❌ Tracking Sync Error:",
+        error?.response?.data || error.message
+      );
+    }
+  }
 }
 
 const ShippingService = new Service();

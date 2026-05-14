@@ -147,6 +147,8 @@ class Provider {
             };
         }
     }
+
+    
 }
 
 const XpressBeesPanel = new Provider();
