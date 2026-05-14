@@ -191,9 +191,9 @@ class ATSProvider {
         serviceSelection: {
           serviceId: ["SWA-IN-OA"]
         },
-        // taxDetails: {
-        //   gstId: "ANBP1234"
-        // },
+        taxDetails: {
+        gstId: "09ABBFK9872E1ZZ"
+        },
 
         shipTo: {
           name: shipTo.name,
