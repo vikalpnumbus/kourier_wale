@@ -32,9 +32,15 @@ const stateMap = {
   "Karnataka": "KA",
   "Tamil Nadu": "TN",
 };
-
 const getStateCode = (state) => stateMap[state] || state || "UP";
-
+const formatAddress = (address = "", maxLength = 60) => {
+  if (!address) return "";
+  return address
+    .replace(/[^a-zA-Z0-9\s,.-]/g, "") // remove weird chars
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+};
 class ATSProvider {
   constructor() {
     if (!ATS_GENERATE_TOKEN_URL) throw new Error("ATS_GENERATE_TOKEN_URL missing");
@@ -119,34 +125,28 @@ class ATSProvider {
         shippingDetails,
         warehouses
       } = data;
-
       const itemsList = Array.isArray(items) ? items : (data.products || []);
-
       const shipTo = {
         name: `${shippingDetails?.fname || ""} ${shippingDetails?.lname || ""}`.trim(),
-        address1: shippingDetails?.address,
-        city: shippingDetails?.city,
+        address1: formatAddress(shippingDetails?.address),
+        city: "Noida",
         state: getStateCode(shippingDetails?.state),
         pincode: shippingDetails?.pincode,
         phone: shippingDetails?.phone || "9999999999",
         email: shippingDetails?.email || "customer@test.com"
       };
-
       const wh = warehouses?.[0]?.dataValues || {};
-
       const shipFrom = {
         name: wh?.name || "Warehouse",
-        address1: wh?.address || "Default Address",
+        address1: formatAddress(wh?.address || "Default Address"),
         city: wh?.city,
         state: getStateCode(wh?.state),
         pincode: wh?.pincode,
         phone: wh?.phone || "9999999999",
         email: wh?.email || "warehouse@test.com"
       };
-
       const payload = {
         channelDetails: { channelType: "EXTERNAL" },
-
         labelSpecifications: {
           dpi: 300,
           format: "PDF",
@@ -155,7 +155,6 @@ class ATSProvider {
           requestedDocumentTypes: ["LABEL"],
           size: { length: 6, width: 4, unit: "INCH" }
         },
-
         packages: [
           {
             dimensions: {
@@ -194,7 +193,6 @@ class ATSProvider {
         taxDetails: {
         gstId: "09ABBFK9872E1ZZ"
         },
-
         shipTo: {
           name: shipTo.name,
           addressLine1: shipTo.address1,
