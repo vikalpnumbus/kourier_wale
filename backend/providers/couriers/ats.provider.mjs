@@ -22,12 +22,28 @@ const num = (v, fallback = 1) => {
   return Math.round(n);
 };
 
+/**
+ * Convert state name → code (IMPORTANT)
+ */
+const stateMap = {
+  "Uttar Pradesh": "UP",
+  "Delhi": "DL",
+  "Maharashtra": "MH",
+  "Karnataka": "KA",
+  "Tamil Nadu": "TN",
+};
+
+const getStateCode = (state) => stateMap[state] || state || "UP";
+
 class ATSProvider {
   constructor() {
     if (!ATS_GENERATE_TOKEN_URL) throw new Error("ATS_GENERATE_TOKEN_URL missing");
     if (!ATS_REFRESH_TOKEN) throw new Error("ATS_REFRESH_TOKEN missing");
     if (!ATS_CLIENT_IDENTIFIER) throw new Error("ATS_CLIENT_IDENTIFIER missing");
     if (!ATS_CLIENT_SECRET) throw new Error("ATS_CLIENT_SECRET missing");
+    if (!AWS_ACCESS_KEY) throw new Error("AWS_ACCESS_KEY missing");
+    if (!AWS_SECRET_KEY) throw new Error("AWS_SECRET_KEY missing");
+
     this.accessToken = null;
     this.tokenExpiry = null;
   }
@@ -59,9 +75,6 @@ class ATSProvider {
     }
   }
 
-  /**
-   * ✅ COMMON SIGNED REQUEST
-   */
   async signedRequest(method, url, payload = null) {
     const token = await this.generateATSToken();
     if (!token) throw new Error("Token failed");
@@ -82,14 +95,10 @@ class ATSProvider {
       body: payload ? JSON.stringify(payload) : undefined,
     };
 
-    // ✅ SIGN REQUEST
     aws4.sign(opts, {
       accessKeyId: AWS_ACCESS_KEY,
       secretAccessKey: AWS_SECRET_KEY,
     });
-
-    // DEBUG (optional)
-    // console.log("SIGNED HEADERS:", opts.headers);
 
     const response = await axios({
       method,
@@ -102,7 +111,6 @@ class ATSProvider {
   }
 
   async createShipment(data) {
-    console.log("payloads:", data);
     try {
       const {
         orderId,
@@ -112,19 +120,16 @@ class ATSProvider {
         warehouses
       } = data;
 
-      const itemsList = Array.isArray(items)
-        ? items
-        : (data.products || []);
+      const itemsList = Array.isArray(items) ? items : (data.products || []);
 
       const shipTo = {
-        name: `${shippingDetails?.fname || ""} ${shippingDetails?.lname || ""}`,
+        name: `${shippingDetails?.fname || ""} ${shippingDetails?.lname || ""}`.trim(),
         address1: shippingDetails?.address,
-        address2: "",
         city: shippingDetails?.city,
-        state: shippingDetails?.state,
+        state: getStateCode(shippingDetails?.state),
         pincode: shippingDetails?.pincode,
-        phone: shippingDetails?.phone,
-        email: "test@gmail.com"
+        phone: shippingDetails?.phone || "9999999999",
+        email: shippingDetails?.email || "customer@test.com"
       };
 
       const wh = warehouses?.[0]?.dataValues || {};
@@ -133,26 +138,24 @@ class ATSProvider {
         name: wh?.name || "Warehouse",
         address1: wh?.address || "Default Address",
         city: wh?.city,
-        state: wh?.state,
+        state: getStateCode(wh?.state),
         pincode: wh?.pincode,
-        phone: wh?.phone,
+        phone: wh?.phone || "9999999999",
         email: wh?.email || "warehouse@test.com"
       };
 
       const payload = {
         channelDetails: { channelType: "EXTERNAL" },
+
         labelSpecifications: {
           dpi: 300,
           format: "PDF",
           pageLayout: "DEFAULT",
           needFileJoining: false,
           requestedDocumentTypes: ["LABEL"],
-          size: {
-            length: 6,
-            width: 4,
-            unit: "INCH"
-          }
+          size: { length: 6, width: 4, unit: "INCH" }
         },
+
         packages: [
           {
             dimensions: {
@@ -166,7 +169,7 @@ class ATSProvider {
               value: num(packageDetails?.weight, 500)
             },
             insuredValue: {
-              value: num(packageDetails?.price, 1),
+              value: num(packageDetails?.price || 100),
               unit: "INR"
             },
             items: itemsList.map((item, i) => ({
@@ -185,16 +188,20 @@ class ATSProvider {
             packageClientReferenceId: orderId
           }
         ],
-        serviceSelection: {
-          serviceId: ["SWA-IN-OA"]
-        },
-        taxDetails: {
-          gstId: "09ABCDE1234F1Z5"
-        },
+
+        // ⚠️ comment for now (depends on account)
+        // serviceSelection: {
+        //   serviceId: ["SWA-IN-OA"]
+        // },
+
+        // ⚠️ optional
+        // taxDetails: {
+        //   gstId: "YOUR_REAL_GST"
+        // },
+
         shipTo: {
           name: shipTo.name,
           addressLine1: shipTo.address1,
-          addressLine2: shipTo.address2,
           city: shipTo.city,
           stateOrRegion: shipTo.state,
           postalCode: shipTo.pincode,
@@ -202,6 +209,7 @@ class ATSProvider {
           phoneNumber: shipTo.phone,
           email: shipTo.email
         },
+
         shipFrom: {
           name: shipFrom.name,
           addressLine1: shipFrom.address1,
@@ -214,6 +222,8 @@ class ATSProvider {
         }
       };
 
+      console.log("FINAL PAYLOAD:", JSON.stringify(payload, null, 2));
+
       return await this.signedRequest(
         "POST",
         ATS_CREATE_SHIPMENT_FORWARD,
@@ -221,8 +231,7 @@ class ATSProvider {
       );
 
     } catch (err) {
-      console.log("full error:", err);
-      console.error("[CREATE SHIPMENT ERROR]", err?.response?.data || err);
+      console.error("❌ FULL ERROR:", err?.response?.data || err);
       return false;
     }
   }
@@ -230,9 +239,7 @@ class ATSProvider {
   async cancelShipment({ amazon_shipment_id }) {
     try {
       const url = `${ATS_CANCEL_SHIPMENT_FORWARD}/${amazon_shipment_id}/cancel`;
-
       return await this.signedRequest("PUT", url);
-
     } catch (err) {
       console.error("[CANCEL ERROR]", err?.response?.data || err);
       return false;
