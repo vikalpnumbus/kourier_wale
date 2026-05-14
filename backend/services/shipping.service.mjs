@@ -660,6 +660,16 @@ class Service {
           console.log("✅ Shiprocket shipment cancelled");
         }
       }
+      if (existingShipmentData.shipment_error == null) {
+        if (["12","13","14","15","16","17","18"].includes(existingShipmentData.courier_id))
+        {
+          const shipmentRes = await Xpressbeespanel.cancelShipment(existingShipmentData.awb_number);
+          if (!shipmentRes || !shipmentRes.success) {
+            throw new Error(shipmentRes?.error || "XB Cancel Failed");
+          }
+          console.log("✅ Xpressbees Shipment Cancelled");
+        }
+      }
       if (existingShipmentData.shipping_status === "booked" && existingShipmentData.awb_number)
       {
         const refundAmount = Number(existingShipmentData.freight_charge || 0) + Number(existingShipmentData.cod_price || 0);
