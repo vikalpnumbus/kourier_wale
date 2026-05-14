@@ -384,7 +384,8 @@ class Service {
   async handleCreateSingleShipment(data) {
     try {
       const { courier } = data;
-      const { code } = courier?.data?.result?.[0];
+      const { code, name} = courier?.data?.result?.[0];
+      console.log()
       // ================= XpressBees =================
       if (code.includes("xpressbees")) {
         const res = await XpressBeesProvider.createShipment(data);
@@ -532,8 +533,9 @@ class Service {
           "Xpressbees 5 K.G": "3",
           "Xpressbees 10 K.G": "4",
         };
-        console.log("code.name =>", code.name);
-        const courierid = courierMap[code.name];
+        console.log("name =>", name);
+        const courierid = courierMap[name];
+        console.log(courierid);
         if (!courierid) {
           return {
             success: false,
@@ -549,6 +551,7 @@ class Service {
               "Xpressbees Failed To Create Shipment.",
           };
         }
+
         return {
           success: true,
           awb_number:
