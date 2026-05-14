@@ -30,9 +30,7 @@ class Provider {
             }
             );
             console.log("XB login response =>", response.data);
-            const token =
-            response.data?.data?.token ||
-            response.data?.token;
+            const token = response.data?.data || response.data?.token;
             if (!token) {
             throw new Error("Token not found in response");
             }
@@ -46,7 +44,7 @@ class Provider {
             return false;
         }
     }
-    async createShipment(data) {
+    async createShipment(data, courierid) {
         console.log("payload request:", data);
         try {
             const token = await this.generateToken();
@@ -94,6 +92,7 @@ class Provider {
                 sku: data.sku || "sku001",
                 },
             ],
+            courier_id: courierid,
             collectable_amount:
                 data.payment_type === "cod" ? data.collectable_amount : 0,
             };
