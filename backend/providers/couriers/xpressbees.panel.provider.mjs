@@ -87,7 +87,7 @@ class Provider {
             order_items: [
                 {
                 name: data.product_name,
-                qty: Number(data.qty) || 1, // ✅ fix
+                qty: Number(data.qty) || 1,
                 price: String(data.price),
                 sku: data.sku || "sku001",
                 },
