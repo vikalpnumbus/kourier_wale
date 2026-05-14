@@ -533,9 +533,7 @@ class Service {
           "Xpressbees 5 K.G (Panel)": "3",
           "Xpressbees 10 K.G (Panel)": "4",
         };
-        console.log("name =>", name);
         const courierid = courierMap[name];
-        console.log(courierid);
         if (!courierid) {
           return {
             success: false,
@@ -543,19 +541,25 @@ class Service {
           };
         }
         const res = await Xpressbeespanel.createShipment(data, courierid);
-        if (!res) {
+        if (!res || !res.status) {
           return {
             success: false,
             error:
+              res?.error ||
               Xpressbeespanel.error?.message ||
               "Xpressbees Failed To Create Shipment.",
           };
         }
-
+        const awb = res?.data?.awb_number;
+        if (!awb) {
+          return {
+            success: false,
+            error: "AWB not received from Xpressbees",
+          };
+        }
         return {
           success: true,
-          awb_number:
-            res?.GenerateWayBillResult?.AWBNo || res?.awb_number || null,
+          awb_number: awb,
         };
       }
       return {
