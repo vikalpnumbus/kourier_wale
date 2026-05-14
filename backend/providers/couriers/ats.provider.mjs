@@ -188,16 +188,12 @@ class ATSProvider {
             packageClientReferenceId: orderId
           }
         ],
-
-        // ⚠️ comment for now (depends on account)
-        // serviceSelection: {
-        //   serviceId: ["SWA-IN-OA"]
-        // },
-
-        // ⚠️ optional
-        // taxDetails: {
-        //   gstId: "YOUR_REAL_GST"
-        // },
+        serviceSelection: {
+          serviceId: ["SWA-IN-OA"]
+        },
+        taxDetails: {
+          gstId: "ANBP1234"
+        },
 
         shipTo: {
           name: shipTo.name,
