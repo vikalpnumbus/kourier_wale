@@ -16,13 +16,32 @@ class Provider {
     async generateToken() {
         try {
             const url = "https://shipment.xpressbees.com/api/users/login";
-            const response = await axios.post(url, {
-            email: this.XB_PANEL_EMAIL,
-            password: this.XB_PANEL_PASSWORD,
-            });
-            return response.data?.data?.token;
+            const response = await axios.post(
+            url,
+            JSON.stringify({
+                email: this.XB_PANEL_EMAIL,
+                password: this.XB_PANEL_PASSWORD,
+            }),
+            {
+                headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                },
+            }
+            );
+            console.log("XB login response =>", response.data);
+            const token =
+            response.data?.data?.token ||
+            response.data?.token;
+            if (!token) {
+            throw new Error("Token not found in response");
+            }
+            return token;
         } catch (error) {
-            console.error("Xpressbees Token Error:", error.response?.data || error.message);
+            console.error(
+            "Xpressbees Token Error:",
+            error.response?.data || error.message
+            );
             this.error = error;
             return false;
         }
