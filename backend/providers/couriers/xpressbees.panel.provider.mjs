@@ -45,74 +45,65 @@ class Provider {
         }
     }
     async createShipment(data, courierid) {
-        console.log("payload request:", data);
-        try {
-            const token = await this.generateToken();
-            if (!token) {
-            throw new Error("Xpressbees token generate failed");
-            }
-            const url = "https://shipment.xpressbees.com/api/shipments2";
-            const payload = {
-            order_number: data.order_number,
-            unique_order_number: "yes",
-            shipping_charges: data.shipping_charges || 0,
-            discount: data.discount || 0,
-            cod_charges: data.cod_charges || 0,
-            payment_type: data.payment_type || "prepaid",
-            order_amount: data.order_amount,
-            package_weight: data.package_weight,
-            package_length: data.package_length,
-            package_breadth: data.package_breadth,
-            package_height: data.package_height,
-            request_auto_pickup: "yes",
-            consignee: {
-                name: data.customer_name,
-                address: data.address,
-                address_2: data.address_2 || "",
-                city: data.city,
-                state: data.state,
-                pincode: data.pincode,
-                phone: data.phone,
-            },
-            pickup: {
-                warehouse_name: data.warehouse_name || "default",
-                name: data.pickup_name,
-                address: data.pickup_address,
-                address_2: data.pickup_address_2 || "",
-                city: data.pickup_city,
-                state: data.pickup_state,
-                pincode: data.pickup_pincode,
-                phone: data.pickup_phone,
-            },
-            order_items: [
-                {
-                name: data.product_name,
-                qty: Number(data.qty) || 1,
-                price: String(data.price),
-                sku: data.sku || "sku001",
-                },
-            ],
-            courier_id: courierid,
-            collectable_amount:
-                data.payment_type === "cod" ? data.collectable_amount : 0,
-            };
-            const response = await axios.post(url, payload, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-            });
-            return response.data;
+  try {
+    const token = await this.generateToken();
 
-        } catch (error) {
-            console.error(
-            "Xpressbees Shipment Error:",
-            error.response?.data || error.message
-            );
-            this.error = error;
-            return false;
-        }
-    }
+    const warehouse = data.warehouses[0].dataValues;
+
+    const payload = {
+      order_number: data.orderId,
+      payment_type: data.paymentType === "cod" ? "cod" : "prepaid",
+      order_amount: data.orderAmount,
+
+      consignee_name: `${data.shippingDetails.fname} ${data.shippingDetails.lname}`,
+      consignee_address: data.shippingDetails.address,
+      consignee_city: data.shippingDetails.city,
+      consignee_state: data.shippingDetails.state,
+      consignee_pincode: data.shippingDetails.pincode,
+      consignee_phone: data.shippingDetails.phone,
+
+      product_name: data.products[0]?.name,
+      quantity: data.products[0]?.qty,
+
+      weight: data.packageDetails.weight / 1000,
+      length: data.packageDetails.length,
+      breadth: data.packageDetails.breadth,
+      height: data.packageDetails.height,
+
+      pickup_name: warehouse.name,
+      pickup_address: warehouse.address,
+      pickup_city: warehouse.city,
+      pickup_state: warehouse.state,
+      pickup_pincode: warehouse.pincode,
+      pickup_phone: warehouse.phone,
+
+      courier_id: courierid,
+    };
+
+    console.log("XB FINAL PAYLOAD =>", payload);
+
+    const response = await axios.post(
+      "https://shipment.xpressbees.com/api/shipments2",
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data;
+
+  } catch (error) {
+    console.error(
+      "Xpressbees Shipment Error:",
+      error.response?.data || error.message
+    );
+    this.error = error;
+    return false;
+  }
+}
 }
 
 const XpressBeesPanel = new Provider();
