@@ -524,36 +524,37 @@ class Service {
       // }
 
       if (code.includes("xb_panel")) {
-      const courierMap = {
-        "Air Xpressbees 0.5 K.G": "6",
-        "Surface Xpressbees 0.5 K.G": "1",
-        "Xpressbees 1 K.G": "12298",
-        "Xpressbees 2 K.G": "2",
-        "Xpressbees 5 K.G": "3",
-        "Xpressbees 10 K.G": "4",
-      };
-      const courierid = courierMap[code.name];
-      if (!courierid) {
+        const courierMap = {
+          "Air Xpressbees 0.5 K.G": "6",
+          "Surface Xpressbees 0.5 K.G": "1",
+          "Xpressbees 1 K.G": "12298",
+          "Xpressbees 2 K.G": "2",
+          "Xpressbees 5 K.G": "3",
+          "Xpressbees 10 K.G": "4",
+        };
+        console.log("code.name =>", code.name);
+        const courierid = courierMap[code.name];
+        if (!courierid) {
+          return {
+            success: false,
+            error: "Invalid Xpressbees courier selected",
+          };
+        }
+        const res = await Xpressbeespanel.createShipment(data, courierid);
+        if (!res) {
+          return {
+            success: false,
+            error:
+              Xpressbeespanel.error?.message ||
+              "Xpressbees Failed To Create Shipment.",
+          };
+        }
         return {
-          success: false,
-          error: "Invalid Xpressbees courier selected",
+          success: true,
+          awb_number:
+            res?.GenerateWayBillResult?.AWBNo || res?.awb_number || null,
         };
       }
-      const res = await Xpressbeespanel.createShipment(data, courierid);
-      if (!res) {
-        return {
-          success: false,
-          error:
-            Xpressbeespanel.error?.message ||
-            "Xpressbees Failed To Create Shipment.",
-        };
-      }
-      return {
-        success: true,
-        awb_number:
-          res?.GenerateWayBillResult?.AWBNo || res?.awb_number || null,
-      };
-    }
       return {
         success: false,
         error: "Unsupported courier",
