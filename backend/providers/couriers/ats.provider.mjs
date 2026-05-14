@@ -117,6 +117,7 @@ class ATSProvider {
   }
 
   async createShipment(data) {
+    console.log("Payload Before the Pass:", data);
     try {
       const {
         orderId,
@@ -129,21 +130,21 @@ class ATSProvider {
       const shipTo = {
         name: `${shippingDetails?.fname || ""} ${shippingDetails?.lname || ""}`.trim(),
         address1: formatAddress(shippingDetails?.address),
-        city: "Noida",
+        city: shippingDetails?.city,
         state: getStateCode(shippingDetails?.state),
         pincode: shippingDetails?.pincode,
-        phone: shippingDetails?.phone || "9999999999",
-        email: shippingDetails?.email || "customer@test.com"
+        phone: shippingDetails?.phone,
+        email: shippingDetails?.email || "customer@veygo.in"
       };
       const wh = warehouses?.[0]?.dataValues || {};
       const shipFrom = {
-        name: wh?.name || "Warehouse",
-        address1: formatAddress(wh?.address || "Default Address"),
+        name: wh?.name,
+        address1: formatAddress(wh?.address),
         city: wh?.city,
         state: getStateCode(wh?.state),
         pincode: wh?.pincode,
-        phone: wh?.phone || "9999999999",
-        email: wh?.email || "warehouse@test.com"
+        phone: wh?.contactPhone,
+        email: wh?.email || "warehouse@veygo.in"
       };
       const payload = {
         channelDetails: { channelType: "EXTERNAL" },
@@ -203,7 +204,6 @@ class ATSProvider {
           phoneNumber: shipTo.phone,
           email: shipTo.email
         },
-
         shipFrom: {
           name: shipFrom.name,
           addressLine1: shipFrom.address1,
@@ -215,15 +215,8 @@ class ATSProvider {
           email: shipFrom.email
         }
       };
-
       console.log("FINAL PAYLOAD:", JSON.stringify(payload, null, 2));
-
-      return await this.signedRequest(
-        "POST",
-        ATS_CREATE_SHIPMENT_FORWARD,
-        payload
-      );
-
+      return await this.signedRequest("POST",ATS_CREATE_SHIPMENT_FORWARD,payload);
     } catch (err) {
       console.error("❌ FULL ERROR:", err?.response?.data || err);
       return false;
