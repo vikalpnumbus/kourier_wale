@@ -9,6 +9,8 @@ import {
   ATS_CREATE_SHIPMENT_FORWARD,
   ATS_CANCEL_SHIPMENT_FORWARD,
   ATS_LABEL_DOWNLOAD_FORWARD,
+  AWS_ACCESS_KEY,
+  AWS_SECRET_KEY,
 } from "../../configurations/base.config.mjs";
 
 /**
@@ -82,8 +84,8 @@ class ATSProvider {
 
     // ✅ SIGN REQUEST
     aws4.sign(opts, {
-      accessKeyId: process.env.AWS_ACCESS_KEY,
-      secretAccessKey: process.env.AWS_SECRET_KEY,
+      accessKeyId: AWS_ACCESS_KEY,
+      secretAccessKey: AWS_SECRET_KEY,
     });
 
     // DEBUG (optional)
@@ -185,6 +187,9 @@ class ATSProvider {
         ],
         serviceSelection: {
           serviceId: ["SWA-IN-OA"]
+        },
+        taxDetails: {
+          gstId: "09ABCDE1234F1Z5"
         },
         shipTo: {
           name: shipTo.name,
