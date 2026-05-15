@@ -21,7 +21,7 @@
 // console.log("cancelOrder.cancelled_at: ", cancelOrder.order.cancelled_at);
 
 import { parentPort, isMainThread } from "node:worker_threads";
-import { shippingCron, remittanceCron } from "../crons/shipping.cron.mjs";
+import { shippingCron, remittanceCron, startTrackingCron } from "../crons/shipping.cron.mjs";
 import ShopifyProvider from "../providers/couriers/shopify.provider.mjs";
 import ShippingConsumer from "../queue/consumer/shipping.consumer.mjs";
 import AdminExportsConsumer from "../queue/consumer/admin/admin.exports.consumer.mjs";
@@ -35,6 +35,7 @@ import AdminImportsConsumer from "../queue/consumer/admin/admin.imports.consumer
   await AdminImportsConsumer.handleImportProcessConsumer();
   await shippingCron.start();
   await remittanceCron.start();
+  await startTrackingCron.start();
 
   // Only send ready signal if actually running inside Worker Thread
   if (!isMainThread && parentPort) {

@@ -59,3 +59,12 @@ export const remittanceCron = cron.schedule("* * * * *", async () => {
   }
 });
 
+export const startTrackingCron = cron.schedule("* * * * *", async () => {
+  try {
+    console.info("⏰ Tracking Cron job running every minute:", new Date().toLocaleString());
+    await ShippingService.runTrackingCron();
+  } catch (error) {
+    console.error(error);
+  }
+});
+
