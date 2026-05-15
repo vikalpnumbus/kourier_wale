@@ -27,6 +27,7 @@ class Service {
   constructor() {
     this.error = null;
     this.repository = FactoryRepository.getRepository("shipping");
+    this.trackingRepo = FactoryRepository.getRepository("shipment_tracking");
   }
   async create({ data }) {
     try {

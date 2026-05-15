@@ -29,17 +29,13 @@ class Provider {
                 },
             }
             );
-            console.log("XB login response =>", response.data);
             const token = response.data?.data || response.data?.token;
             if (!token) {
             throw new Error("Token not found in response");
             }
             return token;
         } catch (error) {
-            console.error(
-            "Xpressbees Token Error:",
-            error.response?.data || error.message
-            );
+            console.error("Xpressbees Token Error:",error.response?.data || error.message);
             this.error = error;
             return false;
         }
@@ -84,7 +80,6 @@ class Provider {
             collectable_amount: data.paymentType === "cod" ? data.collectableAmount : 0,
             courier_id: Number(courierid),
         };
-        console.log("XB FINAL PAYLOAD =>", payload);
         const response = await axios.post("https://shipment.xpressbees.com/api/shipments2",payload,{
             headers: {
             Authorization: `Bearer ${token}`,
@@ -92,20 +87,15 @@ class Provider {
             },
         }
         );
-        console.log("XB FINAL RESPONSE =>", response.data);
         return response.data;
     } catch (error) {
-        console.error(
-        "Xpressbees Shipment Error:",
-        error.response?.data || error.message
-        );
+        console.error("Xpressbees Shipment Error:",error.response?.data || error.message);
         this.error = error;
         return false;
     }
     }
 
     async cancelShipment(awb) {
-        console.log(awb);
         try
         {
             const token = await this.generateToken();
@@ -124,7 +114,6 @@ class Provider {
                 },
             }
             );
-            console.log("XB CANCEL RESPONSE =>", response.data);
             if (!response.data?.status) {
             return {
                 success: false,
@@ -164,10 +153,7 @@ class Provider {
             );
             return response.data;
         } catch (error) {
-            console.error(
-            "XB Tracking Error:",
-            error?.response?.data || error.message
-            );
+            console.error("XB Tracking Error:",error?.response?.data || error.message);
             return null;
         }
     }
