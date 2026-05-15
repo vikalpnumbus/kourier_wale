@@ -153,7 +153,7 @@ class Provider {
     async getTracking(awb) {
         try {
             const token = await this.generateToken();
-            const response = await axios.post(
+            const response = await axios.get(
             `https://shipment.xpressbees.com/api/shipments2/track/${awb}`,
             {},
             {
