@@ -16,7 +16,7 @@ import BluedartProvider from "../providers/couriers/bluedart.provider.mjs";
 import ShiprocketProvider from "../providers/aggregator/shiprocket.provider.mjs";
 import ShiprocketProviderats from "../providers/aggregator/shiprocket.provider.ats.mjs";
 import ShippingModel from "../model/shipping.sql.model.mjs";
-import mapTrackingStatus from "../utils/statusMapper.mjs"
+import { mapTrackingStatus } from "../utils/statusMapper.mjs";
 const num = (v, fallback = 1) => {
   const n = Number(v);
   if (!Number.isFinite(n) || n <= 0) return fallback;
