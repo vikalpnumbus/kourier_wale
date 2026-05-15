@@ -661,7 +661,7 @@ class Service {
         }
       }
       if (existingShipmentData.shipment_error == null) {
-        if (["12","13","14","15","16","17","18"].includes(existingShipmentData.courier_id))
+        if ([12,13,14,15,16,17,18].includes(existingShipmentData.courier_id))
         {
           const shipmentRes = await Xpressbeespanel.cancelShipment(existingShipmentData.awb_number);
           if (!shipmentRes || !shipmentRes.success) {
