@@ -10,6 +10,7 @@ import {
   handleCancelShipment,
   shippingChargesRead,
   generatePickup,
+  getShipmentTrackingById
 } from "../controllers/shipping.controller.mjs";
 const ShippingRouter = express.Router();
 
@@ -48,4 +49,5 @@ ShippingRouter.post(
   validate(ShippingValidations.generatePickup()), // optional but recommended
   generatePickup
 );
+ShippingRouter.get("/tracking/:id",TokenHandler.authenticateToken,getShipmentTrackingById);
 export default ShippingRouter;

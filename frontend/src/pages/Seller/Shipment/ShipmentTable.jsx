@@ -8,6 +8,7 @@ import Pagination from "../../../Component/Pagination";
 import ShipmentsConfig from "../../../config/Shipments/ShipmentsConfig";
 import warehouseConfig from "../../../config/Warehouse/WarehouseConfig";
 import { useAlert } from '../../../middleware/AlertContext';
+import ShipmentTracking from "./ShipmentTracking";
 function ShipmentsTable() {
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,8 @@ function ShipmentsTable() {
   const [statusCounts, setStatusCounts] = useState({});
   const [activeTab, setActiveTab] = useState("All");
   const { showError, showSuccess } = useAlert();
-  
+  const [trackingPopupOpen, setTrackingPopupOpen] = useState(false);
+  const [trackingData, setTrackingData] = useState(null);
   const shipmentTabs = [
     "All",
     "new",
@@ -269,6 +271,7 @@ function ShipmentsTable() {
 };
 
   return (
+    <>
     <div className="tab-content tab-content-vertical">
       <div className="tab-pane fade show active" role="tabpanel">
         <div>
@@ -428,7 +431,7 @@ function ShipmentsTable() {
                         <span>
                           {data?.courier_name}
                         </span>
-                        <span className="awb_design">
+                        <span className="awb_design" style={{ cursor: "pointer", color: "#4d194d", fontWeight: "600" }} onClick={() => {setTrackingPopupOpen(true);setTrackingData(data);}}>
                           {data?.awb_number}
                         </span>
                       </div>
@@ -469,6 +472,14 @@ function ShipmentsTable() {
         )}
       </div>
     </div>
+    {
+      trackingPopupOpen && ( <ShipmentTracking
+        isOpen={trackingPopupOpen}
+        data={trackingData}
+        onClose={() => setTrackingPopupOpen(false)}
+      />
+    )}
+    </>
   )
 }
 

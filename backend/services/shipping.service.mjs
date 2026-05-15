@@ -725,6 +725,24 @@ class Service {
     }
   }
 
+
+  async getShipmentTrackingById({ shipment_id }) {
+  const trackingRepo = FactoryRepository.getRepository("shipment_tracking");
+  const data = await trackingRepo.model.findAll({
+    where: {
+      shipment_id: Number(shipment_id),
+    },
+    order: [["datetime", "DESC"]],
+    raw: true,
+  });
+  console.log("Tracking data from DB:", data);
+  return {
+    total: data.length,
+    result: data,
+  };
+  }
+
+
   async syncTracking(shipment) {
     console.log(`🔄 Syncing tracking for AWB: ${shipment.awb_number}`);
     try {

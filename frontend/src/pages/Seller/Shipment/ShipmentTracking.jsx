@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../utils/api";
 import ShipmentsConfig from "../../../config/Shipments/ShipmentsConfig";
-import "./shipmentTrackingPopup.css";
+import "../../../assets/ShipModal.css";
 
 const ShipmentTracking = ({ isOpen, onClose, data }) => {
     const [trackingData, setTrackingData] = useState([]);

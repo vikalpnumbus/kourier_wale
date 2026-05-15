@@ -5,6 +5,7 @@ const shipmentsConfig = {
   shipping_charges: apiUrl + "/shipping/shipping-charges",
   cancelshipment: apiUrl + "/shipping/cancelShipment",
   bulkpickup: apiUrl + "/shipping/generate-pickup",
+  shipmenttracking: apiUrl + "/shipping/tracking",
   shipment_bulk_label: apiUrl + "/label-settings/generate"
 };
 export default shipmentsConfig;

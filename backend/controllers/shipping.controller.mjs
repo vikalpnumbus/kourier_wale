@@ -215,6 +215,21 @@ export const handleCancelShipment = async (req, res, next) => {
   }
 };
 
+export const getShipmentTrackingById = async (req, res, next) => {
+  console.log("🔍 Tracking Request Params:", req.params);
+  try {
+    const { id } = req.params;
+    const result = await ShippingService.getShipmentTrackingById({
+      shipment_id: id,
+      userId: req.user.id,
+    });
+    res.success({ data: result });
+  } catch (error) {
+    console.error("❌ Tracking Error:", error);
+    next(error);
+  }
+};
+
 export const generatePickup = async (req, res, next) => {
   const t = await sqlDB.sequelize.transaction();
   try {
