@@ -15,6 +15,8 @@ import ATSProvider from "../providers/couriers/ats.provider.mjs";
 import BluedartProvider from "../providers/couriers/bluedart.provider.mjs";
 import ShiprocketProvider from "../providers/aggregator/shiprocket.provider.mjs";
 import ShiprocketProviderats from "../providers/aggregator/shiprocket.provider.ats.mjs";
+import ShippingModel from "../model/shipping.sql.model.mjs";
+import mapTrackingStatus from "../utils/statusMapper.mjs"
 const num = (v, fallback = 1) => {
   const n = Number(v);
   if (!Number.isFinite(n) || n <= 0) return fallback;
@@ -709,12 +711,12 @@ class Service {
       const shipments = await ShippingModel.findAll({
         where: {
           shipping_status: {
-            [Op.notIn]: ["delivered", "cancelled","rto"],
+            [Op.notIn]: ["delivered", "cancelled", "rto"],
           },
         },
       });
       for (const shipment of shipments) {
-          await this.syncTracking(shipment);
+        await this.syncTracking(shipment);
       }
       console.log("✅ Tracking Cron Completed");
     } catch (error) {
@@ -726,61 +728,42 @@ class Service {
     console.log(`🔄 Syncing tracking for AWB: ${shipment.awb_number}`);
     try {
       if (!shipment?.awb_number) return;
-      const trackingData = await Xpressbeespanel.getTracking(shipment.awb_number);
-      console.log("tracking data:", trackingData);
-      if (!trackingData) return;
-      const history = trackingData.tracking_history || [];
-      history.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
-      const records = [];
-      let lastStatus = null;
-      for (const item of history) {
-        if (!item?.datetime) continue;
-        let status = null;
-        if (item.status) {
-          status = item.status.toLowerCase();
-          lastStatus = status;
-        } else if (item.description) {
-          status = item.description.toLowerCase();
-          lastStatus = status;
-        } else {
-          status = lastStatus;
+      const trackingRes = await Xpressbeespanel.getTracking(shipment.awb_number);
+      if (!trackingRes || !trackingRes.status) return;
+      const data = trackingRes.data || {};
+      const history = data.history || [];
+      history.sort(
+        (a, b) => new Date(a.event_time) - new Date(b.event_time)
+      );
+      const records = history.map((item) => ({
+        awb_number: data.awb_number,
+        shipment_id: shipment.id,
+        status: item.message?.toLowerCase() || "",
+        datetime: new Date(item.event_time),
+        description: item.message || "",
+        location: item.location || "",
+      }));
+      const uniqueMap = new Map();
+      for (const r of records) {
+        const key = `${r.awb_number}-${r.status}-${r.datetime}`;
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, r);
         }
-        if (!status) continue;
-        records.push({
-          awb_number: item.awb_number,
-          status,
-          datetime: new Date(item.datetime),
-          shipment_id: shipment.id,
-          description: item.description || "",
-          location: item.location || "",
-        });
       }
-      if (records.length) {
-        const uniqueMap = new Map();
-
-        for (const r of records) {
-          const key = `${r.awb_number}-${r.status}-${r.datetime}`;
-          if (!uniqueMap.has(key)) {
-            uniqueMap.set(key, r);
-          }
-        }
-        const uniqueRecords = Array.from(uniqueMap.values());
+      const uniqueRecords = Array.from(uniqueMap.values());
+      if (uniqueRecords.length) {
         await this.trackingRepo.model.bulkCreate(uniqueRecords, {
           ignoreDuplicates: true,
         });
       }
-      console.log(`trackingData:`, trackingData);
-      console.log("Checking for status update...", trackingData);
-      if (trackingData.status) {
-        const newStatus = mapTrackingStatus("shipclues", trackingData.status);
+      if (data.status) {
+        const newStatus = mapTrackingStatus("xpressbees", data.status);
         if (shipment.shipping_status !== newStatus) {
           await this.update({
             data: {
               id: shipment.id,
               shipping_status: newStatus,
-              pickup_date: !shipment.pickup_date && trackingData.pickup_date ? trackingData.pickup_date : shipment.pickup_date,
-              estimated_delivery_date: trackingData.estimated_delivery_date ? trackingData.estimated_delivery_date : shipment.estimated_delivery_date,
-              delivered_date: newStatus === "delivered" && trackingData.delivered_date ? trackingData.delivered_date : shipment.delivered_date,
+              delivered_date: newStatus === "delivered" ? new Date() : shipment.delivered_date,
             },
           });
         }

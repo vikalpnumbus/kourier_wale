@@ -150,9 +150,28 @@ class Provider {
         }
     }
 
-    
-
-
+    async getTracking(awb) {
+        try {
+            const token = await this.generateToken();
+            const response = await axios.post(
+            `https://shipment.xpressbees.com/api/shipments2/track/${awb}`,
+            {},
+            {
+                headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                },
+            }
+            );
+            return response.data;
+        } catch (error) {
+            console.error(
+            "XB Tracking Error:",
+            error?.response?.data || error.message
+            );
+            return null;
+        }
+    }
 }
 
 const XpressBeesPanel = new Provider();

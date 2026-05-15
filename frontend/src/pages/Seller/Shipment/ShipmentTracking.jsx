@@ -16,7 +16,6 @@ const ShipmentTracking = ({ isOpen, onClose, data }) => {
                     "Expires": "0",
                 },
             });
-
             console.log("TRACKING DATA:", res.data.data.result);
             setTrackingData(res.data.data.result || []);
         } catch (error) {
@@ -140,13 +139,11 @@ const ShipmentTracking = ({ isOpen, onClose, data }) => {
                                     sortedTracking.map((item, index) => {
                                         const ui = getStatusUI(item.status);
                                         const isLatest = index === 0;
-
                                         return (
                                             <div className="tl-item" key={item.id}>
                                                 <div className={`tl-dot ${isLatest ? "active" : ui.class}`}>
                                                     <i className="fa-solid fa-check" style={{ fontSize: "9px" }}></i>
                                                 </div>
-
                                                 <div className="tl-content">
                                                     <div className="tl-top">
                                                         <div className="tl-label">{ui.label}</div>
