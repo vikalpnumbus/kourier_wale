@@ -105,7 +105,9 @@ class Provider {
     }
 
     async cancelShipment(awb) {
-        try {
+        console.log(awb);
+        try
+        {
             const token = await this.generateToken();
             if (!awb) {
             return {
