@@ -155,7 +155,6 @@ class Provider {
             const token = await this.generateToken();
             const response = await axios.get(
             `https://shipment.xpressbees.com/api/shipments2/track/${awb}`,
-            {},
             {
                 headers: {
                 Authorization: `Bearer ${token}`,
