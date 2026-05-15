@@ -14,7 +14,7 @@ import Xpressbeespanel from "../providers/couriers/xpressbees.panel.provider.mjs
 import ATSProvider from "../providers/couriers/ats.provider.mjs";
 import BluedartProvider from "../providers/couriers/bluedart.provider.mjs";
 import ShiprocketProvider from "../providers/aggregator/shiprocket.provider.mjs";
-import ShiprocketProviderats from "../providers/aggregator/shiprocket.provider.ats.mjs";
+// import ShiprocketProviderats from "../providers/aggregator/shiprocket.provider.ats.mjs";
 import ShippingModel from "../model/shipping.sql.model.mjs";
 import { mapTrackingStatus } from "../utils/statusMapper.mjs";
 const num = (v, fallback = 1) => {
@@ -650,19 +650,19 @@ class Service {
           console.log("✅ Shiprocket shipment cancelled");
         }
       }
-      if (existingShipmentData.shipment_error == null) {
-        if (existingShipmentData.courier_id == "11" || existingShipmentData.courier_id == "12") {
-          const shipmentRes = await ShiprocketProviderats.cancelShipment({
-            awb_number: existingShipmentData.awb_number
-          });
+      // if (existingShipmentData.shipment_error == null) {
+      //   if (existingShipmentData.courier_id == "11" || existingShipmentData.courier_id == "12") {
+      //     const shipmentRes = await ShiprocketProviderats.cancelShipment({
+      //       awb_number: existingShipmentData.awb_number
+      //     });
 
-          if (!shipmentRes) {
-            throw ShiprocketProviderats.error;
-          }
+      //     if (!shipmentRes) {
+      //       throw ShiprocketProviderats.error;
+      //     }
 
-          console.log("✅ Shiprocket shipment cancelled");
-        }
-      }
+      //     console.log("✅ Shiprocket shipment cancelled");
+      //   }
+      // }
       if (existingShipmentData.shipment_error == null) {
         if ([12,13,14,15,16,17,18].includes(existingShipmentData.courier_id))
         {
