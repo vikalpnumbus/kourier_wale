@@ -2,8 +2,8 @@ import axios from "axios";
 import https from "https";
 import {
   SHIPROCKET_LOGIN_URL,
-  SHIPROCKET_EMAIL_ATS,
-  SHIPROCKET_PASSWORD_ATS,
+  SHIPROCKET_EMAIL_MAIN,
+  SHIPROCKET_PASSWORD_MAIN,
 } from "../../configurations/base.config.mjs";
 
 class ShiprocketProvider {
@@ -28,8 +28,8 @@ class ShiprocketProvider {
       const response = await axios.post(
         SHIPROCKET_LOGIN_URL,
         {
-          email: SHIPROCKET_EMAIL_ATS,
-          password: SHIPROCKET_PASSWORD_ATS
+          email: SHIPROCKET_EMAIL_MAIN,
+          password: SHIPROCKET_PASSWORD_MAIN
         },
         {
           httpsAgent: this.agent,
