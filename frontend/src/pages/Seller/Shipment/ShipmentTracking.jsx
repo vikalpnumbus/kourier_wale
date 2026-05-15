@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../utils/api";
 import ShipmentsConfig from "../../../config/Shipments/ShipmentsConfig";
-import "../../../assets/ShipModal.css";
+import "./shipmentTrackingPopup.css";
 
 const ShipmentTracking = ({ isOpen, onClose, data }) => {
     const [trackingData, setTrackingData] = useState([]);
@@ -25,11 +25,9 @@ const ShipmentTracking = ({ isOpen, onClose, data }) => {
     useEffect(() => {
         if (isOpen) Shipmentstracking();
     }, [isOpen]);
-    // ✅ Sort latest first
     const sortedTracking = [...trackingData].sort(
         (a, b) => new Date(b.datetime) - new Date(a.datetime)
     );
-    // ✅ Status mapping
     const getStatusUI = (status) => {
         switch (status) {
             case "shipped":
@@ -62,8 +60,6 @@ const ShipmentTracking = ({ isOpen, onClose, data }) => {
             <div className="tracking-popup-container">
                 <div className="backdrop">
                     <div className="popup">
-
-                        {/* HEADER */}
                         <div className="popup-header">
                             <div className="ph-top">
                                 <div className="ph-badge">
@@ -74,7 +70,6 @@ const ShipmentTracking = ({ isOpen, onClose, data }) => {
                                     <i className="fa-solid fa-xmark"></i>
                                 </div>
                             </div>
-
                             <div className="ph-order">
                                 <div>
                                     <div className="ph-order-id">Order No- {data?.orderId}</div>
@@ -84,8 +79,6 @@ const ShipmentTracking = ({ isOpen, onClose, data }) => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* COURIER */}
                         <div className="courier-strip">
                             <div className="cs-left">
                                 <div className="cs-icon">
@@ -96,7 +89,6 @@ const ShipmentTracking = ({ isOpen, onClose, data }) => {
                                     <div className="cs-awb">AWB: {data?.awb_number}</div>
                                 </div>
                             </div>
-
                             <div className="cs-chips">
                                 <span className="chip chip-cod">
                                     ₹{data?.orderAmount}
@@ -106,41 +98,17 @@ const ShipmentTracking = ({ isOpen, onClose, data }) => {
                                 </span>
                             </div>
                         </div>
-                        {/* <div className="map-placeholder">
-                            <div className="map-route">
-                                <div className="map-city"> 
-                                    <div className="map-city-dot" style={{ background: "var(--primary)" }}></div> 
-                                    <div className="map-city-label">Pune</div> 
-                                </div> 
-                                <div className="map-line"> 
-                                    <div className="map-truck">
-                                        <i className="fa-solid fa-truck" style={{ fontSize: "10px" }}></i>
-                                    </div>
-                                </div>
-                                <div className="map-city"> 
-                                    <div className="map-city-dot" style={{ background: "var(--secondary)" }}></div> 
-                                    <div className="map-city-label">{data?.shippingDetails?.city}</div> 
-                                </div> 
-                            </div>
-                        </div> */}
-                        {/* TIMELINE */}
                         <div className="timeline-section">
                             <div className="ts-header">
                                 <span className="ts-title">Shipment Timeline</span>
                             </div>
-
                             <div className="timeline">
-
-                                {/* ✅ STATIC TIMELINE (UNCHANGED) */}
-                                {/* (tumhara pura static code same rahega) */}
-
-                                {/* ✅ DYNAMIC DATA */}
                                 {sortedTracking.length > 0 &&
                                     sortedTracking.map((item, index) => {
                                         const ui = getStatusUI(item.status);
                                         const isLatest = index === 0;
                                         return (
-                                            <div className="tl-item" key={item.id}>
+                                            <div className="tl-item-tracking" key={item.id}>
                                                 <div className={`tl-dot ${isLatest ? "active" : ui.class}`}>
                                                     <i className="fa-solid fa-check" style={{ fontSize: "9px" }}></i>
                                                 </div>
