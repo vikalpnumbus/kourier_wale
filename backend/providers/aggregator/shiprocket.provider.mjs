@@ -221,5 +221,28 @@ class ShiprocketProvider {
         return null;
       }
     }
+
+    async getTracking(awb) {
+      try {
+        const token = await this.getToken();
+        if (!token) throw new Error("Token failed");
+        const response = await axios.get(
+          `https://apiv2.shiprocket.in/v1/external/courier/track/awb/${awb}`,
+          {
+            httpsAgent: this.agent,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.log("❌ Shiprocket tracking failed");
+        if (error.response) console.log(error.response.data);
+        else console.log(error.message);
+        return null;
+      }
+    }
 }
 export default new ShiprocketProvider();

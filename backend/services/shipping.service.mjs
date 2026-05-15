@@ -478,55 +478,6 @@ class Service {
           awb_number: awbRes.response.data.awb_code,
         };
       }
-
-      // if (code.includes("shiprocket_ats")) {
-      //   const orderRes = await ShiprocketProviderats.createOrder(data);
-      //   if (!orderRes) {
-      //     return {
-      //       success: false,
-      //       error: "Shiprocket order failed",
-      //     };
-      //   }
-      //   const awbRes = await ShiprocketProviderats.assignAWB({
-      //     shipment_id: orderRes.shipment_id,
-      //     courier_id: "697",
-      //   });
-      //   if (!awbRes) {
-      //     return {
-      //       success: false,
-      //       error: "AWB Generation failed",
-      //     };
-      //   }
-      //   return {
-      //     success: true,
-      //     awb_number: awbRes.response.data.awb_code,
-      //   };
-      // }
-
-      // if (code.includes("shiprocket_ats500")) {
-      //   const orderRes = await ShiprocketProviderats.createOrder(data);
-      //   if (!orderRes) {
-      //     return {
-      //       success: false,
-      //       error: "Shiprocket order failed",
-      //     };
-      //   }
-      //   const awbRes = await ShiprocketProviderats.assignAWB({
-      //     shipment_id: orderRes.shipment_id,
-      //     courier_id: "195",
-      //   });
-      //   if (!awbRes) {
-      //     return {
-      //       success: false,
-      //       error: "AWB Generation failed",
-      //     };
-      //   }
-      //   return {
-      //     success: true,
-      //     awb_number: awbRes.response.data.awb_code,
-      //   };
-      // }
-
       if (code.includes("xb_panel")) {
         const courierMap = {
           "Air Xpressbees 0.5 K.G": "6",
@@ -650,19 +601,6 @@ class Service {
           console.log("✅ Shiprocket shipment cancelled");
         }
       }
-      // if (existingShipmentData.shipment_error == null) {
-      //   if (existingShipmentData.courier_id == "11" || existingShipmentData.courier_id == "12") {
-      //     const shipmentRes = await ShiprocketProviderats.cancelShipment({
-      //       awb_number: existingShipmentData.awb_number
-      //     });
-
-      //     if (!shipmentRes) {
-      //       throw ShiprocketProviderats.error;
-      //     }
-
-      //     console.log("✅ Shiprocket shipment cancelled");
-      //   }
-      // }
       if (existingShipmentData.shipment_error == null) {
         if ([12,13,14,15,16,17,18].includes(existingShipmentData.courier_id))
         {
@@ -745,6 +683,7 @@ class Service {
 
   async syncTracking(shipment) {
     console.log(`🔄 Syncing tracking for AWB: ${shipment.awb_number}`);
+    console.log('shipment courier data in DB', shipment.courier_id);
     try {
       if (!shipment?.awb_number) return;
       const trackingRes = await Xpressbeespanel.getTracking(shipment.awb_number);
