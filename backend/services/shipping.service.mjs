@@ -18,6 +18,7 @@ import ShiprocketProvider from "../providers/aggregator/shiprocket.provider.mjs"
 import ShippingModel from "../model/shipping.sql.model.mjs";
 import { mapTrackingStatus } from "../utils/statusMapper.mjs";
 import fs from "fs";
+import path from "path";
 const num = (v, fallback = 1) => {
   const n = Number(v);
   if (!Number.isFinite(n) || n <= 0) return fallback;
@@ -443,12 +444,17 @@ class Service {
         let labelUrl = null;
         if (labelBase64 && awb) {
           const fileName = `${awb}.png`;
-          const filePath = `labels/${fileName}`;
+          const filePath = path.join(
+            process.cwd(),
+            "uploads",
+            "labels",
+            fileName
+          );
           fs.writeFileSync(
             filePath,
             Buffer.from(labelBase64, "base64")
           );
-          labelUrl = filePath;
+          labelUrl = `/uploads/labels/${fileName}`;
         }
         return {
           success: true,
