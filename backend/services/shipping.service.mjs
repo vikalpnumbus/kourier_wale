@@ -597,7 +597,7 @@ class Service {
       {
         if (existingShipmentData.courier_id == "7")
         {
-          const shipmentRes = await ATSProvider.cancelShipment({amazon_shipment_id: existingShipmentData.amazon_shipment_id});
+          const shipmentRes = await ATSProvider.cancelShipment({amazon_shipment_id: existingShipmentData.amazon_shipment_id,awb: existingShipmentData.awb_number});
           if (!shipmentRes)
           {
             throw ATSProvider.error;

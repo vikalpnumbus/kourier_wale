@@ -294,15 +294,25 @@ class ATSProvider {
     }
   }
 
-  async cancelShipment({ amazon_shipment_id }) {
-    try {
-      const url = `${ATS_CANCEL_SHIPMENT_FORWARD}/${amazon_shipment_id}/cancel`;
-      return await this.signedRequest("PUT", url);
-    } catch (err) {
-      console.error("[CANCEL ERROR]", err?.response?.data || err);
-      return false;
-    }
+  async cancelShipment({ amazon_shipment_id, awb }) {
+  try {
+    const url = `${ATS_CANCEL_SHIPMENT_FORWARD}/${amazon_shipment_id}/cancel`;
+    const payload = {
+      reason: "Customer cancelled order",
+      packages: [
+        {
+          trackingId: awb
+        }
+      ]
+    };
+    console.log("CANCEL API URL:", url);
+    console.log("CANCEL PAYLOAD:", payload);
+    return await this.signedRequest("PUT", url, payload);
+  } catch (err) {
+    console.error("[CANCEL ERROR]", err?.response?.data || err);
+    return false;
   }
+}
 
   async downloadShipmentLabel({ amazon_shipment_id }) {
     try {
