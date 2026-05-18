@@ -63,6 +63,24 @@ const formatAddress = (address = "", maxLength = 60) => {
     .trim()
     .slice(0, maxLength);
 };
+
+function formatATSDate(date = new Date()) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return (
+    date.getUTCFullYear() +
+    "-" +
+    pad(date.getUTCMonth() + 1) +
+    "-" +
+    pad(date.getUTCDate()) +
+    "T" +
+    pad(date.getUTCHours()) +
+    ":" +
+    pad(date.getUTCMinutes()) +
+    ":" +
+    pad(date.getUTCSeconds()) +
+    "Z"
+  );
+}
 class ATSProvider {
   constructor() {
     if (!ATS_GENERATE_TOKEN_URL) throw new Error("ATS_GENERATE_TOKEN_URL missing");
@@ -245,7 +263,7 @@ class ATSProvider {
               productType: item.name || "Product",
               invoiceDetails: {   // 🔥 FIX
                 invoiceNumber: orderId,
-                invoiceDate: new Date().toISOString()
+                invoiceDate: formatATSDate()
               }
             }))
           }
