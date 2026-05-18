@@ -159,8 +159,15 @@ const ShippingModel = sqlDB.sequelize.define(
     amazon_shipment_id: {
       type: DataTypes.STRING,
       allowNull: true,
+    },    
+    label_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
-
+    shipment_info: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
     shipment_error: {
       type: DataTypes.STRING,
       allowNull: true,

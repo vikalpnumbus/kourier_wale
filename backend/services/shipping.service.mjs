@@ -430,6 +430,7 @@ class Service {
             err?.errors?.[0]?.message ||
             err?.message ||
             "Amazon failed";
+
           return {
             success: false,
             error: message,
@@ -437,10 +438,10 @@ class Service {
         }
         const payload = res.payload || {};
         console.log("ATS Response", payload);
-        const shipmentId = payload?.shipmentId;
+        const shipmentId = payload?.shipmentId || null;
         const pkg = payload?.packageDocumentDetails?.[0] || {};
-        const awb = pkg?.trackingId;
-        const labelBase64 = pkg?.packageDocuments?.[0]?.contents;
+        const awb = pkg?.trackingId || null;
+        const labelBase64 = pkg?.packageDocuments?.[0]?.contents || null;
         let labelUrl = null;
         if (labelBase64 && awb) {
           const fileName = `${awb}.png`;
@@ -456,10 +457,11 @@ class Service {
           );
           labelUrl = `/uploads/labels/${fileName}`;
         }
+        console.log("FINAL DATA:", {shipmentId,awb,labelUrl});
         return {
           success: true,
-          awb_number: awb,
-          amazon_shipment_id: shipmentId,
+          awb_number: awb,                     // ✅ FIXED
+          amazon_shipment_id: shipmentId,     // ✅ FIXED
           label_url: labelUrl,
           shipment_info: payload?.promise || null,
         };
