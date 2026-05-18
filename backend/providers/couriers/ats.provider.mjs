@@ -33,14 +33,14 @@ const weightInGrams = (v) => {
  */
 function normalizeCity(city) {
   if (!city) return "Delhi";
-  const map = {
+  const stateMap = {
     "north west delhi": "Delhi",
     "south delhi": "Delhi",
     "west delhi": "Delhi",
     "gurgaon": "Gurugram"
   };
   const key = city.toLowerCase().trim();
-  return map[key] || city;
+  return stateMap[key] || city;
 }
 const getStateCode = (state) => stateMap[state] || state || "UP";
 const formatAddress = (address = "", maxLength = 60) => {
