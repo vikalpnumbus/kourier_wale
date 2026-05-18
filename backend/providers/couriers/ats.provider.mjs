@@ -31,13 +31,17 @@ const weightInGrams = (v) => {
 /**
  * Convert state name → code (IMPORTANT)
  */
-const stateMap = {
-  "Uttar Pradesh": "UP",
-  "Delhi": "DL",
-  "Maharashtra": "MH",
-  "Karnataka": "KA",
-  "Tamil Nadu": "TN",
-};
+function normalizeCity(city) {
+  if (!city) return "Delhi";
+  const map = {
+    "north west delhi": "Delhi",
+    "south delhi": "Delhi",
+    "west delhi": "Delhi",
+    "gurgaon": "Gurugram"
+  };
+  const key = city.toLowerCase().trim();
+  return map[key] || city;
+}
 const getStateCode = (state) => stateMap[state] || state || "UP";
 const formatAddress = (address = "", maxLength = 60) => {
   if (!address) return "";
