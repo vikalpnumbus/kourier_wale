@@ -197,11 +197,11 @@ class ATSProvider {
             packageClientReferenceId: orderId
           }
         ],
-        serviceSelection: {
-          serviceId: ["SWA-IN-OA"]
-        },
+        // serviceSelection: {
+        //   serviceId: ["SWA-IN-OA"]
+        // },
         taxDetails: {
-        gstId: "09ABBFK9872E1ZZ"
+        gstId: "abcde"
         },
         shipTo: {
           name: shipTo.name,
