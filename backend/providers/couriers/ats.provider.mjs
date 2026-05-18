@@ -21,6 +21,12 @@ const num = (v, fallback = 1) => {
   if (!Number.isFinite(n) || n <= 0) return fallback;
   return Math.round(n);
 };
+const weightInGrams = (v) => {
+  const n = Number(v);
+  if (!Number.isFinite(n) || n <= 0) return 500;
+  if (n < 1) return Math.round(n * 1000);
+  return Math.round(n);
+  };
 
 /**
  * Convert state name → code (IMPORTANT)
@@ -147,7 +153,10 @@ class ATSProvider {
         email: wh?.email || "warehouse@veygo.in"
       };
       const payload = {
-        channelDetails: { channelType: "EXTERNAL" },
+        channelDetails: 
+        { 
+          channelType: "EXTERNAL" 
+        },
         labelSpecifications: {
           dpi: 300,
           format: "PNG",
@@ -166,23 +175,23 @@ class ATSProvider {
             },
             weight: {
               unit: "GRAM",
-              value: num(packageDetails?.weight, 500)
+              value: weightInGrams(packageDetails?.weight, 500)
             },
             insuredValue: {
-              value: num(packageDetails?.price || 100),
+              value: num(data?.orderAmount),
               unit: "INR"
             },
             items: itemsList.map((item, i) => ({
               description: item.name || "Item",
               itemIdentifier: item.sku || item.id || `SKU_${i}`,
-              quantity: num(item.qty || item.quantity, 1),
+              quantity: num(1),
               itemValue: {
-                value: num(item.price, 1),
+                value: num(data?.orderAmount),
                 unit: "INR"
               },
               weight: {
                 unit: "GRAM",
-                value: num(item.weight, 200)
+                value: weightInGrams(packageDetails?.weight, 500)
               }
             })),
             packageClientReferenceId: orderId
