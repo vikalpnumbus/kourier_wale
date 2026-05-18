@@ -17,6 +17,7 @@ import ShiprocketProvider from "../providers/aggregator/shiprocket.provider.mjs"
 // import ShiprocketProviderats from "../providers/aggregator/shiprocket.provider.ats.mjs";
 import ShippingModel from "../model/shipping.sql.model.mjs";
 import { mapTrackingStatus } from "../utils/statusMapper.mjs";
+import fs from "fs";
 const num = (v, fallback = 1) => {
   const n = Number(v);
   if (!Number.isFinite(n) || n <= 0) return fallback;
@@ -428,23 +429,22 @@ class Service {
             err?.errors?.[0]?.message ||
             err?.message ||
             "Amazon failed";
-
           return {
             success: false,
             error: message,
           };
         }
         const payload = res.payload || {};
-        console.log("ATS Response",payload);
+        console.log("ATS Response", payload);
         const shipmentId = payload?.shipmentId;
         const pkg = payload?.packageDocumentDetails?.[0] || {};
         const awb = pkg?.trackingId;
         const labelBase64 = pkg?.packageDocuments?.[0]?.contents;
         let labelUrl = null;
-        if (labelBase64) {
+        if (labelBase64 && awb) {
           const fileName = `${awb}.png`;
           const filePath = `labels/${fileName}`;
-          require("fs").writeFileSync(
+          fs.writeFileSync(
             filePath,
             Buffer.from(labelBase64, "base64")
           );
@@ -454,8 +454,8 @@ class Service {
           success: true,
           awb_number: awb,
           amazon_shipment_id: shipmentId,
-          // label_url: labelUrl,
-          // shipment_info: payload?.promise || null,
+          label_url: labelUrl,
+          shipment_info: payload?.promise || null,
         };
       }
       // ================= Bluedart =================
