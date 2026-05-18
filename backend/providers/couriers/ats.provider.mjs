@@ -307,20 +307,15 @@ class ATSProvider {
   async downloadShipmentLabel({ amazon_shipment_id }) {
     try {
       const url = `${ATS_LABEL_DOWNLOAD_FORWARD}/${amazon_shipment_id}/documents`;
-
       const res = await this.signedRequest("GET", url);
-
       const doc = res?.payload?.packageDocumentDetail?.packageDocuments
         ?.find(d => d.type === "LABEL");
-
       if (!doc) throw new Error("Label not found");
-
       return {
         buffer: Buffer.from(doc.contents, "base64"),
         format: doc.format,
         fileName: `amazon_${amazon_shipment_id}.${doc.format.toLowerCase()}`
       };
-
     } catch (err) {
       console.error("[LABEL ERROR]", err?.response?.data || err);
       return false;
