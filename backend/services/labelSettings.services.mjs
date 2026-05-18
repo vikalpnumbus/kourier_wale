@@ -156,8 +156,8 @@ class Service {
         page.drawImage(image, {
           x: 0,
           y: 0,
-          width: 300,
-          height: 450,
+          width: image.width,
+          height: image.height,
         });
       }
 
