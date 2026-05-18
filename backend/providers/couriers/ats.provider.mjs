@@ -150,7 +150,7 @@ class ATSProvider {
         channelDetails: { channelType: "EXTERNAL" },
         labelSpecifications: {
           dpi: 300,
-          format: "PDF",
+          format: "PNG",
           pageLayout: "DEFAULT",
           needFileJoining: false,
           requestedDocumentTypes: ["LABEL"],
