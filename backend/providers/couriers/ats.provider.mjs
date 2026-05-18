@@ -123,109 +123,92 @@ class ATSProvider {
   }
 
   async createShipment(data) {
-    console.log("Payload Before the Pass:", data);
     try {
-      const {
-        orderId,
-        items,
-        packageDetails,
-        shippingDetails,
-        warehouses
-      } = data;
+      const { orderId, items, packageDetails, shippingDetails, warehouses } = data;
       const itemsList = Array.isArray(items) ? items : (data.products || []);
-      const shipTo = {
-        name: `${shippingDetails?.fname || ""} ${shippingDetails?.lname || ""}`.trim(),
-        address1: formatAddress(shippingDetails?.address),
-        city: shippingDetails?.city,
-        state: getStateCode(shippingDetails?.state),
-        pincode: shippingDetails?.pincode,
-        phone: shippingDetails?.phone,
-        email: shippingDetails?.email || "customer@veygo.in"
-      };
       const wh = warehouses?.[0]?.dataValues || {};
-      const shipFrom = {
-        name: wh?.name,
-        address1: formatAddress(wh?.address),
-        city: wh?.city,
-        state: getStateCode(wh?.state),
-        pincode: wh?.pincode,
-        phone: wh?.contactPhone,
-        email: wh?.email || "warehouse@veygo.in"
-      };
+      const cityFixed = normalizeCity(shippingDetails?.city);
       const payload = {
-        channelDetails: 
-        { 
-          channelType: "EXTERNAL" 
+        channelDetails: {
+          channelType: "EXTERNAL"
+        },
+        serviceSelection: {
+          serviceId: ["SWA-IN-OA"]
         },
         labelSpecifications: {
-          dpi: 300,
           format: "PNG",
-          pageLayout: "DEFAULT",
-          needFileJoining: false,
-          requestedDocumentTypes: ["LABEL"],
           size: { length: 6, width: 4, unit: "INCH" }
+        },
+        shipTo: {
+          name: `${shippingDetails?.fname} ${shippingDetails?.lname}`,
+          addressLine1: formatAddress(shippingDetails?.address),
+          city: cityFixed,
+          stateOrRegion: getStateCode(shippingDetails?.state),
+          postalCode: shippingDetails?.pincode,
+          countryCode: "IN",
+          phoneNumber: shippingDetails?.phone,
+          email: shippingDetails?.email || "customer@veygo.in"
+        },
+        shipFrom: {
+          name: wh?.name,
+          addressLine1: formatAddress(wh?.address),
+          city: wh?.city,
+          stateOrRegion: getStateCode(wh?.state),
+          postalCode: wh?.pincode,
+          countryCode: "IN",
+          phoneNumber: wh?.contactPhone,
+          email: wh?.email || "warehouse@veygo.in"
+        },
+        returnTo: {
+          name: wh?.name,
+          addressLine1: formatAddress(wh?.address),
+          city: wh?.city,
+          stateOrRegion: getStateCode(wh?.state),
+          postalCode: wh?.pincode,
+          countryCode: "IN",
+          phoneNumber: wh?.contactPhone,
+          email: wh?.email || "warehouse@veygo.in"
         },
         packages: [
           {
             dimensions: {
+              unit: "CENTIMETER",
               length: num(packageDetails?.length, 10),
               width: num(packageDetails?.breadth, 10),
-              height: num(packageDetails?.height, 10),
-              unit: "CENTIMETER"
+              height: num(packageDetails?.height, 10)
             },
             weight: {
               unit: "GRAM",
-              value: weightInGrams(packageDetails?.weight, 500)
+              value: weightInGrams(packageDetails?.weight)
             },
-            insuredValue: {
-              value: num(data?.orderAmount),
-              unit: "INR"
-            },
+            isHazmat: false,
+            sellerDisplayName: wh?.name || "Default Seller",
+            charges: [
+              {
+                amount: {
+                  value: num(data?.orderAmount),
+                  unit: "INR"
+                }
+              }
+            ],
+            packageClientReferenceId: orderId,
             items: itemsList.map((item, i) => ({
               description: item.name || "Item",
-              itemIdentifier: item.sku || item.id || `SKU_${i}`,
-              quantity: num(1),
+              quantity: num(item.qty || 1),
               itemValue: {
                 value: num(data?.orderAmount),
                 unit: "INR"
               },
               weight: {
                 unit: "GRAM",
-                value: weightInGrams(packageDetails?.weight, 500)
+                value: weightInGrams(packageDetails?.weight)
               }
-            })),
-            packageClientReferenceId: orderId
+            }))
           }
-        ],
-        // serviceSelection: {
-        //   serviceId: ["SWA-IN-OA"]
-        // },
-        taxDetails: {
-        gstId: "abcde"
-        },
-        shipTo: {
-          name: shipTo.name,
-          addressLine1: shipTo.address1,
-          city: shipTo.city,
-          stateOrRegion: shipTo.state,
-          postalCode: shipTo.pincode,
-          countryCode: "IN",
-          phoneNumber: shipTo.phone,
-          email: shipTo.email
-        },
-        shipFrom: {
-          name: shipFrom.name,
-          addressLine1: shipFrom.address1,
-          city: shipFrom.city,
-          stateOrRegion: shipFrom.state,
-          postalCode: shipFrom.pincode,
-          countryCode: "IN",
-          phoneNumber: shipFrom.phone,
-          email: shipFrom.email
-        }
+        ]
       };
-      console.log("FINAL PAYLOAD:", JSON.stringify(payload, null, 2));
-      return await this.signedRequest("POST",ATS_CREATE_SHIPMENT_FORWARD,payload);
+      console.log("✅ FINAL PAYLOAD:", JSON.stringify(payload, null, 2));
+      return await this.signedRequest("POST", ATS_CREATE_SHIPMENT_FORWARD, payload);
     } catch (err) {
       console.error("❌ FULL ERROR:", err?.response?.data || err);
       return false;
