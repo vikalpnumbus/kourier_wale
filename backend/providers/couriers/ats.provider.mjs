@@ -143,7 +143,10 @@ class ATSProvider {
       const { orderId, items, packageDetails, shippingDetails, warehouses } = data;
       const itemsList = Array.isArray(items) ? items : (data.products || []);
       const wh = warehouses?.[0]?.dataValues || {};
-      const cityFixed = normalizeCity(shippingDetails?.city);
+
+      const totalAmount = Number(data?.orderAmount) || 0;
+      const weight = weightInGrams(packageDetails?.weight);
+
       const payload = {
         channelDetails: {
           channelType: "EXTERNAL"
@@ -153,12 +156,23 @@ class ATSProvider {
         },
         labelSpecifications: {
           format: "PNG",
-          size: { length: 6, width: 4, unit: "INCH" }
+          size: { length: 6, width: 4, unit: "INCH" },
+          dpi: 300,
+          pageLayout: "DEFAULT",
+          needFileJoining: false,
+          requestedDocumentTypes: ["LABEL"],
+          requestedLabelCustomization: {
+            requestAttributes: [
+              "PACKAGE_CLIENT_REFERENCE_ID",
+              "COLLECT_ON_DELIVERY_AMOUNT"
+            ]
+          }
         },
         shipTo: {
           name: `${shippingDetails?.fname} ${shippingDetails?.lname}`,
           addressLine1: formatAddress(shippingDetails?.address),
-          city: cityFixed,
+          addressLine2: formatAddress(shippingDetails?.address2 || shippingDetails?.city),
+          city: normalizeCity(shippingDetails?.city),
           stateOrRegion: getStateCode(shippingDetails?.state),
           postalCode: shippingDetails?.pincode,
           countryCode: "IN",
@@ -168,6 +182,7 @@ class ATSProvider {
         shipFrom: {
           name: wh?.name,
           addressLine1: formatAddress(wh?.address),
+          addressLine2: formatAddress(wh?.address2 || wh?.city),
           city: wh?.city,
           stateOrRegion: getStateCode(wh?.state),
           postalCode: wh?.pincode,
@@ -178,6 +193,7 @@ class ATSProvider {
         returnTo: {
           name: wh?.name,
           addressLine1: formatAddress(wh?.address),
+          addressLine2: formatAddress(wh?.address2 || wh?.city),
           city: wh?.city,
           stateOrRegion: getStateCode(wh?.state),
           postalCode: wh?.pincode,
@@ -195,34 +211,63 @@ class ATSProvider {
             },
             weight: {
               unit: "GRAM",
-              value: weightInGrams(packageDetails?.weight)
+              value: weight
+            },
+            insuredValue: {   // 🔥 FIX
+              value: totalAmount,
+              unit: "INR"
             },
             isHazmat: false,
             sellerDisplayName: wh?.name || "Default Seller",
             charges: [
               {
                 amount: {
-                  value: num(data?.orderAmount),
+                  value: totalAmount,
                   unit: "INR"
-                }
+                },
+                chargeType: "TAX"   // 🔥 FIX
               }
             ],
             packageClientReferenceId: orderId,
-            items: itemsList.map((item, i) => ({
-              description: item.name || "Item",
-              quantity: num(item.qty || 1),
+            items: itemsList.map((item) => ({
+              description: item.name || item.sku || "Item",
+              itemIdentifier: item.sku || "SKU",
+              quantity: 1,
               itemValue: {
-                value: num(data?.orderAmount),
+                value: Number(item.price || totalAmount),
                 unit: "INR"
               },
               weight: {
                 unit: "GRAM",
-                value: weightInGrams(packageDetails?.weight)
+                value: weight
+              },
+              isHazmat: false,
+              productType: item.name || "Product",
+              invoiceDetails: {   // 🔥 FIX
+                invoiceNumber: orderId,
+                invoiceDate: new Date().toISOString()
               }
             }))
           }
+        ],
+        taxDetails: [   // 🔥 FIX
+          {
+            taxType: "GST",
+            taxRegistrationNumber: wh?.gst || "ABCDE1234F1Z5"
+          }
         ]
       };
+      if (data?.paymentMethod !== "prepaid") {
+        payload.valueAddedServiceDetails = [
+          {
+            id: "CollectOnDelivery",
+            amount: {
+              unit: "INR",
+              value: totalAmount
+            }
+          }
+        ];
+      }
       console.log("✅ FINAL PAYLOAD:", JSON.stringify(payload, null, 2));
       return await this.signedRequest("POST", ATS_CREATE_SHIPMENT_FORWARD, payload);
     } catch (err) {
