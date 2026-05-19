@@ -38,179 +38,192 @@ class Class {
   }
 
   async importConsume() {
-  try {
-    await rabbitMQ.consume(
-      this.import_queue,
-      async (msg) => {
-        console.time("bulk-import-orders");
+    try {
+      await rabbitMQ.consume(
+        this.import_queue,
+        async (msg) => {
+          console.time("bulk-import-orders");
 
-        const { rows = null, metadata = null } = msg;
+          const { rows = null, metadata = null } = msg;
 
-        // ✅ Correct checks
-        if (!rows || !rows.length) {
-          throw new Error("No rows provided.");
-        }
-
-        if (!metadata || !metadata.id) {
-          throw new Error("metadata.id (user's document id) is not provided.");
-        }
-
-        async function validateRow(row) {
-          const req = { body: row };
-          await Promise.all(
-            OrdersValidations.create().map((v) => v.run(req))
-          );
-          const errors = validationResult(req);
-          return errors.isEmpty() ? null : errors.array();
-        }
-
-        const productRegex = /^Product (\d+) (ID|Qty)$/;
-
-        // ✅ rows processing
-        rows = rows.map((e) => {
-          const payload = {
-            userId: metadata.id,
-            orderId: e["orderId"],
-            orderAmount: e["orderAmount"],
-            collectableAmount:
-              e["paymentType"] == "cod"
-                ? e["collectableAmount"] ?? e["orderAmount"]
-                : "0",
-            paymentType: e["paymentType"],
-            order_source: "portal_import",
-            shippingDetails: {
-              phone: e["shippingDetails.phone"],
-              fname: e["shippingDetails.fname"],
-              lname: e["shippingDetails.lname"],
-              address: e["shippingDetails.address"],
-              city: e["shippingDetails.city"],
-              state: e["shippingDetails.state"],
-              country: "India",
-              pincode: e["shippingDetails.pincode"],
-            },
-            packageDetails: {
-              weight: e["packageDetails.weight"],
-              length: e["packageDetails.length"],
-              height: e["packageDetails.height"],
-              breadth: e["packageDetails.breadth"],
-              volumetricWeight:
-                (e["packageDetails.length"] *
-                  e["packageDetails.breadth"] *
-                  e["packageDetails.height"]) /
-                5,
-            },
-            charges: {
-              shipping: Number(e["charges.shipping"] || "0"),
-              tax_amount: Number(e["charges.tax_amount"] || "0"),
-              cod: Number(e["charges.cod"] || "0"),
-              discount: Number(e["charges.discount"] || "0"),
-            },
-            warehouse_id: e["warehouse_id"],
-            rto_warehouse_id: e["rto_warehouse_id"],
-          };
-
-          const productMap = [];
-
-          for (const key in e) {
-            const match = key.match(productRegex);
-            if (!match) continue;
-
-            const [, number, type] = match;
-
-            let prod = productMap[number] || { id: null, qty: null };
-
-            if (type === "ID") prod.id = e[key];
-            if (type === "Qty") prod.qty = e[key];
-
-            productMap[number] = prod;
+          // ✅ checks
+          if (!rows || !rows.length) {
+            throw new Error("No rows provided.");
           }
 
-          payload.products = productMap.filter((p) => p.id && p.qty);
+          if (!metadata || !metadata.id) {
+            throw new Error("metadata.id (user's document id) is not provided.");
+          }
 
-          return payload;
-        });
+          async function validateRow(row) {
+            const req = { body: row };
+            await Promise.all(
+              OrdersValidations.create().map((v) => v.run(req))
+            );
+            const errors = validationResult(req);
+            return errors.isEmpty() ? null : errors.array();
+          }
 
-        // ✅ validation
-        const rowsValidation = await Promise.all(
-          rows.map((e) =>
-            validateRow(e).then((check) =>
-              check
-                ? { success: false, value: e, reason: check }
-                : { success: true, value: e }
-            )
-          )
-        );
+          const productRegex = /^Product (\d+) (ID|Qty)$/;
 
-        // ✅ create orders
-        const response = await Promise.all(
-          rowsValidation
-            .filter((e) => e.success)
-            .map((e) =>
-              this.limit(async () => {
-                const result = await OrdersService.create({
-                  data: { ...e.value },
-                });
+          // ✅ FIX: new variable (NO const reassignment)
+          const processedRows = rows.map((e) => {
+            const payload = {
+              userId: metadata.id,
+              orderId: e["orderId"],
+              orderAmount: Number(e["orderAmount"] || 0),
 
-                if (!result) {
-                  return {
-                    success: false,
-                    orderId: e.value.orderId,
-                    error:
-                      OrdersService.error?.message ||
-                      "Some error occured.",
-                  };
-                }
+              collectableAmount:
+                e["paymentType"] === "cod"
+                  ? Number(e["collectableAmount"] ?? e["orderAmount"] ?? 0)
+                  : 0,
 
-                return { success: true, ...result };
-              })
-            )
-        );
+              paymentType: e["paymentType"],
+              order_source: "portal_import",
 
-        // ✅ invalid CSV
-        let invalidData = rowsValidation
-          .filter((e) => e.success == false)
-          .map((e) => ({
-            value: e.value,
-            reason: e.reason.map((error) => ({
-              field: error.path,
-              message: error.msg,
-            })),
-          }));
+              shippingDetails: {
+                phone: e["shippingDetails.phone"],
+                fname: e["shippingDetails.fname"],
+                lname: e["shippingDetails.lname"],
+                address: e["shippingDetails.address"],
+                city: e["shippingDetails.city"],
+                state: e["shippingDetails.state"],
+                country: "India",
+                pincode: e["shippingDetails.pincode"],
+              },
 
-        if (invalidData.length > 0) {
-          createCsvFromArray({
-            userId: metadata.id,
-            data: invalidData.flatMap((e) =>
-              e.reason.map((r) => ({
-                orderId: e.value.orderId,
-                ...r,
-              }))
-            ),
-            dir: "orders-import",
+              packageDetails: {
+                weight: Number(e["packageDetails.weight"] || 0),
+                length: Number(e["packageDetails.length"] || 0),
+                height: Number(e["packageDetails.height"] || 0),
+                breadth: Number(e["packageDetails.breadth"] || 0),
+
+                volumetricWeight:
+                  (Number(e["packageDetails.length"] || 0) *
+                    Number(e["packageDetails.breadth"] || 0) *
+                    Number(e["packageDetails.height"] || 0)) / 5,
+              },
+
+              charges: {
+                shipping: Number(e["charges.shipping"] || 0),
+                tax_amount: Number(e["charges.tax_amount"] || 0),
+                cod: Number(e["charges.cod"] || 0),
+                discount: Number(e["charges.discount"] || 0),
+              },
+
+              warehouse_id: e["warehouse_id"],
+              rto_warehouse_id: e["rto_warehouse_id"],
+            };
+
+            // ✅ products extraction
+            const productMap = [];
+
+            for (const key in e) {
+              const match = key.match(productRegex);
+              if (!match) continue;
+
+              const [, number, type] = match;
+
+              let prod = productMap[number] || { id: null, qty: null };
+
+              if (type === "ID") prod.id = e[key];
+              if (type === "Qty") prod.qty = e[key];
+
+              productMap[number] = prod;
+            }
+
+            payload.products = productMap.filter(
+              (p) => p?.id && p?.qty
+            );
+
+            return payload;
           });
-        }
 
-        if (response.filter((e) => !e.success).length > 0) {
-          createCsvFromArray({
-            userId: metadata.id,
-            data: response
-              .filter((e) => !e.success)
-              .map((e) => ({
-                orderId: e.orderId,
-                error: e.error,
+          // ✅ validation
+          const rowsValidation = await Promise.all(
+            processedRows.map((e) =>
+              validateRow(e).then((check) =>
+                check
+                  ? { success: false, value: e, reason: check }
+                  : { success: true, value: e }
+              )
+            )
+          );
+
+          // ✅ create orders
+          const response = await Promise.all(
+            rowsValidation
+              .filter((e) => e.success)
+              .map((e) =>
+                this.limit(async () => {
+                  const result = await OrdersService.create({
+                    data: { ...e.value },
+                  });
+
+                  if (!result) {
+                    return {
+                      success: false,
+                      orderId: e.value.orderId,
+                      error:
+                        OrdersService.error?.message ||
+                        "Some error occured.",
+                    };
+                  }
+
+                  return { success: true, ...result };
+                })
+              )
+          );
+
+          // ✅ invalid validation CSV
+          const invalidData = rowsValidation
+            .filter((e) => !e.success)
+            .map((e) => ({
+              value: e.value,
+              reason: e.reason.map((error) => ({
+                field: error.path,
+                message: error.msg,
               })),
-            dir: "orders-import",
-          });
-        }
+            }));
 
-        console.timeEnd("bulk-import-orders");
-      },
-      { exchange: this.exchange, routingKey: this.import_routingKey }
-    );
-  } catch (error) {
-    throw new Error(error);
+          if (invalidData.length > 0) {
+            createCsvFromArray({
+              userId: metadata.id,
+              data: invalidData.flatMap((e) =>
+                e.reason.map((r) => ({
+                  orderId: e.value.orderId,
+                  ...r,
+                }))
+              ),
+              dir: "orders-import",
+            });
+          }
+
+          // ✅ failed orders CSV
+          if (response.filter((e) => !e.success).length > 0) {
+            createCsvFromArray({
+              userId: metadata.id,
+              data: response
+                .filter((e) => !e.success)
+                .map((e) => ({
+                  orderId: e.orderId,
+                  error: e.error,
+                })),
+              dir: "orders-import",
+            });
+          }
+
+          console.timeEnd("bulk-import-orders");
+        },
+        {
+          exchange: this.exchange,
+          routingKey: this.import_routingKey,
+        }
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
   }
-}
 
   async createOrderConsumer() {
     try {
