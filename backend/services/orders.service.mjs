@@ -318,26 +318,20 @@ class Service {
     }
   }
 
-  async bulkImport({ files, data }) {
+  async bulkImport({ rows, data }) {
     try {
       const { userId } = data;
-      if (!files) {
-        const error = new Error("No file found.");
+      if (!rows || !rows.length) {
+        const error = new Error("No data found in file.");
         error.status = 400;
         throw error;
       }
-
       OrdersProducer.publishImportFile({
-        files: files.map((e) => ({
-          fileName: userId,
-          file: e,
-          dir: "orders",
-        })),
+        rows, // 👈 direct pass
         metadata: {
           id: userId,
         },
       });
-
       return {
         status: 200,
         data: {

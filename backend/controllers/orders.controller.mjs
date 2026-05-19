@@ -180,8 +180,16 @@ export const bulkImport = async (req, res, next) => {
       throw error;
     }
 
+    rows = rows.map((row) => {
+      const newRow = {};
+      Object.keys(row).forEach((key) => {
+        newRow[key.trim()] = row[key] ? row[key].toString().trim() : "";
+      });
+      return newRow;
+    });
+
     const result = await OrdersService.bulkImport({
-      files: req.files,
+      rows,
       data: { userId: req.user.id },
     });
     if (!result) {

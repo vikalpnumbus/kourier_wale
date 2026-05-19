@@ -43,7 +43,10 @@ class Class {
         this.import_queue,
         async (msg) => {
           console.time("bulk-import-orders");
-          const { files = null, metadata = null } = msg;
+          const { rows = null, metadata = null } = msg;
+          if (!rows || !rows.length) {
+            throw new Error("No rows provided.");
+          }
           if (!files) throw new Error("No files provided.");
           if (!metadata || !metadata.id)
             throw new Error(
@@ -57,9 +60,7 @@ class Class {
             const errors = validationResult(req);
             return errors.isEmpty() ? null : errors.array();
           }
-          const fileBuffer = files[0]?.file?.buffer;
           if (!fileBuffer) throw new Error("File buffer missing.");
-          let rows = await readCsvAsArray(Buffer.from(fileBuffer));
           const productRegex = /^Product (\d+) (ID|Qty)$/;
           rows = rows.map((e, index) => {
             const payload = {
