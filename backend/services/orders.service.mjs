@@ -322,20 +322,77 @@ class Service {
     try {
       const { userId } = data;
       if (!rows || !rows.length) {
-        const error = new Error("No data found in file.");
-        error.status = 400;
-        throw error;
+        throw new Error("No data found in file.");
       }
-      OrdersProducer.publishImportFile({
-        rows, // 👈 direct pass
-        metadata: {
-          id: userId,
-        },
-      });
+      const success = [];
+      const failed = [];
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        try {
+          if (!row.orderId) throw new Error("orderId missing");
+          if (!row.paymentType) throw new Error("paymentType missing");
+          if (row.paymentType === "COD" && !row.collectableAmount) {
+            throw new Error("collectableAmount required for COD");
+          }
+          const orderPayload = {
+            userId,
+            orderId: row.orderId,
+            orderAmount: Number(row.orderAmount || 0),
+            collectableAmount: Number(row.collectableAmount || 0),
+            paymentType: row.paymentType,
+            shippingDetails: {
+              phone: row["shippingDetails.phone"],
+              fname: row["shippingDetails.fname"],
+              lname: row["shippingDetails.lname"],
+              pincode: row["shippingDetails.pincode"],
+              address: row["shippingDetails.address"],
+              city: row["shippingDetails.city"],
+              state: row["shippingDetails.state"],
+              country: row["shippingDetails.country"],
+            },
+            packageDetails: {
+              weight: Number(row["packageDetails.weight"] || 0),
+              length: Number(row["packageDetails.length"] || 0),
+              height: Number(row["packageDetails.height"] || 0),
+              breadth: Number(row["packageDetails.breadth"] || 0),
+            },
+            charges: {
+              shipping: Number(row["charges.shipping"] || 0),
+              tax_amount: Number(row["charges.tax_amount"] || 0),
+              cod: Number(row["charges.cod"] || 0),
+              discount: Number(row["charges.discount"] || 0),
+            },
+            warehouse_id: row.warehouse_id,
+            rto_warehouse_id: row.rto_warehouse_id,
+          };
+          const products = [];
+          Object.keys(row).forEach((key) => {
+            const match = key.match(/^Product (\d+) ID$/);
+            if (match) {
+              const index = match[1];
+              products.push({
+                productId: row[`Product ${index} ID`],
+                qty: Number(row[`Product ${index} Qty`] || 1),
+              });
+            }
+          });
+          orderPayload.products = products;
+          const inserted = await this.create({ data: orderPayload });
+          success.push(inserted);
+        } catch (err) {
+          failed.push({
+            row: i + 1,
+            error: err.message,
+          });
+        }
+      }
       return {
         status: 200,
         data: {
-          message: "Importing the orders.",
+          total: rows.length,
+          successCount: success.length,
+          failedCount: failed.length,
+          failed,
         },
       };
     } catch (error) {
