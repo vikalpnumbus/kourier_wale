@@ -22,49 +22,28 @@ function PricingCourierPage() {
 
   const groupData = (pricingList, couriers) => {
     const grouped = {};
-
-    // 1. Ensure every courier exists in grouped
     couriers.forEach((c) => {
       grouped[c.id] = {
         courier_name: c.name,
-        data: {}
+        data: {},
       };
     });
-
-    // 2. Fill pricing rows where they exist
     pricingList.forEach((item) => {
+      if (!item.courier_id || !item.type) return;
       const cid = item.courier_id;
-
-      if (!grouped[cid]) return; // courier might not exist anymore
-
+      if (!grouped[cid]) return;
       grouped[cid].data[item.type] = item;
     });
-
-    // 3. Ensure forward, rto, weight always exist
     Object.keys(grouped).forEach((cid) => {
       TYPE_ORDER.forEach((type) => {
         if (!grouped[cid].data[type]) {
-          grouped[cid].data[type] = {
-            id: null,
-            courier_id: Number(cid),
-            type,
-            plan_id: 4,
-            zone1: "0",
-            zone2: "0",
-            zone3: "0",
-            zone4: "0",
-            zone5: "0",
-            cod: "0",
-            cod_percentage: "0",
-          };
+          grouped[cid].data[type] = null; // 🔥 IMPORTANT FIX
         }
       });
     });
-
+    console.log("GROUPED DATA", grouped); // debug
     setData(grouped);
   };
-
-
 
   const handleChange = (cid, type, field, value) => {
     setData((prev) => ({
@@ -148,28 +127,22 @@ function PricingCourierPage() {
 
 
   const handleFetchData = async () => {
-    try {
-      setPricingLoading(true);
-
-      const page = Number.parseInt(searchParams.get("page") || "1", 10);
-      const limit = Number.parseInt(searchParams.get("limit") || "10", 10);
-
-      const params = new URLSearchParams();
-      params.append("page", page);
-      params.append("limit", limit);
-
-      const url = `${PricingPlanConfig.pricingPlanCourierApi}?${params}`;
-
-      const { data } = await api.get(url);
-
-      setDataList(data?.data?.result || []);
-    } catch (error) {
-      console.error("Fetch error:", error);
-      setDataList([]);
-    } finally {
-      setPricingLoading(false);
-    }
-  };
+  try {
+    setPricingLoading(true);
+    const params = new URLSearchParams();
+    params.append("page", 1);
+    params.append("limit", 1000); // 🔥 FIXED
+    const url = `${PricingPlanConfig.pricingPlanCourierApi}?${params}`;
+    const { data } = await api.get(url);
+    console.log("API DATA", data?.data?.result); // debug
+    setDataList(data?.data?.result || []);
+  } catch (error) {
+    console.error("Fetch error:", error);
+    setDataList([]);
+  } finally {
+    setPricingLoading(false);
+  }
+};
 
 
   const handleFetchCourier = async () => {

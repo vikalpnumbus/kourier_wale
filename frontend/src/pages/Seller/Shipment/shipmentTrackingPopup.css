@@ -404,7 +404,7 @@
   }
   .action-btn {
     flex: 1;
-    min-width: 100px;
+    /* min-width: 100px; */
     padding: 9px 14px;
     border-radius: 11px;
     font-size: 12px;
