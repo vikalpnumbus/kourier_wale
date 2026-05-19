@@ -128,7 +128,8 @@ export const bulkImport = async (req, res, next) => {
     }
 
     let rows = await readCsvAsArray(Buffer.from(req.files[0].buffer));
-
+    console.log("HEADERS:", Object.keys(rows[0]));
+    console.log("FIRST ROW:", rows[0]);
     if (!rows || rows.length == 0) {
       const error = new Error("Empty file is not accepatable.Add some data before proceeding.");
       error.status = 400;
