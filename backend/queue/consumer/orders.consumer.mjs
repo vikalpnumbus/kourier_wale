@@ -38,159 +38,179 @@ class Class {
   }
 
   async importConsume() {
-    try {
-      await rabbitMQ.consume(
-        this.import_queue,
-        async (msg) => {
-          console.time("bulk-import-orders");
-          const { rows = null, metadata = null } = msg;
-          if (!rows || !rows.length) {
-            throw new Error("No rows provided.");
-          }
-          if (!files) throw new Error("No files provided.");
-          if (!metadata || !metadata.id)
-            throw new Error(
-              "metadata.id (user's document id) is not provided."
-            );
-          async function validateRow(row) {
-            const req = { body: row };
-            await Promise.all(
-              OrdersValidations.create().map((v) => v.run(req))
-            );
-            const errors = validationResult(req);
-            return errors.isEmpty() ? null : errors.array();
-          }
-          if (!fileBuffer) throw new Error("File buffer missing.");
-          const productRegex = /^Product (\d+) (ID|Qty)$/;
-          rows = rows.map((e, index) => {
-            const payload = {
-              userId: metadata.id,
-              orderId: e["orderId"],
-              orderAmount: e["orderAmount"],
-              collectableAmount:
-                e["paymentType"] == "cod"
-                  ? e["collectableAmount"] ?? e["orderAmount"]
-                  : "0",
-              paymentType: e["paymentType"],
-              order_source: "portal_import",
-              shippingDetails: {
-                phone: e["shippingDetails.phone"],
-                fname: e["shippingDetails.fname"],
-                lname: e["shippingDetails.lname"],
-                address: e["shippingDetails.address"],
-                city: e["shippingDetails.city"],
-                state: e["shippingDetails.state"],
-                country: "India",
-                pincode: e["shippingDetails.pincode"],
-              },
-              packageDetails: {
-                weight: e["packageDetails.weight"],
-                length: e["packageDetails.length"],
-                height: e["packageDetails.height"],
-                breadth: e["packageDetails.breadth"],
-                volumetricWeight:
-                  (e["packageDetails.length"] *
-                    e["packageDetails.breadth"] *
-                    e["packageDetails.height"]) /
-                  5,
-              },
-              charges: {
-                shipping: Number(e["charges.shipping"] || "0"),
-                tax_amount: Number(e["charges.tax_amount"] || "0"),
-                cod: Number(e["charges.cod"] || "0"),
-                discount: Number(e["charges.discount"] || "0")
-              },
-              warehouse_id: e["warehouse_id"],
-              rto_warehouse_id: e["rto_warehouse_id"],
-            };
-            const productMap = [];
-            for (const key in e) {
-              const match = key.match(productRegex);
-              if (!match) continue;
-              const [, number, type] = match;
-              let prod = productMap[number] || { id: null, qty: null };
-              if (type === "ID") prod.id = e[key];
-              if (type === "Qty") prod.qty = e[key];
-              productMap[number] = prod;
-            }
+  try {
+    await rabbitMQ.consume(
+      this.import_queue,
+      async (msg) => {
+        console.time("bulk-import-orders");
 
-            payload.products = productMap.filter((p) => p.id && p.qty);
-            return payload;
-          });
+        const { rows = null, metadata = null } = msg;
 
-          const rowsValidation = await Promise.all(
-            rows.map((e) =>
-              validateRow(e).then((check) =>
-                check
-                  ? { success: false, value: e, reason: check }
-                  : { success: true, value: e }
-              )
+        // ✅ Correct checks
+        if (!rows || !rows.length) {
+          throw new Error("No rows provided.");
+        }
+
+        if (!metadata || !metadata.id) {
+          throw new Error("metadata.id (user's document id) is not provided.");
+        }
+
+        async function validateRow(row) {
+          const req = { body: row };
+          await Promise.all(
+            OrdersValidations.create().map((v) => v.run(req))
+          );
+          const errors = validationResult(req);
+          return errors.isEmpty() ? null : errors.array();
+        }
+
+        const productRegex = /^Product (\d+) (ID|Qty)$/;
+
+        // ✅ rows processing
+        rows = rows.map((e) => {
+          const payload = {
+            userId: metadata.id,
+            orderId: e["orderId"],
+            orderAmount: e["orderAmount"],
+            collectableAmount:
+              e["paymentType"] == "cod"
+                ? e["collectableAmount"] ?? e["orderAmount"]
+                : "0",
+            paymentType: e["paymentType"],
+            order_source: "portal_import",
+            shippingDetails: {
+              phone: e["shippingDetails.phone"],
+              fname: e["shippingDetails.fname"],
+              lname: e["shippingDetails.lname"],
+              address: e["shippingDetails.address"],
+              city: e["shippingDetails.city"],
+              state: e["shippingDetails.state"],
+              country: "India",
+              pincode: e["shippingDetails.pincode"],
+            },
+            packageDetails: {
+              weight: e["packageDetails.weight"],
+              length: e["packageDetails.length"],
+              height: e["packageDetails.height"],
+              breadth: e["packageDetails.breadth"],
+              volumetricWeight:
+                (e["packageDetails.length"] *
+                  e["packageDetails.breadth"] *
+                  e["packageDetails.height"]) /
+                5,
+            },
+            charges: {
+              shipping: Number(e["charges.shipping"] || "0"),
+              tax_amount: Number(e["charges.tax_amount"] || "0"),
+              cod: Number(e["charges.cod"] || "0"),
+              discount: Number(e["charges.discount"] || "0"),
+            },
+            warehouse_id: e["warehouse_id"],
+            rto_warehouse_id: e["rto_warehouse_id"],
+          };
+
+          const productMap = [];
+
+          for (const key in e) {
+            const match = key.match(productRegex);
+            if (!match) continue;
+
+            const [, number, type] = match;
+
+            let prod = productMap[number] || { id: null, qty: null };
+
+            if (type === "ID") prod.id = e[key];
+            if (type === "Qty") prod.qty = e[key];
+
+            productMap[number] = prod;
+          }
+
+          payload.products = productMap.filter((p) => p.id && p.qty);
+
+          return payload;
+        });
+
+        // ✅ validation
+        const rowsValidation = await Promise.all(
+          rows.map((e) =>
+            validateRow(e).then((check) =>
+              check
+                ? { success: false, value: e, reason: check }
+                : { success: true, value: e }
             )
-          );
-          const response = await Promise.all(
-            rowsValidation
-              .filter((e) => e.success)
-              .map((e) =>
-                this.limit(async () => {
-                  const result = await OrdersService.create({
-                    data: {
-                      ...e.value,
-                    },
-                  });
+          )
+        );
 
-                  if (!result) {
-                    return {
-                      success: false,
-                      orderId: e.value.orderId,
-                      error:
-                        OrdersService.error?.message || "Some error occured.",
-                    };
-                  }
-                  return { success: true, ...result };
-                })
-              )
-          );
+        // ✅ create orders
+        const response = await Promise.all(
+          rowsValidation
+            .filter((e) => e.success)
+            .map((e) =>
+              this.limit(async () => {
+                const result = await OrdersService.create({
+                  data: { ...e.value },
+                });
 
-          let invalidData = rowsValidation
-            .filter((e) => e.success == false)
-            .map((e) => ({
-              value: e.value,
-              reason: e.reason.map((error) => ({
-                field: error.path,
-                message: error.msg,
+                if (!result) {
+                  return {
+                    success: false,
+                    orderId: e.value.orderId,
+                    error:
+                      OrdersService.error?.message ||
+                      "Some error occured.",
+                  };
+                }
+
+                return { success: true, ...result };
+              })
+            )
+        );
+
+        // ✅ invalid CSV
+        let invalidData = rowsValidation
+          .filter((e) => e.success == false)
+          .map((e) => ({
+            value: e.value,
+            reason: e.reason.map((error) => ({
+              field: error.path,
+              message: error.msg,
+            })),
+          }));
+
+        if (invalidData.length > 0) {
+          createCsvFromArray({
+            userId: metadata.id,
+            data: invalidData.flatMap((e) =>
+              e.reason.map((r) => ({
+                orderId: e.value.orderId,
+                ...r,
+              }))
+            ),
+            dir: "orders-import",
+          });
+        }
+
+        if (response.filter((e) => !e.success).length > 0) {
+          createCsvFromArray({
+            userId: metadata.id,
+            data: response
+              .filter((e) => !e.success)
+              .map((e) => ({
+                orderId: e.orderId,
+                error: e.error,
               })),
-            }));
+            dir: "orders-import",
+          });
+        }
 
-          if (invalidData.length > 0) {
-            createCsvFromArray({
-              userId: metadata.id,
-              data: invalidData.flatMap((e) => {
-                return e.reason.map((r) => ({
-                  orderId: e.value.orderId,
-                  ...r,
-                }));
-              }),
-              dir: "orders-import",
-            });
-          }
-          if (response.filter((e) => !e.success).length > 0) {
-            createCsvFromArray({
-              userId: metadata.id,
-              data: response
-                .filter((e) => !e.success)
-                .map((e) => ({ orderId: e.orderId, error: e.error })),
-              dir: "orders-import",
-            });
-          }
-
-          console.timeEnd("bulk-import-orders");
-        },
-        { exchange: this.exchange, routingKey: this.import_routingKey }
-      );
-    } catch (error) {
-      throw new Error(error);
-    }
+        console.timeEnd("bulk-import-orders");
+      },
+      { exchange: this.exchange, routingKey: this.import_routingKey }
+    );
+  } catch (error) {
+    throw new Error(error);
   }
+}
 
   async createOrderConsumer() {
     try {
