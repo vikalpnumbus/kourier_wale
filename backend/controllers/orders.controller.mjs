@@ -126,16 +126,12 @@ export const bulkImport = async (req, res, next) => {
       error.status = 400;
       throw error;
     }
-
     let rows = await readCsvAsArray(Buffer.from(req.files[0].buffer));
-    console.log("HEADERS:", Object.keys(rows[0]));
-    console.log("FIRST ROW:", rows[0]);
     if (!rows || rows.length == 0) {
       const error = new Error("Empty file is not accepatable.Add some data before proceeding.");
       error.status = 400;
       throw error;
     }
-
     const headers = Object.keys(rows[0]);
     const allowedHeaders = [
       "orderId",
@@ -163,23 +159,19 @@ export const bulkImport = async (req, res, next) => {
       "Product 1 ID",
       "Product 1 Qty",
     ].sort();
-
     const productHeaderRegex = /^Product \d+ (ID|Qty)$/;
-
     const missing = allowedHeaders.filter((h) => !headers.includes(h));
     if (missing.length > 0) {
       const error = new Error(`Missing required headers: ${missing.join(", ")}`);
       error.status = 400;
       throw error;
     }
-
     const invalid = headers.filter((h) => !allowedHeaders.includes(h) && !productHeaderRegex.test(h));
     if (invalid.length > 0) {
       const error = new Error(`Invalid headers found: ${invalid.join(", ")}`);
       error.status = 400;
       throw error;
     }
-
     rows = rows.map((row) => {
       const newRow = {};
       Object.keys(row).forEach((key) => {
@@ -187,7 +179,6 @@ export const bulkImport = async (req, res, next) => {
       });
       return newRow;
     });
-
     const result = await OrdersService.bulkImport({
       rows,
       data: { userId: req.user.id },
