@@ -6,6 +6,9 @@ import WarehouseService from "./warehouse.service.mjs";
 import ChannelService from "./channel.service.mjs";
 import ShopifyProvider from "../providers/couriers/shopify.provider.mjs";
 import sqlDB from "../configurations/sql.config.mjs";
+import Orders from "../model/orders.sql.model.mjs"; // ✅ apne model ka correct path daalo
+import fs from "fs";
+import { Parser } from "json2csv";
 class Service {
   constructor() {
     this.error = null;
@@ -326,6 +329,8 @@ class Service {
       }
       const success = [];
       const failed = [];
+      const batchSize = 100;
+      let batch = [];
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         try {
@@ -377,22 +382,38 @@ class Service {
             }
           });
           orderPayload.products = products;
-          const inserted = await this.create({ data: orderPayload });
-          success.push(inserted);
+          batch.push(orderPayload);
+          if (batch.length === batchSize || i === rows.length - 1) {
+            const inserted = await Orders.bulkCreate(batch);
+            success.push(...inserted);
+            batch = [];
+          }
         } catch (err) {
           failed.push({
-            row: i + 1,
+            ...row,
             error: err.message,
           });
         }
       }
+      let failedCsvUrl = null;
+      if (failed.length) {
+        const parser = new Parser();
+        const csv = parser.parse(failed);
+        const fileName = `failed_orders_${Date.now()}.csv`;
+        if (!fs.existsSync("./uploads")) {
+          fs.mkdirSync("./uploads");
+        }
+        fs.writeFileSync(`./uploads/${fileName}`, csv);
+        failedCsvUrl = `/uploads/${fileName}`;
+      }
       return {
         status: 200,
         data: {
+          message: "Import completed",
           total: rows.length,
           successCount: success.length,
           failedCount: failed.length,
-          failed,
+          failedCsvUrl,
         },
       };
     } catch (error) {

@@ -7,6 +7,7 @@ function ImportModal({ onClose, title, apiURL, onSuccess }) {
   const [fileName, setFileName] = useState("");
   const { showError, showSuccess } = useAlert();
   const [error, setError] = useState("");
+  const [progress, setProgress] = useState(0);
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setError("");
@@ -31,7 +32,8 @@ function ImportModal({ onClose, title, apiURL, onSuccess }) {
       fileInputRef.current.value = "";
     }
   };
-  const handleSubmit = async (e) => {
+  
+    const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
       setError("Please select a CSV file before submitting.");
@@ -39,34 +41,43 @@ function ImportModal({ onClose, title, apiURL, onSuccess }) {
     }
     const formData = new FormData();
     formData.append("file", file);
+    let interval;
     try {
-      const response = await api.post(
-        apiURL,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      setProgress(10);
+      interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) return prev;
+          return prev + 5;
+        });
+      }, 300);
+      const response = await api.post(apiURL, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      clearInterval(interval);
+      setProgress(100);
+      setTimeout(() => setProgress(0), 1000);
       if (response?.data?.status === 200) {
+        const data = response.data.data;
         showSuccess(
-          response.data?.data?.message || "Imported successfully!"
+          `✅ ${data.successCount} Imported, ❌ ${data.failedCount} Failed`
         );
+        if (data.failedCsvUrl) {
+          window.open(data.failedCsvUrl);
+        }
         handleClear();
         onSuccess();
         onClose();
-      }else {
-        showError(
-          response.data?.data?.message || "Something went wrong!"
-        );
+      } else {
+        showError(response.data?.data?.message || "Something went wrong!");
       }
     } catch (err) {
+      clearInterval(interval);
       setError(
         err?.response?.data?.message ||
-          err?.response?.data ||
-          err?.message ||
-          "Something went wrong"
+        err?.message ||
+        "Something went wrong"
       );
     }
   };
@@ -169,10 +180,19 @@ const currentSample = sampleFiles[title] || {};
                 </button>
               </div>
             )}
-
             {error && <div className="text-danger mt-3">{error}</div>}
           </div>
-
+          {progress > 0 && (
+            <div className="progress mt-3">
+              <div
+                className="progress-bar progress-bar-striped progress-bar-animated"
+                role="progressbar"
+                style={{ width: `${progress}%` }}
+              >
+                {progress}%
+              </div>
+            </div>
+          )}
         </div>
           {/* Footer */}
           <div className="modal-footer">
