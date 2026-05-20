@@ -134,13 +134,16 @@ class Service {
       // ================= ✅ SUCCESS =================
 
       // ✅ Create shipment now
+      console.log("response value",shipmentRes);
       const result = await this.repository.save({
         ...payload,
         awb_number: shipmentRes.awb_number,
         shipping_status: "booked",
         shiprocket_shipment_id: shipmentRes.shipment_id,
+        amazon_shipment_id: shipmentRes.amazon_shipment_id,
+        label_url: shipmentRes.label_url,
+        shipment_info: shipmentRes.shipment_info
       });
-
       // ✅ Update order
       await OrdersService.update({
         data: {
