@@ -322,33 +322,70 @@ class Service {
   }
 
   async bulkImport({ rows, data }) {
-    console.log("rows records",rows);
-    console.log("data records",data);
+    console.log("rows records", rows);
+    console.log("data records", data);
+
     try {
       const { userId } = data;
+
       if (!rows || !rows.length) {
         throw new Error("No data found in file.");
       }
+
       const success = [];
       const failed = [];
       const batchSize = 100;
       let batch = [];
+
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
-        const paymentType = row.paymentType?.toLowerCase();
+        const paymentType = String(row.paymentType || "").toLowerCase();
+
         try {
+          // ✅ BASIC VALIDATIONS
           if (!row.orderId) throw new Error("orderId missing");
           if (!paymentType) throw new Error("paymentType missing");
+
           if (paymentType === "cod" && !row.collectableAmount) {
             throw new Error("collectableAmount required for COD");
           }
+
+          // ✅ SAFE CHARGES MAPPING (FIXED 🔥)
+          const shippingValue =
+            row["charges.shipping"] ??
+            row["charges_shipping"] ??
+            row["shipping"];
+
+          if (shippingValue === undefined) {
+            throw new Error("charges.shipping missing");
+          }
+
+          const charges = {
+            shipping: Number(shippingValue),
+            tax_amount: Number(
+              row["charges.tax_amount"] ??
+              row["tax_amount"] ??
+              0
+            ),
+            cod: Number(row["charges.cod"] ?? row["cod"] ?? 0),
+            discount: Number(
+              row["charges.discount"] ??
+              row["discount"] ??
+              0
+            ),
+          };
+
+          // ✅ ORDER PAYLOAD
           const orderPayload = {
             userId,
             orderId: row.orderId,
             order_source: "BULK_IMPORT",
+
             orderAmount: Number(row.orderAmount || 0),
             collectableAmount: Number(row.collectableAmount || 0),
-            paymentType: String(row.paymentType || "").toUpperCase(),
+
+            paymentType: paymentType.toUpperCase(),
+
             shippingDetails: {
               phone: row["shippingDetails.phone"],
               fname: row["shippingDetails.fname"],
@@ -359,43 +396,57 @@ class Service {
               state: row["shippingDetails.state"],
               country: row["shippingDetails.country"],
             },
+
             packageDetails: {
               weight: Number(row["packageDetails.weight"] || 0),
               length: Number(row["packageDetails.length"] || 0),
               height: Number(row["packageDetails.height"] || 0),
               breadth: Number(row["packageDetails.breadth"] || 0),
+
+              // ✅ volumetricWeight FIX
               volumetricWeight:
                 (Number(row["packageDetails.length"] || 0) *
                   Number(row["packageDetails.breadth"] || 0) *
                   Number(row["packageDetails.height"] || 0)) /
                 5000,
             },
-            charges: {
-              shipping: Number(row["charges.shipping"] ?? 0),
-              tax_amount: Number(row["charges.tax_amount"] || 0),
-              cod: Number(row["charges.cod"] || 0),
-              discount: Number(row["charges.discount"] || 0),
-            },
+
+            charges,
             warehouse_id: row.warehouse_id,
             rto_warehouse_id: row.rto_warehouse_id,
           };
+
+          // ✅ DEBUG (IMPORTANT 🔥)
+          console.log(
+            "FINAL PAYLOAD:",
+            JSON.stringify(orderPayload, null, 2)
+          );
+
+          // ✅ PRODUCTS FIX
           const products = [];
           Object.keys(row).forEach((key) => {
             const match = key.match(/^Product (\d+) ID$/);
             if (match) {
               const index = match[1];
+
               const productId = row[`Product ${index} ID`];
               const qty = Number(row[`Product ${index} Qty`] || 1);
+
               if (productId && qty) {
                 products.push({
                   id: productId,
-                  qty: qty,
+                  qty,
                 });
               }
             }
           });
+
           orderPayload.products = products;
+
+          // ✅ BATCH PUSH
           batch.push({ row, orderPayload });
+
+          // ✅ BULK INSERT
           if (batch.length === batchSize || i === rows.length - 1) {
             try {
               const inserted = await Orders.bulkCreate(
@@ -403,18 +454,19 @@ class Service {
                 { validate: true }
               );
               success.push(...inserted);
-            } 
-            catch (bulkError) 
-            {
+            } catch (bulkError) {
               console.log("❌ BULK ERROR:", bulkError);
+
+              // 🔥 FALLBACK SINGLE INSERT
               for (const item of batch) {
                 try {
                   const inserted = await Orders.create(item.orderPayload);
                   success.push(inserted);
-                }
-                catch (err) {
+                } catch (err) {
                   console.log("❌ SINGLE ERROR:", err);
-                  let errorType = "1 UNKNOWN";
+
+                  let errorType = "UNKNOWN";
+
                   if (
                     err.message.includes("missing") ||
                     err.message.includes("required")
@@ -424,23 +476,24 @@ class Service {
                     err.name === "SequelizeUniqueConstraintError"
                   ) {
                     errorType = "DUPLICATE_ERROR";
-                  } else if (
-                    err.name?.includes("Sequelize")
-                  ) {
+                  } else if (err.name?.includes("Sequelize")) {
                     errorType = "DB_ERROR";
                   }
+
                   failed.push({
                     ...item.row,
                     error: err.message,
-                    errorType, // 👈 NEW COLUMN
+                    errorType,
                   });
                 }
               }
             }
+
             batch = [];
           }
         } catch (err) {
-          let errorType = "2 UNKNOWN";
+          let errorType = "UNKNOWN";
+
           if (
             err.message.includes("missing") ||
             err.message.includes("required")
@@ -450,11 +503,10 @@ class Service {
             err.name === "SequelizeUniqueConstraintError"
           ) {
             errorType = "DUPLICATE_ERROR";
-          } else if (
-            err.name?.includes("Sequelize")
-          ) {
+          } else if (err.name?.includes("Sequelize")) {
             errorType = "DB_ERROR";
           }
+
           failed.push({
             ...row,
             error: err.message,
@@ -462,17 +514,24 @@ class Service {
           });
         }
       }
+
+      // ✅ FAILED CSV
       let failedCsvUrl = null;
+
       if (failed.length) {
         const parser = new Parser();
         const csv = parser.parse(failed);
+
         const fileName = `failed_orders_${Date.now()}.csv`;
+
         if (!fs.existsSync("./uploads")) {
           fs.mkdirSync("./uploads");
         }
+
         fs.writeFileSync(`./uploads/${fileName}`, csv);
         failedCsvUrl = `/uploads/${fileName}`;
       }
+
       return {
         status: 200,
         data: {
