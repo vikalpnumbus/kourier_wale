@@ -334,11 +334,12 @@ class Service {
       const batchSize = 100;
       let batch = [];
       for (let i = 0; i < rows.length; i++) {
+        const paymentType = row.paymentType?.tolowerCase();
         const row = rows[i];
         try {
           if (!row.orderId) throw new Error("orderId missing");
-          if (!row.paymentType) throw new Error("paymentType missing");
-          if (row.paymentType === "COD" && !row.collectableAmount) {
+          if (!paymentType) throw new Error("paymentType missing");
+          if (paymentType === "cod" && !row.collectableAmount) {
             throw new Error("collectableAmount required for COD");
           }
           const orderPayload = {
@@ -346,7 +347,7 @@ class Service {
             orderId: row.orderId,
             orderAmount: Number(row.orderAmount || 0),
             collectableAmount: Number(row.collectableAmount || 0),
-            paymentType: row.paymentType,
+            paymentType: paymentType,
             shippingDetails: {
               phone: row["shippingDetails.phone"],
               fname: row["shippingDetails.fname"],
@@ -393,13 +394,17 @@ class Service {
                 { validate: true }
               );
               success.push(...inserted);
-            } catch (bulkError) {
+            } 
+            catch (bulkError) 
+            {
+              console.log("❌ BULK ERROR:", bulkError);
               for (const item of batch) {
                 try {
                   const inserted = await Orders.create(item.orderPayload);
                   success.push(inserted);
                 }
                 catch (err) {
+                  console.log("❌ SINGLE ERROR:", err);
                   let errorType = "1 UNKNOWN";
                   if (
                     err.message.includes("missing") ||
