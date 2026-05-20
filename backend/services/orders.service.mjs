@@ -324,21 +324,27 @@ class Service {
   async bulkImport({ rows, data }) {
     try {
       const { userId } = data;
+
       if (!rows || !rows.length) {
         throw new Error("No data found in file.");
       }
+
       const success = [];
       const failed = [];
       const batchSize = 100;
       let batch = [];
+
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
+
         try {
           if (!row.orderId) throw new Error("orderId missing");
           if (!row.paymentType) throw new Error("paymentType missing");
+
           if (row.paymentType === "COD" && !row.collectableAmount) {
             throw new Error("collectableAmount required for COD");
           }
+
           const orderPayload = {
             userId,
             orderId: row.orderId,
@@ -370,6 +376,8 @@ class Service {
             warehouse_id: row.warehouse_id,
             rto_warehouse_id: row.rto_warehouse_id,
           };
+
+          // products mapping
           const products = [];
           Object.keys(row).forEach((key) => {
             const match = key.match(/^Product (\d+) ID$/);
@@ -381,13 +389,42 @@ class Service {
               });
             }
           });
+
           orderPayload.products = products;
-          batch.push(orderPayload);
+
+          batch.push({ row, orderPayload }); // ✅ row bhi store karo
+
+          // 🔥 Batch hit
           if (batch.length === batchSize || i === rows.length - 1) {
-            const inserted = await Orders.bulkCreate(batch);
-            success.push(...inserted);
+
+            try {
+              // ✅ FAST TRY
+              const inserted = await Orders.bulkCreate(
+                batch.map((b) => b.orderPayload),
+                { validate: true }
+              );
+
+              success.push(...inserted);
+
+            } catch (bulkError) {
+
+              // ❌ Bulk fail → row by row insert
+              for (const item of batch) {
+                try {
+                  const inserted = await Orders.create(item.orderPayload);
+                  success.push(inserted);
+                } catch (err) {
+                  failed.push({
+                    ...item.row,
+                    error: err.message,
+                  });
+                }
+              }
+            }
+
             batch = [];
           }
+
         } catch (err) {
           failed.push({
             ...row,
@@ -395,17 +432,25 @@ class Service {
           });
         }
       }
+
+      // ✅ Failed CSV
       let failedCsvUrl = null;
+
       if (failed.length) {
         const parser = new Parser();
         const csv = parser.parse(failed);
+
         const fileName = `failed_orders_${Date.now()}.csv`;
+
         if (!fs.existsSync("./uploads")) {
           fs.mkdirSync("./uploads");
         }
+
         fs.writeFileSync(`./uploads/${fileName}`, csv);
+
         failedCsvUrl = `/uploads/${fileName}`;
       }
+
       return {
         status: 200,
         data: {
@@ -416,6 +461,7 @@ class Service {
           failedCsvUrl,
         },
       };
+
     } catch (error) {
       this.error = error;
       return false;

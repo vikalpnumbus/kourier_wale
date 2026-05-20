@@ -8,6 +8,7 @@ function ImportModal({ onClose, title, apiURL, onSuccess }) {
   const { showError, showSuccess } = useAlert();
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(0);
+  const [importResult, setImportResult] = useState(null);
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setError("");
@@ -35,51 +36,65 @@ function ImportModal({ onClose, title, apiURL, onSuccess }) {
   
     const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!file) {
-      setError("Please select a CSV file before submitting.");
+      setError("Please select a CSV file.");
       return;
     }
+
     const formData = new FormData();
     formData.append("file", file);
+
     let interval;
+
     try {
       setProgress(10);
+
       interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 90) return prev;
-          return prev + 5;
-        });
+        setProgress((prev) => (prev < 90 ? prev + 5 : prev));
       }, 300);
+
       const response = await api.post(apiURL, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+
       clearInterval(interval);
       setProgress(100);
       setTimeout(() => setProgress(0), 1000);
+
       if (response?.data?.status === 200) {
         const data = response.data.data;
+
+        setImportResult(data); // ✅ SAVE RESULT
+
         showSuccess(
           `✅ ${data.successCount} Imported, ❌ ${data.failedCount} Failed`
         );
-        if (data.failedCsvUrl) {
-          window.open(data.failedCsvUrl);
-        }
-        handleClear();
-        onSuccess();
-        onClose();
+
+        onSuccess?.();
+
+        // ❌ POPUP CLOSE REMOVE
+        // ❌ AUTO DOWNLOAD REMOVE
       } else {
-        showError(response.data?.data?.message || "Something went wrong!");
+        showError("Something went wrong!");
       }
     } catch (err) {
       clearInterval(interval);
       setError(
         err?.response?.data?.message ||
         err?.message ||
-        "Something went wrong"
+        "Upload failed"
       );
     }
+  };
+
+  const handleDownloadFailed = () => {
+    if (!importResult?.failedCsvUrl) return;
+
+    const url = `${import.meta.env.VITE_API_URL}${importResult.failedCsvUrl}`;
+    window.open(url, "_blank");
   };
 
   const sampleFiles = {
@@ -191,6 +206,28 @@ const currentSample = sampleFiles[title] || {};
               >
                 {progress}%
               </div>
+            </div>
+          )}
+          {/* ✅ RESULT SECTION */}
+          {importResult && (
+            <div className="mt-4 p-3 border rounded bg-light">
+              <h6>Import Result</h6>
+              <p className="mb-1">
+                ✅ Success: {importResult.successCount}
+              </p>
+              <p className="mb-2">
+                ❌ Failed: {importResult.failedCount}
+              </p>
+
+              {importResult.failedCsvUrl && (
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger"
+                  onClick={handleDownloadFailed}
+                >
+                  ⬇ Download Failed CSV
+                </button>
+              )}
             </div>
           )}
         </div>
