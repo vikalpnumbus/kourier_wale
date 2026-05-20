@@ -361,14 +361,14 @@ class Service {
           }
 
           const charges = {
-            shipping: Number(shippingValue),
-            tax_amount: Number(
+            shipping: String(shippingValue),
+            tax_amount: String(
               row["charges.tax_amount"] ??
               row["tax_amount"] ??
               0
             ),
-            cod: Number(row["charges.cod"] ?? row["cod"] ?? 0),
-            discount: Number(
+            cod: String(row["charges.cod"] ?? row["cod"] ?? 0),
+            discount: String(
               row["charges.discount"] ??
               row["discount"] ??
               0
