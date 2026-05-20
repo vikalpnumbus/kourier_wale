@@ -334,8 +334,8 @@ class Service {
       const batchSize = 100;
       let batch = [];
       for (let i = 0; i < rows.length; i++) {
-        const paymentType = row.paymentType?.tolowerCase();
         const row = rows[i];
+        const paymentType = row.paymentType?.tolowerCase();
         try {
           if (!row.orderId) throw new Error("orderId missing");
           if (!paymentType) throw new Error("paymentType missing");
