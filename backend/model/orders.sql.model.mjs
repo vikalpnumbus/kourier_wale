@@ -109,11 +109,11 @@ const OrdersModel = sqlDB.sequelize.define(
         hasRequiredFields(value) {
           const required = ["shipping", "cod", "tax_amount", "discount"];
           for (let field of required) {
-            if (!value[field]) {
+            if (value[field] === undefined || value[field] === null) {
               throw new Error(`Missing field ${field} in charges`);
             }
           }
-        },
+        }
       },
     },
 
