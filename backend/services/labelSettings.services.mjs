@@ -99,15 +99,21 @@ class Service {
           shippingDetails_country: "India",
           shippingDetails_pincode: e.shippingDetails?.pincode || "",
           shippingDetails_phone: e.shippingDetails?.phone || "",
-          order_date: e.updatedAt
-            ? formatDate_YYYY_MM_DD(e.updatedAt)
-            : "",
+          order_date: e.updatedAt ? formatDate_YYYY_MM_DD(e.updatedAt) : "",
           invoice_no: e.orderId || "",
           awb_number: e.awb_number || "",
           courier_name: courier?.name || "",
           total_price: e.orderAmount || "",
+          paymentType: e.paymentType || "",
+          packageDetails_weight: e.packageDetails?.volumetricWeight || "",
+          packageDetails_length: e.packageDetails?.length || "",
+          packageDetails_breadth: e.packageDetails?.breadth || "",
+          packageDetails_height: e.packageDetails?.height || "",
+          name: e.products?.name || "",
+          sku: e.products?.sku || "",
+          qty: e.products?.qty || "",
+          price: e.products?.price || "",
         };
-
         return payload;
       })
     );
