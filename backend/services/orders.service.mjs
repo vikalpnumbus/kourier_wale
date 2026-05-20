@@ -322,6 +322,8 @@ class Service {
   }
 
   async bulkImport({ rows, data }) {
+    console.log("rows records",rows);
+    console.log("data records",data);
     try {
       const { userId } = data;
       if (!rows || !rows.length) {
