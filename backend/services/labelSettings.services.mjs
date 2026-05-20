@@ -114,6 +114,7 @@ class Service {
           qty: e.products?.qty || "",
           price: e.products?.price || "",
         };
+        console.log("label payload", payload);
         return payload;
       })
     );
