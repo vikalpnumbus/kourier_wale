@@ -345,9 +345,10 @@ class Service {
           const orderPayload = {
             userId,
             orderId: row.orderId,
+            order_source: "BULK_IMPORT",
             orderAmount: Number(row.orderAmount || 0),
             collectableAmount: Number(row.collectableAmount || 0),
-            paymentType: paymentType,
+            paymentType: String(row.paymentType || "").toUpperCase(),
             shippingDetails: {
               phone: row["shippingDetails.phone"],
               fname: row["shippingDetails.fname"],
@@ -363,9 +364,14 @@ class Service {
               length: Number(row["packageDetails.length"] || 0),
               height: Number(row["packageDetails.height"] || 0),
               breadth: Number(row["packageDetails.breadth"] || 0),
+              volumetricWeight:
+                (Number(row["packageDetails.length"] || 0) *
+                  Number(row["packageDetails.breadth"] || 0) *
+                  Number(row["packageDetails.height"] || 0)) /
+                5000,
             },
             charges: {
-              shipping: Number(row["charges.shipping"] || 0),
+              shipping: Number(row["charges.shipping"] ?? 0),
               tax_amount: Number(row["charges.tax_amount"] || 0),
               cod: Number(row["charges.cod"] || 0),
               discount: Number(row["charges.discount"] || 0),
@@ -378,15 +384,18 @@ class Service {
             const match = key.match(/^Product (\d+) ID$/);
             if (match) {
               const index = match[1];
-              products.push({
-                productId: row[`Product ${index} ID`],
-                qty: Number(row[`Product ${index} Qty`] || 1),
-              });
+              const productId = row[`Product ${index} ID`];
+              const qty = Number(row[`Product ${index} Qty`] || 1);
+              if (productId && qty) {
+                products.push({
+                  id: productId,
+                  qty: qty,
+                });
+              }
             }
           });
           orderPayload.products = products;
-          batch.push({ row, orderPayload }); // ✅ row bhi store karo
-          // 🔥 Batch hit
+          batch.push({ row, orderPayload });
           if (batch.length === batchSize || i === rows.length - 1) {
             try {
               const inserted = await Orders.bulkCreate(
