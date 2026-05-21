@@ -11,6 +11,13 @@ import UserService from "./user.service.mjs";
 import fs from "fs";
 import { PDFDocument } from "pdf-lib";
 import WarehouseService from "./warehouse.service.mjs";
+function chunkArray(arr, size) {
+  const result = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
+}
 class Service {
   constructor() {
     this.error = null;
@@ -135,10 +142,11 @@ class Service {
         "templates/label.template.html",
         "utf-8"
       );
+      const groupedShipping = chunkArray(shipping, 4);
       const pdf = new PdfGenerator({
         fileName: "normal-labels",
         templateHtml,
-        data: shipping,
+        data: groupedShipping,
         paperSize: "A4",
       });
       const pdfGenRes = await pdf.generate({ returnBuffer: true });
