@@ -43,51 +43,41 @@ class Service {
   async generate({ data }) {
   try {
     const { userId, shipping_db_ids } = data;
-
     const [user, shippingRes] = await Promise.all([
       UserService.read({ id: userId }),
       ShippingService.read({ userId, id: shipping_db_ids }),
     ]);
-
     if (!user) throw UserService.error;
-
     const allShipments = shippingRes?.data?.result || [];
-
-    // ✅ Split shipments
+    console.log("all shipment records in DB", allShipments);
     const amazonShipments = allShipments.filter(
       (e) => Number(e.courier_id) === 7
     );
-
     const normalShipments = allShipments.filter(
       (e) => Number(e.courier_id) !== 7
     );
-
     let labelSettings = user.label_settings;
     if (!labelSettings) throw new Error("Label Settings Not Found.");
-
     // ================= NORMAL LABELS =================
     const shipping = await Promise.all(
       normalShipments.map(async (e) => {
         const [courierRes, warehouseRes] = await Promise.all([
           CourierService.read({ id: e.courier_id }),
           WarehouseService.read({
-            id: [...new Set([e.warehouse_id, e.rto_warehouse_id])],
+            id: [e.warehouse_id, e.rto_warehouse_id].filter(Boolean),
           }),
         ]);
-
         const courier = courierRes?.data?.result?.[0];
-
-        const pickupWarehouse = warehouseRes?.data?.result?.find(
-          (w) => w.id == e.warehouse_id
+        const warehouses = warehouseRes?.data?.result || [];
+        const pickupWarehouse = warehouses.find(
+          (w) => Number(w.id) === Number(e.warehouse_id)
         );
-
-        const rtoWarehouse = warehouseRes?.data?.result?.find(
-          (w) => w.id == e.rto_warehouse_id
+        const rtoWarehouse = warehouses.find(
+          (w) => Number(w.id) === Number(e.rto_warehouse_id)
         );
-
         if (!pickupWarehouse) throw new Error("No pickup warehouse found.");
         if (!rtoWarehouse) throw new Error("No rto warehouse found.");
-
+        const product = Array.isArray(e.products)? e.products[0] : e.products;
         const payload = {
           invoice_generated_date: formatDate_DD_MM_YYYY_HH_MM(Date.now()),
           sellercompname: user.companyName || "",
@@ -105,35 +95,39 @@ class Service {
           courier_name: courier?.name || "",
           total_price: e.orderAmount || "",
           paymentType: e.paymentType || "",
-          packageDetails_weight: e.packageDetails?.volumetricWeight || "",
+          packageDetails_weight:e.packageDetails?.volumetricWeight || "",
           packageDetails_length: e.packageDetails?.length || "",
           packageDetails_breadth: e.packageDetails?.breadth || "",
           packageDetails_height: e.packageDetails?.height || "",
-          name: e.products?.name || "",
-          sku: e.products?.sku || "",
-          qty: e.products?.qty || "",
-          price: e.products?.price || "",
+          name: product?.name || "",
+          sku: product?.sku || "",
+          qty: product?.qty || "",
+          price: product?.price || "",
+          pickup_address: pickupWarehouse?.address || "",
+          pickup_city: pickupWarehouse?.city || "",
+          pickup_state: pickupWarehouse?.state || "",
+          pickup_pincode: pickupWarehouse?.pincode || "",
+          rto_address: rtoWarehouse?.address || "",
+          rto_city: rtoWarehouse?.city || "",
+          rto_state: rtoWarehouse?.state || "",
+          rto_pincode: rtoWarehouse?.pincode || "",
         };
         console.log("label payload", payload);
         return payload;
       })
     );
-
     let normalPdfBuffer = null;
-
     if (shipping.length) {
       const templateHtml = fs.readFileSync(
         "templates/label.template.html",
         "utf-8"
       );
-
       const pdf = new PdfGenerator({
         fileName: "normal-labels",
         templateHtml,
         data: shipping,
         paperSize: "A4",
       });
-
       const pdfGenRes = await pdf.generate({ returnBuffer: true });
       normalPdfBuffer = pdfGenRes.pdfBuffer;
     }
@@ -210,7 +204,7 @@ class Service {
     this.error = error;
     return false;
   }
-}
+  }
 }
 
 const LabelSettingsService = new Service();
