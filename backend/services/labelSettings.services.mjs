@@ -77,7 +77,6 @@ class Service {
         );
         if (!pickupWarehouse) throw new Error("No pickup warehouse found.");
         if (!rtoWarehouse) throw new Error("No rto warehouse found.");
-        const product = Array.isArray(e.products)? e.products[0] : e.products;
         const payload = {
           invoice_generated_date: formatDate_DD_MM_YYYY_HH_MM(Date.now()),
           sellercompname: user.companyName || "",
@@ -89,28 +88,42 @@ class Service {
           shippingDetails_country: "India",
           shippingDetails_pincode: e.shippingDetails?.pincode || "",
           shippingDetails_phone: e.shippingDetails?.phone || "",
-          order_date: e.updatedAt ? formatDate_YYYY_MM_DD(e.updatedAt) : "",
+          shippingDetails_alternate_phone: e.shippingDetails?.alternate_phone || "",
+          order_date: e.updatedAt
+            ? formatDate_YYYY_MM_DD(e.updatedAt)
+            : "",
           invoice_no: e.orderId || "",
           awb_number: e.awb_number || "",
           courier_name: courier?.name || "",
           total_price: e.orderAmount || "",
           paymentType: e.paymentType || "",
-          packageDetails_weight:e.packageDetails?.volumetricWeight || "",
+          packageDetails_weight: e.packageDetails?.volumetricWeight || "",
           packageDetails_length: e.packageDetails?.length || "",
           packageDetails_breadth: e.packageDetails?.breadth || "",
           packageDetails_height: e.packageDetails?.height || "",
-          name: product?.name || "",
-          sku: product?.sku || "",
-          qty: product?.qty || "",
-          price: product?.price || "",
-          pickup_address: pickupWarehouse?.address || "",
-          pickup_city: pickupWarehouse?.city || "",
-          pickup_state: pickupWarehouse?.state || "",
-          pickup_pincode: pickupWarehouse?.pincode || "",
-          rto_address: rtoWarehouse?.address || "",
-          rto_city: rtoWarehouse?.city || "",
-          rto_state: rtoWarehouse?.state || "",
-          rto_pincode: rtoWarehouse?.pincode || "",
+          products: Array.isArray(e.products)
+            ? e.products.map((p) => ({
+                name: p?.name || "",
+                sku: p?.sku || "",
+                qty: p?.qty || "",
+                price: p?.price || "",
+              }))
+            : e.products
+            ? [
+                {
+                  name: e.products?.name || "",
+                  sku: e.products?.sku || "",
+                  qty: e.products?.qty || "",
+                  price: e.products?.price || "",
+                },
+              ]
+            : [],
+          pickupWarehouse_full_address: `${pickupWarehouse?.name || ""}, ${pickupWarehouse?.address || ""}, ${pickupWarehouse?.city || ""}, ${pickupWarehouse?.state || ""} - ${pickupWarehouse?.pincode || ""}`,
+          rtoWarehouse_contactPhone:
+            rtoWarehouse?.phone ||
+            pickupWarehouse?.phone ||
+            "",
+          zone: e.zone || "",
         };
         console.log("label payload", payload);
         return payload;
